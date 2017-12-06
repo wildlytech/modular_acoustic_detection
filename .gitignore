@@ -1,0 +1,16 @@
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+*.csv
+*.json
+*.jpg
+*.log
+*.bak
+*.swp
+*.Rhistory
+*.theanorc
+*.pyc
+*.wav
+*.mp3
+svmSMtemp
+svmSMtemp.arff
+svmSMtempMEANS
