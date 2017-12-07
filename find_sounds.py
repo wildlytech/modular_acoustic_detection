@@ -44,6 +44,10 @@ def find_sound_peaks(url):
         
         if len(sub_seg) == 0:
             continue
+
+        # the function in peakutils doesn't work if array is constant
+        if sum(sub_seg - sub_seg.mean()) == 0:
+            continue
        
         # Find the peaks within the window, add offset when done
         local_peaks = peakutils.peak.indexes(sub_seg,
@@ -72,11 +76,12 @@ def find_sound_peaks(url):
     # Convert sample indexes to seconds
     peaks = np.array(peaks) / float(frame_rate)
 
-    vfunc = np.vectorize(lambda x: np.min([aud_seg_length_ms/1000., x]))
+    start_vfunc = np.vectorize(lambda x: np.max([0, x]))
+    end_vfunc = np.vectorize(lambda x: np.min([aud_seg_length_ms/1000., x]))
 
     # compute low/high endpoints for range around peak
-    start_ = (peaks - range_around_peak/2)
-    end_ = vfunc(peaks + range_around_peak/2)
+    start_ = start_vfunc(peaks - range_around_peak/2)
+    end_ = end_vfunc(peaks + range_around_peak/2)
 
     # round interval endpoints to nearest half-second
     start_ = np.round(start_ / 0.5) * 0.5
