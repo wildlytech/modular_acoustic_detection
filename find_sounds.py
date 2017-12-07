@@ -8,20 +8,13 @@ import numpy as np
 import pandas as pd
 import peakutils
 
-def find_sound_peaks(url):
-    filename = 'sounds/tmp_clip'
-    filename_w_extension = filename +'.wav'
-
-    if not os.path.exists('sounds'):
-        os.makedirs('sounds')
-
-    check_call(['youtube-dl', url, '--audio-format', 'wav', '-x', '-o', filename +'.%(ext)s'])
+def find_sound_peaks(filepath):
 
     window=10
     stride = 5
     range_around_peak = 5.
 
-    aud_seg = AudioSegment.from_wav(filename_w_extension)
+    aud_seg = AudioSegment.from_wav(filepath)
     aud_seg_length_ms = len(aud_seg)
 
     frame_rate = aud_seg.frame_rate
@@ -94,6 +87,17 @@ def find_sound_peaks(url):
 
     return df
 
+def find_sound_peaks_from_url(url):
+    filename = 'sounds/tmp_clip'
+    filename_w_extension = filename +'.wav'
+
+    if not os.path.exists('sounds'):
+        os.makedirs('sounds')
+
+    check_call(['youtube-dl', url, '--audio-format', 'wav', '-x', '-o', filename +'.%(ext)s'])
+
+    return find_sound_peaks(filename_w_extension)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process a youtube url and find time-intervals where there may be relevant sounds.')
     parser.add_argument('URL', nargs=1, help='url of youtube video')
@@ -103,7 +107,7 @@ if __name__ == "__main__":
 
     # url = 'https://www.youtube.com/watch?v=m5hi6bbDBm0'
 
-    df = find_sound_peaks(url)
+    df = find_sound_peaks_from_url(url)
 
     if args.output_file:
         out_file = args.output_file[0] + ".csv"
