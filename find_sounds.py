@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import peakutils
 
-def find_sound_peaks(filepath):
+def find_sound_peaks(filepath, url):
 
     window=10
     stride = 5
@@ -87,7 +87,7 @@ def find_sound_peaks(filepath):
 
     return df
 
-def find_sound_peaks_from_url(url):
+def download_youtube_url(url):
     filename = 'sounds/tmp_clip'
     filename_w_extension = filename +'.wav'
 
@@ -96,18 +96,35 @@ def find_sound_peaks_from_url(url):
 
     check_call(['youtube-dl', url, '--audio-format', 'wav', '-x', '-o', filename +'.%(ext)s'])
 
-    return find_sound_peaks(filename_w_extension)
+    return filename_w_extension
+
+def extract_sound_clips(filepath, df, directory):
+
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    aud_seg = AudioSegment.from_wav(filepath)
+
+    for start_time, end_time in zip(df.start_time, df.end_time):
+        aud_seg[start_time*1000:end_time*1000].export(directory + '/sound-' + str(start_time) + '-' + str(end_time)+".wav", format="wav")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process a youtube url and find time-intervals where there may be relevant sounds.')
     parser.add_argument('URL', nargs=1, help='url of youtube video')
-    parser.add_argument('-o', nargs=1, dest='output_file', help='output file name (without extension)')
+    parser.add_argument('-i', nargs=1, dest='input_file', help='input file path (to use if you don\'t want to download url and just use the file from disk)')
+    parser.add_argument('-o', nargs=1, dest='output_file', help='output file name (without file extension)')
+    parser.add_argument('-e', nargs=1, dest='extract_dir', help='extract relevant sound clips to subdirectory')
     args = parser.parse_args()
     url = args.URL[0]
 
     # url = 'https://www.youtube.com/watch?v=m5hi6bbDBm0'
 
-    df = find_sound_peaks_from_url(url)
+    if args.input_file:
+        filename_w_extension = args.input_file[0]
+    else:
+        filename_w_extension = download_youtube_url(url)
+    df = find_sound_peaks(filename_w_extension, url)
 
     if args.output_file:
         out_file = args.output_file[0] + ".csv"
@@ -115,4 +132,8 @@ if __name__ == "__main__":
         print "\nResults written to " + out_file
     else:
         print df
+
+    if args.extract_dir:
+        extract_sound_clips(filename_w_extension, df, args.extract_dir[0])
+        print "Sound clips extracted!"
 
