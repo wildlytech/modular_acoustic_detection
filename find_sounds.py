@@ -8,11 +8,14 @@ import numpy as np
 import pandas as pd
 import peakutils
 
+import librosa
+
 def find_sound_peaks(filepath, url):
 
     window=10
     stride = 5
     range_around_peak = 5.
+    num_frequency_bands = 8
 
     aud_seg = AudioSegment.from_wav(filepath)
     aud_seg_length_ms = len(aud_seg)
@@ -24,8 +27,30 @@ def find_sound_peaks(filepath, url):
 
     # Separate the audio channels (if we have stereo)
     aud_seg = np.fromstring(aud_seg._data, np.int16).reshape((-1, num_channels)).astype(np.int32)
-    aud_seg_energy = aud_seg.mean(axis=1)**2
-    # aud_seg_energy = scipy.convolve(aud_seg_energy, np.ones(frame_rate/4)*4./frame_rate)
+
+    # Take the short-time fourier transform of the mean of the audio channels.
+    # We expect the audio channels to be mostly the same.
+    stft_ = librosa.stft(aud_seg.mean(axis=1))
+
+    # Decompose the stft into different bands and take the inverse stft to get the energy of the
+    # component of the original signal pertaining to each respective band
+    stft_bands_ = []
+    power_bands_ = []
+    for i in range(num_frequency_bands):
+        stft_band_ = stft_.copy()
+        if i > 0:
+            stft_band_[:3*(2**(i-1)),:] = 0
+        stft_band_[3*(2**i):,:] = 0
+        
+        stft_bands_ += [stft_band_]
+        power_bands_ += [librosa.istft(stft_band_)**2]
+
+    # Normalize each component to [0,1] scale and essentially perform an additive-OR of all of them
+    # The composite signal that is generated will be used for peak detection
+    aud_seg_energy = []
+    for index in range(len(power_bands_)):
+        aud_seg_energy += [power_bands_[index] / power_bands_[index].max()]
+    aud_seg_energy = np.array(aud_seg_energy).max(axis=0)
 
     # Aggregate all the local peaks from all the rolling-windows across the audio
     peaks = []
@@ -46,11 +71,12 @@ def find_sound_peaks(filepath, url):
         local_peaks = peakutils.peak.indexes(sub_seg,
                                              min_dist=frame_rate*range_around_peak/2/down_sample_rate,
                                              thres=0.2)
+
         local_peaks = local_peaks*down_sample_rate + index
-        
-        # Make sure there are no overlaps between peaks from different windows
-        if len(peaks) > 0:
-            if len(local_peaks) > 0:
+
+        if index > 0:
+            # Make sure there are no overlaps between peaks from different windows
+            while len(peaks) > 0 and len(local_peaks) > 0:
                 # print local_peaks[0], peaks[-1]
                 if local_peaks[0] <= peaks[-1]:
                     local_peaks = local_peaks[1:]
@@ -59,6 +85,8 @@ def find_sound_peaks(filepath, url):
                         local_peaks = local_peaks[1:]
                     else:
                         peaks = peaks[:-1]
+                else:
+                    break
 
         peaks += local_peaks.tolist()
 
@@ -69,21 +97,10 @@ def find_sound_peaks(filepath, url):
     # Convert sample indexes to seconds
     peaks = np.array(peaks) / float(frame_rate)
 
-    start_vfunc = np.vectorize(lambda x: np.max([0, x]))
-    end_vfunc = np.vectorize(lambda x: np.min([aud_seg_length_ms/1000., x]))
-
-    # compute low/high endpoints for range around peak
-    start_ = start_vfunc(peaks - range_around_peak/2)
-    end_ = end_vfunc(peaks + range_around_peak/2)
-
-    # round interval endpoints to nearest half-second
-    start_ = np.round(start_ / 0.5) * 0.5
-    end_ = np.round(end_ / 0.5) * 0.5
-
     df = pd.DataFrame({'url':url,
-                       'start_time':start_,
-                       'end_time': end_ })
-    df = df.loc[:,['url', 'start_time', 'end_time']]
+                       'time':peaks
+                       })
+    df = df.loc[:,['url', 'time']]
 
     return df
 
@@ -105,8 +122,10 @@ def extract_sound_clips(filepath, df, directory):
 
     aud_seg = AudioSegment.from_wav(filepath)
 
-    for start_time, end_time in zip(df.start_time, df.end_time):
-        aud_seg[start_time*1000:end_time*1000].export(directory + '/sound-' + str(start_time) + '-' + str(end_time)+".wav", format="wav")
+    for time in df.time:
+        start_time = np.max([0,time-2.5])
+        end_time = np.min([time+2.5, len(aud_seg)/1000])
+        aud_seg[int(start_time*1000):int(end_time*1000)].export(directory + '/sound-' + str(start_time) + '-' + str(end_time)+".wav", format="wav")
 
 
 if __name__ == "__main__":
