@@ -43,12 +43,12 @@ impact_sounds = [
 ]
 
 def get_data():
-    label_names = pd.read_csv("data/class_labels_indices.csv")
+    label_names = pd.read_csv("data/audioset/class_labels_indices.csv")
 
-    balanced_train = pd.read_csv("data/balanced_train_segments.csv",quotechar='"', skipinitialspace=True, skiprows=2)
+    balanced_train = pd.read_csv("data/audioset/balanced_train_segments.csv",quotechar='"', skipinitialspace=True, skiprows=2)
     balanced_train.columns = [balanced_train.columns[0][2:]] + balanced_train.columns[1:].values.tolist()
 
-    unbalanced_train = pd.read_csv("data/unbalanced_train_segments.csv",quotechar='"', skipinitialspace=True, skiprows=2)
+    unbalanced_train = pd.read_csv("data/audioset/unbalanced_train_segments.csv",quotechar='"', skipinitialspace=True, skiprows=2)
     unbalanced_train.columns = [unbalanced_train.columns[0][2:]] + unbalanced_train.columns[1:].values.tolist()
 
     train = pd.concat([unbalanced_train, balanced_train], axis=0, ignore_index=True)
