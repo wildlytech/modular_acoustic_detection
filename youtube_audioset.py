@@ -1,7 +1,10 @@
+import numpy as np
 import pandas as pd
 from pydub import AudioSegment
 from subprocess import call, check_call, CalledProcessError
 import threading
+
+import tensorflow as tf
 
 import os
 
@@ -42,7 +45,7 @@ impact_sounds = [
 "Conversation"
 ]
 
-def get_data():
+def get_csv_data():
     label_names = pd.read_csv("data/audioset/class_labels_indices.csv")
 
     balanced_train = pd.read_csv("data/audioset/balanced_train_segments.csv",quotechar='"', skipinitialspace=True, skiprows=2)
@@ -117,7 +120,7 @@ def download_clip(YTID, start_seconds, end_seconds):
 
 def download_data():
 
-    df, labels_binarized = get_data()
+    df, labels_binarized = get_csv_data()
 
     if not os.path.exists('sounds'):
         os.makedirs('sounds')
@@ -143,3 +146,78 @@ def download_data():
 
     for t in threads:
         t.join()
+
+# slightly modified from https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
+def read_audio_record(audio_record):
+    vid_ids = []
+    labels = []
+    start_time_seconds = [] # in secondes
+    end_time_seconds = []
+    feat_audio = []
+    count = 0
+    with tf.device("/cpu:0"):
+        for example in tf.python_io.tf_record_iterator(audio_record):
+            tf_example = tf.train.Example.FromString(example)
+            #print(tf_example)
+            vid_ids.append(tf_example.features.feature['video_id'].bytes_list.value[0].decode(encoding='UTF-8'))
+            labels.append(list(tf_example.features.feature['labels'].int64_list.value))
+            start_time_seconds.append(tf_example.features.feature['start_time_seconds'].float_list.value[0])
+            end_time_seconds.append(tf_example.features.feature['end_time_seconds'].float_list.value[0])
+
+            tf_seq_example = tf.train.SequenceExample.FromString(example)
+            n_frames = len(tf_seq_example.feature_lists.feature_list['audio_embedding'].feature)
+
+            sess = tf.InteractiveSession()
+            rgb_frame = []
+            audio_frame = []
+            # iterate through frames
+            for i in range(n_frames):
+                audio_frame.append(tf.cast(tf.decode_raw(
+                        tf_seq_example.feature_lists.feature_list['audio_embedding'].feature[i].bytes_list.value[0],tf.uint8)
+                               ,tf.float32).eval())
+
+            sess.close()
+            feat_audio.append([])
+
+            feat_audio[count].append(audio_frame)
+            count+=1
+
+    df = pd.DataFrame(zip(vid_ids, labels, start_time_seconds, end_time_seconds, feat_audio),
+                      columns=['video_id', 'labels', 'start_time_seconds', 'end_time_seconds', 'features'])
+    df['features'] = df.features.apply(lambda x: np.array(x[0]))
+
+    return df
+
+def get_data():
+
+    label_names = pd.read_csv("data/audioset/class_labels_indices.csv")
+
+    audio_files = map(lambda x: 'bal_train/'+x, os.listdir('data/audioset/audioset_v1_embeddings/bal_train')) + \
+                  map(lambda x: 'unbal_train/'+x, os.listdir('data/audioset/audioset_v1_embeddings/unbal_train'))
+
+    df = []
+    for audio_record in audio_files[:10]:
+        sub_df = read_audio_record('data/audioset/audioset_v1_embeddings/' + audio_record)
+
+        def check_sounds(x):
+            for sound in (impact_sounds+ambient_sounds):
+                if sound in x:
+                    return True
+
+            return False
+
+        sub_df['labels'] = sub_df['labels'].map(lambda arr: [label_names.iloc[x].display_name for x in arr])
+        sub_df = sub_df.loc[sub_df['labels'].map(check_sounds)]
+        df += [sub_df]
+
+    df = pd.concat(df, ignore_index=True)
+
+    # Binarize the labels
+    name_bin = LabelBinarizer().fit(ambient_sounds + impact_sounds)
+    labels_split = df['labels'].apply(pd.Series).fillna('None')
+    labels_binarized = name_bin.transform(labels_split[labels_split.columns[0]])
+    for column in labels_split.columns:
+        labels_binarized |= name_bin.transform(labels_split[column])
+    labels_binarized = pd.DataFrame(labels_binarized, columns = name_bin.classes_)
+
+    return df, labels_binarized
