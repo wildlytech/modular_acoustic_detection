@@ -167,7 +167,10 @@ def read_audio_record(audio_record):
             tf_seq_example = tf.train.SequenceExample.FromString(example)
             n_frames = len(tf_seq_example.feature_lists.feature_list['audio_embedding'].feature)
 
-            sess = tf.InteractiveSession()
+            config = tf.ConfigProto()
+            config.gpu_options.per_process_gpu_memory_fraction = 0.0001
+
+            sess = tf.InteractiveSession(config=config)
             rgb_frame = []
             audio_frame = []
             # iterate through frames
@@ -196,7 +199,7 @@ def get_data():
                   map(lambda x: 'unbal_train/'+x, os.listdir('data/audioset/audioset_v1_embeddings/unbal_train'))
 
     df = []
-    for audio_record in audio_files[:10]:
+    for audio_record in audio_files:
         sub_df = read_audio_record('data/audioset/audioset_v1_embeddings/' + audio_record)
 
         def check_sounds(x):
