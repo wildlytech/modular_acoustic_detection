@@ -208,9 +208,11 @@ def get_data():
     audio_files.sort()
 
 
+    path_prefix = 'data/audioset/audioset_v1_embeddings/'
+
     for audio_record in audio_files:
 
-        if os.path.isfile('data/audioset/audioset_v1_embeddings/' + audio_record.replace('.tfrecord', '.pkl')):
+        if os.path.isfile(path_prefix + audio_record.replace('.tfrecord', '.pkl')):
             continue
 
         print "Reading", audio_record, "..."
@@ -222,7 +224,7 @@ def get_data():
             continue
 
         if pid == 0:
-            read_audio_record('data/audioset/audioset_v1_embeddings/' + audio_record, True)
+            read_audio_record(path_prefix + audio_record, True)
             os._exit(0)
         else:
             os.waitpid(pid, 0)
@@ -234,7 +236,7 @@ def get_data():
 
         print "Reading", audio_record, "pickle"
 
-        sub_df = pd.from_pickle(audio_record.replace('.tfrecord', '.pkl'))
+        sub_df = pd.read_pickle(path_prefix + audio_record.replace('.tfrecord', '.pkl'))
 
         def check_sounds(x):
             for sound in (impact_sounds+ambient_sounds):
