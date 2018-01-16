@@ -213,7 +213,7 @@ def get_data():
         if os.path.isfile('data/audioset/audioset_v1_embeddings/' + audio_record.replace('.tfrecord', '.pkl')):
             continue
 
-        print "Reading", audio_record "..."
+        print "Reading", audio_record, "..."
 
         try:
             pid = os.fork()
