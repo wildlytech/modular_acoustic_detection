@@ -4,9 +4,9 @@ from pydub import AudioSegment
 from subprocess import call, check_call, CalledProcessError
 import threading
 
-import tensorflow as tf
-
 import os
+from datetime import datetime
+import tensorflow as tf
 
 from sklearn.preprocessing import LabelBinarizer
 
@@ -148,17 +148,25 @@ def download_data():
         t.join()
 
 # slightly modified from https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
-def read_audio_record(audio_record):
+def read_audio_record(audio_record, output_to_file=None):
     vid_ids = []
     labels = []
     start_time_seconds = [] # in secondes
     end_time_seconds = []
     feat_audio = []
     count = 0
+
     with tf.device("/cpu:0"):
+
+        config = tf.ConfigProto()
+        config.gpu_options.per_process_gpu_memory_fraction = 0.0001
+
+        sess = tf.InteractiveSession(config=config)
+
         for example in tf.python_io.tf_record_iterator(audio_record):
+
             tf_example = tf.train.Example.FromString(example)
-            #print(tf_example)
+
             vid_ids.append(tf_example.features.feature['video_id'].bytes_list.value[0].decode(encoding='UTF-8'))
             labels.append(list(tf_example.features.feature['labels'].int64_list.value))
             start_time_seconds.append(tf_example.features.feature['start_time_seconds'].float_list.value[0])
@@ -167,10 +175,6 @@ def read_audio_record(audio_record):
             tf_seq_example = tf.train.SequenceExample.FromString(example)
             n_frames = len(tf_seq_example.feature_lists.feature_list['audio_embedding'].feature)
 
-            config = tf.ConfigProto()
-            config.gpu_options.per_process_gpu_memory_fraction = 0.0001
-
-            sess = tf.InteractiveSession(config=config)
             rgb_frame = []
             audio_frame = []
             # iterate through frames
@@ -179,15 +183,18 @@ def read_audio_record(audio_record):
                         tf_seq_example.feature_lists.feature_list['audio_embedding'].feature[i].bytes_list.value[0],tf.uint8)
                                ,tf.float32).eval())
 
-            sess.close()
             feat_audio.append([])
 
             feat_audio[count].append(audio_frame)
             count+=1
+        sess.close()
 
     df = pd.DataFrame(zip(vid_ids, labels, start_time_seconds, end_time_seconds, feat_audio),
                       columns=['video_id', 'labels', 'start_time_seconds', 'end_time_seconds', 'features'])
     df['features'] = df.features.apply(lambda x: np.array(x[0]))
+
+    if output_to_file:
+        df.to_pickle(audio_record.replace('.tfrecord', '.pkl'))
 
     return df
 
@@ -197,10 +204,37 @@ def get_data():
 
     audio_files = map(lambda x: 'bal_train/'+x, os.listdir('data/audioset/audioset_v1_embeddings/bal_train')) + \
                   map(lambda x: 'unbal_train/'+x, os.listdir('data/audioset/audioset_v1_embeddings/unbal_train'))
+    audio_files = filter(lambda x: x.endswith('.tfrecord'), audio_files)
+    audio_files.sort()
+
+
+    for audio_record in audio_files:
+
+        if os.path.isfile('data/audioset/audioset_v1_embeddings/' + audio_record.replace('.tfrecord', '.pkl')):
+            continue
+
+        print "Reading", audio_record "..."
+
+        try:
+            pid = os.fork()
+        except OSError:
+            sys.stderr.write("Could not create a child process\n")
+            continue
+
+        if pid == 0:
+            read_audio_record('data/audioset/audioset_v1_embeddings/' + audio_record, True)
+            os._exit(0)
+        else:
+            os.waitpid(pid, 0)
+
+    print "Reading pickles..."
 
     df = []
     for audio_record in audio_files:
-        sub_df = read_audio_record('data/audioset/audioset_v1_embeddings/' + audio_record)
+
+        print "Reading", audio_record, "pickle"
+
+        sub_df = pd.from_pickle(audio_record.replace('.tfrecord', '.pkl'))
 
         def check_sounds(x):
             for sound in (impact_sounds+ambient_sounds):
