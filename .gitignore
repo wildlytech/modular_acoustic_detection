@@ -17,3 +17,4 @@ svmSMtempMEANS
 data/audioset/rerated_video_ids.txt
 *.tfrecord
 *.tar.gz
+*.pkl
