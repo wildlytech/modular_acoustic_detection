@@ -229,14 +229,20 @@ def get_data():
         else:
             os.waitpid(pid, 0)
 
+
+    pickle_files = map(lambda x: 'bal_train/'+x, os.listdir('data/audioset/audioset_v1_embeddings/bal_train')) + \
+                  map(lambda x: 'unbal_train/'+x, os.listdir('data/audioset/audioset_v1_embeddings/unbal_train'))
+    pickle_files = filter(lambda x: x.endswith('.pkl'), pickle_files)
+    pickle_files.sort()
+
     print "Reading pickles..."
 
     df = []
-    for audio_record in audio_files:
+    for audio_record in pickle_files:
 
         print "Reading", audio_record, "pickle"
 
-        sub_df = pd.read_pickle(path_prefix + audio_record.replace('.tfrecord', '.pkl'))
+        sub_df = pd.read_pickle(path_prefix + audio_record)
 
         def check_sounds(x):
             for sound in (impact_sounds+ambient_sounds):
