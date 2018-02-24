@@ -10,7 +10,39 @@ import tensorflow as tf
 
 from sklearn.preprocessing import LabelBinarizer
 
-ambient_sounds = [
+explosion_sounds = [
+'Fireworks',
+'Burst, pop',
+'Eruption',
+'Gunshot, gunfire',
+'Explosion',
+'Boom'
+]
+
+motor_sounds = [
+'Chainsaw',
+'Medium engine (mid frequency)',
+'Light engine (high frequency)',
+'Heavy engine (low frequency)',
+'Engine starting',
+'Engine',
+'Motor vehicle (road)',
+'Vehicle'
+]
+
+wood_sounds = [
+'Wood',
+'Chop',
+'Splinter',
+'Crack'
+]
+
+human_sounds = [
+'Chatter',
+'Conversation'
+]
+
+nature_sounds = [
 "Silence",
 "Stream",
 "Wind noise (microphone)",
@@ -19,31 +51,17 @@ ambient_sounds = [
 "Howl",
 "Raindrop",
 "Rain on surface",
-"Rain"
+"Rain",
+"Thunderstorm",
+"Thunder",
+"Fire",
+"Crackle"
 ]
 
-impact_sounds = [
-"Fire",
-"Fireworks",
-"Burst, pop",
-"Eruption",
-"Crackle",
-"Thunderstorm",
-"Gunshot, gunfire",
-"Explosion",
-"Boom",
-"Chainsaw",
-"Wood",
-"Medium engine (mid frequency)",
-"Light engine (high frequency)",
-"Heavy engine (low frequency)",
-"Engine starting",
-"Engine",
-"Motor vehicle (road)",
-"Vehicle",
-"Chatter",
-"Conversation"
-]
+ambient_sounds = nature_sounds[:-2]
+impact_sounds = explosion_sounds + motor_sounds + \
+                wood_sounds + human_sounds + \
+                nature_sounds[-2:]
 
 def get_csv_data():
     label_names = pd.read_csv("data/audioset/class_labels_indices.csv")
@@ -198,6 +216,42 @@ def read_audio_record(audio_record, output_to_file=None):
 
     return df
 
+def get_recursive_sound_names(designated_sound_names):
+
+    ontology_dict = pd.read_json("data/audioset/ontology.json")
+
+    ontology_dict_from_name = ontology_dict.copy()
+    ontology_dict_from_name.index = ontology_dict_from_name['name']
+    ontology_dict_from_name = ontology_dict_from_name.T
+
+    ontology_dict_from_id = ontology_dict.copy()
+    ontology_dict_from_id.index = ontology_dict_from_id.id
+    ontology_dict_from_id = ontology_dict_from_id.T
+
+    del ontology_dict
+
+    designated_sound_ids = map(lambda sound: ontology_dict_from_name[sound]['id'], designated_sound_names)
+
+    def get_ids(id):
+        id_list = [id]
+
+        for child_id in ontology_dict_from_id[id].child_ids:
+            id_list += get_ids(child_id)
+
+        return id_list
+
+    recursive_sound_ids = []
+    for id in designated_sound_ids:
+        recursive_sound_ids += get_ids(id)
+    recursive_sound_ids = list(set(recursive_sound_ids))
+
+    recursive_sound_names = map(lambda sound_id: ontology_dict_from_id[sound_id]['name'], recursive_sound_ids)
+
+    return recursive_sound_names
+
+def get_all_sound_names():
+    return get_recursive_sound_names(ambient_sounds), get_recursive_sound_names(impact_sounds)
+
 def get_data():
 
     label_names = pd.read_csv("data/audioset/class_labels_indices.csv")
@@ -234,6 +288,8 @@ def get_data():
                   map(lambda x: 'unbal_train/'+x, os.listdir('data/audioset/audioset_v1_embeddings/unbal_train'))
     pickle_files = filter(lambda x: x.endswith('.pkl'), pickle_files)
     pickle_files.sort()
+
+    ambient_sounds, impact_sounds = get_all_sound_names()
 
     print "Reading pickles..."
 
