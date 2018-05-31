@@ -39,17 +39,17 @@ print(req_df.head())
 #Filter out the mislabelled ie sound that are labelled as Silence but the audio_clip is not silent and Vice-versa.
 #Sounds that are labelled silence, but are not silent. A silent audio will have dBFS value -inf (negative infinite).
 df_filtered1 = req_df.loc[req_df['labels'].apply(lambda x: (len(x) == 1)) & req_df.labels.apply(lambda x: 'Silence' in x)]
-mislabelled_as_otherthan_silent = df_filtered.loc[df_filtered['dBFS']!=float('-inf')]
-list_of_wavfiles = mislabelled_as_otherthan_silent.wav_file.tolist()
+mislabelled_as_silent = df_filtered.loc[df_filtered['dBFS']!=float('-inf')]
+list_of_wavfiles = mislabelled_as_silent.wav_file.tolist()
 #save the balcklisted sounds in a text file
-with open('mislabelled_as_otherthan_silent.txt','w')as f:
+with open('mislabelled_as_silent.txt','w')as f:
     pickle.dump(list_of_wavfiles,f)
 
 
 #Sounds that are labelled other than Silence but audio clip is pure silent
 df_filtered2 = req_df.loc[req['dBFS']==float('-inf')]
-mislabelled_as_silence = df_filtered2.loc[df_filtered2['labels_name'].apply(lambda x: 'Silence' not in x)]
-list_of_wavfiles2 = mislabelled_as_silence.wav_file.tolist()
+mislabelled_as_other_than_silence = df_filtered2.loc[df_filtered2['labels_name'].apply(lambda x: 'Silence' not in x)]
+list_of_wavfiles2 = mislabelled_as_othet_than_silence.wav_file.tolist()
 #save the blacklisted sounds in a text file
-with open('mislabelled_as_silence.txt','w') as f:
+with open('mislabelled_as__other_than_silence.txt','w') as f:
     pickle.dump(list_of_wavfiles2,f)
