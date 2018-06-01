@@ -1,0 +1,34 @@
+,sounds,id
+0,Fireworks,0
+1,"Burst, pop",0
+2,Eruption,0
+3,"Gunshot, gunfire",0
+4,Explosion,0
+5,Boom,0
+6,Chainsaw,1
+7,Medium engine (mid frequency),1
+8,Light engine (high frequency),1
+9,Heavy engine (low frequency),1
+10,Engine starting,1
+11,Engine,1
+12,Motor vehicle (road),1
+13,Vehicle,1
+14,Silence,2
+15,Stream,2
+16,Wind noise (microphone),2
+17,Wind,2
+18,Rustling leaves,2
+19,Howl,2
+20,Raindrop,2
+21,Rain on surface,2
+22,Rain,2
+23,Thunderstorm,2
+24,Thunder,2
+25,Fire,2
+26,Crackle,2
+27,Chatter,3
+28,Conversation,3
+29,Wood,4
+30,Chop,4
+31,Splinter,4
+32,Crack,4
