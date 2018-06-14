@@ -24,7 +24,7 @@ for i in wav_files:
 #use the get_csv_data() from youtube_audioset.py for reading the unbalanced data
 df,labels_binarized = get_csv_data()
 df['wav_file'] = df['YTID'].astype(str) +'-'+df['start_seconds'].astype(str)+'-'+df['end_seconds'].astype(str)+'.wav'
-df['labels_name'] = df1['positive_labels'].map(lambda arr:[labels_csv.loc[labels_csv['mid']==x].display_name for x in arr])
+df['labels_name'] = df['positive_labels'].map(lambda arr:[labels_csv.loc[labels_csv['mid']=='x'].display_name for x in arr])
 #save it in a pickle file
 with open('unbalanced_data.pkl','w') as f:
     pickle.dump(df,f)
