@@ -17,6 +17,7 @@ with open('coarse_labels.pkl','rb') as f:
 
 #Taking the first 50000 examples
 df=df.iloc[:][:]
+df['positive_labels']=df['positive_labels'].apply(lambda arr: arr.split(','))
 df['labels_name']=df['positive_labels'].map(lambda arr:[labels_csv.loc[labels_csv['mid']==x].display_name for x in arr])
 df['labels_name']=df['labels_name'].apply(np.concatenate)
 print(df['labels_name'])
