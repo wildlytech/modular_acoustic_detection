@@ -202,9 +202,11 @@ def get_csv_data(target_sounds):
     return train, train_label_binarized
 
 
-def download_clip(YTID, start_seconds, end_seconds):
+def download_clip(YTID, start_seconds, end_seconds, target_path):
     url = "https://www.youtube.com/watch?v=" + YTID
-    target_file = 'sounds/audioset/' + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)+".wav"
+
+    #set the target path to download the audio files
+    target_file = target_path + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)+".wav"
 
     # No need to download audio file that already has been downloaded
     if os.path.isfile(target_file):
@@ -216,6 +218,7 @@ def download_clip(YTID, start_seconds, end_seconds):
     try:
         check_call(['youtube-dl', url, '--audio-format', 'wav', '-x', '-o', tmp_filename +'.%(ext)s'])
     except CalledProcessError:
+
         # do nothing
         print "Exception CalledProcessError!"
         return
@@ -228,6 +231,8 @@ def download_clip(YTID, start_seconds, end_seconds):
         print "Error while reading file!"
 
     os.remove(tmp_filename_w_extension)
+
+
 
 
 # To download the audio files from youtube 
