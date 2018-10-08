@@ -72,74 +72,81 @@ FLAGS = flags.FLAGS
 
 def main(_):
 
-#Specify the path for the downloaded or recorded audio files and also path for writing the embeddings or pickle files
 
-  wav_files=glob.glob('<path to wave file >*.wav')
-  pickle_files=glob.glob('<path to write the embeddings or pickle files >/*.pkl')
-  wav_lst=[]
-  for pkl in wav_files:
-      c_lst.append(pkl.split('/')[-1])
+  #Specify the path for the downloaded or recorded audio files and also path for writing the embeddings or pickle files
 
-
-  for i in wav_files:
-      pkl=str(i).split('.')[0]+'.pkl'
-      indexs= a.index(i)
-      print(indexs)
-
-      #No need to generate the embeddings that are already generated.
-      if pkl in pickle_files:
-          print('done')
-          print(pkl)
+  # This is example code for generating embeddings for downloaded explosion sounds 
+  # Give the path where wavfiles and embeddings are saved
+  wav_files_path = 'sounds/explosion_sounds/'
+  path_to_write_embeddings = 'data/explosion_embeddings/'
 
 
-          # In this simple example, we run the examples from a single audio file through
-          # the model. If none is provided, we generate a synthetic input.
-      else:
-          if FLAGS.wav_file:
-            wav_file = i
-          else:
-            # Write a WAV of a sine wav into an in-memory file object.
-            num_secs = 5
-            freq = 1000
-            sr = 44100
-            t = np.linspace(0, num_secs, int(num_secs * sr))
-            x = np.sin(2 * np.pi * freq * t)
-            # Convert to signed 16-bit samples.
-            samples = np.clip(x * 32768, -32768, 32767).astype(np.int16)
-            wav_file = six.BytesIO()
-            wavfile.write(wav_file, sr, samples)
-            wav_file.seek(0)
-          examples_batch = vggish_input.wavfile_to_examples(wav_file)
-          print(examples_batch)
+  #glob all the wave files and embeddings if any .
 
-          # Prepare a postprocessor to munge the model embeddings.
-          pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
-
-          # If needed, prepare a record writer to store the postprocessed embeddings.
-          writer = tf.python_io.TFRecordWriter(
-              FLAGS.tfrecord_file) if FLAGS.tfrecord_file else None
-
-          with tf.Graph().as_default(), tf.Session() as sess:
-            # Define the model in inference mode, load the checkpoint, and
-            # locate input and output tensors.
-            vggish_slim.define_vggish_slim(training=False)
-            vggish_slim.load_vggish_slim_checkpoint(sess, FLAGS.checkpoint)
-            features_tensor = sess.graph.get_tensor_by_name(
-                vggish_params.INPUT_TENSOR_NAME)
-            embedding_tensor = sess.graph.get_tensor_by_name(
-                vggish_params.OUTPUT_TENSOR_NAME)
-
-            # Run inference and postprocessing.
-            [embedding_batch] = sess.run([embedding_tensor],
-                                         feed_dict={features_tensor: examples_batch})
-            print(embedding_batch)
-            postprocessed_batch = pproc.postprocess(embedding_batch)
-            print(postprocessed_batch)
+  wav_files_path = glob.glob(wav_files_path + '*.wav')
+  pickle_files = glob.glob(path_to_write_embeddings + '*.pkl')
+  wav_file_list = []
+  for wav_file_path in wav_files_path:
+    wav_file_list.append(wav_file_path.split('/')[-1])
 
 
-            #Specify the same path that is mentioned above for writing the embeddings or pickle files
-            with open('< path to write the embeddings or pickle files >'+b,'w') as f:
-                pickle.dump(postprocessed_batch, f)
+  for wav_file in wav_file_list:
+    pkl = str(i).split('.')[0][:11]+'.pkl'
+    indexs = wav_file_list.index(wav_file)
+
+    #No need to generate the embeddings that are already generated.
+    if pkl in pickle_files:
+        print'Embeddings are already Generated for :', pkl
+
+
+        # In this simple example, we run the examples from a single audio file through
+        # the model. If none is provided, we generate a synthetic input.
+    else:
+        if FLAGS.wav_file:
+          wav_file = i
+        else:
+          # Write a WAV of a sine wav into an in-memory file object.
+          num_secs = 5
+          freq = 1000
+          sr = 44100
+          t = np.linspace(0, num_secs, int(num_secs * sr))
+          x = np.sin(2 * np.pi * freq * t)
+          # Convert to signed 16-bit samples.
+          samples = np.clip(x * 32768, -32768, 32767).astype(np.int16)
+          wav_file = six.BytesIO()
+          wavfile.write(wav_file, sr, samples)
+          wav_file.seek(0)
+        examples_batch = vggish_input.wavfile_to_examples(wav_file)
+        print(examples_batch)
+
+        # Prepare a postprocessor to munge the model embeddings.
+        pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
+
+        # If needed, prepare a record writer to store the postprocessed embeddings.
+        writer = tf.python_io.TFRecordWriter(
+            FLAGS.tfrecord_file) if FLAGS.tfrecord_file else None
+
+        with tf.Graph().as_default(), tf.Session() as sess:
+          # Define the model in inference mode, load the checkpoint, and
+          # locate input and output tensors.
+          vggish_slim.define_vggish_slim(training=False)
+          vggish_slim.load_vggish_slim_checkpoint(sess, FLAGS.checkpoint)
+          features_tensor = sess.graph.get_tensor_by_name(
+              vggish_params.INPUT_TENSOR_NAME)
+          embedding_tensor = sess.graph.get_tensor_by_name(
+              vggish_params.OUTPUT_TENSOR_NAME)
+
+          # Run inference and postprocessing.
+          [embedding_batch] = sess.run([embedding_tensor],
+                                       feed_dict={features_tensor: examples_batch})
+          print(embedding_batch)
+          postprocessed_batch = pproc.postprocess(embedding_batch)
+          print(postprocessed_batch)
+
+
+          #Specify the same path that is mentioned above for writing the embeddings or pickle files
+          with open(path_to_write_embeddings + pkl,'w') as f:
+              pickle.dump(postprocessed_batch, f)
 
 
 if __name__ == '__main__':
