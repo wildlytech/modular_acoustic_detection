@@ -16,7 +16,8 @@ explosion_sounds = [
 'Eruption',
 'Gunshot, gunfire',
 'Explosion',
-'Boom'
+'Boom',
+"Fire"
 ]
 
 motor_sounds = [
@@ -39,7 +40,90 @@ wood_sounds = [
 
 human_sounds = [
 'Chatter',
-'Conversation'
+'Conversation',
+'Speech',
+'Narration, monologue',
+'Babbling',
+'Whispering',
+'Laughter',
+'Chatter',
+'Crowd',
+'Hubbub, speech noise, speech babble',
+'Children playing',
+'Whack, thwack',
+'Smash, crash',
+'Breaking',
+'Crushing',
+'Tearing',
+'Run',
+'Walk, footsteps',
+'Clapping'
+
+]
+
+
+domestic_sounds=[
+'Dog',
+'Bark',
+'Howl',
+'Bow-wow',
+'Growling',
+'Bay',
+'Livestock, farm animals, working animals',
+'Yip',
+'Cattle, bovinae',
+'Moo',
+'Cowbell',
+'Goat',
+'Bleat',
+'Sheep',
+'Squawk',
+'Domestic animals, pets'
+
+]
+
+
+tools=[
+'Jackhammer',
+'Sawing',
+'Tools',
+'Hammer',
+'Filing (rasp)',
+'Sanding',
+'Power tool'
+]
+
+
+Wild_animals=[
+'Roaring cats (lions, tigers)',
+'Roar',
+'Bird',
+'Bird vocalization, bird call, bird song',
+'Squawk',
+'Pigeon, dove',
+'Chirp, tweet',
+'Coo',
+'Crow',
+'Caw',
+'Owl',
+'Hoot',
+'Gull, seagull',
+'Bird flight, flapping wings',
+'Canidae, dogs, wolves',
+'Rodents, rats, mice',
+'Mouse',
+'Chipmunk',
+'Patter',
+'Insect',
+'Cricket',
+'Mosquito',
+'Fly, housefly',
+'Buzz',
+'Bee, wasp, etc.',
+'Frog',
+'Croak',
+'Snake',
+'Rattle'
 ]
 
 nature_sounds = [
@@ -54,16 +138,22 @@ nature_sounds = [
 "Rain",
 "Thunderstorm",
 "Thunder",
-"Fire",
-"Crackle"
+'Crow',
+'Caw',
+'Bird',
+'Bird vocalization, bird call, bird song',
+'Chirp, tweet',
+'Owl',
+'Hoot'
+
 ]
 
-ambient_sounds = nature_sounds[:-2]
-impact_sounds = explosion_sounds + motor_sounds + \
-                wood_sounds + human_sounds + \
-                nature_sounds[-2:]
+#Defining Ambient and Impact sounds as to what sounds it must comprise of.
+ambient_sounds = nature_sounds
+impact_sounds = explosion_sounds + wood_sounds + motor_sounds + human_sounds + tools  + domestic_sounds
 
-def get_csv_data():
+#function to get the dataframe from csv data
+def get_csv_data(target_sounds):
     label_names = pd.read_csv("data/audioset/class_labels_indices.csv")
 
     balanced_train = pd.read_csv("data/audioset/balanced_train_segments.csv",quotechar='"', skipinitialspace=True, skiprows=2)
@@ -74,14 +164,15 @@ def get_csv_data():
 
     train = pd.concat([unbalanced_train, balanced_train], axis=0, ignore_index=True)
 
-    # Filter out sounds we don't care about
-    forest_sounds = pd.Series(ambient_sounds + impact_sounds, name='display_name')
+    # Filter out sounds we don't care about.
+    forest_sounds = pd.Series(target_sounds, name='display_name')
     forest_sounds = pd.DataFrame(forest_sounds).merge(label_names, how='inner', left_on='display_name', right_on='display_name')
 
     # Binarizer for labels of interest.  We add ;None' as a placeholder for sounds that
     # are NOT of interest.
     name_bin = LabelBinarizer()
     name_bin.fit(forest_sounds.mid.values.tolist() + ['None'])
+
 
     # Binarize labels for dataset
     # There are multiple labels per row, so we have to split them and do a binarization
@@ -94,11 +185,13 @@ def get_csv_data():
     train_label_binarized = pd.DataFrame(train_label_binarized, columns = name_bin.classes_)
     del train_label_binarized['None']
 
+
     # Remove rows for uninteresting sounds
     train = train.loc[train_label_binarized.sum(axis=1) > 0]
     train.index = range(train.shape[0])
     train_label_binarized = train_label_binarized.loc[train_label_binarized.sum(axis=1) > 0]
     train_label_binarized.index = range(train_label_binarized.shape[0])
+
 
     # Translate mid to display name
     new_column_names = []
@@ -107,6 +200,7 @@ def get_csv_data():
     train_label_binarized.columns = new_column_names
 
     return train, train_label_binarized
+
 
 def download_clip(YTID, start_seconds, end_seconds):
     url = "https://www.youtube.com/watch?v=" + YTID
@@ -136,17 +230,31 @@ def download_clip(YTID, start_seconds, end_seconds):
     os.remove(tmp_filename_w_extension)
 
 
-def download_data():
+# To download the audio files from youtube 
+def download_data(target_sounds_list, target_path):
 
-    df, labels_binarized = get_csv_data()
+    # Get the data necessary for downloading audio files
+    df, labels_binarized = get_csv_data(target_sounds_list)
+    labels_csv = pd.read_csv("data/audioset/class_labels_indices.csv")
 
-    if not os.path.exists('sounds'):
-        os.makedirs('sounds')
+    # create a column with name of the labels given to sounds and also column with wav file names
+    df['positive_labels']=df['positive_labels'].apply(lambda arr: arr.split(','))
+    df['labels_name']=df['positive_labels'].map(lambda arr:np.concatenate([labels_csv.loc[labels_csv['mid']==x].display_name for x in arr]))
+    df['wav_file'] = df['YTID'].astype(str) + '-' + df['start_seconds'].astype(str) + '-' + df['end_seconds'].astype(str)+'.wav'
 
-    if not os.path.exists('sounds/audioset'):
-        os.makedirs('sounds/audioset')
+
+    #save the data frame which can be used for further balancing the data and generating the embeddings for audio files.
+    with open('downloaded_base_dataframe.pkl','w') as f:
+        pickle.dump(df,f)
+
+    print 'Base dataframe is saved as " downloaded_base_dataframe.pkl "..!!'
+
+    # create a path if it doesn't exists
+    if not os.path.exists(target_path):
+        os.makedirs(target_path)
 
     threads = []
+
 
     for index in range(df.shape[0]):
         row = df.iloc[index]
@@ -154,9 +262,10 @@ def download_data():
         print "Downloading", str(index), "of", df.shape[0], ":", row.YTID
 
         # download_clip(row.YTID, row.start_seconds, row.end_seconds)
-        t = threading.Thread(target=download_clip, args=(row.YTID, row.start_seconds, row.end_seconds))
+        t = threading.Thread(target=download_clip, args=(row.YTID, row.start_seconds, row.end_seconds, target_path))
         threads.append(t)
         t.start()
+
 
         if len(threads) > 4:
             threads[0].join()
