@@ -158,5 +158,5 @@ HL = hamming_loss(clf2_test_target.values.argmax(axis=1), clf2_test_prediction.a
 print 'Hamming Loss :',HL
 
 #Save the model weights
-# model.save_weights('multiclass_weights.model')
+# model.save_weights('multiclass_weights.h5')
 # print('Weights_saved')
