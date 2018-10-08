@@ -1,138 +1,151 @@
+#Importing necessary library funtions
 import numpy as np
 import pandas as pd
 import pickle
 from matplotlib import pyplot as plt
 import glob
 import os
-from youtube_audioset import get_csv_data
+
 
 #Reading a pickle file consiting of the unbalanced data and sound labels
-with open('unbalanced_data.pkl','rb') as f:
-    df=pickle.load(f)
-labels_csv=pd.read_csv('<path to class_labels_indices.csv>')
+with open('downloaded_final_dataframe.pkl','rb') as f:
+    un=pickle.load(f)
+labels_csv=pd.read_csv('data/audioset/class_labels_indices.csv')
 print('Files Loaded')
-#Reading the coarse labels pickle file . It consists of seperate classes for sounds related to Explosion, Motor, Nature, Human, Wood with numbers assigned as 0,1,2,3,4 respectively.
-with open('coarse_labels.pkl','rb') as f:
-    lab=pickle.load(f)
+print un.shape
 
-#Taking the first 50000 examples
-df=df.iloc[:][:]
-df['positive_labels']=df['positive_labels'].apply(lambda arr: arr.split(','))
-df['labels_name']=df['positive_labels'].map(lambda arr:[labels_csv.loc[labels_csv['mid']==x].display_name for x in arr])
-df['labels_name']=df['labels_name'].apply(np.concatenate)
-print(df['labels_name'])
-df['Data_dist']=df['labels_name'].map(lambda arr:[lab.loc[lab['sounds']==y].id for y in arr])
-df['start_seconds_int']=df['start_seconds'].apply(int)
-df['YTID']=df['YTID'].astype(str) +'-'+df['start_seconds_int'].astype(str)
+
+#Reading the coarse labels pickle file . It consists of seperate classes for sounds related to Explosion, Motor, Nature, Human, Wood with numbers assigned as 0,1,2,3,4 respectively.
+lab=pd.read_csv('coarse_labels.csv')
 
 # Creating the Data distribution coulumn
-df['Data_dist']=df['Data_dist'].apply(np.concatenate)
-df['Data_dist']=df['Data_dist'].apply(set)
-df['Data_dist']=df['Data_dist'].apply(list)
-df['len_labels']=df['Data_dist'].apply(len)
-print(df)
-print(df.shape)
-df['len_labels']=df['Data_dist'].apply(len)
-print("Maximum number of labels for a sound:",df['len_labels'].max())
-
-#For sounds with two labels in it. Taking each labels as a different sound
-df1=df.loc[df['len_labels']==1]
-d1=df1['Data_dist'].values.tolist()
-print(len(d1))
-e1=[]
-n=0
-for i in d1:
-    e1.append(d1[n][0])
-    n=n+1
-print(len(e1))
-df1['Data_dist']=e1
-print(df1)
-#For sounds with two labels in it
-df2=df.loc[df['len_labels']==2]
-d2=df2['Data_dist'].values.tolist()
-
-print(len(d2))
-e2_0=[]
-e2_1=[]
-for i in d2:
-    e2_0.append(i[0])
-    e2_1.append(i[1])
-e2=e2_0+e2_1
-print(len(e2))
-df2=pd.concat([df2]*2, ignore_index=True)
-df2['Data_dist']=e2
-print(df2)
-#For sounds with three labels in it
-df3=df.loc[df['len_labels']==3]
-d3=df3['Data_dist'].values.tolist()
-print(len(d3))
-e3_0=[]
-e3_1=[]
-e3_2=[]
-for i in d3:
-    e3_0.append(i[0])
-    e3_1.append(i[1])
-    e3_2.append(i[2])
-e3=e3_0 + e3_1 + e3_2
-print(len(e3))
-df3=pd.concat([df3]*3, ignore_index=True)
-df3['Data_dist']=e3
-print(df3)
-#For sounds with four lables in it
-df4=df.loc[df['len_labels']==4]
-d4=df4['Data_dist'].values.tolist()
-print(len(d4))
+un['Data_dist_new']=un['labels_name'].map(lambda arr:[lab.loc[lab['sounds']==y].id for y in arr])
+un['Data_dist_new']=un['Data_dist_new'].apply(np.concatenate)
+un['Data_dist_new']=un['Data_dist_new'].apply(set)
+un['Data_dist_new']=un['Data_dist_new'].apply(list)
 
 
-req_df=pd.DataFrame()
-req_df=pd.concat([df1,df2,df3],ignore_index=True)
-print(req_df.shape)
-print(req_df.head())
-#Adding the Data_dist column to the DataFrame df and plotting the histogram of the data distribution
-a=req_df['Data_dist'].value_counts(sort=True)
-print(a)
+# get the dataframe for having single type of sounds
+un['len'] = un['Data_dist_new'].apply(len)
 
-#Saving all the classes of sounds ie Explosion, Motor, Nature, Human, Wood seperately.
-#Explosion Sounds
-df_exp=pd.DataFrame(req_df.loc[req_df['Data_dist']==0])
-df_exp.index=range(a.iloc[2])
-print(df_exp.shape)
-print(df_exp.head())
 
-with open('Explosion_sounds.pkl','w') as f:
-    pickle.dump(df_exp,f)
-#motor sounds
-df_mot=pd.DataFrame(req_df.loc[req_df['Data_dist']==1])
-df_mot.index=range(a.iloc[0])
-print(df_mot.shape)
-print(df_mot.head())
-with open('Motor_sounds.pkl','w') as f:
-    pickle.dump(df_mot,f)
+#For with single sound , two , three , four and five
+un_1 = un.loc[un['len']==1]
+un_2 = un.loc[un['len']==2]
+un_3 = un.loc[un['len']==3]
+un_4 = un.loc[un['len']==4]
+un_5 = un.loc[un['len']==5]
 
-#Nature sounds
-df_nat=pd.DataFrame(req_df.loc[req_df['Data_dist']==2])
-df_nat.index=range(a.iloc[1])
-print(df_nat.shape)
-print(df_nat.head())
-with open('Nature_sounds.pkl','w') as f:
-    pickle.dump(df_nat,f)
 
-#Human sounds Balancing
-df_hum=pd.DataFrame(req_df.loc[req_df['Data_dist']==3])
-df_hum.index=range(a.iloc[3])
-print(df_hum.shape)
-print(df_hum.head())
-with open('Human_sounds.pkl','w') as f:
-    pickle.dump(df_hum,f)
+# seperate out the sounds from single labelled. Check out the coarse_labels.csv file to know what are index values for Explosion, Motor, Natutre, Human, and all other sounds
+pure_exp = un_1.loc[un_1['Data_dist_new'].apply(lambda arr: arr[0]==0)]
+pure_mot = un_1.loc[un_1['Data_dist_new'].apply(lambda arr: arr[0]==1)]
+pure_nat = un_1.loc[un_1['Data_dist_new'].apply(lambda arr: arr[0]==2)]
+pure_hum = un_1.loc[un_1['Data_dist_new'].apply(lambda arr: arr[0]==3)]
+pure_wod = un_1.loc[un_1['Data_dist_new'].apply(lambda arr: arr[0]==4)]
+pure_wild = un_1.loc[un_1['Data_dist_new'].apply(lambda arr: arr[0]==5)]
+pure_dom = un_1.loc[un_1['Data_dist_new'].apply(lambda arr: arr[0]==6)]
+pure_tools = un_1.loc[un_1['Data_dist_new'].apply(lambda arr: arr[0]==7)]
 
-#Wood sounds
-df_wod=pd.DataFrame(req_df.loc[req_df['Data_dist']==4])
-df_wod.index=range(a.iloc[4])
-print(df_wod.shape)
-print(df_wod.head())
-with open('Wood_sounds.pkl','w') as f:
-    pickle.dump(df_wod,f)
-#plot the histogram to know the various amount of distrubution of sounds across the labels
-req_df['Data_dist'].plot(kind='hist',xticks=[0,1,2,3,4])
-plt.xlabel("Explosion,Motor,Nature,Human,Wood")
-plt.show()
+# write out all those pure single labelled Sounds
+file_names = ['pure_exp','pure_mot','pure_nat','pure_hum','pure_wod','pure_wild','pure_dom','pure_tools']
+for i,j in zip(file_names,[pure_exp,pure_mot,pure_nat,pure_hum,pure_wod,pure_wild,pure_dom,pure_tools]):
+    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+        pickle.dump(j,f)
+
+
+
+# seperate out sounds which are Multi-labelled with two classes
+#exp with other sounds
+exp_mot = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==0) & (arr[1]==1)))]
+exp_nat = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==0) & (arr[1]==2)))]
+exp_hum = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==0) & (arr[1]==3)))]
+exp_wod = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==0) & (arr[1]==4)))]
+exp_wild = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==0) & (arr[1]==5)))]
+exp_dom = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==0) & (arr[1]==6)))]
+exp_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==0) & (arr[1]==7)))]
+# exp_mot = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: (arr[0]==0 & arr[1]==8)]
+
+# write out all those Sounds
+file_names = ['exp_mot','exp_nat','exp_hum','exp_wod','exp_wild','exp_dom','exp_tools']
+for i,j in zip(file_names,[exp_mot,exp_nat,exp_hum,exp_wod,exp_wild,exp_dom,exp_tools]):
+    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+        pickle.dump(j,f)
+
+
+# mot with other sounds
+mot_nat = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==1) & (arr[1]==2)))]
+mot_hum = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==1) & (arr[1]==3)))]
+mot_wod = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==1) & (arr[1]==4)))]
+mot_wild = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==1) & (arr[1]==5)))]
+mot_dom = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==1) & (arr[1]==6)))]
+mot_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==1) & (arr[1]==7)))]
+
+# write out all those Sounds
+file_names = ['mot_nat','mot_hum','mot_wod','mot_wild','mot_dom','mot_tools']
+for i,j in zip(file_names,[mot_nat,mot_hum,mot_wod,mot_wild,mot_dom,mot_tools]):
+    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+        pickle.dump(j,f)
+
+
+#nature with other Sounds
+nat_hum = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==2) & (arr[1]==3)))]
+nat_wod = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==2) & (arr[1]==4)))]
+nat_wild = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==2) & (arr[1]==5)))]
+nat_dom = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==2) & (arr[1]==6)))]
+nat_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==2) & (arr[1]==7)))]
+file_names = ['nat_hum','nat_wod','nat_wild','nat_dom','nat_tools']
+for i,j in zip(file_names,[nat_hum,nat_wod,nat_wild,nat_dom,nat_tools]):
+    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+        pickle.dump(j,f)
+
+
+#human sounds with other Sounds
+hum_wod = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==3) & (arr[1]==4)))]
+hum_wild = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==3) & (arr[1]==5)))]
+hum_dom = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==3) & (arr[1]==6)))]
+hum_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==3) & (arr[1]==7)))]
+file_names = ['hum_wod','hum_wild','hum_dom','hum_tools']
+for i,j in zip(file_names,[hum_wod,hum_wild,hum_dom,hum_tools]):
+    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+        pickle.dump(j,f)
+
+
+#wood and other sounds
+wod_wild = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==4) & (arr[1]==5)))]
+wod_dom = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==4) & (arr[1]==6)))]
+wod_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==4) & (arr[1]==7)))]
+
+# write out all those Sounds
+file_names = ['wod_wild','wod_dom','wod_tools']
+for i,j in zip(file_names,[wod_wild,wod_dom,wod_tools]):
+    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+        pickle.dump(j,f)
+
+
+#wild and other sounds
+wild_dom = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==5) & (arr[1]==6)))]
+wild_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==5) & (arr[1]==7)))]
+file_names = ['wild_dom','wild_tools']
+
+# write out all those Sounds
+for i,j in zip(file_names,[wild_dom,wild_tools]):
+    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+        pickle.dump(j,f)
+
+
+#domestic and other
+dom_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==6) & (arr[1]==7)))]
+with open('diff_class_datasets/new_wild/'+'dom_tools_'+str(dom_tools.shape[0])+'_wild.pkl','w') as f:
+    pickle.dump(dom_tools,f)
+
+#Sounds with more than 2 classes labelled are witten
+print 'three labelled sounds shape: ', un_3.shape
+with open('3_labelled_priority1_'+str(un_3.shape[0])+'.pkl' ,'w') as f:
+    pickle.dump(un_3,f)
+print 'four labelled sounds shape: ', un_4.shape
+with open('4_labelled_priority1_'+str(un_4.shape[0])+'.pkl' ,'w') as f:
+    pickle.dump(un_4,f)
+print 'five labelled sounds shape: ', un_5.shape
+with open('5_labelled_prioirty1_'+str(un_5.shape[0])+'.pkl' ,'w') as f:
+    pickle.dump(un_5,f)
