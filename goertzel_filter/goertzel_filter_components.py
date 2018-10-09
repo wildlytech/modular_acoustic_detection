@@ -20,7 +20,6 @@ import scipy.io.wavfile
 import balance_data_priority
 import arbitary
 import resampy
-import audiomoth
 
 
 # give the path for audio files , and also path where to write the goertzel frequency components
