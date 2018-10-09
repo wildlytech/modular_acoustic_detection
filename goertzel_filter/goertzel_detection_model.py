@@ -10,19 +10,16 @@ from keras.optimizers import RMSprop, Adam
 from keras_tqdm import TQDMNotebookCallback
 from youtube_audioset import get_data, get_recursive_sound_names, get_all_sound_names
 from youtube_audioset import explosion_sounds, motor_sounds, wood_sounds, human_sounds, nature_sounds, Wild_animals,domestic_sounds
-import balanced_data_priority_2
 import math
 import numpy as np
 from sklearn.utils import shuffle
 import pandas as pd
-import numpy as np
 import math
 import os
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelBinarizer, MinMaxScaler
 from sklearn.model_selection import train_test_split
-import ast
 import pylab
 import pydub
 import glob
@@ -33,11 +30,8 @@ from keras.layers.core import Dropout
 from pydub import AudioSegment
 from matplotlib import pyplot as plt
 import scipy.io.wavfile
-import balanced_data_priority_2
-import _copy_goertzel
-import arbitary
-import balance_data_priority
-
+import balancing_dataset
+import frequency_component_files
 
 #give the path for saved frequency component files
 Path_of_saved_freq_components = '/media/wildly/1TB-HDD/goertzel_data_8k_resampled_800_1600_2000_2300/'
