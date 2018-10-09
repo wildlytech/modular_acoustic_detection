@@ -8,7 +8,7 @@ import audiomoth_function
 
 
 #give the path where the frequency components are saved ( '.pkl' files )
-frequency_component_files = '/media/wildly/1TB-HDD/goertzel_data_ervikulam_8k/'
+path_to_goertzel_components = '/media/wildly/1TB-HDD/goertzel_data_ervikulam_8k/'
 audio_files_path = '/media/wildly/1TB-HDD/AudioMoth/test_wave/'
 
 #Define the goertzel model same as model from which the weights are saved
@@ -28,7 +28,7 @@ print model.summary()
 model.load_weights('../Goertzel_model_8k_weights_time.h5')
 
 #call the audiomoth function to predict on the frequency components of audio moth WAV files
-test_values, df = audiomoth_function_for_goertzel_model.dataframe_with_frequency_components(audio_files_path,frequency_component_files)
+test_values, df = audiomoth_function_for_goertzel_model.dataframe_with_frequency_components(audio_files_path,path_to_goertzel_components)
 predictions = model.predict(test_values).ravel()
 df['predictions_prob'] = predictions
 df['predictions'] = predictions.ravel().round()
