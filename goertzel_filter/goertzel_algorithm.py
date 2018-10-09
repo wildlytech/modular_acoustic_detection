@@ -32,11 +32,10 @@ def Goertzel_filter(sample,sample_rate,target_frequency, number_samples):
     result_imag =[]
     result_mag_sqre = []
     n_range = range(len(sample))
-    target_freq = freq
     N = number_samples
 
     # computing the constants
-    k = int(( N * target_freq)/sample_rate)
+    k = int(( N * target_frequency)/sample_rate)
     w =  ((2 * math.pi * k)/N)
     cosine =  math.cos(w)
     sine = math.sin(w)
