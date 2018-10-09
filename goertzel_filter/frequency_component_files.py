@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import glob
-import balanced_data_priority_2
+import balancing_dataset
 
 
 
