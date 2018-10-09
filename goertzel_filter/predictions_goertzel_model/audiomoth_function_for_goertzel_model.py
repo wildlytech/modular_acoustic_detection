@@ -51,13 +51,13 @@ def audio_dataframe(audio_files_path):
     return df
 
 
-def dataframe_with_frequency_components(audio_files_path,frequency_component_files):
+def dataframe_with_frequency_components(audio_files_path,path_to_goertzel_components):
 
     #get the dataframe of the audiomoth files (.WAV files )
     df = audio_dataframe(audio_files_path)
 
     # Get all the pickle files into list
-    pickle_files = glob.glob(frequency_component_files + '*.pkl')
+    pickle_files = glob.glob(path_to_goertzel_components + '*.pkl')
     audiomoth_id=[]
     for pkl in pickle_files:
         audiomoth_id.append( ( pkl.split('/')[-1]) [:10] + '.WAV')
