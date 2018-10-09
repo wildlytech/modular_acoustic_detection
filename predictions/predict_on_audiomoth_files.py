@@ -1,6 +1,6 @@
 import pandas as pd
 import keras
-import audiomoth
+import audiomoth_function
 from keras.models import Sequential
 from keras.layers import Dense, Conv1D, Conv2D, MaxPooling1D, Flatten, AveragePooling1D
 from keras.layers.core import Lambda
@@ -31,7 +31,7 @@ model.load_weights('multiclass_weights.h5')
 
 
 # call the audiomoth function to get the test data for predictions
-test_data , df = audiomoth.embeddings_on_dataframe()
+test_data , df = audiomoth_function.embeddings_on_dataframe()
 predictions= model.predict(test_data).ravel().round()
 df['predicted_labels']=np.split(predictions,df.shape[0])
 
