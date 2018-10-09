@@ -10,8 +10,12 @@ import time
 import math
 import resampy
 
-#set the resampling rate
+#set the resampling rate, target frequency
 resampling_rate = 8000
+target_frequency = 400
+number_of_seconds = 10
+
+#read the sample wav file
 x = scipy.io.wavfile.read('speech.wav')
 wave_file = np.array([i[0] for i in x[1]])
 print wave_file.shape
@@ -20,7 +24,7 @@ print wave_file.shape
 wave_file =resampy.resample(wave_file,44100,resampling_rate)
 print wave_file.shape
 
-def Goertzel_filter(sample,sample_rate,freq, number_samples):
+def Goertzel_filter(sample,sample_rate,target_frequency, number_samples):
 
     # Initialize and precomputing all the constants
     result_mag = np.zeros((sample_rate*10,1))
@@ -57,7 +61,7 @@ def Goertzel_filter(sample,sample_rate,freq, number_samples):
     return  result_mag
 
 # applying Goertzel on those signals
-mag = Goertzel_filter(wave_file, resampling_rate, 400, resampling_rate*1)
+mag = Goertzel_filter(wave_file, resampling_rate, target_frequency, resampling_rate*numer_of_seconds)
 mag = map(int, mag)
 SAMPLE_RATE = 44100
 t = np.linspace(0, 10, resampling_rate*10)
