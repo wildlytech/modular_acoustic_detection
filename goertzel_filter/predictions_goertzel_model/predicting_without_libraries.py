@@ -1,8 +1,6 @@
-import pickle
 import numpy as np
 import math
 import time
-import glob
 
 
 def matrix_multiplication(X,Y, activation, bias):
