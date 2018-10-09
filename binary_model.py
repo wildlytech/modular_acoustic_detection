@@ -50,6 +50,7 @@ for column in labels_split.columns:
     labels_binarized |= name_bin.transform(labels_split[column])
 labels_binarized = pd.DataFrame(labels_binarized, columns = name_bin.classes_)
 
+
 print(labels_binarized.shape)
 print df.shape[0], "examples"
 
