@@ -18,18 +18,18 @@ def audio_dataframe(audio_files_path):
 
 
     #check for audio duration to be 10 seconds. Remove if its not.
-    for i in audiomoth_wav_files:
-        sound = AudioSegment.from_wav(i)
+    for each_wav in audiomoth_wav_files:
+        sound = AudioSegment.from_wav(each_wav)
         if not len(sound)==10000:
-            print i + 'is removed, as it is not a ten second audio'
+            print each_wav + 'is removed, as it is not a ten second audio'
             audiomoth_wav_files.remove(i)
 
     # create lists that has audiomoth file name and id's
     audiomoth_id = []
     wave_files= []
-    for i in audiomoth_wav_files:
-        audiomoth_id.append((i.split('/')[-1])[:8])
-        wave_files.append(i.split('/')[-1])
+    for each_wav in audiomoth_wav_files:
+        audiomoth_id.append((each_wav.split('/')[-1])[:8])
+        wave_files.append(each_wav.split('/')[-1])
     print 'first element :', audiomoth_id[0]
 
     # create a dataframe
