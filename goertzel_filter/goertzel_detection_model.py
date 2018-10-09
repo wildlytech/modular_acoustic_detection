@@ -183,4 +183,4 @@ f_score = metrics.f1_score(clf1_test_target, clf1_test_prediction)
 print 'F1 score is  : ', f_score
 
 #save the model
-# model.save_weights('Goertzel_model_8k_weights_time.h5')
+model.save_weights('Goertzel_model_8k_weights_time.h5')
