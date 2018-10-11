@@ -1,3 +1,4 @@
+import youtube_audioset
 from youtube_audioset import download_data
 
 if __name__ == "__main__":	
