@@ -1,4 +1,5 @@
 import youtube_audioset
+import argparse
 
 #Define the sounds
 
@@ -144,10 +145,19 @@ nature_sounds = [
 ambient_sounds = nature_sounds
 impact_sounds = explosion_sounds + wood_sounds + motor_sounds + human_sounds + tools  + domestic_sounds
 
-#SELECT the sounds that must be downloaded and set the path to download . For example we are taking explosion sounds
-target_sounds = explosion_sounds
-target_path = 'sounds/explosion_sounds/'
+#create a dictionary of sounds
+sounds_dict = { 'explosion_sounds': explosion_sounds, 'wood_sounds': wood_sounds,
+                'nature_sounds': nature_sounds, 'motor_sounds': motor_sounds,
+                'human_sounds': human_sounds, 'tools': tools, 'domestic_sounds': domestic_sounds,
+                'Wild_animals':Wild_animals }
+
+#parse the input arguments given from command line
+parser= argparse.ArgumentParser(description = 'Input one of these sounds : explosion_sounds , wood_sounds , motor_sounds, human_sounds, tools ,domestic_sounds, Wild_animals, nature_sounds')
+parser.add_argument( '-target_sounds', '--target_sounds' ,action ='store', help='Input the target sounds. It should be one of the listed sounds', default = 'explosion_sounds')
+parser.add_argument( '-target_path', '--target_path',action ='store' , help='Input the path', default = 'sounds/explosion_sounds/')
+result = parser.parse_args()
+
 
 #call the function to dowload the target or sounds of Interest. Set the target
 if __name__=='__main__':
-    youtube_audioset.download_data(target_sounds,target_path)
+    youtube_audioset.download_data(sounds_dict[result.target_sounds],result.target_path)
