@@ -13,4 +13,4 @@ we use pre-trained weights of ```multiclass_model.py``` which will be in ```.h5`
 $ python predict_on_audiomoth_files.py [-h] [ -path_to_audio_files PATH_TO_AUDIO_FILES ] [ -path_to_embeddings PATH_TO_EMBEDDINGS ]
 ```
 ###### output returns :
-- ```audiomoth_prediction.csv``` file is created with one of the column as ```predicted_labels```
+- ```audiomoth_prediction.csv``` file with one of the column as ```predicted_labels```
