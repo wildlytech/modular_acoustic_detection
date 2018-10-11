@@ -7,6 +7,13 @@ from keras.layers.core import Lambda
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.optimizers import RMSprop, Adam
 import numpy as np
+import argparse
+
+# parsing the inputs given  
+parser= argparse.ArgumentParser(description = 'Input the path for audio files and embeddings  ')
+parser.add_argument('-path_to_audio_files','--path_to_audio_files', action ='store' , help = 'Input the path')
+parser.add_argument('-path_to_embeddings','--path_to_embeddings', action ='store' , help = 'Input the path')
+result = parser.parse_args()
 
 
 #Define the model
@@ -30,10 +37,18 @@ model = create_keras_model()
 model.load_weights('multiclass_weights.h5')
 
 
-# call the audiomoth function to get the test data for predictions
-test_data , df = audiomoth_function.embeddings_on_dataframe()
+# call the audiomoth function to get the dataframe with embeddings and then filter out audio files that are not having [ 10*128 ] embeddings size
+df = audiomoth_function.embeddings_on_dataframe(result.path_to_audio_files,result.path_to_embeddings)
+df_filtered = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+print df_filtered.head()
+
+#reshape the data according to model's input 
+X_test = np.array(df_filtered.features.apply(lambda x: x.flatten()).tolist())
+test_data = X_test.reshape((-1,1280,1))
+
+#predict the data using the loaded model 
 predictions= model.predict(test_data).ravel().round()
 df['predicted_labels']=np.split(predictions,df.shape[0])
 
 #Save it to  csv file to see the results
-df[['wav_file','predicted_labels','Label_1','Label_2','Label_3']].to_csv('GKVK_prediction.csv')
+df.to_csv('audiomoth_prediction.csv')
