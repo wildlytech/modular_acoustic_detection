@@ -51,4 +51,4 @@ predictions= model.predict(test_data).ravel().round()
 df['predicted_labels']=np.split(predictions,df.shape[0])
 
 #Save it to  csv file to see the results
-df.to_csv('audiomoth_prediction.csv')
+df.drop('features',axis=1).to_csv('audiomoth_prediction.csv')
