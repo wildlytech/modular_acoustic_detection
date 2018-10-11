@@ -66,6 +66,10 @@ flags.DEFINE_string(
     'tfrecord_file', None,
     'Path to a TFRecord file where embeddings will be written.')
 
+flags.DEFINE_string(
+    'path_to_write_embeddings', None,
+    'path where the embeddings should be written')
+
 FLAGS = flags.FLAGS
 
 
@@ -75,16 +79,15 @@ def main(_):
 
   #Specify the path for the downloaded or recorded audio files and also path for writing the embeddings or pickle files
 
-  # This is example code for generating embeddings for downloaded explosion sounds 
-  # Give the path where wavfiles and embeddings are saved
-  wav_files_path = 'sounds/explosion_sounds/'
-  path_to_write_embeddings = 'data/explosion_embeddings/'
+
+  # create a path if there is no path
+  if not os.path.exists(FLAGS.path_to_write_embeddings):
+      os.makedirs(FLAGS.path_to_write_embeddings)
 
 
   #glob all the wave files and embeddings if any .
-
-  wav_files_path = glob.glob(wav_files_path + '*.wav')
-  pickle_files = glob.glob(path_to_write_embeddings + '*.pkl')
+  wav_files_path = glob.glob(FLAGS.wav_file + '*.wav')
+  pickle_files = glob.glob(FLAGS.path_to_write_embeddings + '*.pkl')
   wav_file_list = []
   for wav_file_path in wav_files_path:
     wav_file_list.append(wav_file_path.split('/')[-1])
@@ -145,7 +148,7 @@ def main(_):
 
 
           #Specify the same path that is mentioned above for writing the embeddings or pickle files
-          with open(path_to_write_embeddings + pkl,'w') as f:
+          with open(FLAGS.path_to_write_embeddings + pkl,'w') as f:
               pickle.dump(postprocessed_batch, f)
 
 
