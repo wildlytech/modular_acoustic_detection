@@ -2,16 +2,19 @@ import pandas as pd
 import numpy
 import pickle
 import glob
+import argparse
 
-#give the path where the embeddings of the downloaded files are saved
-path_where_embedddings_saved = 'data/audioset/explosion/'
+#parse the input path where the embeddings of the downloaded files are saved
+parser= argparse.ArgumentParser(description = 'Input the path where embeddings of the downloaded files are saved ')
+parser.add_argument('-path_to_embeddings','--path_where_embedddings_saved',action ='store'  ,help='Input the path')
+result = parser.parse_args()
 
 #Load the downloaded base dataframe generated from download_data() function of youtube_audioset
 with open('downloaded_base_dataframe.pkl','rb') as f:
     un_df=pickle.load(f)
 
 # glob all the generated pickle files( embeddings ) from the generting_embeddings.py
-embedding_files = glob.glob(path_where_embedddings_saved + '*.pkl')
+embedding_files = glob.glob(result.path_where_embedddings_saved + '*.pkl')
 #get the YTID from embedding files names
 ytid =[]
 for each_file_name in embedding_files:
@@ -19,6 +22,7 @@ for each_file_name in embedding_files:
 
 #Reading all the pickle files into the python environment
 embeddings=[]
+print 'reading the embedding files..'
 for embedding_each_file in embedding_files:
     with open(embedding_each_file,'rb') as f:
         arb=pickle.load(f)
