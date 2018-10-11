@@ -5,6 +5,17 @@ import pickle
 from matplotlib import pyplot as plt
 import glob
 import os
+import argparse
+
+
+#parse the input path to write the dataframes of seprated sounds
+parser= argparse.ArgumentParser(description = 'Input path to write the dataframe of seperated sounds. Make it interpretable directory name [ eg "diff_class_datasets/explosion_sounds" for explosion sound] so that it could be easily accessed ')
+parser.add_argument( '-path_to_write_different_sounds', '--path_to_write_different_sounds', action ='store'  ,help='Input the path')
+result = parser.parse_args()
+
+#create a path if not there
+if not os.path.exists(result.path_to_write_different_sounds):
+    os.makedirs(result.path_to_write_different_sounds)
 
 
 #Reading a pickle file consiting of the unbalanced data and sound labels
@@ -50,7 +61,7 @@ pure_tools = un_1.loc[un_1['Data_dist_new'].apply(lambda arr: arr[0]==7)]
 # write out all those pure single labelled Sounds
 file_names = ['pure_exp','pure_mot','pure_nat','pure_hum','pure_wod','pure_wild','pure_dom','pure_tools']
 for i,j in zip(file_names,[pure_exp,pure_mot,pure_nat,pure_hum,pure_wod,pure_wild,pure_dom,pure_tools]):
-    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+    with open(result.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
         pickle.dump(j,f)
 
 
@@ -69,7 +80,7 @@ exp_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==0) & (arr
 # write out all those Sounds
 file_names = ['exp_mot','exp_nat','exp_hum','exp_wod','exp_wild','exp_dom','exp_tools']
 for i,j in zip(file_names,[exp_mot,exp_nat,exp_hum,exp_wod,exp_wild,exp_dom,exp_tools]):
-    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+    with open(result.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
         pickle.dump(j,f)
 
 
@@ -84,7 +95,7 @@ mot_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==1) & (arr
 # write out all those Sounds
 file_names = ['mot_nat','mot_hum','mot_wod','mot_wild','mot_dom','mot_tools']
 for i,j in zip(file_names,[mot_nat,mot_hum,mot_wod,mot_wild,mot_dom,mot_tools]):
-    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+    with open(result.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
         pickle.dump(j,f)
 
 
@@ -96,7 +107,7 @@ nat_dom = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==2) & (arr[1
 nat_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==2) & (arr[1]==7)))]
 file_names = ['nat_hum','nat_wod','nat_wild','nat_dom','nat_tools']
 for i,j in zip(file_names,[nat_hum,nat_wod,nat_wild,nat_dom,nat_tools]):
-    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+    with open(result.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
         pickle.dump(j,f)
 
 
@@ -107,7 +118,7 @@ hum_dom = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==3) & (arr[1
 hum_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==3) & (arr[1]==7)))]
 file_names = ['hum_wod','hum_wild','hum_dom','hum_tools']
 for i,j in zip(file_names,[hum_wod,hum_wild,hum_dom,hum_tools]):
-    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+    with open(result.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
         pickle.dump(j,f)
 
 
@@ -119,7 +130,7 @@ wod_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==4) & (arr
 # write out all those Sounds
 file_names = ['wod_wild','wod_dom','wod_tools']
 for i,j in zip(file_names,[wod_wild,wod_dom,wod_tools]):
-    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+    with open(result.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
         pickle.dump(j,f)
 
 
@@ -130,22 +141,22 @@ file_names = ['wild_dom','wild_tools']
 
 # write out all those Sounds
 for i,j in zip(file_names,[wild_dom,wild_tools]):
-    with open('diff_class_datasets/new_wild/'+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
+    with open(result.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'_wild.pkl','w') as f:
         pickle.dump(j,f)
 
 
 #domestic and other
 dom_tools = un_2.loc[un_2['Data_dist_new'].apply(lambda arr: ((arr[0]==6) & (arr[1]==7)))]
-with open('diff_class_datasets/new_wild/'+'dom_tools_'+str(dom_tools.shape[0])+'_wild.pkl','w') as f:
+with open(result.path_to_write_different_sounds+'dom_tools_'+str(dom_tools.shape[0])+'_wild.pkl','w') as f:
     pickle.dump(dom_tools,f)
 
 #Sounds with more than 2 classes labelled are witten
 print 'three labelled sounds shape: ', un_3.shape
-with open('3_labelled_priority1_'+str(un_3.shape[0])+'.pkl' ,'w') as f:
+with open(result.path_to_write_different_sounds+'3_labelled_priority1_'+str(un_3.shape[0])+'.pkl' ,'w') as f:
     pickle.dump(un_3,f)
 print 'four labelled sounds shape: ', un_4.shape
-with open('4_labelled_priority1_'+str(un_4.shape[0])+'.pkl' ,'w') as f:
+with open(result.path_to_write_different_sounds+'4_labelled_priority1_'+str(un_4.shape[0])+'.pkl' ,'w') as f:
     pickle.dump(un_4,f)
 print 'five labelled sounds shape: ', un_5.shape
-with open('5_labelled_prioirty1_'+str(un_5.shape[0])+'.pkl' ,'w') as f:
+with open(result.path_to_write_different_sounds+'5_labelled_prioirty1_'+str(un_5.shape[0])+'.pkl' ,'w') as f:
     pickle.dump(un_5,f)
