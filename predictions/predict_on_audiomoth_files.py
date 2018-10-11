@@ -10,7 +10,7 @@ import numpy as np
 import argparse
 
 # parsing the inputs given  
-parser= argparse.ArgumentParser(description = 'Input the path for audio files and embeddings  ')
+parser= argparse.ArgumentParser(description = 'Input the path of the audio files recorded from audiomoth ( .WAV files ) and thier embeddings  ')
 parser.add_argument('-path_to_audio_files','--path_to_audio_files', action ='store' , help = 'Input the path')
 parser.add_argument('-path_to_embeddings','--path_to_embeddings', action ='store' , help = 'Input the path')
 result = parser.parse_args()
