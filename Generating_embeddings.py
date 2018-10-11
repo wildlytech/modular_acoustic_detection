@@ -93,13 +93,13 @@ def main(_):
     wav_file_list.append(wav_file_path.split('/')[-1])
 
 
-  for wav_file in wav_file_list:
-    pkl = str(i).split('.')[0][:11]+'.pkl'
-    indexs = wav_file_list.index(wav_file)
-
+  for wav_file,wav_file_name in zip(wav_files_path,wav_file_list):
+    pkl = str(wav_file_name)[:11]+'.pkl'
+    indexs = wav_file_list.index(wav_file_name)
+    print (wav_file)
     #No need to generate the embeddings that are already generated.
     if pkl in pickle_files:
-        print'Embeddings are already Generated for :', pkl
+        print ('Embeddings are already Generated for', pkl)
 
 
         # In this simple example, we run the examples from a single audio file through
