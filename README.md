@@ -58,7 +58,8 @@ This will download the embeddings in ```.pkl``` files at the directory where you
 $ python Generating_embeddings.py --wav_file /path/to/a/wav/file \
                                     --tfrecord_file /path/to/tfrecord/file \
                                     --checkpoint /path/to/model/checkpoint \
-                                    --pca_params /path/to/pca/params
+                                    --pca_params /path/to/pca/params \
+				    --path_to_write_embeddings /path/to/write/embeddings
 ```
 ###### Output of above script will return :
 - embeddings in ```.pkl``` files for each downloaded audio file at specified directory. 
