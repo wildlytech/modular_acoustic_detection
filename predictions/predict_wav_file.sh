@@ -1,0 +1,1 @@
+python hello.py --wav_file $1
