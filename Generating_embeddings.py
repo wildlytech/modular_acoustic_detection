@@ -37,6 +37,8 @@ import numpy as np
 from scipy.io import wavfile
 import six
 import tensorflow as tf
+import sys
+sys.path.insert(0,'externals/tensorflow_models/research/audioset/')
 import vggish_input
 import vggish_params
 import vggish_postprocess
@@ -55,11 +57,11 @@ flags.DEFINE_string(
     'If none is provided, a synthetic sound is used.')
 
 flags.DEFINE_string(
-    'checkpoint', 'vggish_model.ckpt',
+    'checkpoint', 'externals/tensorflow_models/research/audioset/vggish_model.ckpt',
     'Path to the VGGish checkpoint file.')
 
 flags.DEFINE_string(
-    'pca_params', 'vggish_pca_params.npz',
+    'pca_params', 'externals/tensorflow_models/research/audioset/vggish_pca_params.npz',
     'Path to the VGGish PCA parameters file.')
 
 flags.DEFINE_string(
