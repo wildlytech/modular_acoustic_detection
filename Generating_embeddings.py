@@ -108,7 +108,7 @@ def main(_):
         # the model. If none is provided, we generate a synthetic input.
     else:
         if FLAGS.wav_file:
-          wav_file = i
+          wav_file = wav_file
         else:
           # Write a WAV of a sine wav into an in-memory file object.
           num_secs = 5
