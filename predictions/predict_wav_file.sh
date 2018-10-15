@@ -1,1 +1,1 @@
-python predict_on_wav_file --wav_file $1
+python predict_on_wav_file.py --wav_file $1
