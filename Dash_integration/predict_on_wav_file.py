@@ -38,7 +38,7 @@ import six
 import tensorflow as tf
 import sys
 from keras import backend as K
-sys.path.insert(0,'externals/tensorflow_models/research/audioset/')
+sys.path.insert(0,'../externals/tensorflow_models/research/audioset/')
 import vggish_input
 import vggish_params
 import vggish_postprocess
