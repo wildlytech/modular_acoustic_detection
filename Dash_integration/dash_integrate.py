@@ -21,7 +21,6 @@ import datetime
 from keras.models import Sequential, Model
 import dash_table_experiments as dt
 from keras.optimizers import RMSprop
-# from keras.layers import Input
 from keras.layers import Dense, Conv1D, Conv2D, MaxPooling1D, Flatten, AveragePooling1D, TimeDistributed, MaxPooling2D
 
 
@@ -320,11 +319,13 @@ def check_for_data(n_intervals):
 
 
 ################################################################################
-                            #pag 4 Layou#
+                            #page 4 Layout#
 ################################################################################
 
 page_4_layout = html.Div(style={'color': 'green', 'fontSize': 20},children=[
     html.H2('Analysis on Downloaded files',style={'color': 'green', 'fontSize': 50, 'textAlign':'center','text-decoration': 'underline'}),
+    html.Button('Play sound',id='button'),
+    html.Div(id='display-play'),
     dcc.Interval(
     id='interval-component',
     interval=1*15000, # in milliseconds
@@ -340,7 +341,33 @@ page_4_layout = html.Div(style={'color': 'green', 'fontSize': 20},children=[
     ])
 
 
+# Make sound file play-able. 
+@app.callback(Output('button', 'disabled'),
+            [Input('my-dropdown','value')])
 
+def button_enable_disable(dropdown_value):
+    if dropdown_value :
+        return False
+    else :
+        return True
+
+@app.callback(Output('display-play','children'),
+            [Input('button', 'n_clicks'), Input('my-dropdown','value')])
+
+def play_sound(n_clicks,dropdown_value):
+    print n_clicks
+    if (dropdown_value != None) and   (n_clicks > 1) :
+
+        from pydub import AudioSegment
+        from pydub.playback import play
+
+        song = AudioSegment.from_wav(dropdown_value)
+        play(song)
+        n_clicks = 0
+        return
+
+
+#Update the dropdown when-ever new file is downloaded
 @app.callback(Output('my-dropdown', 'options'),
     [Input('interval-component', 'n_intervals')])
 
@@ -354,7 +381,7 @@ def markdown_drop_layout(n_intervals):
     return   data_labels
 
 
-
+# Run the analysis on the selected wav file and plot the prediction graph
 @app.callback(Output('page-4-content-2', 'children'),
 [Input('my-dropdown', 'value')])
 
