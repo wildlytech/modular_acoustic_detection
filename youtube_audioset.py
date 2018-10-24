@@ -1,165 +1,164 @@
-import numpy as np
-import pandas as pd
-from pydub import AudioSegment
 from subprocess import call, check_call, CalledProcessError
 import threading
 import pickle
 import os
-from datetime import datetime
+import sys
+import numpy as np
+import pandas as pd
+from pydub import AudioSegment
+from sklearn.preprocessing import LabelBinarizer
 import tensorflow as tf
 
-from sklearn.preprocessing import LabelBinarizer
-
-explosion_sounds = [
-'Fireworks',
-'Burst, pop',
-'Eruption',
-'Gunshot, gunfire',
-'Explosion',
-'Boom',
-"Fire"
+EXPLOSION_SOUNDS = [
+    'Fireworks',
+    'Burst, pop',
+    'Eruption',
+    'Gunshot, gunfire',
+    'Explosion',
+    'Boom',
+    'Fire'
 ]
 
-motor_sounds = [
-'Chainsaw',
-'Medium engine (mid frequency)',
-'Light engine (high frequency)',
-'Heavy engine (low frequency)',
-'Engine starting',
-'Engine',
-'Motor vehicle (road)',
-'Vehicle'
+MOTOR_SOUNDS = [
+    'Chainsaw',
+    'Medium engine (mid frequency)',
+    'Light engine (high frequency)',
+    'Heavy engine (low frequency)',
+    'Engine starting',
+    'Engine',
+    'Motor vehicle (road)',
+    'Vehicle'
 ]
 
-wood_sounds = [
-'Wood',
-'Chop',
-'Splinter',
-'Crack'
+WOOD_SOUNDS = [
+    'Wood',
+    'Chop',
+    'Splinter',
+    'Crack'
 ]
 
-human_sounds = [
-'Chatter',
-'Conversation',
-'Speech',
-'Narration, monologue',
-'Babbling',
-'Whispering',
-'Laughter',
-'Chatter',
-'Crowd',
-'Hubbub, speech noise, speech babble',
-'Children playing',
-'Whack, thwack',
-'Smash, crash',
-'Breaking',
-'Crushing',
-'Tearing',
-'Run',
-'Walk, footsteps',
-'Clapping'
-
-]
-
-
-domestic_sounds=[
-'Dog',
-'Bark',
-'Howl',
-'Bow-wow',
-'Growling',
-'Bay',
-'Livestock, farm animals, working animals',
-'Yip',
-'Cattle, bovinae',
-'Moo',
-'Cowbell',
-'Goat',
-'Bleat',
-'Sheep',
-'Squawk',
-'Domestic animals, pets'
+HUMAN_SOUNDS = [
+    'Chatter',
+    'Conversation',
+    'Speech',
+    'Narration, monologue',
+    'Babbling',
+    'Whispering',
+    'Laughter',
+    'Chatter',
+    'Crowd',
+    'Hubbub, speech noise, speech babble',
+    'Children playing',
+    'Whack, thwack',
+    'Smash, crash',
+    'Breaking',
+    'Crushing',
+    'Tearing',
+    'Run',
+    'Walk, footsteps',
+    'Clapping'
 
 ]
 
 
-tools=[
-'Jackhammer',
-'Sawing',
-'Tools',
-'Hammer',
-'Filing (rasp)',
-'Sanding',
-'Power tool'
+DOMESTIC_SOUNDS = [
+    'Dog',
+    'Bark',
+    'Howl',
+    'Bow-wow',
+    'Growling',
+    'Bay',
+    'Livestock, farm animals, working animals',
+    'Yip',
+    'Cattle, bovinae',
+    'Moo',
+    'Cowbell',
+    'Goat',
+    'Bleat',
+    'Sheep',
+    'Squawk',
+    'Domestic animals, pets'
+
 ]
 
 
-Wild_animals=[
-'Roaring cats (lions, tigers)',
-'Roar',
-'Bird',
-'Bird vocalization, bird call, bird song',
-'Squawk',
-'Pigeon, dove',
-'Chirp, tweet',
-'Coo',
-'Crow',
-'Caw',
-'Owl',
-'Hoot',
-'Gull, seagull',
-'Bird flight, flapping wings',
-'Canidae, dogs, wolves',
-'Rodents, rats, mice',
-'Mouse',
-'Chipmunk',
-'Patter',
-'Insect',
-'Cricket',
-'Mosquito',
-'Fly, housefly',
-'Buzz',
-'Bee, wasp, etc.',
-'Frog',
-'Croak',
-'Snake',
-'Rattle'
+TOOLS_SOUNDS = [
+    'Jackhammer',
+    'Sawing',
+    'Tools',
+    'Hammer',
+    'Filing (rasp)',
+    'Sanding',
+    'Power tool'
 ]
 
-nature_sounds = [
-"Silence",
-"Stream",
-"Wind noise (microphone)",
-"Wind",
-"Rustling leaves",
-"Howl",
-"Raindrop",
-"Rain on surface",
-"Rain",
-"Thunderstorm",
-"Thunder",
-'Crow',
-'Caw',
-'Bird',
-'Bird vocalization, bird call, bird song',
-'Chirp, tweet',
-'Owl',
-'Hoot'
+
+WILD_ANIMALS = [
+    'Roaring cats (lions, tigers)',
+    'Roar',
+    'Bird',
+    'Bird vocalization, bird call, bird song',
+    'Squawk',
+    'Pigeon, dove',
+    'Chirp, tweet',
+    'Coo',
+    'Crow',
+    'Caw',
+    'Owl',
+    'Hoot',
+    'Gull, seagull',
+    'Bird flight, flapping wings',
+    'Canidae, dogs, wolves',
+    'Rodents, rats, mice',
+    'Mouse',
+    'Chipmunk',
+    'Patter',
+    'Insect',
+    'Cricket',
+    'Mosquito',
+    'Fly, housefly',
+    'Buzz',
+    'Bee, wasp, etc.',
+    'Frog',
+    'Croak',
+    'Snake',
+    'Rattle'
+]
+
+NATURE_SOUNDS = [
+    "Silence",
+    "Stream",
+    "Wind noise (microphone)",
+    "Wind",
+    "Rustling leaves",
+    "Howl",
+    "Raindrop",
+    "Rain on surface",
+    "Rain",
+    "Thunderstorm",
+    "Thunder",
+    'Crow',
+    'Caw',
+    'Bird',
+    'Bird vocalization, bird call, bird song',
+    'Chirp, tweet',
+    'Owl',
+    'Hoot'
 
 ]
 
 #Defining Ambient and Impact sounds as to what sounds it must comprise of.
-ambient_sounds = nature_sounds
-impact_sounds = explosion_sounds + wood_sounds + motor_sounds + human_sounds + tools  + domestic_sounds
+AMBIENT_SOUNDS = NATURE_SOUNDS
+IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + HUMAN_SOUNDS + TOOLS_SOUNDS  + DOMESTIC_SOUNDS
 
 #function to get the dataframe from csv data
 def get_csv_data(target_sounds):
     label_names = pd.read_csv("data/audioset/class_labels_indices.csv")
 
-    balanced_train = pd.read_csv("data/audioset/balanced_train_segments.csv",quotechar='"', skipinitialspace=True, skiprows=2)
+    balanced_train = pd.read_csv("data/audioset/balanced_train_segments.csv", quotechar='"', skipinitialspace=True, skiprows=2)
     balanced_train.columns = [balanced_train.columns[0][2:]] + balanced_train.columns[1:].values.tolist()
 
-    unbalanced_train = pd.read_csv("data/audioset/unbalanced_train_segments.csv",quotechar='"', skipinitialspace=True, skiprows=2)
+    unbalanced_train = pd.read_csv("data/audioset/unbalanced_train_segments.csv", quotechar='"', skipinitialspace=True, skiprows=2)
     unbalanced_train.columns = [unbalanced_train.columns[0][2:]] + unbalanced_train.columns[1:].values.tolist()
 
     train = pd.concat([unbalanced_train, balanced_train], axis=0, ignore_index=True)
@@ -182,7 +181,7 @@ def get_csv_data(target_sounds):
     train_label_binarized = name_bin.transform(train_labels_split[train_labels_split.columns[0]])
     for column in train_labels_split.columns:
         train_label_binarized |= name_bin.transform(train_labels_split[column])
-    train_label_binarized = pd.DataFrame(train_label_binarized, columns = name_bin.classes_)
+    train_label_binarized = pd.DataFrame(train_label_binarized, columns=name_bin.classes_)
     del train_label_binarized['None']
 
 
@@ -235,7 +234,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
 
 
 
-# To download the audio files from youtube 
+# To download the audio files from youtube
 def download_data(target_sounds_list, target_path):
 
     # Get the data necessary for downloading audio files
@@ -243,14 +242,14 @@ def download_data(target_sounds_list, target_path):
     labels_csv = pd.read_csv("data/audioset/class_labels_indices.csv")
 
     # create a column with name of the labels given to sounds and also column with wav file names
-    df['positive_labels']=df['positive_labels'].apply(lambda arr: arr.split(','))
-    df['labels_name']=df['positive_labels'].map(lambda arr:np.concatenate([labels_csv.loc[labels_csv['mid']==x].display_name for x in arr]))
+    df['positive_labels'] = df['positive_labels'].apply(lambda arr: arr.split(','))
+    df['labels_name'] = df['positive_labels'].map(lambda arr: np.concatenate([labels_csv.loc[labels_csv['mid'] == x].display_name for x in arr]))
     df['wav_file'] = df['YTID'].astype(str) + '-' + df['start_seconds'].astype(str) + '-' + df['end_seconds'].astype(str)+'.wav'
 
 
     #save the data frame which can be used for further balancing the data and generating the embeddings for audio files.
-    with open('downloaded_base_dataframe.pkl','w') as f:
-        pickle.dump(df,f)
+    with open('downloaded_base_dataframe.pkl', 'w') as file_obj:
+        pickle.dump(df, file_obj)
 
     print 'Base dataframe is saved as " downloaded_base_dataframe.pkl "..!!'
 
@@ -307,18 +306,17 @@ def read_audio_record(audio_record, output_to_file=None):
             tf_seq_example = tf.train.SequenceExample.FromString(example)
             n_frames = len(tf_seq_example.feature_lists.feature_list['audio_embedding'].feature)
 
-            rgb_frame = []
             audio_frame = []
             # iterate through frames
             for i in range(n_frames):
                 audio_frame.append(tf.cast(tf.decode_raw(
-                        tf_seq_example.feature_lists.feature_list['audio_embedding'].feature[i].bytes_list.value[0],tf.uint8)
-                               ,tf.float32).eval())
+                    tf_seq_example.feature_lists.feature_list['audio_embedding'].feature[i].bytes_list.value[0], tf.uint8)
+                                           , tf.float32).eval())
 
             feat_audio.append([])
 
             feat_audio[count].append(audio_frame)
-            count+=1
+            count += 1
         sess.close()
 
     df = pd.DataFrame(zip(vid_ids, labels, start_time_seconds, end_time_seconds, feat_audio),
@@ -364,7 +362,7 @@ def get_recursive_sound_names(designated_sound_names):
     return recursive_sound_names
 
 def get_all_sound_names():
-    return get_recursive_sound_names(ambient_sounds), get_recursive_sound_names(impact_sounds)
+    return get_recursive_sound_names(AMBIENT_SOUNDS), get_recursive_sound_names(IMPACT_SOUNDS)
 
 def get_data():
 
@@ -403,7 +401,7 @@ def get_data():
     pickle_files = filter(lambda x: x.endswith('.pkl'), pickle_files)
     pickle_files.sort()
 
-    ambient_sounds, impact_sounds = get_all_sound_names()
+    AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names()
 
     print "Reading pickles..."
 
@@ -415,7 +413,7 @@ def get_data():
         sub_df = pd.read_pickle(path_prefix + audio_record)
 
         def check_sounds(x):
-            for sound in (impact_sounds+ambient_sounds):
+            for sound in IMPACT_SOUNDS+AMBIENT_SOUNDS:
                 if sound in x:
                     return True
 
@@ -428,11 +426,11 @@ def get_data():
     df = pd.concat(df, ignore_index=True)
 
     # Binarize the labels
-    name_bin = LabelBinarizer().fit(ambient_sounds + impact_sounds)
+    name_bin = LabelBinarizer().fit(AMBIENT_SOUNDS + IMPACT_SOUNDS)
     labels_split = df['labels'].apply(pd.Series).fillna('None')
     labels_binarized = name_bin.transform(labels_split[labels_split.columns[0]])
     for column in labels_split.columns:
         labels_binarized |= name_bin.transform(labels_split[column])
-    labels_binarized = pd.DataFrame(labels_binarized, columns = name_bin.classes_)
+    labels_binarized = pd.DataFrame(labels_binarized, columns=name_bin.classes_)
 
     return df, labels_binarized
