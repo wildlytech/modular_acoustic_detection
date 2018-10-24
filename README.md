@@ -41,7 +41,7 @@ $ python download_all_sounds.py
 This will download the sounds ( _.wav files_ ) that you are interested in, from enlisted sounds of  [Google audioset](https://research.google.com/audioset/). you can see the list for class of sounds by using ```[-h]``` argument for script in command line .
 
 ```
-$ python Download_SOI.py [-h] [-target_sounds TARGET_SOUNDS] [-target_path TARGET_PATH]
+$ python download_soi.py [-h] [-target_sounds TARGET_SOUNDS] [-target_path TARGET_PATH]
 
 ```
 ###### Output of the above script will return:
@@ -55,7 +55,7 @@ $ python Download_SOI.py [-h] [-target_sounds TARGET_SOUNDS] [-target_path TARGE
 This will download the embeddings in ```.pkl``` files at the directory where you specify. This script requires additional functional scripts found at [Tensorflow-models-repo](https://github.com/tensorflow/models/tree/9b57f41ce21cd7264c52140c9ab31cdfc5169fcd/research/audioset).
 
 ```shell
-$ python Generating_embeddings.py --wav_file /path/to/a/wav/file \
+$ python generating_embeddings.py --wav_file /path/to/a/wav/file \
                                     --tfrecord_file /path/to/tfrecord/file \
                                     --checkpoint /path/to/model/checkpoint \
                                     --pca_params /path/to/pca/params \
@@ -111,7 +111,7 @@ $ python binary_model.py [-h] [-save_weights SAVE_WEIGHTS]
 ##### 10. To train a Multi-label model :
 This will call ```balancing_dataset.py``` function to get the balanced dataframe for training the multi-label model. 
 ```
-$ python multiclass_model.py [-h] [-save_weights SAVE_WEIGHTS] 
+$ python multilabel_model.py [-h] [-save_weights SAVE_WEIGHTS] 
 ```
 
 ###### output returns:
