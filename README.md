@@ -55,10 +55,7 @@ $ python download_soi.py [-h] [-target_sounds TARGET_SOUNDS] [-target_path TARGE
 This will download the embeddings in ```.pkl``` files at the directory where you specify. This script requires additional functional scripts found at [Tensorflow-models-repo](https://github.com/tensorflow/models/tree/9b57f41ce21cd7264c52140c9ab31cdfc5169fcd/research/audioset).
 
 ```shell
-$ python generating_embeddings.py --wav_file /path/to/a/wav/file \
-                                    --tfrecord_file /path/to/tfrecord/file \
-                                    --checkpoint /path/to/model/checkpoint \
-                                    --pca_params /path/to/pca/params \
+$ python generating_embeddings.py   --wav_file /path/to/a/wav/file \
 				    --path_to_write_embeddings /path/to/write/embeddings
 ```
 ###### Output of above script will return :
