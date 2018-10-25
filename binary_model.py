@@ -18,15 +18,14 @@ import balancing_dataset
 
 
 ambient_sounds, impact_sounds = get_all_sound_names()
-
 explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS)
 motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS)
 wood_sounds = get_recursive_sound_names(WOOD_SOUNDS)
 human_sounds = get_recursive_sound_names(HUMAN_SOUNDS)
 nature_sounds = get_recursive_sound_names(NATURE_SOUNDS)
 
-#Read the balanced data created by running the balancing_datasets.py
 
+#Read the balanced data created by running the balancing_datasets.py
 #Note that this is binary classification. Balancing must be  [ Ambient ] vs  [ Impact ]
 DATA_FRAME = balancing_dataset.balanced_data()
 
@@ -38,21 +37,17 @@ for column in LABELS_SPLIT.columns:
     LABELS_BINARIZED |= NAME_BIN.transform(LABELS_SPLIT[column])
 LABELS_BINARIZED = pd.DataFrame(LABELS_BINARIZED, columns=NAME_BIN.classes_)
 
-
 print LABELS_BINARIZED.shape
 print DATA_FRAME.shape[0], "examples"
 
 # print the percentage of Impact and Ambinet sounds
 print "Percentage Impact Sounds:", (LABELS_BINARIZED[impact_sounds].sum(axis=1) > 0).mean()
 print "Percentage Ambient Sounds:", (LABELS_BINARIZED[ambient_sounds].sum(axis=1) > 0).mean()
-
 print LABELS_BINARIZED.mean()
-
 
 #Filter out the sounds that are having 10 seconds duration.
 DF_FILTERED = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
 LABELS_FILTERED = LABELS_BINARIZED.loc[DF_FILTERED.index, :]
-
 
 #split the data into train and test
 DF_TRAIN, DF_TEST, LABELS_BINARIZED_TRAIN, LABELS_BINARIZED_TEST = train_test_split(DF_FILTERED, LABELS_FILTERED,
@@ -63,10 +58,8 @@ X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 X_TEST_STANDARDIZED = X_TEST / 255
-
 Y_TRAIN = (LABELS_BINARIZED_TRAIN[impact_sounds].any(axis=1)*1).values
 Y_TEST = (LABELS_BINARIZED_TEST[impact_sounds].any(axis=1)*1).values
-
 
 # Print the percentage of each sounds in whole data
 print LABELS_FILTERED.loc[:, explosion_sounds].any(axis=1).mean()
@@ -77,7 +70,6 @@ print LABELS_FILTERED.loc[:, nature_sounds].any(axis=1).mean()
 
 
 LABELS_FILTERED.loc[:, impact_sounds].any(axis=1).mean()
-
 
 # Try experimenting with Logistic regression algorithm
 CLF1_ = LogisticRegression(max_iter=1000)
@@ -95,7 +87,6 @@ CLF1_.fit(CLF1_TRAIN, CLF1_TRAIN_TARGET)
 CLF1_TRAIN_PREDICTION = CLF1_.predict(CLF1_TRAIN)
 CLF1_TEST_PREDICTION = CLF1_.predict(CLF1_TEST)
 CLF1_TEST_PREDICTION_PROB = CLF1_.predict_proba(CLF1_TEST)[:, 1]
-
 
 # Print out the confusion matrix for Train data
 CLF1_CONF_TRAIN_MAT = pd.crosstab(CLF1_TRAIN_TARGET, CLF1_TRAIN_PREDICTION, margins=True)
@@ -116,7 +107,6 @@ print "Test Precision:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_M
 print "Test Recall:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT['All'][True])
 print "Test Accuracy:", (CLF1_TEST_PREDICTION == CLF1_TEST_TARGET).mean()
 print CLF1_CONF_TEST_MAT
-
 
 # create the keras neural netwrok model
 def create_keras_model():
