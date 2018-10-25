@@ -8,8 +8,6 @@ import argparse
 import numpy as np
 import pandas as pd
 
-
-
 #parse the input path to write the dataframes of seprated sounds
 PARSER = argparse.ArgumentParser(description='Input path to write the dataframe \
                                  of seperated sounds Make it interpretable directory name \
@@ -25,14 +23,12 @@ RESULT = PARSER.parse_args()
 if not os.path.exists(RESULT.path_to_write_different_sounds):
     os.makedirs(RESULT.path_to_write_different_sounds)
 
-
 #Reading a pickle file consiting of the unbalanced data and sound labels
 with open('downloaded_final_dataframe.pkl', 'rb') as f:
     UN = pickle.load(f)
 LABELS_CSV = pd.read_csv('data/audioset/class_labels_indices.csv')
 print 'Files Loaded'
 print UN.shape
-
 
 #Reading the coarse labels pickle file.
 #It consists of seperate classes for sounds related to
@@ -45,10 +41,8 @@ UN['Data_dist_new'] = UN['Data_dist_new'].apply(np.concatenate)
 UN['Data_dist_new'] = UN['Data_dist_new'].apply(set)
 UN['Data_dist_new'] = UN['Data_dist_new'].apply(list)
 
-
 # get the dataframe for having single type of sounds
 UN['len'] = UN['Data_dist_new'].apply(len)
-
 
 #For with single sound , two , three , four and five
 UN_1 = UN.loc[UN['len'] == 1]
@@ -56,7 +50,6 @@ UN_2 = UN.loc[UN['len'] == 2]
 UN_3 = UN.loc[UN['len'] == 3]
 UN_4 = UN.loc[UN['len'] == 4]
 UN_5 = UN.loc[UN['len'] == 5]
-
 
 # seperate out the sounds from single labelled.
 #Check out the coarse_labels.csv file
@@ -78,7 +71,6 @@ for i, j in zip(FILE_NAMES,
                  PURE_WOD, PURE_WILD, PURE_DOM, PURE_TOOLS]):
     with open(RESULT.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'.pkl', 'w') as f:
         pickle.dump(j, f)
-
 
 
 # seperate out sounds which are Multi-labelled with two classes
@@ -120,6 +112,8 @@ NAT_WOD = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 2) & (arr
 NAT_WILD = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 2) & (arr[1] == 5)))]
 NAT_DOM = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 2) & (arr[1] == 6)))]
 NAT_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 2) & (arr[1] == 7)))]
+
+#wrute out all those sounds
 FILE_NAMES = ['nat_hum', 'nat_wod', 'nat_wild', 'nat_dom', 'nat_tools']
 for i, j in zip(FILE_NAMES, [NAT_HUM, NAT_WOD, NAT_WILD, NAT_DOM, NAT_TOOLS]):
     with open(RESULT.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'.pkl', 'w') as f:
@@ -148,7 +142,6 @@ for i, j in zip(FILE_NAMES, [WOD_WILD, WOD_DOM, WOD_TOOLS]):
     with open(RESULT.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'.pkl', 'w') as f:
         pickle.dump(j, f)
 
-
 #wild and other sounds
 WILD_DOM = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 5) & (arr[1] == 6)))]
 WILD_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 5) & (arr[1] == 7)))]
@@ -158,7 +151,6 @@ FILE_NAMES = ['wild_dom', 'wild_tools']
 for i, j in zip(FILE_NAMES, [WILD_DOM, WILD_TOOLS]):
     with open(RESULT.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'.pkl', 'w') as f:
         pickle.dump(j, f)
-
 
 #domestic and other
 DOM_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 6) & (arr[1] == 7)))]
