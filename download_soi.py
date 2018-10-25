@@ -1,3 +1,6 @@
+"""
+Downloads Sounds of Interest audio files amoung the list
+"""
 import argparse
 import youtube_audioset
 
@@ -140,20 +143,28 @@ NATURE_SOUNDS = [
 
 ]
 
+#Description and Help
+DESCRIPTION = 'Input one of these sounds : explosion_sounds , wood_sounds , motor_sounds,\
+               human_sounds, tools ,domestic_sounds, Wild_animals, nature_sounds'
+HELP = 'Input the target sounds. It should be one of the listed sounds'
+
 #Defining Ambient and Impact sounds as to what sounds it must comprise of.
 AMBIENT_SOUNDS = NATURE_SOUNDS
-IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + HUMAN_SOUNDS + TOOLS_SOUNDS + DOMESTIC_SOUNDS
+IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
+                HUMAN_SOUNDS + TOOLS_SOUNDS + DOMESTIC_SOUNDS
 
 #create a dictionary of sounds
 SOUNDS_DICT = {'explosion_sounds': EXPLOSION_SOUNDS, 'wood_sounds': WOOD_SOUNDS,
                'nature_sounds': NATURE_SOUNDS, 'motor_sounds': MOTOR_SOUNDS,
-               'human_sounds': HUMAN_SOUNDS, 'tools': TOOLS_SOUNDS, 'domestic_sounds': DOMESTIC_SOUNDS,
-               'Wild_animals':WILD_ANIMALS}
+               'human_sounds': HUMAN_SOUNDS, 'tools': TOOLS_SOUNDS,
+               'domestic_sounds': DOMESTIC_SOUNDS, 'Wild_animals':WILD_ANIMALS}
 
 #parse the input arguments given from command line
-PARSER = argparse.ArgumentParser(description='Input one of these sounds : explosion_sounds , wood_sounds , motor_sounds, human_sounds, tools ,domestic_sounds, Wild_animals, nature_sounds')
-PARSER.add_argument('-target_sounds', '--target_sounds', action='store', help='Input the target sounds. It should be one of the listed sounds', default='explosion_sounds')
-PARSER.add_argument('-target_path', '--target_path', action='store', help='Input the path', default='sounds/explosion_sounds/')
+PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+PARSER.add_argument('-target_sounds', '--target_sounds', action='store',
+                    help=HELP, default='explosion_sounds')
+PARSER.add_argument('-target_path', '--target_path', action='store',
+                    help='Input the path', default='sounds/explosion_sounds/')
 RESULT = PARSER.parse_args()
 
 
