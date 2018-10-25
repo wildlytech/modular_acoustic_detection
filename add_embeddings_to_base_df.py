@@ -3,9 +3,16 @@ import argparse
 import pickle
 import pandas as pd
 
+
+# Help description
+DESCRIPTION = 'Input the path for embeddings of the downloaded files'
+HELP = 'Input the path'
+ARGS = '--path_where_embedddings_saved'
+
+
 #parse the input path where the embeddings of the downloaded files are saved
-PARSER = argparse.ArgumentParser(description='Input the path for embeddings of the downloaded files')
-PARSER.add_argument('-path_to_embeddings', '--path_where_embedddings_saved', action='store', help='Input the path')
+PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+PARSER.add_argument('-path_to_embeddings', ARGS, action='store', help=HELP)
 RESULT = PARSER.parse_args()
 
 #Load the downloaded base dataframe generated from download_data() function of youtube_audioset
