@@ -2,36 +2,43 @@ import pickle
 import random
 import pandas as pd
 
+
+
+
+# Common path
+
+PATH_FOR_DATA = 'diff_class_datasets/Datasets/'
+
 def balanced_data():
 
     # Reding all the files into pandas dataframe
 
     #Files with single class
-    with open('diff_class_datasets/Datasets/pure/Explosion/pure_exp_7957.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'pure/Explosion/pure_exp_7957.pkl', 'rb') as file_obj:
         pure_exp = pickle.load(file_obj)
-    with open('diff_class_datasets/Datasets/pure/Motor/pure_mot_76045.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'pure/Motor/pure_mot_76045.pkl', 'rb') as file_obj:
         pure_mot = pickle.load(file_obj)
-    with open('diff_class_datasets/Datasets/pure/Human_sounds/pure_hum_46525.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'pure/Human_sounds/pure_hum_46525.pkl', 'rb') as file_obj:
         pure_hum = pickle.load(file_obj)
-    with open('diff_class_datasets/Datasets/pure/Wood/pure_wod_1115.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'pure/Wood/pure_wod_1115.pkl', 'rb') as file_obj:
         pure_wod = pickle.load(file_obj)
-    with open('diff_class_datasets/Datasets/pure/Nature_sounds/pure_nat_13527.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'pure/Nature_sounds/pure_nat_13527.pkl', 'rb') as file_obj:
         pure_nat = pickle.load(file_obj)
-    with open('diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'pure/Domestic/pure_dom_9497.pkl', 'rb') as file_obj:
         pure_dom = pickle.load(file_obj)
-    with open('diff_class_datasets/Datasets/pure/Tools/pure_tools_8113.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'pure/Tools/pure_tools_8113.pkl', 'rb') as file_obj:
         pure_tools = pickle.load(file_obj)
-    # with open('diff_class_datasets/Datasets/pure/Wild/pure_wild_7061.pkl','rb') as file_obj:
+    # with open(PATH_FOR_DATA+'pure/Wild/pure_wild_7061.pkl','rb') as file_obj:
     #     pure_wild=pickle.load(file_obj)
 
     # Mixed sounds
-    with open('diff_class_datasets/Datasets/Mixed_2/mixed_with_human/hum_exp_3969.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'Mixed_2/mixed_with_human/hum_exp_3969.pkl', 'rb') as file_obj:
         hum_exp = pickle.load(file_obj)
-    with open('diff_class_datasets/Datasets/Mixed_2/mixed_with_wod/wood_tools_1283.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'Mixed_2/mixed_with_wod/wood_tools_1283.pkl', 'rb') as file_obj:
         wood_tool = pickle.load(file_obj)
-    with open('diff_class_datasets/Datasets/Mixed_2/mixed_with_nature/nat_dom_345.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'Mixed_2/mixed_with_nature/nat_dom_345.pkl', 'rb') as file_obj:
         nat_dom = pickle.load(file_obj)
-    with open('diff_class_datasets/Datasets/Mixed_2/mixed_with_motor/mot_wod_62.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA+'Mixed_2/mixed_with_motor/mot_wod_62.pkl', 'rb') as file_obj:
         mot_wod = pickle.load(file_obj)
 
      #Balancing and experimenting
