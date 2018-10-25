@@ -1,3 +1,6 @@
+"""
+Seperates different sounds based on its labelling
+"""
 #Importing necessary library funtions
 import pickle
 import os
@@ -8,8 +11,14 @@ import pandas as pd
 
 
 #parse the input path to write the dataframes of seprated sounds
-PARSER = argparse.ArgumentParser(description='Input path to write the dataframe of seperated sounds. Make it interpretable directory name [ eg "diff_class_datasets/explosion_sounds" for explosion sound] so that it could be easily accessed ')
-PARSER.add_argument('-path_to_write_different_sounds', '--path_to_write_different_sounds', action='store', help='Input the path')
+PARSER = argparse.ArgumentParser(description='Input path to write the dataframe \
+                                 of seperated sounds Make it interpretable directory name \
+                                 [ eg "diff_class_datasets/explosion_sounds" for explosion sound].\
+                                 so that it could be easily accessed ')
+PARSER.add_argument('-path_to_write_different_sounds',
+                    '--path_to_write_different_sounds',
+                    action='store',
+                    help='Input the path')
 RESULT = PARSER.parse_args()
 
 #create a path if not there
@@ -25,7 +34,9 @@ print 'Files Loaded'
 print UN.shape
 
 
-#Reading the coarse labels pickle file . It consists of seperate classes for sounds related to Explosion, Motor, Nature, Human, Wood with numbers assigned as 0,1,2,3,4 respectively.
+#Reading the coarse labels pickle file.
+#It consists of seperate classes for sounds related to
+#Explosion, Motor, Nature, Human, Wood with numbers assigned as 0,1,2,3,4 respectively.
 LAB = pd.read_csv('coarse_labels.csv')
 
 # Creating the Data distribution coulumn
@@ -47,7 +58,9 @@ UN_4 = UN.loc[UN['len'] == 4]
 UN_5 = UN.loc[UN['len'] == 5]
 
 
-# seperate out the sounds from single labelled. Check out the coarse_labels.csv file to know what are index values for Explosion, Motor, Natutre, Human, and all other sounds
+# seperate out the sounds from single labelled.
+#Check out the coarse_labels.csv file
+#to know what are index values for Explosion, Motor, Natutre, Human, and all other sounds
 PURE_EXP = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 0)]
 PURE_MOT = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 1)]
 PURE_NAT = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 2)]
@@ -58,8 +71,11 @@ PURE_DOM = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 6)]
 PURE_TOOLS = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 7)]
 
 # write out all those pure single labelled Sounds
-FILE_NAMES = ['pure_exp', 'pure_mot', 'pure_nat', 'pure_hum', 'pure_wod', 'pure_wild', 'pure_dom', 'pure_tools']
-for i, j in zip(FILE_NAMES, [PURE_EXP, PURE_MOT, PURE_NAT, PURE_HUM, PURE_WOD, PURE_WILD, PURE_DOM, PURE_TOOLS]):
+FILE_NAMES = ['pure_exp', 'pure_mot', 'pure_nat', 'pure_hum',
+              'pure_wod', 'pure_wild', 'pure_dom', 'pure_tools']
+for i, j in zip(FILE_NAMES,
+                [PURE_EXP, PURE_MOT, PURE_NAT, PURE_HUM,
+                 PURE_WOD, PURE_WILD, PURE_DOM, PURE_TOOLS]):
     with open(RESULT.path_to_write_different_sounds+i+'_'+str(j.shape[0])+'.pkl', 'w') as f:
         pickle.dump(j, f)
 
@@ -146,16 +162,20 @@ for i, j in zip(FILE_NAMES, [WILD_DOM, WILD_TOOLS]):
 
 #domestic and other
 DOM_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 6) & (arr[1] == 7)))]
-with open(RESULT.path_to_write_different_sounds+'dom_tools_'+str(DOM_TOOLS.shape[0])+'.pkl', 'w') as f:
+with open(RESULT.path_to_write_different_sounds+'dom_tools_'+
+          str(DOM_TOOLS.shape[0])+'.pkl', 'w') as f:
     pickle.dump(DOM_TOOLS, f)
 
 #Sounds with more than 2 classes labelled are witten
 print 'three labelled sounds shape: ', UN_3.shape
-with open(RESULT.path_to_write_different_sounds+'3_labelled_priority1_'+str(UN_3.shape[0])+'.pkl', 'w') as f:
+with open(RESULT.path_to_write_different_sounds+'3_labelled_priority1_'+
+          str(UN_3.shape[0])+'.pkl', 'w') as f:
     pickle.dump(UN_3, f)
 print 'four labelled sounds shape: ', UN_4.shape
-with open(RESULT.path_to_write_different_sounds+'4_labelled_priority1_'+str(UN_4.shape[0])+'.pkl', 'w') as f:
+with open(RESULT.path_to_write_different_sounds+'4_labelled_priority1_'+
+          str(UN_4.shape[0])+'.pkl', 'w') as f:
     pickle.dump(UN_4, f)
 print 'five labelled sounds shape: ', UN_5.shape
-with open(RESULT.path_to_write_different_sounds+'5_labelled_prioirty1_'+str(UN_5.shape[0])+'.pkl', 'w') as f:
+with open(RESULT.path_to_write_different_sounds+'5_labelled_prioirty1_'+
+          str(UN_5.shape[0])+'.pkl', 'w') as f:
     pickle.dump(UN_5, f)
