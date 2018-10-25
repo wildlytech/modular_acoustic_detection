@@ -1,14 +1,19 @@
+"""
+Training a Binary Output model.
+Impact Sounds = 1
+Ambient SOunds = 2
+"""
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score, recall_score, precision_recall_curve
 from keras.models import Sequential
 from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from keras.optimizers import RMSprop
-from youtube_audioset import get_data, get_recursive_sound_names, get_all_sound_names
-from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS
+from youtube_audioset import get_recursive_sound_names, get_all_sound_names
+from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, \
+                             WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS
 import balancing_dataset
 
 
@@ -91,23 +96,21 @@ CLF1_TRAIN_PREDICTION = CLF1_.predict(CLF1_TRAIN)
 CLF1_TEST_PREDICTION = CLF1_.predict(CLF1_TEST)
 CLF1_TEST_PREDICTION_PROB = CLF1_.predict_proba(CLF1_TEST)[:, 1]
 
+
 # Print out the confusion matrix for Train data
 CLF1_CONF_TRAIN_MAT = pd.crosstab(CLF1_TRAIN_TARGET, CLF1_TRAIN_PREDICTION, margins=True)
+
 print 'Train precsion and recall for Logistic regression'
 print '============================================='
-
-
 print "Train Precision:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT[True]['All'])
 print "Train Recall:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT['All'][True])
 print "Train Accuracy:", (CLF1_TRAIN_PREDICTION == CLF1_TRAIN_TARGET).mean()
-
 print CLF1_CONF_TRAIN_MAT
 
 # Print out the confusion matrix for test data
 CLF1_CONF_TEST_MAT = pd.crosstab(CLF1_TEST_TARGET, CLF1_TEST_PREDICTION, margins=True)
 print 'Test precsion and recall for Logistic regression'
 print '============================================='
-
 
 print "Test Precision:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT[True]['All'])
 print "Test Recall:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT['All'][True])
@@ -117,9 +120,12 @@ print CLF1_CONF_TEST_MAT
 
 # create the keras neural netwrok model
 def create_keras_model():
-    # create model
+    """
+    Create a Model
+    """
     model = Sequential()
-    model.add(Conv1D(40, input_shape=(1280, 1), kernel_size=128, strides=128, activation='relu', padding='same'))
+    model.add(Conv1D(40, input_shape=(1280, 1), kernel_size=128,
+                     strides=128, activation='relu', padding='same'))
     model.add(Conv1D(100, kernel_size=3, activation='relu', padding='same'))
     model.add(Dense(10, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
@@ -166,7 +172,6 @@ print CLF2_CONF_TRAIN_MAT
 CLF2_CONF_TEST_MAT = pd.crosstab(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION, margins=True)
 print "Testing Precision and recall for Keras model"
 print '============================================='
-
 
 print "Test Precision:", CLF2_CONF_TEST_MAT[True][True] / float(CLF2_CONF_TEST_MAT[True]['All'])
 print "Test Recall:", CLF2_CONF_TEST_MAT[True][True] / float(CLF2_CONF_TEST_MAT['All'][True])
