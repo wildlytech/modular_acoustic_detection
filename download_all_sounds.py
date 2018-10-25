@@ -7,5 +7,7 @@ if __name__ == "__main__":
     TARGET_PATH = 'sounds/ambient_impact/'
 
 	#start downloading all the files
-	#It will also return a base dataframe with [ YTID, start_seconds, end_seconds, positive_labels, labels_name, wav_file ] name  as columns along with audio wav files
+	#It will also return a base dataframe with
+	#[ YTID, start_seconds, end_seconds, positive_labels, labels_name, wav_file
+	# name  as columns along with audio wav files
     download_data(TARGET_SOUNDS, TARGET_PATH)
