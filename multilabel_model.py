@@ -1,3 +1,6 @@
+"""
+Traning a Mulit-label Model
+"""
 #Import the necessary functions and libraries
 import pandas as pd
 import numpy as np
@@ -8,7 +11,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from keras.optimizers import Adam
 from youtube_audioset import get_recursive_sound_names, get_all_sound_names
-from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS, DOMESTIC_SOUNDS, TOOLS_SOUNDS
+from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, \
+                             HUMAN_SOUNDS, NATURE_SOUNDS, DOMESTIC_SOUNDS, TOOLS_SOUNDS
 import balancing_dataset
 
 
@@ -29,9 +33,12 @@ tools = get_recursive_sound_names(TOOLS_SOUNDS)
 DATA_FRAME = balancing_dataset.balanced_data()
 print DATA_FRAME.shape[0], "examples"
 
-# Different classes of sounds. You can increase the class by adding the necesssary sounds of that class which will be used for training
-ALL_SOUND_NAMES = ['Motor_sound', 'Explosion_sound', 'Human_sound', 'Nature_sound', 'Domestic_animals', 'Tools']
-ALL_SOUND_LIST = explosion_sounds + motor_sounds + human_sounds + nature_sounds + domestic_sounds + tools
+# Different classes of sounds.
+#You can increase the class by adding the necesssary sounds of that class
+ALL_SOUND_NAMES = ['Motor_sound', 'Explosion_sound', 'Human_sound',
+                   'Nature_sound', 'Domestic_animals', 'Tools']
+ALL_SOUND_LIST = explosion_sounds + motor_sounds + human_sounds + \
+                 nature_sounds + domestic_sounds + tools
 
 
 
@@ -73,12 +80,14 @@ X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 X_TEST_STANDARDIZED = X_TEST / 255
 
-
 #create the keras model
 def create_keras_model():
-    # create model
+    """
+    Creating a Model
+    """
     model = Sequential()
-    model.add(Conv1D(500, input_shape=(1280, 1), kernel_size=128, strides=128, activation='relu', padding='same'))
+    model.add(Conv1D(500, input_shape=(1280, 1), kernel_size=128,
+                     strides=128, activation='relu', padding='same'))
     model.add(Dense(500, activation='relu'))
     model.add(Dense(500, activation='relu'))
     model.add(Dense(500, activation='relu'))
@@ -87,9 +96,9 @@ def create_keras_model():
     model.add(Flatten())
     print model.summary()
     # Compile model
-    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8), metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+                  metrics=['accuracy'])
     return model
-
 
 #reshaping the train and test data so as to align with input for model
 CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
@@ -103,7 +112,6 @@ MODEL = create_keras_model()
 MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            epochs=50, batch_size=100, verbose=1,
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
-
 
 #Predict on train and test data
 CLF2_TRAIN_PREDICTION = MODEL.predict(CLF2_TRAIN).round()
@@ -119,25 +127,31 @@ DF_TEST['predicted_prob'] = np.split(CLF2_TEST_PREDICTION_PROB, DF_TEST.shape[0]
 MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 
-
 # print misclassified number of examples
 print 'Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shape[0]
-
 
 #Print confusion matrix and classification_report
 print CLF2_TEST_TARGET.values.argmax(axis=1).shape
 print '        Confusion Matrix          '
 print '============================================'
-RESULT = confusion_matrix(CLF2_TEST_TARGET.values.argmax(axis=1), CLF2_TEST_PREDICTION.argmax(axis=1))
+RESULT = confusion_matrix(CLF2_TEST_TARGET.values.argmax(axis=1),
+                          CLF2_TEST_PREDICTION.argmax(axis=1))
 print RESULT
+
+#print classification report
 print '                 Classification Report      '
 print '============================================'
-CL_REPORT = classification_report(CLF2_TEST_TARGET.values.argmax(axis=1), CLF2_TEST_PREDICTION.argmax(axis=1))
+CL_REPORT = classification_report(CLF2_TEST_TARGET.values.argmax(axis=1),
+                                  CLF2_TEST_PREDICTION.argmax(axis=1))
 print CL_REPORT
-ACCURACY = accuracy_score(CLF2_TEST_TARGET.values.argmax(axis=1), CLF2_TEST_PREDICTION.argmax(axis=1))
-print 'Accuracy :', ACCURACY
+
+#calculate accuracy and hamming loss
+ACCURACY = accuracy_score(CLF2_TEST_TARGET.values.argmax(axis=1),
+                          CLF2_TEST_PREDICTION.argmax(axis=1))
 HL = hamming_loss(CLF2_TEST_TARGET.values.argmax(axis=1), CLF2_TEST_PREDICTION.argmax(axis=1))
+
 print 'Hamming Loss :', HL
+print 'Accuracy :', ACCURACY
 
 #Save the model weights
 # MODEL.save_weights('multiclass_weights.h5')
