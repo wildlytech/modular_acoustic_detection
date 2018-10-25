@@ -188,7 +188,6 @@ def get_csv_data(target_sounds):
     name_bin = LabelBinarizer()
     name_bin.fit(forest_sounds.mid.values.tolist() + ['None'])
 
-
     # Binarize labels for dataset
     # There are multiple labels per row, so we have to split them and do a binarization
     # on each column.  We then aggregate all the one-hot variables to get our final encoding.
@@ -207,7 +206,6 @@ def get_csv_data(target_sounds):
     train_label_binarized = train_label_binarized.loc[train_label_binarized.sum(axis=1) > 0]
     train_label_binarized.index = range(train_label_binarized.shape[0])
 
-
     # Translate mid to display name
     new_column_names = []
     for column in train_label_binarized.columns:
@@ -215,7 +213,6 @@ def get_csv_data(target_sounds):
     train_label_binarized.columns = new_column_names
 
     return train, train_label_binarized
-
 
 def download_clip(YTID, start_seconds, end_seconds, target_path):
     """
@@ -252,9 +249,6 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
 
     os.remove(tmp_filename_w_extension)
 
-
-
-
 # To download the audio files from youtube
 def download_data(target_sounds_list, target_path):
     """
@@ -269,7 +263,6 @@ def download_data(target_sounds_list, target_path):
     df['wav_file'] = df['YTID'].astype(str) + '-' + df['start_seconds'].astype(str) +\
                      '-' + df['end_seconds'].astype(str)+'.wav'
 
-
     #save the data frame which can be used for further balancing the data
     #and generating the embeddings for audio files.
     with open('downloaded_base_dataframe.pkl', 'w') as file_obj:
@@ -283,29 +276,26 @@ def download_data(target_sounds_list, target_path):
 
     threads = []
 
-
     for index in range(df.shape[0]):
         row = df.iloc[index]
-
         print "Downloading", str(index), "of", df.shape[0], ":", row.YTID
-
         # download_clip(row.YTID, row.start_seconds, row.end_seconds)
         t = threading.Thread(target=download_clip,
                              args=(row.YTID, row.start_seconds, row.end_seconds, target_path))
         threads.append(t)
         t.start()
-
-
         if len(threads) > 4:
             threads[0].join()
             threads = threads[1:]
-
     for t in threads:
         t.join()
 
 # slightly modified from
 #https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
 def read_audio_record(audio_record, output_to_file=None):
+    """
+    #https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
+    """
     vid_ids = []
     labels = []
     start_time_seconds = [] # in secondes
@@ -314,24 +304,18 @@ def read_audio_record(audio_record, output_to_file=None):
     count = 0
 
     with tf.device("/cpu:0"):
-
         config = tf.ConfigProto()
         config.gpu_options.per_process_gpu_memory_fraction = 0.0001
-
         sess = tf.InteractiveSession(config=config)
 
         for example in tf.python_io.tf_record_iterator(audio_record):
-
             tf_example = tf.train.Example.FromString(example)
-
             vid_ids.append(tf_example.features.feature['video_id'].bytes_list.value[0].decode(encoding='UTF-8'))
             labels.append(list(tf_example.features.feature['labels'].int64_list.value))
             start_time_seconds.append(tf_example.features.feature['start_time_seconds'].float_list.value[0])
             end_time_seconds.append(tf_example.features.feature['end_time_seconds'].float_list.value[0])
-
             tf_seq_example = tf.train.SequenceExample.FromString(example)
             n_frames = len(tf_seq_example.feature_lists.feature_list['audio_embedding'].feature)
-
             audio_frame = []
             # iterate through frames
             for i in range(n_frames):
@@ -341,11 +325,9 @@ def read_audio_record(audio_record, output_to_file=None):
                                            tf.float32).eval())
 
             feat_audio.append([])
-
             feat_audio[count].append(audio_frame)
             count += 1
         sess.close()
-
     df = pd.DataFrame(zip(vid_ids, labels, start_time_seconds, end_time_seconds, feat_audio),
                       columns=['video_id',
                                'labels',
@@ -353,10 +335,8 @@ def read_audio_record(audio_record, output_to_file=None):
                                'end_time_seconds',
                                'features'])
     df['features'] = df.features.apply(lambda x: np.array(x[0]))
-
     if output_to_file:
         df.to_pickle(audio_record.replace('.tfrecord', '.pkl'))
-
     return df
 
 def get_recursive_sound_names(designated_sound_names):
@@ -372,23 +352,18 @@ def get_recursive_sound_names(designated_sound_names):
     ontology_dict_from_id = ontology_dict.copy()
     ontology_dict_from_id.index = ontology_dict_from_id.id
     ontology_dict_from_id = ontology_dict_from_id.T
-
     del ontology_dict
 
     designated_sound_ids = map(lambda sound: ontology_dict_from_name[sound]['id'],
                                designated_sound_names)
-
     def get_ids(id):
         """
         Get the ID of the sounds
         """
         id_list = [id]
-
         for child_id in ontology_dict_from_id[id].child_ids:
             id_list += get_ids(child_id)
-
         return id_list
-
     recursive_sound_ids = []
     for id in designated_sound_ids:
         recursive_sound_ids += get_ids(id)
@@ -396,7 +371,6 @@ def get_recursive_sound_names(designated_sound_names):
 
     recursive_sound_names = map(lambda sound_id: ontology_dict_from_id[sound_id]['name'],
                                 recursive_sound_ids)
-
     return recursive_sound_names
 
 def get_all_sound_names():
@@ -409,39 +383,28 @@ def get_data():
     """
     Read the tf.record files data
     """
-
     label_names = pd.read_csv("data/audioset/class_labels_indices.csv")
-
     audio_files = map(lambda x: 'bal_train/'+x,
                       os.listdir('data/audioset/audioset_v1_embeddings/bal_train')) + \
                   map(lambda x: 'unbal_train/'+x,
                       os.listdir('data/audioset/audioset_v1_embeddings/unbal_train'))
     audio_files = filter(lambda x: x.endswith('.tfrecord'), audio_files)
     audio_files.sort()
-
-
     path_prefix = 'data/audioset/audioset_v1_embeddings/'
-
     for audio_record in audio_files:
-
         if os.path.isfile(path_prefix + audio_record.replace('.tfrecord', '.pkl')):
             continue
-
         print "Reading", audio_record, "..."
-
         try:
             pid = os.fork()
         except OSError:
             sys.stderr.write("Could not create a child process\n")
             continue
-
         if pid == 0:
             read_audio_record(path_prefix + audio_record, True)
             os._exit(0)
         else:
             os.waitpid(pid, 0)
-
-
     pickle_files = map(lambda x: 'bal_train/'+x,
                        os.listdir('data/audioset/audioset_v1_embeddings/bal_train')) + \
                   map(lambda x: 'unbal_train/'+x,
@@ -450,27 +413,20 @@ def get_data():
     pickle_files.sort()
 
     ambient_sounds, impact_sounds = get_all_sound_names()
-
     print "Reading pickles..."
-
     df = []
     for audio_record in pickle_files:
-
         print "Reading", audio_record, "pickle"
-
         sub_df = pd.read_pickle(path_prefix + audio_record)
 
         def check_sounds(x):
             for sound in impact_sounds+ambient_sounds:
                 if sound in x:
                     return True
-
             return False
-
         sub_df['labels'] = sub_df['labels'].map(lambda arr: [label_names.iloc[x].display_name for x in arr])
         sub_df = sub_df.loc[sub_df['labels'].map(check_sounds)]
         df += [sub_df]
-
     df = pd.concat(df, ignore_index=True)
 
     # Binarize the labels
