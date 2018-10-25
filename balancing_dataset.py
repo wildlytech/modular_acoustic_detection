@@ -1,3 +1,6 @@
+"""
+Returns Balanced dataframe mainly to Train data
+"""
 import pickle
 import random
 import pandas as pd
@@ -6,9 +9,13 @@ import pandas as pd
 # Common path
 PATH_FOR_DATA = 'diff_class_datasets/Datasets/'
 
+
+
 def balanced_data():
 
-    # Reding all the files into pandas dataframe
+    """
+    Function to read all data frames and balancing
+    """
 
     #Files with single class
     with open(PATH_FOR_DATA+'pure/Explosion/pure_exp_7957.pkl', 'rb') as file_obj:
@@ -59,12 +66,16 @@ def balanced_data():
     # wild_req = wild.loc[random.sample(range(0,wild.shape[0]),1000)]
 
 
+    # Sounds that are to concatenated
+    sounds_to_concatenate = [exp_req, nat_req, hum_req, mot_req, dom_req, tools_req]
+
     #concat the required sounds
-    data_frame = pd.concat([exp_req, nat_req, hum_req, mot_req, dom_req, tools_req], ignore_index=True)
+    data_frame = pd.concat(sounds_to_concatenate, ignore_index=True)
     print 'Final dataframe shape :', data_frame.shape
 
     #Free up the space
-    del pure_nat, pure_dom, pure_exp, pure_mot, pure_wod, pure_tools, exp_req, nat_req, hum_req, mot_req, dom_req, tools_req
+    del pure_nat, pure_dom, pure_exp, pure_mot, pure_wod, pure_tools, \
+        exp_req, nat_req, hum_req, mot_req, dom_req, tools_req
 
     return data_frame
 
