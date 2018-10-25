@@ -1,14 +1,15 @@
+"""
+Adds the embeddings on to base dataframe
+"""
 import glob
 import argparse
 import pickle
 import pandas as pd
 
-
 # Help description
 DESCRIPTION = 'Input the path for embeddings of the downloaded files'
 HELP = 'Input the path'
 ARGS = '--path_where_embedddings_saved'
-
 
 #parse the input path where the embeddings of the downloaded files are saved
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
