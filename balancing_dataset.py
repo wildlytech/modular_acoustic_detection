@@ -3,10 +3,7 @@ import random
 import pandas as pd
 
 
-
-
 # Common path
-
 PATH_FOR_DATA = 'diff_class_datasets/Datasets/'
 
 def balanced_data():
