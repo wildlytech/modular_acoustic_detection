@@ -31,36 +31,31 @@ Usage:
 """
 
 from __future__ import print_function
-
-import numpy as np
-from scipy.io import wavfile
-import six
-import tensorflow as tf
 import sys
-sys.path.insert(0,'../externals/tensorflow_models/research/audioset/')
+import tensorflow as tf
+sys.path.insert(0, '../externals/tensorflow_models/research/audioset/')
 import vggish_input
 import vggish_params
 import vggish_postprocess
 import vggish_slim
-import pickle
-import glob
-import os
-import model_function 
+import model_function
 
 
 flags = tf.app.flags
 
 flags.DEFINE_string(
-    'wav_file',None,
+    'wav_file', None,
     'Path to a wav file. Should contain signed 16-bit PCM samples. '
     'If none is provided, a synthetic sound is used.')
 
 flags.DEFINE_string(
-    'checkpoint', '../externals/tensorflow_models/research/audioset/vggish_model.ckpt',
+    'checkpoint',
+    '../externals/tensorflow_models/research/audioset/vggish_model.ckpt',
     'Path to the VGGish checkpoint file.')
 
 flags.DEFINE_string(
-    'pca_params', '../externals/tensorflow_models/research/audioset/vggish_pca_params.npz',
+    'pca_params',
+    '../externals/tensorflow_models/research/audioset/vggish_pca_params.npz',
     'Path to the VGGish PCA parameters file.')
 
 flags.DEFINE_string(
@@ -72,45 +67,41 @@ FLAGS = flags.FLAGS
 
 
 def main(_):
-
-
-  #Specify the path for the downloaded or recorded audio files and also path for writing the embeddings or pickle files
-
-  if FLAGS.wav_file:
-      wav_file = FLAGS.wav_file
-      pkl = FLAGS.wav_file[:-4]+'.pkl'
-      print (pkl)
-  examples_batch = vggish_input.wavfile_to_examples(wav_file)
+    """
+    Specify the path for the downloaded or recorded audio files
+    and also path for writing the embeddings or pickle files
+    """
+    if FLAGS.wav_file:
+        wav_file = FLAGS.wav_file
+        pkl = FLAGS.wav_file[:-4]+'.pkl'
+        print (pkl)
+    examples_batch = vggish_input.wavfile_to_examples(wav_file)
 
     # Prepare a postprocessor to munge the model embeddings.
-  pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
+    pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
 
-    # If needed, prepare a record writer to store the postprocessed embeddings.
-  writer = tf.python_io.TFRecordWriter(
-  FLAGS.tfrecord_file) if FLAGS.tfrecord_file else None
 
-  with tf.Graph().as_default(), tf.Session() as sess:
+    with tf.Graph().as_default(), tf.Session() as sess:
 
         # Define the model in inference mode, load the checkpoint, and
-    # locate input and output tensors.
-      vggish_slim.define_vggish_slim(training=False)
-      vggish_slim.load_vggish_slim_checkpoint(sess, FLAGS.checkpoint)
-      features_tensor = sess.graph.get_tensor_by_name(
-      vggish_params.INPUT_TENSOR_NAME)
-      embedding_tensor = sess.graph.get_tensor_by_name(
-      vggish_params.OUTPUT_TENSOR_NAME)
+        # locate input and output tensors.
+        vggish_slim.define_vggish_slim(training=False)
+        vggish_slim.load_vggish_slim_checkpoint(sess, FLAGS.checkpoint)
+        features_tensor = sess.graph.get_tensor_by_name(
+            vggish_params.INPUT_TENSOR_NAME)
+        embedding_tensor = sess.graph.get_tensor_by_name(
+            vggish_params.OUTPUT_TENSOR_NAME)
 
-    # Run inference and postprocessing.
-      [embedding_batch] = sess.run([embedding_tensor],
-      feed_dict={features_tensor: examples_batch})
-      postprocessed_batch = pproc.postprocess(embedding_batch)
-      print(postprocessed_batch)
+        # Run inference and postprocessing.
+        [embedding_batch] = sess.run([embedding_tensor],
+                                     feed_dict={features_tensor: examples_batch})
+        postprocessed_batch = pproc.postprocess(embedding_batch)
+        print(postprocessed_batch)
 
-      predict_prob, predictions= model_function.predictions_wavfile(postprocessed_batch)
-      print (predict_prob)
-      print (predictions)
+        predict_prob, predictions = model_function.predictions_wavfile(postprocessed_batch)
+        print (predict_prob)
+        print (predictions)
 
 
 if __name__ == '__main__':
-
     tf.app.run()
