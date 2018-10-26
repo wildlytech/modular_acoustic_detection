@@ -129,11 +129,11 @@ def main(_):
                     vggish_params.OUTPUT_TENSOR_NAME)
 
             # Run inference and postprocessing.
-            [embedding_batch] = sess.run([embedding_tensor],
-                                         feed_dict={features_tensor: examples_batch})
-            print(embedding_batch)
-            postprocessed_batch = pproc.postprocess(embedding_batch)
-            print(postprocessed_batch)
+                [embedding_batch] = sess.run([embedding_tensor],
+                                             feed_dict={features_tensor: examples_batch})
+                print(embedding_batch)
+                postprocessed_batch = pproc.postprocess(embedding_batch)
+                print(postprocessed_batch)
 
             #write the embeddings as pickle files
             with open(FLAGS.path_to_write_embeddings + pkl, 'w') as file_obj:
