@@ -1,5 +1,6 @@
 
-#This code is copied from https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
+#This code is copied from
+#https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
 
 r"""A simple demonstration of running VGGish in inference mode.
 This is intended as a toy example that demonstrates how the various building
@@ -40,9 +41,7 @@ import vggish_postprocess
 import vggish_slim
 import model_function
 
-
 flags = tf.app.flags
-
 flags.DEFINE_string(
     'wav_file', None,
     'Path to a wav file. Should contain signed 16-bit PCM samples. '
@@ -64,8 +63,6 @@ flags.DEFINE_string(
 
 FLAGS = flags.FLAGS
 
-
-
 def main(_):
     """
     Specify the path for the downloaded or recorded audio files
@@ -76,13 +73,9 @@ def main(_):
         pkl = FLAGS.wav_file[:-4]+'.pkl'
         print (pkl)
     examples_batch = vggish_input.wavfile_to_examples(wav_file)
-
     # Prepare a postprocessor to munge the model embeddings.
     pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
-
-
     with tf.Graph().as_default(), tf.Session() as sess:
-
         # Define the model in inference mode, load the checkpoint, and
         # locate input and output tensors.
         vggish_slim.define_vggish_slim(training=False)
@@ -91,17 +84,14 @@ def main(_):
             vggish_params.INPUT_TENSOR_NAME)
         embedding_tensor = sess.graph.get_tensor_by_name(
             vggish_params.OUTPUT_TENSOR_NAME)
-
         # Run inference and postprocessing.
         [embedding_batch] = sess.run([embedding_tensor],
                                      feed_dict={features_tensor: examples_batch})
         postprocessed_batch = pproc.postprocess(embedding_batch)
         print(postprocessed_batch)
-
         predict_prob, predictions = model_function.predictions_wavfile(postprocessed_batch)
         print (predict_prob)
         print (predictions)
-
 
 if __name__ == '__main__':
     tf.app.run()
