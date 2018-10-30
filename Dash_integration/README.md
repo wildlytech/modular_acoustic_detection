@@ -11,7 +11,7 @@
 $ python dash_integrate.py 
 ```
 
- ###### UI consists 3 pages :
+ ###### UI consists of 3 pages :
  - ##### Home Page
  - ##### Input audio :
    This page lets you to upload a ```.wav``` file from your local drive to run the analysis and see the predictions.
