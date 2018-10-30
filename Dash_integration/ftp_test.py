@@ -38,7 +38,7 @@ def get_files():
 
 def download_files(value, flag):
     """
-    Download the wav file if uploaded into
+    Download the wav file into local drive if uploaded into
     ftp server
     """
     if flag == 1:
