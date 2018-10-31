@@ -1,11 +1,9 @@
 """
 Predictions are returned for a single wav file
 """
-
 from keras.models import Sequential
 from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from keras.optimizers import Adam
-
 
 def create_keras_model():
     """
@@ -28,7 +26,6 @@ def create_keras_model():
     model.compile(loss='binary_crossentropy',
                   optimizer=Adam(lr=1e-4, epsilon=1e-8),
                   metrics=['accuracy'])
-
     return model
 
 def predictions_wavfile(data):
@@ -42,5 +39,4 @@ def predictions_wavfile(data):
     #predict the data using the loaded model
     predictions_prob = model.predict(test_data).ravel()
     predictions = predictions_prob.round()
-
     return predictions_prob, predictions
