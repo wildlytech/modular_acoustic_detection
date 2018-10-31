@@ -63,7 +63,7 @@ MAGNITUDE = Goertzel_filter(WAV_FILE, RESAMPLING_RATE,
                             TARGET_FREQUENCY, RESAMPLING_RATE*NUMBER_OF_SECONDS)
 MAGNITUDE = map(int, MAGNITUDE)
 SAMPLE_RATE = 44100
-TIME_SPACE = np.linspace(0, 10, RESAMPLING_RATE*10)
+TIME_SPACE = np.linspace(0, NUMBER_OF_SECONDS, RESAMPLING_RATE*10)
 
 #PLOT THE GOERTZEL FILTER COMPONENT
 plt.subplot(2, 1, 1)
@@ -74,5 +74,5 @@ plt.plot(TIME_SPACE, WAV_FILE)
 plt.subplot(2, 1, 2)
 plt.title('Goertzel Filter for 2000Hz component')
 plt.xlabel('Time (seconds)')
-plt.plot(np.linspace(0, 10, RESAMPLING_RATE*10), MAGNITUDE)
+plt.plot(np.linspace(0, NUMBER_OF_SECONDS, RESAMPLING_RATE*NUMBER_OF_SECONDS), MAGNITUDE)
 plt.show()
