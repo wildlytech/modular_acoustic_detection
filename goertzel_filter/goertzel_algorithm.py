@@ -1,78 +1,78 @@
+"""
+Implements the goertzel filter algorithm that
+returns the target frequency components of the audio
+"""
 import math
+import time
 import numpy as np
-import pandas as pd
-import numpy as np
-import math
 import scipy.signal
 from matplotlib import pyplot as plt
 import scipy.io.wavfile
-import time
-import math
 import resampy
 
 #set the resampling rate, target frequency
-resampling_rate = 8000
-target_frequency = 400
-number_of_seconds = 10
+RESAMPLING_RATE = 8000
+TARGET_FREQUENCY = 400
+NUMBER_OF_SECONDS = 10
 
 #read the sample wav file
-x = scipy.io.wavfile.read('speech.wav')
-wave_file = np.array([i[0] for i in x[1]])
-print wave_file.shape
+READ_FILE = scipy.io.wavfile.read('speech.wav')
+WAV_FILE = np.array([i[0] for i in READ_FILE[1]])
+print WAV_FILE.shape
 
 #resampling the wave file
-wave_file =resampy.resample(wave_file,44100,resampling_rate)
-print wave_file.shape
+WAV_FILE = resampy.resample(WAV_FILE, 44100, RESAMPLING_RATE)
+print WAV_FILE.shape
 
-def Goertzel_filter(sample,sample_rate,target_frequency, number_samples):
-
+def Goertzel_filter(sample, sample_rate, target_frequency, number_samples):
+    """
+    Implements the goertzel algorithm and
+    returs the target frequency components of the audio
+    """
     # Initialize and precomputing all the constants
-    result_mag = np.zeros((sample_rate*10,1))
-    result_real = []
-    result_imag =[]
-    result_mag_sqre = []
-    n_range = range(len(sample))
-    N = number_samples
+    result_mag = np.zeros((sample_rate*10, 1))
+    total_samples = number_samples
 
     # computing the constants
-    k = int(( N * target_frequency)/sample_rate)
-    w =  ((2 * math.pi * k)/N)
-    cosine =  math.cos(w)
-    sine = math.sin(w)
+    k_constant = int((total_samples * target_frequency)/sample_rate)
+    w_constant = ((2 * math.pi * k_constant)/total_samples)
+    cosine = math.cos(w_constant)
+    sine = math.sin(w_constant)
     coeff = 2 * cosine
 
     # Doing the calculation on the whole sample
-    q1, q2 = 0.0, 0.0
+    q_1, q_2 = 0.0, 0.0
 
-    i=0
-    start=time.time()
-    for n in range(N):
-        q0  = sample[n] + coeff * q1 - q2
-        q2, q1 = q1, q0
+    index = 0
+    start = time.time()
+    for n_sample in range(total_samples):
+        q_0 = sample[n_sample] + coeff * q_1 - q_2
+        q_2, q_1 = q_1, q_0
 
-        real = ( q1 - q2 * cosine)
-        imag = (q2 * sine)
+        real = (q_1 - q_2 * cosine)
+        imag = (q_2 * sine)
         magnitude = np.square(real) + np.square(imag)
-        result_mag[i]=math.sqrt(magnitude)
-    	i+=1
-    end=time.time()
+        result_mag[index] = math.sqrt(magnitude)
+        index += 1
+    end = time.time()
     print 'Time elapsed :', (end-start)
     return  result_mag
 
 # applying Goertzel on those signals
-mag = Goertzel_filter(wave_file, resampling_rate, target_frequency, resampling_rate*numer_of_seconds)
-mag = map(int, mag)
+MAGNITUDE = Goertzel_filter(WAV_FILE, RESAMPLING_RATE,
+                            TARGET_FREQUENCY, RESAMPLING_RATE*NUMBER_OF_SECONDS)
+MAGNITUDE = map(int, MAGNITUDE)
 SAMPLE_RATE = 44100
-t = np.linspace(0, 10, resampling_rate*10)
+TIME_SPACE = np.linspace(0, 10, RESAMPLING_RATE*10)
 
 #PLOT THE GOERTZEL FILTER COMPONENT
 plt.subplot(2, 1, 1)
 plt.title('(1) speech wave of 44.1KHz sampling rate')
 plt.xlabel('Time (seconds)')
-plt.plot(t, wave_file)
+plt.plot(TIME_SPACE, WAV_FILE)
 
-plt.subplot(2,1,2)
+plt.subplot(2, 1, 2)
 plt.title('Goertzel Filter for 2000Hz component')
 plt.xlabel('Time (seconds)')
-plt.plot(np.linspace(0, 10, resampling_rate*10),mag)
+plt.plot(np.linspace(0, 10, RESAMPLING_RATE*10), MAGNITUDE)
 plt.show()
