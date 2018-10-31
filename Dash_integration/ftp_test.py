@@ -25,7 +25,6 @@ def ftp_data():
         ftp.quit()
         return 0, 0
 
-
 def get_files():
     """
     get the list of files in ftp directory
@@ -34,7 +33,6 @@ def get_files():
     files_list = ftp.retrlines('LIST')
     ftp.quit()
     return files_list
-
 
 def download_files(value, flag):
     """
