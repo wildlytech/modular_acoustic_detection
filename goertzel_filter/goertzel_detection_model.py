@@ -1,7 +1,7 @@
 """
 Detection of Ambient Vs Impact sounds
 using the Goertzel frequency components
-ie [800, 1600, 200, 2300]
+ie [800, 1600, 2000, 2300]
 """
 import pickle
 import argparse
