@@ -29,15 +29,15 @@ RESULT = PARSER.parse_args()
 #Define the goertzel model same as model from which the weights are saved
 INPUTS = Input(shape=(10, 8000, 4))
 CONV_1 = TimeDistributed(Conv1D(100,
-	                               kernel_size=200,
-	                               strides=100,
-	                               activation='relu',
-	                               padding='same'),
+                                kernel_size=200,
+                                strides=100,
+                                activation='relu',
+                                padding='same'),
                          input_shape=(10, 8000, 4))(INPUTS)
 CONV_2 = TimeDistributed(Conv1D(100,
-	                               kernel_size=4,
-	                               activation='relu',
-	                               padding='same'))(CONV_1)
+                                kernel_size=4,
+                                activation='relu',
+                                padding='same'))(CONV_1)
 MAX_POOL = TimeDistributed(MaxPooling1D(80))(CONV_2)
 DENSE_1 = TimeDistributed(Dense(60, activation='relu'))(MAX_POOL)
 DENSE_2 = TimeDistributed(Dense(50, activation='relu'))(DENSE_1)
