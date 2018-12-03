@@ -1,37 +1,66 @@
+"""
+predictions are done on the audiomoth files
+"""
+import argparse
 import keras
 from keras.models import Sequential, Model
 from keras.layers import Input
-import pickle
 import predictions_on_weights
 from keras.layers import Dense, Conv1D, Conv2D, MaxPooling1D, Flatten, AveragePooling1D, TimeDistributed, MaxPooling2D
-import audiomoth_function
+import audiomoth_function_for_goertzel_model as aud_goertzel
 
 
-#give the path where the frequency components are saved ( '.pkl' files )
-path_to_goertzel_components = '/media/wildly/1TB-HDD/goertzel_data_ervikulam_8k/'
-audio_files_path = '/media/wildly/1TB-HDD/AudioMoth/test_wave/'
+# Define the constants
+DESCRIPTION = "Compares the prediction my goertzel model and annotated labels"
+HELP_AUDIO = "Path for audio files ( .WAV )"
+HELP_GOERTZEL = "Path for Goertzel freq components ( .pkl )"
+
+
+#parse the input arguments given from command line
+PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+PARSER.add_argument('-audio_files_path',
+                    '--audio_files_path', action='store',
+                    help=HELP_AUDIO)
+PARSER.add_argument('-path_for_goertzel_components',
+                    '--path_for_goertzel_components', action='store',
+                    help=HELP_GOERTZEL)
+RESULT = PARSER.parse_args()
 
 #Define the goertzel model same as model from which the weights are saved
-inputs = Input(shape=(10,8000,4))
-conv_1= TimeDistributed(Conv1D(100, kernel_size=200,strides=100,activation='relu',padding='same'),input_shape=(10,8000,4))(inputs)
-conv_2 = TimeDistributed(Conv1D(100, kernel_size=4,activation='relu',padding='same'))(conv_1)
-max_pool = TimeDistributed(MaxPooling1D(80))(conv_2)
-dense_1 = TimeDistributed(Dense(60, activation = 'relu'))(max_pool)
-dense_2 = TimeDistributed(Dense(50, activation = 'relu'))(dense_1)
-dense_3 = TimeDistributed(Dense(1, activation='sigmoid'))(dense_2)
-max_pool_2 = MaxPooling2D((10,1))(dense_3)
-predictions = Flatten()(max_pool_2)
-model = Model(inputs=[inputs],outputs=[predictions])
-print model.summary()
+INPUTS = Input(shape=(10, 8000, 4))
+CONV_1 = TimeDistributed(Conv1D(100,
+	                               kernel_size=200,
+	                               strides=100,
+	                               activation='relu',
+	                               padding='same'),
+                         input_shape=(10, 8000, 4))(INPUTS)
+CONV_2 = TimeDistributed(Conv1D(100,
+	                               kernel_size=4,
+	                               activation='relu',
+	                               padding='same'))(CONV_1)
+MAX_POOL = TimeDistributed(MaxPooling1D(80))(CONV_2)
+DENSE_1 = TimeDistributed(Dense(60, activation='relu'))(MAX_POOL)
+DENSE_2 = TimeDistributed(Dense(50, activation='relu'))(DENSE_1)
+DENSE_3 = TimeDistributed(Dense(1, activation='sigmoid'))(DENSE_2)
+MAX_POOL_2 = MaxPooling2D((10, 1))(DENSE_3)
+PREDICTIONS = Flatten()(MAX_POOL_2)
+MODEL = Model(inputs=[INPUTS], outputs=[PREDICTIONS])
+print MODEL.summary()
 
-#Load the saved weights and predict on the audiomoth  recordings
-model.load_weights('../Goertzel_model_8k_weights_time.h5')
+# Load the saved weights and predict on the audiomoth  recordings
+MODEL.load_weights('../Goertzel_model_8k_weights_time.h5')
 
 #call the audiomoth function to predict on the frequency components of audio moth WAV files
-test_values, df = audiomoth_function_for_goertzel_model.dataframe_with_frequency_components(audio_files_path,path_to_goertzel_components)
-predictions = model.predict(test_values).ravel()
-df['predictions_prob'] = predictions
-df['predictions'] = predictions.ravel().round()
+TEST_VALUES, DATAFRAME = aud_goertzel.dataframe_with_frequency_components(RESULT.audio_files_path,
+                                                                          RESULT.path_for_goertzel_components)
+PREDICTIONS = MODEL.predict(TEST_VALUES).ravel()
+DATAFRAME['predictions_prob'] = PREDICTIONS
+DATAFRAME['predictions'] = PREDICTIONS.ravel().round()
 
 #save it in a CSV file
-df[['wav_file', 'Label_1','Label_2', 'Label_3', 'predictions_prob', 'predictions']].to_csv('predictions_by_goertzel_model.csv')
+DATAFRAME[['wav_file',
+		         'Label_1',
+		         'Label_2',
+		         'Label_3',
+		         'predictions_prob',
+		         'predictions']].to_csv('predictions_by_goertzel_model.csv')
