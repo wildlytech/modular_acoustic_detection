@@ -1,6 +1,6 @@
 
 
-#This code is copied from
+#This code is slightly modified from :
 #https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
 
 r"""A simple demonstration of running VGGish in inference mode.
