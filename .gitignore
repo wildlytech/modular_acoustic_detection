@@ -18,5 +18,6 @@ data/audioset/rerated_video_ids.txt
 *.tfrecord
 *.tar.gz
 *.pkl
+*.h5
 data/
 sounds/
