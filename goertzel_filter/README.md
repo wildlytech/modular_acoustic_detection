@@ -1,4 +1,4 @@
-#### Goertzel Filter Implementation
+## Goertzel Filter Implementation
 
 We implemented the goertzel algorithm in order to filter out only particular target frequencies of each sound files. This is done in order to do a basic detection on board using the goertzel frequency components of sound files ( .wav files )
 
