@@ -29,7 +29,10 @@ $ ./download_data_files.sh
 ```
 <br>
 
-**3. To download all the sound files** : (This is a really lengthy process and hence is not advisable unless you absolutely have to):
+##### 3. To download all the sound files : 
+
+This is a really lengthy process and hence is not advisable unless you absolutely have to
+
 ```shell
 $ python download_all_sounds.py
 ```
@@ -114,6 +117,7 @@ $ python multilabel_model.py [-h] [-save_weights SAVE_WEIGHTS]
 ###### output returns:
 
 - ```.h5``` file is saved consists of weights of the trained ```multiclass_model.py```
+
 
 
 
