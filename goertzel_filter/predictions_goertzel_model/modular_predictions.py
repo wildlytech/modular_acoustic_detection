@@ -102,14 +102,11 @@ def dense_layer(X, weights, type_activate):
         result = activation_function( result, type_activate)
     else:
         return result
-
-
-
     return result
 
 def sigmoid(data):
     """
-    apply sigmoid activaetion function
+    apply sigmoid activation function
     """
     return 1 / (1 + math.exp(-data))
 
