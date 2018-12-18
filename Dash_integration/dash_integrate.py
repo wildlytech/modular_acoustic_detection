@@ -36,7 +36,7 @@ with open('list_of_files.pkl', 'wb') as f:
 
 app = dash.Dash()
 app.config.suppress_callback_exceptions = True
-IMAGE_FILENAME = '/home/shiv/Downloads/spec3.png' # replace with your own image
+IMAGE_FILENAME = 'test_image.png' # replace with your own image
 ENCODED_IMAGE = base64.b64encode(open(IMAGE_FILENAME, 'rb').read())
 
 app.layout = html.Div([
