@@ -8,7 +8,8 @@ import time
 import numpy as np
 
 def convolutional_layer(data, weights, kernel_size, strides, padding_type, units):
-    """function goes here
+    """
+    actual convoultion layer implementation with window movement
     """
     if padding_type == "same":
         padding_length = calculate_padding_length(data, strides, kernel_size)
@@ -24,10 +25,9 @@ def convolutional_layer(data, weights, kernel_size, strides, padding_type, units
 
         return final_result
 
-
-
 def add_bias(data, weights):
-    """add bias
+    """
+    add bias
     """
     if (len(data) == len(weights) and type(data[0]) != list):
         result = [[0 for cols in range(len(weights))]for rows in range(len([data]))]
@@ -38,7 +38,6 @@ def add_bias(data, weights):
         for index in enumerate(data):
             result[index[0]] = [sum(zip_values) for zip_values in zip(index[1], weights)]
         return  result
-
 
 def activation_function(data, type_activate):
     """
@@ -51,8 +50,6 @@ def activation_function(data, type_activate):
         result = sigmoid(data)
 
     return result
-
-
 
 def relu_function(data):
     """
@@ -72,7 +69,7 @@ def relu_function(data):
 
 def max_pooling_layer(data, pool_length):
 
-    """function goes here
+    """implementing max pooling layer
     """
     result = np.zeros((len(data)/pool_length, len(data[0])))
     out_ind = 0
@@ -83,10 +80,9 @@ def max_pooling_layer(data, pool_length):
         out_ind += 1
     return result.tolist()
 
-
 def dense_layer(X, weights, type_activate):
     """
-    function goes here
+    dense layers implementation
     """
     Y = weights[0]
     result = [[0 for cols in range(len(Y[0]))]for rows in range(len(X))]
@@ -111,37 +107,32 @@ def dense_layer(X, weights, type_activate):
 
     return result
 
-
-
 def sigmoid(data):
     """
-    opertaion goes here
+    apply sigmoid activaetion function
     """
     return 1 / (1 + math.exp(-data))
 
-
 def calculate_padding_length(data, strides, kernel_size):
     """
-    calculation goes here
+    calculating for padding length
     """
     out_len = len(data)/(strides)
     padding_length = ((out_len - 1) * strides) - (len(data) - kernel_size)
 
     return padding_length
 
-
-
 def apply_padding(data, padding_length):
     """
-    process takes place here
+    apply padding on the data
     """
     data = data + [[0 for cols in range(len(data[0]))]for rows in range(padding_length)]
     return data
 
-
 def matrix_mulitplication(X, Y, select):
     """
-    multiplication goes here
+    matrix multiplication for convolution
+    layer ie it considers window movement
     """
     # For convolution layer mulitplication
     if select == 0:
@@ -164,8 +155,6 @@ def matrix_mulitplication(X, Y, select):
 
         return final_result
 
-
-
 def keras_implementation(data, weights):
     """
     whole architecture
@@ -183,7 +172,6 @@ def keras_implementation(data, weights):
         final_output[each_second[0]] = sigmoid(layer_output[0][0])
         end_time = time.time() - start_time
         print "Time Elapsed for one second prediction: ", end_time
-
 
     print final_output
     return final_output
