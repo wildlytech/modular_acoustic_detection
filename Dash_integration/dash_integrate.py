@@ -12,7 +12,7 @@ import dash_html_components as html
 import plotly
 import pandas as pd
 import predict_on_wav_file
-import ftp_test_copy
+import ftp_test
 
 #set the different colors
 COLORS = {
@@ -302,7 +302,7 @@ def check_for_data(n_intervals):
     check for .wav files in ftp server
     for every specified seconds
     """
-    wav_files, wav_files_count, flag = ftp_test_copy.ftp_data()
+    wav_files, wav_files_count, flag = ftp_test.ftp_data()
     with open('file_count.pkl', 'rb') as f:
         old_count = pickle.load(f)
     with open('downloaded_from_ftp.pkl', 'rb') as f:
