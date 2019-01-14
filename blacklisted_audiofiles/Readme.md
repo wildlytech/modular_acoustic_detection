@@ -15,3 +15,12 @@ Eg. Audio clip has ```[ Vehicle, Human ]``` in it but the labeling is done only 
 
 You  can read the above stored ```.txt``` into python as list values of ```.wav``` files using ```pickle``` library.
 
+For Eg:
+##### To open ```mislabelled_as_other_than_silence.txt``` this file into python list you have to run following commands:
+
+```python
+import pickle
+with open("mislabelled_as_other_than_silence.txt", "rb") as file_object:
+    mislabelled_list = pickle.load(f)
+print "Mis-labelled Examples:", mislabelled_list
+```
