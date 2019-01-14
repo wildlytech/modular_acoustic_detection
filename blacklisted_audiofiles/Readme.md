@@ -21,6 +21,6 @@ For Eg:
 ```python
 import pickle
 with open("mislabelled_as_other_than_silence.txt", "rb") as file_object:
-    mislabelled_list = pickle.load(f)
+    mislabelled_list = pickle.load(file_object)
 print "Mis-labelled Examples:", mislabelled_list
 ```
