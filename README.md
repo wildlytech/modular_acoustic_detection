@@ -3,12 +3,20 @@
 ## Environment Setup
 
 To download all the relevant Ubuntu packages:
+
+You can do it by two ways:
+
+##### Approach 1:
 ```shell
 # Make script executable
 $ chmod 777 ubuntu_packages_install.sh
 
 # Run script to install
 $ ./ubuntu_packages_install.sh
+```
+##### Approach 2:
+```shell
+$ pip install -r requirements.txt
 ```
 
 ## Local repo setup
