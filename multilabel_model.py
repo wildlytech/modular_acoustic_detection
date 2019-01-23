@@ -29,8 +29,8 @@ tools = get_recursive_sound_names(TOOLS_SOUNDS)
 #wild_animals=get_recursive_sound_names(Wild_animals)
 
 
-#Importing balanced data from the function
-DATA_FRAME = balancing_dataset.balanced_data()
+#Importing balanced data from the function. Including audiomoth annotated files for training
+DATA_FRAME = balancing_dataset.balanced_data(flag_for_audiomoth=1)
 print DATA_FRAME.shape[0], "examples"
 
 # Different classes of sounds.
