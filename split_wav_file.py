@@ -3,11 +3,9 @@ Function to split a long duration audio file
 into chunks of 10second files
 """
 import argparse
-import subprocess
 import librosa
 from pydub import AudioSegment
 from pydub.utils import make_chunks
-import glob
 from colorama import Fore, Style
 
 
@@ -34,13 +32,12 @@ def start_splitting(chunk_length_ms, wav_file):
     into chunks of length specified
     """
     file_name = wav_file.split('/')[-1].split(".")[0]
-    print "splitting audio files :", file_name
+    print "splitting audio files into chunks of 10 seconds :", file_name
     myaudio = AudioSegment.from_wav(wav_file)
     chunks = make_chunks(myaudio, chunk_length_ms)
     #Export all of the individual chunks as wav files
     for i, chunk in enumerate(chunks):
         chunk_name = file_name+"_"+str(i)+'.wav'
-        print "exporting", chunk_name
         chunk.export(RESULT.path_to_write_chunks+chunk_name, format="wav")
     return len(chunks)
 
@@ -59,10 +56,11 @@ def initiate_audio_split(wav_file, chunk_length_ms):
             num_wav_files = int(total_duration_seconds) - 1
         number_of_chunks_generated = start_splitting(chunk_length_ms, wav_file)
         if num_wav_files == number_of_chunks_generated:
-            print Fore.GREEN + "Total number of wav files splitted from" + wav_file +": ", number_of_chunks_generated
+            print Fore.GREEN + "\nTotal number of wav files splitted from" + wav_file.split('/')[-1].split(".")[0] +": ", number_of_chunks_generated
             print Style.RESET_ALL
         else:
-            print "Total number of wav files splitted from" + wav_file +": ", number_of_chunks_generated
+            print  Fore.GREEN + "\nTotal number of wav files splitted from" + wav_file.split('/')[-1].split(".")[0] +": ", number_of_chunks_generated
+            print Style.RESET_ALL
     else:
         print Fore.RED + "\nWARNING :Audio File must be atleast greater than 20seconds to split"
         print Style.RESET_ALL
