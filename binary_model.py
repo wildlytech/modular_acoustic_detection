@@ -27,7 +27,7 @@ nature_sounds = get_recursive_sound_names(NATURE_SOUNDS)
 
 #Read the balanced data created by running the balancing_datasets.py
 #Note that this is binary classification. Balancing must be  [ Ambient ] vs  [ Impact ]
-DATA_FRAME = balancing_dataset.balanced_data()
+DATA_FRAME = balancing_dataset.balanced_data(flag_for_audiomoth=1)
 
 # Binarize the labels
 NAME_BIN = LabelBinarizer().fit(ambient_sounds + impact_sounds)
