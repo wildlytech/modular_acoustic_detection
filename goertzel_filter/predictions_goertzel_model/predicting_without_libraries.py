@@ -21,7 +21,7 @@ import downsampling_and_goertzel_filter
 
 
 # Read all the global variables i.e weights and Inputs. 
-with open("motor_weights_goertzel_remodel_400_500_2000_2300_maxpool_frst_kern_8_432305555.pkl", "rb") as f:
+with open("pretrained_weights_goertzel_model", "rb") as f:
     WEIGHTS_VALUE = pickle.load(f)
 ARCHITECTURE_CSV = pd.read_csv("test_architecture.csv")
 TEN_SEC_INPUT_DATA = np.random.uniform(low=0.00000002, high=0.00001, size=(10, 8000, 4))
