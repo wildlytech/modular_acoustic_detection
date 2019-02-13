@@ -16,13 +16,15 @@ import pickle
 from colorama import Fore, Style
 # To log the time lapse for computation
 import time
+# To downsample and apply goertzel filter
+import downsampling_and_goertzel_filter
 
 
 # Read all the global variables i.e weights and Inputs. 
-with open("pretrained_weights_goertzel_model", "rb") as f:
+with open("motor_weights_goertzel_remodel_400_500_2000_2300_maxpool_frst_kern_8_432305555.pkl", "rb") as f:
     WEIGHTS_VALUE = pickle.load(f)
 ARCHITECTURE_CSV = pd.read_csv("test_architecture.csv")
-TEN_SEC_INPUT_DATA = np.random.uniform(low=0.00000002, high=0.000001, size=(10, 8000, 4))
+TEN_SEC_INPUT_DATA = np.random.uniform(low=0.00000002, high=0.00001, size=(10, 8000, 4))
 
 
 class ConvolutionalNeuralNetwork(object):
@@ -46,10 +48,10 @@ class ConvolutionalNeuralNetwork(object):
         """
         if type_padding == "same" and stride_length > 1:
             self.input_data = self.input_data + [[0 for cols in range(len(self.input_data[0]))]for rows in range(stride_length)]
-            return np.array(self.input_data, dtype='float32').tolist()
+            return np.array(self.input_data, dtype='float64').tolist()
         else:
             self.input_data = self.input_data + [[0 for col in range(len(self.input_data[0]))] for row in range(filter_size-1)]
-            return np.array(self.input_data, dtype='float32').tolist()
+            return np.array(self.input_data, dtype='float64').tolist()
 
 
     def matrix_multiplication(self, data, nested_index):
@@ -66,7 +68,7 @@ class ConvolutionalNeuralNetwork(object):
                 for k in range(len(self.weights[nested_index])):
                     result[i][j] += data[i][k] * self.weights[nested_index][k][j]
 
-        return  np.array(result, dtype='float32').tolist()
+        return  np.array(result, dtype='float64').tolist()
 
     def add_bias_terms(self, data):
         """
@@ -77,7 +79,7 @@ class ConvolutionalNeuralNetwork(object):
             print "not except"
         except TypeError:
             add_bias = [sum(zip_values) for zip_values in zip(data[0], self.bias)]
-        return np.array(add_bias, dtype='float32').tolist()
+        return np.array(add_bias, dtype='float64').tolist()
 
     def relu(self, data):
         """
@@ -88,7 +90,7 @@ class ConvolutionalNeuralNetwork(object):
             apply_relu = [0 if arb < 0 else arb for arb in data]
         except (TypeError, ValueError) as error:
             apply_relu = [0 if arb < 0 else arb for arb in data[0]]
-        return np.array(apply_relu, dtype='float32').tolist()
+        return np.array(apply_relu, dtype='float64').tolist()
 
 
 
@@ -119,9 +121,9 @@ class ConvolutionalNeuralNetwork(object):
                                                                              self.matrix_multiplication([self.input_data[data_index]], nested_index)[0])]
                     result_after_mat_mull = [result_after_mat_mull]
             result_after_mat_mull = self.add_bias_terms(result_after_mat_mull)
-            result_final[inter_index] = np.array(self.relu(result_after_mat_mull), dtype='float32').tolist()
+            result_final[inter_index] = np.array(self.relu(result_after_mat_mull), dtype='float64').tolist()
 
-        return np.array(result_final, dtype='float32').tolist()
+        return np.array(result_final, dtype='float64').tolist()
 
 
 
@@ -153,7 +155,7 @@ class FullyConnectedLayer(object):
                     # print len(self.weights[0])
                     result[i][j] += data[i][k] * self.weights[k][j]
 
-        return  np.array(result, dtype='float32').tolist()
+        return  np.array(result, dtype='float64').tolist()
 
     def add_bias_terms(self, data):
         """
@@ -163,7 +165,7 @@ class FullyConnectedLayer(object):
             add_bias = [sum(zip_values) for zip_values in zip(data, self.bias)]
         except TypeError:
             add_bias = [sum(zip_values) for zip_values in zip(data[0], self.bias)]
-        return np.array(add_bias, dtype='float32').tolist()
+        return np.array(add_bias, dtype='float64').tolist()
 
 
     def relu(self, data):
@@ -175,7 +177,7 @@ class FullyConnectedLayer(object):
             apply_relu = [0 if arb < 0 else arb for arb in data]
         except (TypeError, ValueError) as error:
             apply_relu = [0 if arb < 0 else arb for arb in data[0]]
-        return np.array(apply_relu, dtype='float32').tolist()
+        return np.array(apply_relu, dtype='float64').tolist()
 
     def sigmoid(self, data):
         """
@@ -202,8 +204,8 @@ class FullyConnectedLayer(object):
                 result_after_mat_mull = self.sigmoid(result_after_mat_mull[0])
             else:
                 print Fore.RED + "Warning: No activation function given"
-            result_final[inter_index] = np.array(result_after_mat_mull, dtype='float32').tolist()
-        return np.array(result_final, dtype='float32').tolist()
+            result_final[inter_index] = np.array(result_after_mat_mull, dtype='float64').tolist()
+        return np.array(result_final, dtype='float64').tolist()
 
 
 
@@ -235,7 +237,7 @@ class MaxPoolingLayer(object):
                 intermediate_result[columns] = max(result)
             result_final[index_value] = intermediate_result
 
-        return np.array(result_final, dtype='float32').tolist()
+        return np.array(result_final, dtype='float64').tolist()
 
 
 
@@ -281,17 +283,35 @@ class InitialCheckForShape(object):
 
 
 def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
-
+    """
+    Initiates the neural network calculation as per the layer
+    """
     try:
         if layer_name == "conv":
-            cnn_rolled = ConvolutionalNeuralNetwork(units=int(arch_dict['units']), input_data=input_data, weights=WEIGHTS_VALUE[layer_index+1][0], activation=arch_dict['activation'], bias=WEIGHTS_VALUE[layer_index+1][1])
-            resut_value = cnn_rolled.start_window_moment(stride_length=int(arch_dict['stride_length']), filter_size=int(arch_dict['filter_size']), type_padding=arch_dict['type_padding'])
+            cnn_rolled = ConvolutionalNeuralNetwork(units=int(arch_dict['units']),
+                                                    input_data=input_data,
+                                                    weights=np.array(WEIGHTS_VALUE[layer_index+1][0],
+                                                                     dtype="float64").tolist(),
+                                                    activation=arch_dict['activation'],
+                                                    bias=np.array(WEIGHTS_VALUE[layer_index+1][1],
+                                                                  dtype="float64").tolist())
+            resut_value = cnn_rolled.start_window_moment(stride_length=int(arch_dict['stride_length']),
+                                                         filter_size=int(arch_dict['filter_size']),
+                                                         type_padding=arch_dict['type_padding'])
+            # print np.array(resut_value).shape
             return resut_value
         elif layer_name == "maxpool":
-            maxpool_rolled = MaxPoolingLayer(input_data=input_data, max_pool_length=int(arch_dict['max_pool_length']))
+            maxpool_rolled = MaxPoolingLayer(input_data=input_data,
+                                             max_pool_length=int(arch_dict['max_pool_length']))
             return maxpool_rolled.max_pool_2d_array()
         elif layer_name == "dense":
-            fully_connected = FullyConnectedLayer(units=int(arch_dict['units']), input_data=input_data, weights=WEIGHTS_VALUE[layer_index+1][0], activation=arch_dict['activation'], bias=WEIGHTS_VALUE[layer_index+1][1])
+            fully_connected = FullyConnectedLayer(units=int(arch_dict['units']),
+                                                  input_data=input_data,
+                                                  weights=np.array(WEIGHTS_VALUE[layer_index+1][0],
+                                                                   dtype="float64").tolist(),
+                                                  activation=arch_dict['activation'],
+                                                  bias=np.array(WEIGHTS_VALUE[layer_index+1][1],
+                                                                dtype="float64").tolist())
             return fully_connected.dense_layer()
         else:
             print Fore.RED + "ERROR: Invalid Layer used \n"
@@ -301,10 +321,81 @@ def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
         sys.exit("Input the correct order"+Style.RESET_ALL)
 
 
-if __name__ == "__main__":
+def flag_for_downsampling(audiofilepath):
+    """
+    Implements three things.
+    1. Reading the audio file that is being passed
+    2. Applying the downsampling using the resampy library. We can also implement without using library but it is currently taking longer
+    3. Generating the goertzel frequency components for each second of the audio file  [400Hz, 500Hz, 2000Hz, 2300Hz]
+    3. Making the predictions for each second of the audio file
+    """
 
-    print "start"
-    for each_second in TEN_SEC_INPUT_DATA.tolist():
+    # Reading the audio file
+    samplingrate_samples = downsampling_and_goertzel_filter.ReadAudioFile(audiofilepath).read_wav_file()
+    try:
+        samples_only = np.array([i[0] for i in samplingrate_samples[1]])
+    except:
+        samples_only = samplingrate_samples[1]
+
+    # Downsampling the audio from any sampling rate to 8KHz for each second of the audio
+    for seconds_index in range(0, samples_only.shape[0], samplingrate_samples[0])[:10]:
+        down_library = downsampling_and_goertzel_filter.DownsampleUsingLibrary(samples_only[seconds_index:seconds_index+samplingrate_samples[0]], samplingrate_samples[0])
+        resampled_using_lib = down_library.resample_using_resampy(8000)
+
+        # Applying the goertzel filter on the downsampled audio
+        for freqs in [400, 500, 2000, 2300]:
+            if freqs == 400:
+                goertzel = downsampling_and_goertzel_filter.GoertzelComponents(samples=resampled_using_lib,
+                                                                               sample_rate=8000,
+                                                                               target_frequency=freqs,
+                                                                               number_samples=8000)
+                goertzel_components = goertzel.goertzel_filter().tolist()
+            else:
+                goertzel = downsampling_and_goertzel_filter.GoertzelComponents(samples=resampled_using_lib,
+                                                                               sample_rate=8000,
+                                                                               target_frequency=freqs,
+                                                                               number_samples=8000)
+                goertzel_components_1 = goertzel.goertzel_filter().tolist()
+
+                # Applying stacking on the axis =1
+                for indices in range(len(goertzel_components)):
+                    goertzel_components[indices].append(goertzel_components_1[indices][0])
+
+        # Normalizing the data
+        goertzel_components = goertzel_components / np.linalg.norm(goertzel_components)
+
+        # Predicting using the goertzel model for each second
+        for each_second in [goertzel_components]:
+            start_time = time.time()
+            for layer_index, layer_name in enumerate(ARCHITECTURE_CSV['layer_name'].values.tolist()):
+                print Fore.GREEN + str(layer_index)+ " "+layer_name + " " +str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2]+ Style.RESET_ALL
+                if layer_index == 0 and layer_name != "EOF":
+                    intermediate_result_values = unroll_the_architecture(ARCHITECTURE_CSV.iloc[layer_index].to_dict(),
+                                                                         layer_name=layer_name,
+                                                                         input_data=each_second,
+                                                                         layer_index=layer_index
+                                                                        )
+
+                elif layer_name == "EOF":
+                    print intermediate_result_values
+                else:
+                    intermediate_result_values = unroll_the_architecture(ARCHITECTURE_CSV.iloc[layer_index].to_dict(),
+                                                                         layer_name=layer_name,
+                                                                         input_data=intermediate_result_values,
+                                                                         layer_index=layer_index
+                                                                        )
+            end_time = time.time() - start_time
+            print Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL
+
+
+def predict_on_goertzelcomponents(ten_sec_data):
+    """
+    Predicts for a given goertzel components
+    shape should of either
+    (  1, 8000, 4 ) => 1 second  or
+    ( 10, 8000, 4 ) => 10 seconds
+    """
+    for each_second in ten_sec_data:
         start_time = time.time()
         for layer_index, layer_name in enumerate(ARCHITECTURE_CSV['layer_name'].values.tolist()):
             print Fore.GREEN + str(layer_index)+ " "+layer_name + " " +str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2]+ Style.RESET_ALL
@@ -314,16 +405,30 @@ if __name__ == "__main__":
                                                                      input_data=each_second,
                                                                      layer_index=layer_index
                                                                     )
+                # print np.array(intermediate_result_values)
 
             elif layer_name == "EOF":
-                print "Each Second Prediction: ", intermediate_result_values
+                print intermediate_result_values
             else:
                 intermediate_result_values = unroll_the_architecture(ARCHITECTURE_CSV.iloc[layer_index].to_dict(),
                                                                      layer_name=layer_name,
                                                                      input_data=intermediate_result_values,
                                                                      layer_index=layer_index
                                                                     )
-
+                # print np.array(intermediate_result_values)
         end_time = time.time() - start_time
         print Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL
 
+if __name__ == "__main__":
+    print "start"
+    '''
+    If
+    FLAG is set to 0, it takes audio file as input and starts the process of prediction from initial stage
+    FLAG is set to 1, it takes generated goertzel frequency componets as input and gives the prediction
+    '''
+    FLAG = 0
+    if FLAG == 0:
+        flag_for_downsampling("-0RZOr28TNE-0.0-10.0.wav")
+
+    else:
+        predict_on_goertzelcomponents(TEN_SEC_INPUT_DATA)
