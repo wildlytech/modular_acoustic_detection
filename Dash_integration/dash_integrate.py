@@ -55,7 +55,7 @@ def check_pre_requiste_files():
 
 app = dash.Dash()
 app.config.suppress_callback_exceptions = True
-IMAGE_FILENAME = 'test_image.png' # replace with your own image
+IMAGE_FILENAME = 'pic.png' # replace with your own image
 ENCODED_IMAGE = base64.b64encode(open(IMAGE_FILENAME, 'rb').read())
 
 app.layout = html.Div([
@@ -63,22 +63,25 @@ app.layout = html.Div([
     html.Div(id='page-content')
                      ])
 
-INDEX_PAGE = html.Div(style={'color': 'green', 'fontSize': 20}, children=[
-    html.Div(style={"background-color":"green", "padding":"2px"},children=[
-    html.H1('Wildly Listen', style={'color': 'white', 'fontSize': 30, 'textAlign':'center', 'text-decoration': 'underline'}),
-    html.H2('Acoustic Monitoring and Audio Analysis',style={'color': 'white', 'fontSize': 20,  'text-decoration': 'underline','textAlign':'center'})]),
+INDEX_PAGE = html.Div(children=[
+    html.Div(children=[
+    html.H1('Wildly Listen'),
+    html.H2('Acoustic Monitoring and Audio Analysis')]),
 
     # html.Br(),
-    html.Div(style={"background-color":"lavender", "padding-bottom":"100px"},children=[
-    html.Div(style={ "background-color":"lightgrey"},children=[
+    html.Div(children=[
+    html.Div(children=[
     html.Img(src='data:image/png;base64,{}'.format(ENCODED_IMAGE), style={'width': '100%',
-                                                                          'height':'800px' 
-                                                                          })]),      
-    dcc.Link('Input audio file', href='/page-1', style={'marginBottom': "20px", 'marginTop': "30px", 'color': 'green'}),
+                                                                          'height':'360px' 
+                                                                          })]),  
+
+
+    html.Div( id = 't',className="app-header",children = [
+    html.Button(dcc.Link('Input audio file', href='/page-1', style={'fontSize': 20,'color': 'green','text-decoration': 'none'})),
     html.Br(),
-    dcc.Link('FTP status', href='/page-3', style={'marginBottom': 20, 'marginTop': 45, 'color':'green'}),
+    html.Button(dcc.Link('FTP status', href='/page-3', style={'fontSize': 20,'color': 'green','text-decoration': 'none'})),
     html.Br(),
-    dcc.Link('Sound Library', href='/page-4', style={'marginBottom':20, 'marginTop':45, 'color': 'green', 'fontSize':20})]),
+    html.Button(dcc.Link('Sound Library', href='/page-4', style={'fontSize': 20,'color': 'green','text-decoration': 'none'}))])]),
     html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ' ,style={"position":"fixed",
       "left":"0",
       "bottom":"0",
@@ -121,11 +124,11 @@ PAGE_1_LAYOUT = html.Div(id='out-upload-data', children=[
         # Allow multiple files to be uploaded
         multiple=True
         ),
-    html.Div(id='page-1-content'),
+    html.Div(id='page1',children =[
     html.Br(),
-    dcc.Link('Home page', href='/', style={'color': 'green', 'fontSize': 20, 'textAlign':'center'}),
+    html.Button(dcc.Link('Home page', href='/', style={ 'fontSize': 20, 'color': 'green','text-decoration': 'none'})),
     html.Br(),
-    dcc.Link('FTP status', href='/page-3', style={'marginBottom':20, 'marginTop':45, 'color': 'green', 'fontSize':20}),
+    html.Button(dcc.Link('FTP status', href='/page-3', style={'text-decoration': 'none', 'color': 'green','fontSize':20}))]),
     html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 .' ,style={"position":"fixed",
       "left":"0",
       "bottom":"0",
@@ -267,11 +270,11 @@ PAGE_2_LAYOUT = html.Div(id='Wildly listen', children=[
         value='select the task'
         ),
     html.Div(id='page-2-content'),
-    dcc.Link('Input audio file', href='/page-1', style={'marginBottom': 20, 'marginTop': 20, 'color':'green', 'fontSize': 14}),
+    html.Button(dcc.Link('Input audio file', href='/page-1', style={'marginBottom': 20, 'marginTop': 20, 'text-decoration': 'none', 'fontSize': 14})),
     html.Br(),
-    dcc.Link('Home Page', href='/', style={'marginBottom': 20, 'marginTop': 20, 'color': 'green', 'fontSize':14}),
+    html.Button(dcc.Link('Home Page', href='/', style={'marginBottom': 20, 'marginTop': 20,'text-decoration': 'none',  'fontSize':14})),
     html.Br(),
-    dcc.Link('FTP status', href='/page-3', style={'marginBottom': 20, 'marginTop': 45, 'color': 'green', 'fontSize': 14}),
+    html.Button(dcc.Link('FTP status', href='/page-3', style={'marginBottom': 20, 'marginTop': 45, 'text-decoration': 'none', 'fontSize': 14})),
     html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ' ,style={"position":"fixed",
       "left":"0",
       "bottom":"0",
@@ -313,7 +316,7 @@ def update_values(input_data):
 
 def call_for_ftp():
     global ftp
-    ftp = FTP('****', user='*****', passwd='*****')
+    ftp = FTP('34.211.117.196', user='user-u0xzU', passwd='G1JNomOYdzd3v')
     print "connected to FTP"
     ex = ftp.nlst()
 
@@ -393,9 +396,9 @@ def disabling_button(n_clicks):
 def display_output(rows, columns, indices):
     df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
     print "indices :", indices[0]
-    path = "FTP_downloadeded/"+str(df.iloc[indices[0]]["FileNames"])
+    path = "FTP_downloaded/"+str(df.iloc[indices[0]]["FileNames"])
     print path
-    if os.path.exists("FTP_downloadeded/"+df.iloc[indices[0]]["FileNames"]):
+    if os.path.exists("FTP_downloaded/"+df.iloc[indices[0]]["FileNames"]):
         print "path Exists"
     else:
         with open(path, 'wb') as file_obj:
@@ -886,5 +889,4 @@ def display_page(pathname):
 
 if __name__ == '__main__':
     app.run_server(debug=True, use_reloader=True)
-
 
