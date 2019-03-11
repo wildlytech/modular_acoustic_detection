@@ -1,0 +1,40 @@
+body{
+ background-image: url("forest1.jpg");
+}
+h1 {
+	text-align: center;
+	text-decoration: underline;
+	color: green;
+	font-size: 40px;
+}
+h2{
+	font-size: 25px;
+	text-align: center;
+	color: green;
+}
+
+
+#t {
+	text-align:justify;
+	text-decoration: none;
+	margin: 0 auto; 
+	width: 180px;
+	font-size: 20;
+
+
+}
+#page1 {
+	text-align:center;
+	text-decoration: none;
+	margin: 0 auto; 
+	width: 180px;
+
+}
+#button{
+	color: green;
+	text-align:center;
+	text-decoration: none;
+	margin: 0 auto; 
+	width: 180px;
+
+}
