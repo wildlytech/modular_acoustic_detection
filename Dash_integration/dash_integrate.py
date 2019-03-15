@@ -59,33 +59,58 @@ IMAGE_FILENAME = 'pic.png' # replace with your own image
 ENCODED_IMAGE = base64.b64encode(open(IMAGE_FILENAME, 'rb').read())
 
 app.layout = html.Div([
+
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
                      ])
 
 INDEX_PAGE = html.Div(children=[
     html.Div(children=[
-    html.H1('Wildly Listen'),
-    html.H2('Acoustic Monitoring and Audio Analysis')]),
+    html.Div(children = [
+
+    html.H1('Wildly Listen',id = 'select',style ={'text-align': 'center','margin': '0 auto',})]),
+
+    html.H2('Acoustic Monitoring and Audio Analysis')
+
+
+    ]),
 
     # html.Br(),
     html.Div(children=[
     html.Div(children=[
+
     html.Img(src='data:image/png;base64,{}'.format(ENCODED_IMAGE), style={'width': '100%',
-                                                                          'height':'360px' 
-                                                                          })]),  
+                                                                          'height':'250px' 
+                                                                          })]),
+    html.Div( id = 't1',className="app-header",children = [
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Br(),
+      html.Div(children = [
+      dcc.Link('Input audio file', href='/page-1', style={'fontSize': '100%','border':'3px solid green','color': 'white','text-decoration': 'none'}),
+      html.Br()]),
+      html.Br(),
+      dcc.Link('FTP status', href='/page-3', style={'fontSize': '100%','color': 'white','border':'3px solid green','position': 'relative','display':'inline','margin-top':100,'text-decoration': 'none'}),
+      html.Br(),
+      html.Br(),
+      dcc.Link('Sound Library', href='/page-4', style={'fontSize': '100%','color': 'white','border':'3px solid green','position': 'relative','text-decoration': 'none'}),
+      html.Br(),
 
-
-    html.Div( id = 't',className="app-header",children = [
-    html.Button(dcc.Link('Input audio file', href='/page-1', style={'fontSize': 20,'color': 'green','text-decoration': 'none'})),
-    html.Br(),
-    html.Button(dcc.Link('FTP status', href='/page-3', style={'fontSize': 20,'color': 'green','text-decoration': 'none'})),
-    html.Br(),
-    html.Button(dcc.Link('Sound Library', href='/page-4', style={'fontSize': 20,'color': 'green','text-decoration': 'none'}))])]),
+    
+    ])]),
     html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ' ,style={"position":"fixed",
       "left":"0",
       "bottom":"0",
-      "height":"4%",
+      "height":"2%",
       "width":"100%",
       "background-color":"black",
       "color":"white",
@@ -101,34 +126,26 @@ INDEX_PAGE = html.Div(children=[
 
 PAGE_1_LAYOUT = html.Div(id='out-upload-data', children=[
     html.Div(style={"background-color":"green", "padding":"2px"},children=[
-    html.H1('Upload audio Files', style={'color': 'white', 'fontSize': 30, 'textAlign': 'center'})]),
-    html.Div(id='display-play_1'),
+    dcc.Link('Home page', href='/', style={ 'fontSize': 20, 'color': 'white','text-decoration': 'none'}),
+
+    html.H1('Upload Audio Files', style={'color': 'white', 'fontSize': 30, 'textAlign': 'center','text-decoration': 'none'})]),
+
+    
+    html.Div(id='display-play_1',children = [
+    html.Br(),
     dcc.Upload(
-        id='upload-data',
+        id='upload-data1',
         children=
-        html.Div(['Drag and Drop or',
-                  html.A(' Select File')], style={'color': 'green', 'fontSize': 20, 'textAlign':'center'}),
-        style={
-            'width': '100%',
-            'height': '60px',
-            'lineHeight': '60px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-            'texAlign': 'center',
-            'margin': '10px',
-            'color': 'green',
-            'fontSize': 20,
-            'font':'italic'
-        },
+        html.A('Drag and Drop or Select File',style = {'border':'3px solid green'}), style={'color': 'green', 'fontSize': 20, 'textAlign':'center'},
         # Allow multiple files to be uploaded
         multiple=True
         ),
+    html.Br(),
+    dcc.Link('FTP status', href='/page-3', style={'text-decoration': 'none','textAlign': 'center', 'border':'3px solid green','margin-left':'630px','align':'center','color': 'green','fontSize':20}),
+
     html.Div(id='page1',children =[
     html.Br(),
-    html.Button(dcc.Link('Home page', href='/', style={ 'fontSize': 20, 'color': 'green','text-decoration': 'none'})),
-    html.Br(),
-    html.Button(dcc.Link('FTP status', href='/page-3', style={'text-decoration': 'none', 'color': 'green','fontSize':20}))]),
+    html.Br(),]),
     html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 .' ,style={"position":"fixed",
       "left":"0",
       "bottom":"0",
@@ -140,7 +157,7 @@ PAGE_1_LAYOUT = html.Div(id='out-upload-data', children=[
       "textAlign":"center"
       })   
 
-])
+])])
 
 
 def save_file(name, content):
@@ -270,11 +287,11 @@ PAGE_2_LAYOUT = html.Div(id='Wildly listen', children=[
         value='select the task'
         ),
     html.Div(id='page-2-content'),
-    html.Button(dcc.Link('Input audio file', href='/page-1', style={'marginBottom': 20, 'marginTop': 20, 'text-decoration': 'none', 'fontSize': 14})),
+    dcc.Link('Input audio file', href='/page-1', style={'marginBottom': 20, 'marginTop': 20, 'text-decoration': 'none', 'fontSize': 14}),
     html.Br(),
-    html.Button(dcc.Link('Home Page', href='/', style={'marginBottom': 20, 'marginTop': 20,'text-decoration': 'none',  'fontSize':14})),
+    dcc.Link('Home Page', href='/', style={'marginBottom': 20, 'marginTop': 20,'text-decoration': 'none',  'fontSize':14}),
     html.Br(),
-    html.Button(dcc.Link('FTP status', href='/page-3', style={'marginBottom': 20, 'marginTop': 45, 'text-decoration': 'none', 'fontSize': 14})),
+    dcc.Link('FTP status', href='/page-3', style={'marginBottom': 20, 'marginTop': 45, 'text-decoration': 'none', 'fontSize': 14}),
     html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ' ,style={"position":"fixed",
       "left":"0",
       "bottom":"0",
@@ -355,7 +372,7 @@ def call_for_data(dataframe):
 # app.config['suppress_callback_exceptions'] = True
 PAGE_3_LAYOUT = html.Div([
     html.Div(style={"background-color":"green", "padding":"2px"},children=[
-    html.H1("Sound Library", style={"color":"white", "text-align":"center",'fontSize': 20,'text-decoration': 'underline' })]),
+    html.H1("FTP Status", style={"color":"white", "text-align":"center",'fontSize': 20,'text-decoration': 'underline' })]),
     html.Div(id='page-new-content'),
     html.Button("FTP Status",id='button'),
     html.Div(id="datatable-interactivity-container"),
