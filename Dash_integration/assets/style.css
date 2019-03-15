@@ -1,5 +1,12 @@
 body{
  background-image: url("forest1.jpg");
+    background-size: 100% 100%;
+    background-position: center center;
+    background-origin:border-box;
+    min-width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+
 }
 h1 {
 	text-align: center;
@@ -11,6 +18,9 @@ h2{
 	font-size: 25px;
 	text-align: center;
 	color: green;
+}
+@-moz-document url-prefix() {
+    select {padding:400px;}
 }
 
 
@@ -37,4 +47,8 @@ h2{
 	margin: 0 auto; 
 	width: 180px;
 
+}
+
+._dash-undo-redo {
+  display: none;
 }
