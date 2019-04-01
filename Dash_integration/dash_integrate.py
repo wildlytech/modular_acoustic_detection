@@ -333,7 +333,7 @@ def update_values(input_data):
 
 def call_for_ftp():
     global ftp
-    ftp = FTP('34.211.117.196', user='user-u0xzU', passwd='G1JNomOYdzd3v')
+    ftp = FTP('******', user='*******', passwd='*********')
     print "connected to FTP"
     ex = ftp.nlst()
 
@@ -906,4 +906,3 @@ def display_page(pathname):
 
 if __name__ == '__main__':
     app.run_server(debug=True, use_reloader=True)
-
