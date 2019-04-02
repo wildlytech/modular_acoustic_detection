@@ -34,9 +34,13 @@ def predictions_wavfile(data):
     """
     # call the model and load the weights
     model = create_keras_model()
-    model.load_weights('multiclass_weights.model')
+    model.load_weights('../predictions/multilabel_weights.h5')
     test_data = data.reshape((-1, 1280, 1))
-    #predict the data using the loaded model
-    predictions_prob = model.predict(test_data).ravel()
-    predictions = predictions_prob.round()
+    if len(test_data) == 1:
+        predictions_prob = model.predict(test_data)
+        predictions = predictions_prob.round()
+    else:
+        #predict the data using the loaded model
+        predictions_prob = model.predict(test_data).ravel()
+        predictions = predictions_prob.round()
     return predictions_prob, predictions
