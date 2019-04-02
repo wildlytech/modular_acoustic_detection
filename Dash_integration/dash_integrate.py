@@ -15,7 +15,7 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
-import generate_before_predict
+import predict_on_wav_file
 import dash_table
 import pymongo
 from pymongo import MongoClient
@@ -199,8 +199,8 @@ def parse_contents(contents, filename, date):
         save_file(filename, contents)
         encoded_image_uploaded_file = 'uploaded_files_from_dash/'+ filename
         encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read())
-        embeddings = generate_before_predict.main('uploaded_files_from_dash/'+filename, 0, 0)
-        predictions_prob, predictions = generate_before_predict.main('uploaded_files_from_dash/'+filename, 1, embeddings)
+        embeddings = predict_on_wav_file.main('uploaded_files_from_dash/'+filename, 0, 0)
+        predictions_prob, predictions = predict_on_wav_file.main('uploaded_files_from_dash/'+filename, 1, embeddings)
         predictions_prob = [float(i) for i in predictions_prob[0]]
         if predictions[0][0] == 1:
             output_sound = 'Motor sound'
@@ -554,7 +554,7 @@ def batch_downloading_and_predict(n_clicks):
                 with open(path, 'wb') as file_obj:
                     ftp.retrbinary('RETR '+ i, file_obj.write)
             try:
-                emb.append(generate_before_predict.main(path, 0, 0))
+                emb.append(predict_on_wav_file.main(path, 0, 0))
             except ValueError:
                 print "malformed index", dum_df.loc[dum_df["FileNames"] == i].index
                 dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == i].index)
@@ -563,7 +563,7 @@ def batch_downloading_and_predict(n_clicks):
               # continue
         dum_df['features'] = emb
         if len(dum_df["FileNames"].tolist()) == 1:
-            pred_prob, pred = generate_before_predict.main(path,
+            pred_prob, pred = predict_on_wav_file.main(path,
                                                            1,
                                                            np.array(dum_df.features.apply(
                                                                lambda x: x.flatten()).tolist()))
@@ -578,7 +578,7 @@ def batch_downloading_and_predict(n_clicks):
                                    malformed)
 
         elif len(dum_df["FileNames"] > 1):
-            pred_prob, pred = generate_before_predict.main(path,
+            pred_prob, pred = predict_on_wav_file.main(path,
                                                            1,
                                                            np.array(dum_df.features.apply(
                                                                lambda x: x.flatten()).tolist()))
@@ -1000,8 +1000,8 @@ def predict_on_downloaded_file(n_clicks):
     print input_name
     if n_clicks >= 1:
         if input_name[-3:] == 'wav' or 'WAV':
-            get_emb = generate_before_predict.main(input_name, 0, 0)
-            predictions_prob, predictions = generate_before_predict.main(input_name,
+            get_emb = predict_on_wav_file.main(input_name, 0, 0)
+            predictions_prob, predictions = predict_on_wav_file.main(input_name,
                                                                          1,
                                                                          get_emb)
             predictions_prob = [float(i) for i in predictions_prob]
