@@ -61,36 +61,38 @@ flags.DEFINE_string(
 FLAGS = flags.FLAGS
 
 
-def main(wav_file):
+def main(wav_file, flag_for_data, data):
     """
     #Specify the path for the downloaded or recorded audio files and
     #also path for writing the embeddings or pickle files
     """
-    if wav_file:
-        pkl = wav_file[:-4]+'.pkl'
-        print (pkl)
-    examples_batch = vggish_input.wavfile_to_examples(wav_file)
+    if flag_for_data == 0:
+        if wav_file:
+            pkl = wav_file[:-4]+'.pkl'
+          # print (pkl)
+        examples_batch = vggish_input.wavfile_to_examples(wav_file)
 
-    # Prepare a postprocessor to munge the model embeddings.
-    pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
+        # Prepare a postprocessor to munge the model embeddings.
+        pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
 
-    with tf.Graph().as_default(), tf.Session() as sess:
+        with tf.Graph().as_default(), tf.Session() as sess:
 
-        # Define the model in inference mode, load the checkpoint, and
-        # locate input and output tensors.
-        vggish_slim.define_vggish_slim(training=False)
-        vggish_slim.load_vggish_slim_checkpoint(sess, FLAGS.checkpoint)
-        features_tensor = sess.graph.get_tensor_by_name(
-            vggish_params.INPUT_TENSOR_NAME)
-        embedding_tensor = sess.graph.get_tensor_by_name(
-            vggish_params.OUTPUT_TENSOR_NAME)
+          # Define the model in inference mode, load the checkpoint, and
+          # locate input and output tensors.
+            vggish_slim.define_vggish_slim(training=False)
+            vggish_slim.load_vggish_slim_checkpoint(sess, FLAGS.checkpoint)
+            features_tensor = sess.graph.get_tensor_by_name(
+                vggish_params.INPUT_TENSOR_NAME)
+            embedding_tensor = sess.graph.get_tensor_by_name(
+                vggish_params.OUTPUT_TENSOR_NAME)
 
-       # Run inference and postprocessing.
-        [embedding_batch] = sess.run([embedding_tensor],
-                                     feed_dict={features_tensor: examples_batch})
-        postprocessed_batch = pproc.postprocess(embedding_batch)
-        print(postprocessed_batch)
-
-    predict_prob, predictions = model_function.predictions_wavfile(postprocessed_batch)
-    K.clear_session()
-    return predict_prob, predictions
+         # Run inference and postprocessing.
+            [embedding_batch] = sess.run([embedding_tensor],
+                                         feed_dict={features_tensor: examples_batch})
+            postprocessed_batch = pproc.postprocess(embedding_batch)
+            return postprocessed_batch
+        # print(postprocessed_batch)
+    elif flag_for_data == 1:
+        predict_prob, predictions = model_function.predictions_wavfile(data)
+        K.clear_session()
+        return predict_prob, predictions
