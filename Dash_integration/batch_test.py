@@ -21,7 +21,7 @@ import csv
 # Target Path or Folder in FTP
 TARGET_PATH_FOLDER_FTP = "may/"
 PRIMARY_PATH = "/home/user-u0xzU/" + TARGET_PATH_FOLDER_FTP
-print PRIMARY_PATH
+print "Target Path : ", PRIMARY_PATH
 
 
 def check_directory_to_write_wavfiles():
@@ -42,7 +42,28 @@ def check_for_wav_only(list_values):
     for each_value in list_values:
         if each_value[-3:] == "WAV"  or each_value[-3:] == "wav":
             wav_files.append(each_value)
+    print "Total file: ", len(wav_files)
     return wav_files
+
+
+def sorting_files_same_as_upload_order(wav_files_list):
+    """
+    sorting files based on the timestamp i.e upload time
+    """
+    DICT = {}
+    count = 0
+    print "Files are being sorted.."
+    for name in wav_files_list:
+        if (name[-3:] == 'wav') or (name[-3:] == 'WAV'):
+            # returns last uploaded file's time with utc
+            time1 = ftp.voidcmd("MDTM " + name)
+            count += 1
+            #print time1[4:], name
+            DICT[name] = time1[4:]
+    sorted_list = sorted((value, key) for (key, value) in DICT.items())
+    sorted_filenames = [element[0] for element in sorted_list]
+
+    return sorted_filenames
 
 
 def call_for_ftp():
@@ -51,10 +72,16 @@ def call_for_ftp():
     """
     global ftp
     ftp = FTP('34.211.117.196', user='******', passwd='******')
-    print "connected to FTP"
+    print "Connection Status : connected to FTP"
     ftp.cwd(PRIMARY_PATH)
     ex = ftp.nlst()
     wav_files_only = check_for_wav_only(ex)
+
+    # If files are needed in the order in which they are uploaded  the uncomment the below the line
+    # This will take a quite a bit of time if there are more number of files
+
+    # wav_files_only = files_same_as_upload_order(wav_files_only)
+
     dataframe = pd.DataFrame()
     dataframe["FileNames"] = wav_files_only
     dataframe = dataframe.sort_values(["FileNames"], ascending=[1])
