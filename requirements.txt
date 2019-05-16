@@ -24,6 +24,7 @@ dash==0.35.0
 dash-core-components==0.30.2
 dash-html-components==0.13.2
 dash-renderer==0.16.1
+dash-table==3.4.0
 dash-table-experiments==0.6.0
 decorator==4.3.0
 Django==1.11.14
