@@ -1,5 +1,6 @@
 import subprocess
 import os
+import time
 import pickle
 import base64
 import datetime
@@ -174,5 +175,8 @@ def start_batch_run_ftp_live():
 
 
 if __name__=="__main__":
-    start_batch_run_ftp_live()
+    while(True):
+        start_batch_run_ftp_live()        
+        time.sleep(120) 
+        print "Waiting to FTP files to get accumulate: 2 Minutes"
 
