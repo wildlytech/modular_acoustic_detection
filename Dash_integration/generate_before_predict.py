@@ -51,6 +51,24 @@ flags.DEFINE_string(
     'Path to the VGGish checkpoint file.')
 
 flags.DEFINE_string(
+    'local_folder_path', None, help='Path to the local folder')
+
+flags.DEFINE_string(
+    'remote_ftp_path', None, help='Path to remote FTP folder.')
+
+flags.DEFINE_string(
+    'csv_filename', None, help='Input the name of csv file to save results')
+
+flags.DEFINE_string(
+    'ftp_username', None, help='Input FTP Username')
+
+flags.DEFINE_string(
+    'ftp_host', None, help='Input FTP Hostname')
+
+flags.DEFINE_string(
+    'ftp_password', None, help='Input FTP Password')
+
+flags.DEFINE_string(
     'pca_params', '../externals/tensorflow_models/research/audioset/vggish_pca_params.npz',
     'Path to the VGGish PCA parameters file.')
 
