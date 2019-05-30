@@ -123,6 +123,7 @@ def start_batch_run_ftp_live():
                         dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
                         malformed.append(each_file)
                         os.remove(path)
+                        continue
 
                     # Predict the result and save the result to the csv file
                     pred_prob, pred = generate_before_predict.main(path, 1, np.array(emb.flatten().tolist()))
@@ -161,6 +162,7 @@ def start_batch_run_ftp_live():
                     dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
                     malformed.append(each_file)
                     os.remove(path)
+                    continue
                 pred_prob, pred = generate_before_predict.main(path, 1, np.array(emb.flatten().tolist()))
                 motor_probability = "{0:.2f}".format(pred_prob[0][0])
                 explosion_probability = "{0:.2f}".format(pred_prob[0][1])
