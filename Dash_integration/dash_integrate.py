@@ -7,9 +7,12 @@ import pickle
 import base64
 import datetime
 import glob
+import argparse
 import numpy as np
 from ftplib import FTP
 import dash
+import csv
+import threading
 import dash.dependencies
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -26,11 +29,40 @@ COLORS = {
     'text': '#7FDBFF'
 }
 
+
+DESCRIPTION = "Creates UI for uploading Files and checking FTP server status. Works Offline and Online"
+HELP = "Give the Required Arguments"
+
+#parse the input arguments given from command line
+PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+PARSER.add_argument('-remote_ftp_path', '--remote_ftp_path', action='store',
+                    help=HELP)
+PARSER.add_argument('-local_folder_path', '--local_folder_path', action='store',
+                    help='Input the path')
+PARSER.add_argument('-csv_filename', '--csv_filename', action='store',
+                    help='Input the name of csv file to save results', default='wav_file_results.csv')
+PARSER.add_argument('-ftp_password', '--ftp_password', action='store',
+                    help='Input FTP Password')
+PARSER.add_argument('-ftp_username', '--ftp_username', action='store',
+                    help='Input FTP username')
+PARSER.add_argument('-ftp_host', '--ftp_host', action='store',
+                    help='Input host name of FTP server', default='34.211.117.196')
+RESULT = PARSER.parse_args()
+
+
+
 ########################################################################
                       #set the FTP Taregt folder#
 ########################################################################
 
-TARGET_FTP_FOLDER = "may/"
+TARGET_FTP_FOLDER = RESULT.remote_ftp_path
+FOLDER_FILES_PATH = RESULT.local_folder_path
+CSV_FILENAME = RESULT.csv_filename
+FTP_USER_NAME = RESULT.ftp_username
+FTP_HOST_NAME = RESULT.ftp_host
+FTP_PASSWORD =RESULT.ftp_password
+
+
 
 
 def check_pre_requiste_files():
@@ -53,7 +85,7 @@ def check_pre_requiste_files():
 
 
 ################################################################################
-                                #Main page
+                      #INDEX PAGE / HOME PAGE
 ################################################################################
 
 
@@ -127,7 +159,7 @@ INDEX_PAGE = html.Div(children=[html.Div(children=[html.Div(children=[html.H1('W
                                                    "textAlign":"center"})])
 
 ################################################################################
-                         #Upload Page#
+                         #1 UPLOAD PAGE 
 ################################################################################
 
 
@@ -159,19 +191,33 @@ PAGE_1_LAYOUT = html.Div(id='out-upload-data',
                                               # Allow multiple files to be uploaded
                                               multiple=True),
                                    html.Br(),
-                                   html.Div([dcc.Link('FTP status',
-                                                      href='/page-3',
-                                                      style={'text-decoration': 'none',
-                                                             'textAlign': 'center',
-                                                             'border':'3px solid green',
-                                                             # 'margin-left':'800',
-                                                             # 'align':'center',
-                                                             'color': 'green',
-                                                             'fontSize':20})],
+                                   html.Div(children=[html.Button('Folder Run',
+                                                                  id='button1',
+                                                                  style={'text-decoration': 'none',
+                                                                         'textAlign': 'center',
+                                                                         'border':'3px solid green',
+                                                                         # 'margin-left':'800',
+                                                                         # 'align':'center',
+                                                                         'color': 'green',
+                                                                         'fontSize':20}),
+                                                      html.Br(),
+                                                      html.Br()],
+                                            style={"textAlign":"center"}),
+                                   html.Div(children=[dcc.Link('FTP status',
+                                                               href='/page-3',
+                                                               style={'text-decoration': 'none',
+                                                                      'textAlign': 'center',
+                                                                      'border':'3px solid green',
+                                                                      # 'margin-left':'800',
+                                                                      # 'align':'center',
+                                                                      'color': 'green',
+                                                                      'fontSize':20})],
                                             style={"textAlign":"center"}),
                                    html.Div(id="page-1-content"),
-                                   html.Div(id='page1', children=[html.Br(),
-                                                                  html.Br()]),
+                                   html.Div(id="page-1-content-link"),
+                                   html.Div(id='page1',
+                                            children=[html.Br(),
+                                                      html.Br()]),
                                    html.Footer('\xc2\xa9'+' Copyright WildlyTech Inc. 2019 .',
                                                style={"position":"fixed",
                                                       "left":"0",
@@ -187,7 +233,7 @@ PAGE_1_LAYOUT = html.Div(id='out-upload-data',
 def save_file(name, content):
     """Decode and store a file uploaded with Plotly Dash."""
     data = content.encode("utf8").split(b";base64,")[1]
-    with open('uploaded_files_from_dash/'+name, "wb") as file_p:
+    with open("uploaded_files_from_dash/"+name, "wb") as file_p:
         file_p.write(base64.b64decode(data))
 
 
@@ -240,22 +286,30 @@ def parse_contents(contents, filename, date):
                                                 'rgba(204,204,204,1)', 'rgba(0,150,0,0.8)',
                                                 'rgba(204,204,204,1)', 'rgba(55, 128, 191, 0.7)']},
                                    'type':'bar'}],
-                          'layout': {'title':'probablistic prediction graph ',
-                                     'titlefont':{'family':'Courier New, monospace',
-                                                  'size':22,
-                                                  'color':'green'},
-                                     'xaxis':{'title': 'Labels of the sound',
-                                              'titlefont':{'family':'Courier New, monospace',
-                                                           'size':18,
-                                                           'color':'green'}},
-                                     'yaxis':{'title': 'Percenatge probabality',
-                                              'titlefont':{'family':'Courier New, monospace',
-                                                           'size':18,
-                                                           'color':'green'}},
-                                     'height':400,
-                                     'paper_bgcolor':'rgba(0,0,0,0)',
-                                     'plot_bgcolor':'rgba(0,0,0,0)',
-                                     'font': {'color':'#7f7f7f'}}},
+                          'layout': {
+                              'title':'probablistic prediction graph ',
+                              'titlefont':{
+                                  'family':'Courier New, monospace',
+                                  'size':22,
+                                  'color':'green'},
+
+                              'xaxis':{
+                                  'title': 'Labels of the sound',
+                                  'titlefont':{
+                                      'family':'Courier New, monospace',
+                                      'size':18,
+                                      'color':'green'}},
+                              'yaxis':{
+                                  'title': 'Percenatge probabality',
+                                  'titlefont':{
+                                      'family':'Courier New, monospace',
+                                      'size':18,
+                                      'color':'green'}},
+                              'height':400,
+                              'paper_bgcolor':'rgba(0,0,0,0)',
+                              'plot_bgcolor':'rgba(0,0,0,0)',
+                              'font': {
+                                  'color':'#7f7f7f'}}},
                       style={'marginBottom': 20,
                              'marginTop': 45,
                              'color':'black'}),
@@ -270,11 +324,92 @@ def parse_contents(contents, filename, date):
                            'marginTop':45,
                            'color': 'red',
                            'fontSize':14}),
-            html.P('Uploaded File : '+filename,
-                   style={'color': 'black', 'fontSize': 12}),
+            html.P('Uploaded File : '+filename, style={'color': 'black', 'fontSize': 12}),
             html.P('Last Modified : '+ str(datetime.datetime.fromtimestamp(date)),
                    style={'color':'black',
-                          'fontSize': 12}),])
+                          'fontSize': 12}),
+        ])
+
+def call_for_data_offline(dataframe, list_of_malformed):
+    """
+    Returns the predicted values as the data table
+    """
+    return html.Div([
+        html.H4("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
+                style={"color":"white",
+                       'text-decoration':'underline'}),
+        html.H4("Error while prediciton: " + str(list_of_malformed), style={"color":"white"}),
+        dash_table.DataTable(id='datatable-interactivity-predictions',
+                             columns=[{"name": i,
+                                       "id": i,
+                                       "deletable": True} for i in dataframe.columns],
+                             data=dataframe.to_dict("rows"),
+                             filtering=True,
+                             sorting=True,
+                             # n_fixed_rows=1,
+                             style_cell={'width': '50px'},
+                             sorting_type="multi",
+                             row_selectable="single",
+                             style_table={"maxHeight":"400",
+                                          "overflowY":"scroll"},
+                             selected_rows=[]),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br()])
+
+def parse_contents_batch(contents, names, dates):
+    """
+    Multiple files that are uploaded are handled
+    """
+    emb = []
+    malformed = []
+    dum_df = pd.DataFrame()
+    dum_df['FileNames'] = names
+    for i in zip(contents, names, dates):
+        if not os.path.exists("uploaded_files_from_dash/"):
+            os.makedirs("uploaded_files_from_dash/")
+        path = "uploaded_files_from_dash/"+i[1]
+        if os.path.exists(path):
+            print "path Exists"
+        else:
+            print "Downloading and generating embeddings ", i[1]
+            save_file(i[1], i[0])
+            # with open(path, 'wb') as file_obj:
+            #     ftp.retrbinary('RETR '+ i, file_obj.write)
+        try:
+            emb.append(generate_before_predict.main(path, 0, 0))
+            os.remove(path)
+        except ValueError:
+            print "malformed index", dum_df.loc[dum_df["FileNames"] == i[1]].index
+            dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == i[1]].index)
+            malformed.append(i[1])
+            os.remove(path)
+          # continue
+    dum_df['features'] = emb
+    if len(dum_df["FileNames"].tolist()) == 1:
+        pred_prob, pred = generate_before_predict.main(path, 1, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
+
+        dum_df["Motor_probability"] = "{0:.2f}".format(pred_prob[0][0])
+        dum_df["Explosion_probability"] = "{0:.2f}".format(pred_prob[0][1])
+        dum_df["Human_probability"] = "{0:.2f}".format(pred_prob[0][2])
+        dum_df["Nature_probability"] = "{0:.2f}".format(pred_prob[0][3])
+        dum_df["Domestic_probability"] = "{0:.2f}".format(pred_prob[0][4])
+        dum_df["Tools_probability"] = "{0:.2f}".format(pred_prob[0][5])
+        return call_for_data_offline(dum_df[dum_df.drop("features", axis=1).columns], malformed)
+
+    elif len(dum_df["FileNames"] > 1):
+        pred_prob, pred = generate_before_predict.main(path, 1, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
+
+        dum_df["Motor_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 0].tolist()]
+        dum_df["Explosion_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 1].tolist()]
+        dum_df["Human_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 2].tolist()]
+        dum_df["Nature_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred, dum_df.shape[0]))[:, 3].tolist()]
+        dum_df["Domestic_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 4].tolist()]
+        dum_df["Tools_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 5].tolist()]
+        return call_for_data_offline(dum_df[dum_df.drop("features", axis=1).columns],
+                               malformed)
+
 
 # callback function for
 @app.callback(Output(component_id='page-1-content', component_property='children'),
@@ -285,15 +420,185 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     """
     check for upload of the files
     """
-    if list_of_contents is not None:
-        children = [
-            parse_contents(c, n, d) for c, n, d in
-            zip(list_of_contents, list_of_names, list_of_dates)]
-        return children
+    if len(list_of_names) == 1:
+        if list_of_contents is not None:
+            children = [
+                parse_contents(c, n, d) for c, n, d in
+                zip(list_of_contents, list_of_names, list_of_dates)]
+            return children
+    else:
+        print "len of files: ", (list_of_names)
+        return parse_contents_batch(list_of_contents, list_of_names, list_of_dates)
+
+
+def start_batch_run_ftp_live(path_for_folder):
+    """
+    Writes the predicted results  on to csvfile row wise
+    """
+    all_wav_files_path = glob.glob(path_for_folder+"*.WAV") + glob.glob(path_for_folder+"*.wav")
+    all_wav_files = [each_file.split("/")[-1] for each_file in all_wav_files_path]
+    print 'len:', len(all_wav_files)
+    dum_df = pd.DataFrame()
+    dum_df["FileNames"] = all_wav_files
+    malformed_specific = []
+    tag_names = ["FileNames", "Motor_probability", "Explosion_probability",
+                 "Human_probability", "Nature_probability", "Domestic_probability",
+                 "Tools_probability"]
+
+
+    # Check if the csv file is already existing or not. If it is existing then append the result
+    # to same csv file based on the downloaded file
+    if os.path.exists(CSV_FILENAME):
+        with open(CSV_FILENAME, "a") as file_object:
+            wav_information_object = csv.writer(file_object)
+            file_object.flush()
+            for each_file in dum_df['FileNames'].tolist():
+                try:
+                    emb = generate_before_predict.main(path_for_folder+each_file, 0, 0)
+                except ValueError:
+                    print "malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index
+                    dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
+                    malformed_specific.append(each_file)
+                    continue
+
+                # Predict the result and save the result to the csv file
+                pred_prob, pred = generate_before_predict.main(path_for_folder+each_file, 1, np.array(emb.flatten().tolist()))
+                motor_probability = "{0:.2f}".format(pred_prob[0][0])
+                explosion_probability = "{0:.2f}".format(pred_prob[0][1])
+                human_probability = "{0:.2f}".format(pred_prob[0][2])
+                nature_probabilty = "{0:.2f}".format(pred_prob[0][3])
+                domestic = "{0:.2f}".format(pred_prob[0][4])
+                tools = "{0:.2f}".format(pred_prob[0][5])
+                wav_information_object.writerow([each_file, motor_probability,
+                                                 explosion_probability, human_probability,
+                                                 nature_probabilty, domestic, tools])
+                file_object.flush()
+
+    # Is there is no csv file then create one and write the result onto it.
+    else:
+        with open(CSV_FILENAME, "w") as file_object:
+            wav_information_object = csv.writer(file_object)
+            wav_information_object.writerow(tag_names)
+            file_object.flush()
+
+            # Loop over the files
+            for each_file in dum_df['FileNames'].tolist():
+                try:
+                    emb = generate_before_predict.main(path_for_folder+each_file, 0, 0)
+                except ValueError:
+                    print "malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index
+                    dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
+                    malformed_specific.append(each_file)
+                    continue
+
+                pred_prob, pred = generate_before_predict.main(path_for_folder+each_file, 1, np.array(emb.flatten().tolist()))
+                motor_probability = "{0:.2f}".format(pred_prob[0][0])
+                explosion_probability = "{0:.2f}".format(pred_prob[0][1])
+                human_probability = "{0:.2f}".format(pred_prob[0][2])
+                nature_probabilty = "{0:.2f}".format(pred_prob[0][3])
+                domestic = "{0:.2f}".format(pred_prob[0][4])
+                tools = "{0:.2f}".format(pred_prob[0][5])
+                wav_information_object.writerow([each_file, motor_probability,
+                                                 explosion_probability, human_probability,
+                                                 nature_probabilty, domestic, tools])
+                file_object.flush()
+
+def call_for_data_to_display(dataframe, list_of_malformed):
+    """
+    Returns the predicted values as the data table
+    """
+    return html.Div([
+        html.H4("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
+                style={"color":"white",
+                       'text-decoration':'underline'}),
+        html.H4("Error while prediciton: " + str(list_of_malformed), style={"color":"white"}),
+        dash_table.DataTable(id='datatable-interactivity-predictions',
+                             columns=[{"name": i,
+                                       "id": i,
+                                       "deletable": True} for i in dataframe.columns],
+                             data=dataframe.to_dict("rows"),
+                             filtering=True,
+                             sorting=True,
+                             # n_fixed_rows=1,
+                             style_cell={'width': '50px'},
+                             sorting_type="multi",
+                             row_selectable="single",
+                             style_table={"maxHeight":"700",
+                                          "overflowY":"scroll"},
+                             selected_rows=[]),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br()])
+
+
+
+#####################################################################################################
+                      #1A UPLOAD PAGE : Reloading for Folder file results#
+#####################################################################################################
+
+PAGE_5_LAYOUT = html.Div(html.Div([html.H4('Prediction Result'),
+                                   html.Div(id='live-update-text'),
+                                   dcc.Interval(id='interval-component',
+                                                interval=1*1000,
+                                                n_intervals=0)]))
+
+@app.callback(Output('live-update-text', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def display_reloading_csv(n_intervals):
+    """
+    Reads csv file after every interval and displays the results
+    """
+    dataframe = pd.read_csv(CSV_FILENAME)
+    return call_for_data_to_display(dataframe, [])
+
+
+@app.callback(Output('button1', 'style'),
+              [Input('button1', 'n_clicks')])
+def disabling_button_1a(n_clicks):
+    """
+    Disabling the button after its being clicked once
+    """
+    if n_clicks >= 1:
+        return {'display':"none"}
+
+
+@app.callback(Output('page-1-content', 'style'),
+              [Input('button1', 'n_clicks')])
+def disabling_button_1b(n_clicks):
+    """
+    Disabling the button after its being clicked once
+    """
+    if n_clicks >= 1:
+        return {'display':"none"}
+
+
+@app.callback(Output('page-1-content-link', 'children'),
+              [Input('button1', 'n_clicks')])
+def disabling_button_1c(n_clicks):
+    """
+    Disabling the button after its being clicked once
+    """
+    if n_clicks >= 1:
+        download_thread = threading.Thread(target=start_batch_run_ftp_live,
+                                           args=[FOLDER_FILES_PATH])
+        download_thread.start()
+        return html.Div([html.Br(),
+                         html.Br(),
+                         dcc.Link("Selected Folder: "+FOLDER_FILES_PATH,
+                                  href="/page-5",
+                                  style={'text-decoration': 'none',
+                                         'textAlign': 'left',
+                                         'border':'3px solid green',
+                                         # 'margin-left':'800',
+                                         # 'align':'center',
+                                         'color': 'green',
+                                         'fontSize':20})],
+                        style={'textAlign':"left"})
 
 
 ################################################################################
-                            # Test Page / Misc #
+                            # TEST PAGE / MISC#
 ################################################################################
 
 
@@ -361,7 +666,7 @@ def update_values(input_data):
 
 
 ###############################################################################
-                             #FTP Status Page#
+                          #FTP STATUS PAGE
 ###############################################################################
 
 def check_for_wav_only(list_values):
@@ -382,7 +687,7 @@ def call_for_ftp():
     Connect to FTP and display all the wav files present in directory
     """
     global ftp
-    ftp = FTP('34.211.117.196', user='*******', passwd='********')
+    ftp = FTP(FTP_HOST_NAME, user=FTP_USER_NAME, passwd=FTP_PASSWORD)
     print "connected to FTP"
     ftp.cwd(TARGET_FTP_FOLDER)
     ex = ftp.nlst()
@@ -545,6 +850,8 @@ def batch_downloading_and_predict(n_clicks):
         malformed = []
         dum_df = df.copy()
         for i in df["FileNames"].tolist():
+            if not os.path.exists("FTP_downloaded/"):
+                os.makedirs("FTP_downloaded/")
             path = "FTP_downloaded/"+i
             if os.path.exists(path):
                 print "path Exists"
@@ -596,7 +903,7 @@ def batch_downloading_and_predict(n_clicks):
 
 
 ################################################################################
-                     #Sound Library - Requires MongoDB Server#
+                    #SOUND LIBRARY - Requires MongoDB server
 ################################################################################
 
 
@@ -1057,6 +1364,8 @@ def display_page(pathname):
         return PAGE_3_LAYOUT
     elif pathname == '/page-4':
         return PAGE_4_LAYOUT
+    elif pathname == "/page-5":
+        return PAGE_5_LAYOUT
     else:
         return INDEX_PAGE
 
