@@ -33,10 +33,7 @@ CHECKLIST_DISPLAY = ["Nature", "Bird", "Wind", "Vehicle", "Honking", "Conversati
 ##########################################################################################
 
 app.layout = html.Div([html.Div([html.H1("Audio Annotation",
-                                         style={"color":"white",
-                                     	   				"display":"center",
-                                                'fontSize': 25,
-                 										            'text-decoration':'underline'})],
+                                         style={"color":"white", "display":"center", 'fontSize': 25, 'text-decoration':'underline'})],
                                 style={"background-color":"green",
                                        "padding":"3px"}),
                        html.Div(dcc.Textarea(id="text_area",
@@ -92,11 +89,11 @@ def previous_next_button_content(n_clicks):
                                            style={"margin-left":'8%',
                                                   "width":"65%",
                                                   'display': 'inline-block'}),
-        						              html.Div(children=[html.Button("Next Audio",
+        						                    html.Div(children=[html.Button("Next Audio",
                                                                  value="next",
                                                                  id='next_button',
                                                                  style={"width" : "200px"})],
-                                           style={"width":"10%",'display': 'inline-block'})])
+                                           style={"width":"10%", 'display': 'inline-block'})])
 
 ##########################################################################################
                        # STYLING FOR TABS #
