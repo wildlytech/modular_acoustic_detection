@@ -1,0 +1,123 @@
+._dash-loading-callback {
+/*  font-family: sans-serif;
+  padding-top: 50px;
+  color: rgb(90, 90, 90);*/
+
+  display: inline-block;
+  position: relative;
+  width: 74px;
+  height: 74px;
+
+
+  -webkit-animation: fadein 0.5s ease-in 7s forwards; /* Safari, Chrome and Opera > 12.1 */
+     -moz-animation: fadein 0.5s; /* Firefox < 16 */
+      -ms-animation: fadein 0.5s; /* Internet Explorer */
+       -o-animation: fadein 0.5s; /* Opera < 12.1 */
+          animation: fadein 0.5s ease-in 7s forwards;  
+
+}
+  
+  /* The banner */
+/*  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  cursor: progress;
+*/
+/*  border: 16px solid #f3f3f3; /* Light grey */
+/*  border-top: 16px solid #3498db; /* Blue
+  
+  width: 2px;
+  height: 2px;*/
+  /*content: "Please wait";*/
+._dash-loading-callback::after{
+  content: " ";
+  display: block;
+  border-radius: 50%;
+  width: 0;
+  height: 0;
+  margin: 6px;
+  box-sizing: border-box;
+  border: 26px solid #fff;
+  border-color: #97151c transparent #97151c transparent;
+  animation: lds-hourglass 1.2s infinite;
+
+
+  /*animation: spin 2s linear infinite;*/
+/*  border-top: 10px solid #97151c;
+  border-right: 10px solid white;
+  border-bottom: 10px solid #97151c;
+  border-left: 10px solid white;
+  border-radius: 50%;*/
+  position: fixed;
+  left: 50%;
+  top: 40%;
+/*  width: 30px;
+  height: 30px;
+*/
+
+
+}
+
+@keyframes lds-hourglass {0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
+}
+
+
+
+
+
+
+
+/*#out-upload-data {
+  width: 100%;
+  background-color: grey;}*/
+
+#upload-data {
+  width: 1%;
+  height: 30px;
+  background-color: green;
+}
+
+
+
+/*@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}*/
+
+
+/*@-moz-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+@-webkit-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+@-ms-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+@-o-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}*/
