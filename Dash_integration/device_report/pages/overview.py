@@ -7,14 +7,9 @@ from plotly import tools
 import pandas as pd
 import pathlib
 import numpy as np
-
-# get relative data folder
-PATH = pathlib.Path(__file__).parent
-DATA_PATH = PATH.joinpath("../data").resolve()
 from datetime import datetime
 
-csv_files = glob.glob("/home/shiv/Pictures/modular_acoustic_detection/wav_header_info/sd_card_wav_header_csv/*.csv")
-csv_files1 = glob.glob("/home/shiv/Pictures/modular_acoustic_detection/wav_header_info/only_recorded_wav_info_csv/*.csv")
+csv_files = glob.glob("transmission_details/*.csv")
 
 
 
