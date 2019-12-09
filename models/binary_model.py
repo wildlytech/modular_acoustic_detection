@@ -1,7 +1,7 @@
 """
 Training a Binary Output model.
 Impact Sounds = 1
-Ambient SOunds = 2
+Ambient SOunds = 0
 """
 import sys
 import numpy as np
