@@ -1,0 +1,89 @@
+._dash-loading-callback {
+/*  font-family: sans-serif;
+  padding-top: 50px;
+  color: rgb(90, 90, 90);*/
+
+  -webkit-animation: fadein 0.5s ease-in 7s forwards; /* Safari, Chrome and Opera > 12.1 */
+     -moz-animation: fadein 0.5s; /* Firefox < 16 */
+      -ms-animation: fadein 0.5s; /* Internet Explorer */
+       -o-animation: fadein 0.5s; /* Opera < 12.1 */
+          animation: fadein 0.5s ease-in 7s forwards;  
+
+
+  
+  /* The banner */
+/*  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  cursor: progress;
+*/
+/*  border: 16px solid #f3f3f3; /* Light grey */
+/*  border-top: 16px solid #3498db; /* Blue
+  
+  width: 2px;
+  height: 2px;*/
+  animation: spin 2s linear infinite;
+  border-top: 10px solid blue;
+  border-right: 10px solid green;
+  border-bottom: 10px solid red;
+  border-left: 10px solid pink;
+  border-radius: 50%;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 5%;
+  height: 5%;
+
+
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+/*#out-upload-data {
+  width: 100%;
+  background-color: grey;}*/
+
+#upload-data {
+  width: 1%;
+  height: 30px;
+  background-color: green;
+}
+
+
+
+/*@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}*/
+
+
+/*@-moz-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+@-webkit-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+@-ms-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+@-o-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}*/
