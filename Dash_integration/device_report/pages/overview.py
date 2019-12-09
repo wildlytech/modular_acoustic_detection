@@ -12,7 +12,6 @@ from datetime import datetime
 csv_files = glob.glob("transmission_details/*.csv")
 
 
-
 ##########################################################################################
                          # BATTERY PERFORMANCE GRAPH HELPER FUNC TAB #
 ##########################################################################################

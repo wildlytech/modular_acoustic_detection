@@ -15,7 +15,7 @@ body {
 }
 .page {
   position: relative;
-  width: 210mm;
+  width: 310mm;
   min-height: 300mm;
   padding: 0mm;
   margin: 10mm auto;
@@ -32,7 +32,7 @@ body {
 }
 
 @page {
-  size: A4;
+  size: A5;
   margin: 0;
 }
 @media print {
