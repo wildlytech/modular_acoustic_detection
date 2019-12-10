@@ -12,6 +12,11 @@ from pydub import AudioSegment
 from sklearn.preprocessing import LabelBinarizer
 import tensorflow as tf
 
+
+
+########################################################################
+            # Define the class and sublabels in it
+########################################################################
 EXPLOSION_SOUNDS = [
     'Fireworks',
     'Burst, pop',
@@ -148,12 +153,18 @@ NATURE_SOUNDS = [
 
 ]
 
-#Defining Ambient and Impact sounds as to what sounds it must comprise of.
+############################################################################################
+        #Defining Ambient and Impact sounds as to what sounds it must comprise of.
+############################################################################################
 AMBIENT_SOUNDS = NATURE_SOUNDS
 IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
                 HUMAN_SOUNDS + TOOLS_SOUNDS  + DOMESTIC_SOUNDS
 
-#function to get the dataframe from csv data
+
+
+############################################################################################
+            # function to get the dataframe from csv data
+############################################################################################
 def get_csv_data(target_sounds):
     """
     Read all the csv file data into pandas dataframe
@@ -214,6 +225,11 @@ def get_csv_data(target_sounds):
 
     return train, train_label_binarized
 
+
+
+############################################################################################
+            # Downloads the youtube audio files
+############################################################################################
 def download_clip(YTID, start_seconds, end_seconds, target_path):
     """
     Downloads the youtube audio files
@@ -249,7 +265,12 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
 
     os.remove(tmp_filename_w_extension)
 
-# To download the audio files from youtube
+
+
+
+############################################################################################
+                # To download the audio files from youtube
+############################################################################################
 def download_data(target_sounds_list, target_path):
     """
     Get the data necessary for downloading audio files
@@ -290,8 +311,13 @@ def download_data(target_sounds_list, target_path):
     for t in threads:
         t.join()
 
-# slightly modified from
-#https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
+
+
+
+############################################################################################
+                        # slightly modified from
+    #https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
+############################################################################################
 def read_audio_record(audio_record, output_to_file=None):
     """
     #https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
@@ -339,11 +365,17 @@ def read_audio_record(audio_record, output_to_file=None):
         df.to_pickle(audio_record.replace('.tfrecord', '.pkl'))
     return df
 
+
+
+
+############################################################################################
+                    # Read the recursive names from JSON file
+############################################################################################
 def get_recursive_sound_names(designated_sound_names):
     """
     Read the recursive names from JSON file
     """
-    ontology_dict = pd.read_json("data/audioset/ontology.json")
+    ontology_dict = pd.read_json("../data/audioset/ontology.json")
 
     ontology_dict_from_name = ontology_dict.copy()
     ontology_dict_from_name.index = ontology_dict_from_name['name']
@@ -379,6 +411,12 @@ def get_all_sound_names():
     """
     return get_recursive_sound_names(AMBIENT_SOUNDS), get_recursive_sound_names(IMPACT_SOUNDS)
 
+
+
+
+############################################################################################
+                    # Read the tf.record files data
+############################################################################################
 def get_data():
     """
     Read the tf.record files data
