@@ -371,11 +371,14 @@ def read_audio_record(audio_record, output_to_file=None):
 ############################################################################################
                     # Read the recursive names from JSON file
 ############################################################################################
-def get_recursive_sound_names(designated_sound_names):
+def get_recursive_sound_names(designated_sound_names, path_to_ontology):
     """
     Read the recursive names from JSON file
     """
-    ontology_dict = pd.read_json("../data/audioset/ontology.json")
+    if path_to_ontology:
+        ontology_dict = pd.read_json(path_to_ontology+"data/audioset/ontology.json")
+    else:
+        ontology_dict = pd.read_json("data/audioset/ontology.json")
 
     ontology_dict_from_name = ontology_dict.copy()
     ontology_dict_from_name.index = ontology_dict_from_name['name']
@@ -405,11 +408,11 @@ def get_recursive_sound_names(designated_sound_names):
                                 recursive_sound_ids)
     return recursive_sound_names
 
-def get_all_sound_names():
+def get_all_sound_names(path_to_ontology):
     """
     Get all the sound names
     """
-    return get_recursive_sound_names(AMBIENT_SOUNDS), get_recursive_sound_names(IMPACT_SOUNDS)
+    return get_recursive_sound_names(AMBIENT_SOUNDS, path_to_ontology), get_recursive_sound_names(IMPACT_SOUNDS, path_to_ontology)
 
 
 
