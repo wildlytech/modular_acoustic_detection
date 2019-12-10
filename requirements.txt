@@ -37,7 +37,7 @@ dash-renderer==1.0.0
 dash-table==4.5.0
 dash-table-experiments==0.6.0
 decorator==4.3.0
-Django==1.11.14
+Django==1.11.23
 docutils==0.14
 entrypoints==0.2.3
 enum34==1.1.6
