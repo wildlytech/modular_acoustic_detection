@@ -119,7 +119,7 @@ PeakUtils==1.1.1
 periodictable==1.5.1
 pexpect==4.5.0
 pickleshare==0.7.4
-Pillow==5.2.0
+Pillow==6.2.0
 plotly==3.4.2
 prompt-toolkit==1.0.15
 protobuf==3.6.1
