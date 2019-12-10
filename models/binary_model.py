@@ -26,12 +26,12 @@ import balancing_dataset
 ########################################################################
             # get all the sounds
 ########################################################################
-AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names()
-explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS)
-motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS)
-wood_sounds = get_recursive_sound_names(WOOD_SOUNDS)
-human_sounds = get_recursive_sound_names(HUMAN_SOUNDS)
-nature_sounds = get_recursive_sound_names(NATURE_SOUNDS)
+AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names("../")
+explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS, "../")
+motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS, "../")
+wood_sounds = get_recursive_sound_names(WOOD_SOUNDS, "../")
+human_sounds = get_recursive_sound_names(HUMAN_SOUNDS, "../")
+nature_sounds = get_recursive_sound_names(NATURE_SOUNDS, "../")
 
 
 
