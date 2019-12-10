@@ -154,7 +154,7 @@ pytube==9.5.1
 PyTweening==1.0.3
 pytz==2018.7
 pyusb==1.0.2
-PyYAML==3.12
+PyYAML==5.1
 pyzmq==17.0.0
 reportlab==3.5.23
 requests==2.21.0
