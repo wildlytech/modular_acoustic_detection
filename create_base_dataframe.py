@@ -69,7 +69,7 @@ def read_all_embeddings(embedding_filespath):
     """
     embeddings_value = []
     for each_value in embedding_filespath:
-        embeddings_value.append(read_pickle_file(RESULT.path_for_saved_embeddings+each_value))
+        embeddings_value.append(read_pickle_file(each_value))
 
     return embeddings_value
 
