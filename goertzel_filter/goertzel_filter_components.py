@@ -2,22 +2,30 @@
 Generates the multiple target frequency components
 for a single .wav file
 """
+import sys
 import math
 import os
 import argparse
 import pickle
+import glob
 import numpy as np
 import pandas as pd
 import scipy.signal
 from matplotlib import pyplot as plt
 import scipy.io.wavfile
-import balance_data_priority
 import resampy
 
 
+#################################################################################
+            # Description
+#################################################################################
 DESCRIPTION = 'Generates the target Goertzel filter components of audio files'
 
-#parse the input arguments given from command line
+
+
+#################################################################################
+            # parse the input arguments given from command line
+#################################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-audio_files_path', '--audio_files_path', action='store',
                     help='input the path for audio files: .wav format files')
@@ -25,19 +33,31 @@ PARSER.add_argument('-path_to_freq_comp', '--path_to_freq_comp', action='store',
                     help='Input the path to write goertzel filter components : .pkl format files ')
 RESULT = PARSER.parse_args()
 
-# give the path for audio files , and also path where to write the goertzel frequency components
+
+
+#################################################################################
+                # set the input arguments
+#################################################################################
 AUDIO_FILES_PATH = RESULT.audio_files_path
 PATH_TO_GOERTZEL_COMPONENTS = RESULT.path_to_freq_comp
 
-#set the target target frequencies that we are interested to filter out from  audio file
+
+
+#################################################################################
+    #set the target frequencies are interested to filter out from  audio file
+#################################################################################
 TARGET_FREQUENCIES = [800, 1600, 2000, 2300]
+ACCEPTABLE_SAMPLINGRATE = 48000
+DOWNSAMPLING_FREQUENCY = 8000
 
 
+#################################################################################
+            # Goertzel Algorithm implementation
+#################################################################################
 def Goertzel_filter(sample, sample_rate, freq, number_samples):
     """
     Implementing the goertzel filter
     """
-    # Initialize and precomputing all the constants
     result_mag = []
     result_real = []
     result_imag = []
@@ -71,27 +91,23 @@ def Goertzel_filter(sample, sample_rate, freq, number_samples):
     return  result_mag, result_real, result_imag, result_mag_sqre
 
 
+
+#################################################################################
+            # Getting the candle stick type of data
+#################################################################################
 def get_candlesticks_data(magnitude_data, sample_rate, time_stamp, length_of_audio_ms):
 
     # calculate the number of samples for evry given time stamp value
     nsamples_asper_timestamp = int((time_stamp * len(magnitude_data))/(length_of_audio_ms))
-
-    # split magnitude_data into samples for every time_stamp
     split_data = np.split(magnitude_data, magnitude_data.shape[0]/nsamples_asper_timestamp)
     row = []
     for i in split_data:
         arb = []
-        # Start value amoung the sample
         open_sample = i[0]
-        # Last value amoung the sample
         close = i[-1]
-        # Max value amoung the samples
         high = max(i)
-        # Lowest value amoung the samples
         low = min(i)
-        # List all the values into a single list
         arb = [open_sample, close, high, low]
-        #append the list to a main list
         row.append(arb)
 
     # Create  a dataframe with evry row as time stamp values for a single audio file
@@ -102,90 +118,83 @@ def get_candlesticks_data(magnitude_data, sample_rate, time_stamp, length_of_aud
     return row, arb_df
 
 
+
+
+#################################################################################
+        # Batch processing for generating goertzel components
+#################################################################################
 def generate_frequency_components():
     """
     Gnerates the multiple target frequency components for
     a single audio file
     """
-    #calling the balanced data function
-    pickle_data = balance_data_priority.balancing_our_data()
-    # pickle_data = audiomoth.audio_dataframe()
-    print pickle_data.shape
-
-    # pickle_data = arbitary.req_sounds()
-    req_audio_files = pickle_data['wav_file'].tolist()[:]
-    req_labels = pickle_data['labels_name'].tolist()[:]
-
-    #computation for all the wave files
+    # pickle_data = balancing_dataset.balanced_data(flag_for_audiomoth=0)
+    # req_audio_files = pickle_data['wav_file'].tolist()
+    # req_labels = pickle_data['labels_name'].tolist()
     number_audio = 0
 
-    #Iterate through all the wav files to generate the goertzel frequency components
-    for audio, label in zip(req_audio_files, req_labels):
+    wavfiles_path = glob.glob(RESULT.audio_files_path + "*.wav") + glob.glob(RESULT.audio_files_path + "*.WAV")
 
-        #Read in the wave file
+    #############################################################################
+                # Iterate through all the wav files.
+                # Generate goertzel filter components
+    #############################################################################
+    for audio_path in wavfiles_path:
         try:
-            read_file = scipy.io.wavfile.read(AUDIO_FILES_PATH + audio)
+            read_file = scipy.io.wavfile.read(audio_path)
 
-            #Check for the sampling rate of the audio file
-            if read_file[1].shape[0] == 480000:
 
-                #check if the audio is mono or stereo
+            #############################################################################
+                        # Check for the sampling rate of the audio file
+            #############################################################################
+            if read_file[1].shape[0] == ACCEPTABLE_SAMPLINGRATE * 10:
                 try:
-                    # If its stereo taking only the first of the array
+
+                    #############################################################################
+                                # If its stereo taking only the first of the array
+                    #############################################################################
                     if read_file[1].shape[1] == 2:
                         wave_file = np.array([i[0] for i in read_file[1]])
-                        print 'wave file is stereo type'
-                        print wave_file.shape
 
-                # If the audio is mono
+
+                    #############################################################################
+                                # If mono take as it is
+                    #############################################################################
                 except:
                     wave_file = np.array(read_file[1])
-                    print 'Wave file is single channel'
 
-                #Print out the details of the audio file which is undergoing goertzel filter
-                print 'Audio Name :', audio
-                print 'Label of Audio :', label
+                #############################################################################
+                            #Print out the details of the audio file
+                #############################################################################
+                number_audio = number_audio+1
+                print 'Audio FileName :', audio_path.split("/")[-1]
                 print 'Number of audio :', number_audio
 
-                #update
-                number_audio = number_audio+1
                 mag = []
 
-                #check if the audio file is already filtered
-                if os.path.exists(PATH_TO_GOERTZEL_COMPONENTS + audio[:11]+'.pkl'):
-                    print 'Done'
-
+                #############################################################################
+                         # check if the audio file is already filtered else do it
+                #############################################################################
+                if os.path.exists(PATH_TO_GOERTZEL_COMPONENTS + audio_path.split("/")[-1][:-4]+'.pkl'):
+                    pass
                 else:
                     # Resample the audio sampling rate to 8000Hz
-                    print 'Executing the loop'
-                    wave_file = resampy.resample(wave_file, x[0], 8000)
-                    print 'resamples audio: ', wave_file.shape
-
-                    # applying Goertzel on resampled signals with required target frequecnies
+                    wave_file = resampy.resample(wave_file, read_file[0], DOWNSAMPLING_FREQUENCY)
                     for i in TARGET_FREQUENCIES:
-                        mag_arb, real, imag, magnitude_square = Goertzel_filter(wave_file, 8000, i, wave_file.shape[0])
+                        mag_arb, _, _, _ = Goertzel_filter(wave_file, DOWNSAMPLING_FREQUENCY, i, wave_file.shape[0])
                         mag.append(mag_arb)
-                    with open(PATH_TO_GOERTZEL_COMPONENTS + audio[:11]+'.pkl', 'w') as file_obj:
+                    with open(PATH_TO_GOERTZEL_COMPONENTS + audio_path.split("/")[-1][:-4]+'.pkl', 'w') as file_obj:
                         pickle.dump(np.array(mag, dtype=np.float32), file_obj)
-
             else:
-                print ' Wave file is not at good sampling rate'
-        except:
-            print 'Wave file not found in directory'
+                print ' Wave file is not at good sampling rate ie ' + str(ACCEPTABLE_SAMPLINGRATE) + "Hz"
 
-    #Plot the graph for last example only
-    time_space = np.linspace(0, 10, wave_file.shape[0])
-    plt.subplot(2, 1, 1)
-    plt.title('(1) wav file of 8Khz sampling rate')
-    plt.xlabel('Time (seconds)')
-    plt.plot(time_space, wave_file)
+        except OSError:
+            print 'Wave file not found in directory '+ audio_path.split("/")[-1]
 
-    plt.subplot(2, 1, 2)
-    plt.title('Goertzel Filter for 2300Hz component')
-    plt.xlabel('Time (seconds)')
-    plt.plot(np.linspace(0, 10, wave_file.shape[0]), mag_arb)
-    plt.show()
 
-# Main function
+
+#################################################################################
+                # Main function
+#################################################################################
 if __name__ == "__main__":
     generate_frequency_components()
