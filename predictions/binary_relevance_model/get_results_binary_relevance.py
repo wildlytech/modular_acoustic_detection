@@ -14,10 +14,11 @@ from keras.models import Sequential
 from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, AtrousConvolution1D
 from keras.optimizers import Adam
 import generate_before_predict_BR
+import model_function_binary_relevance
 sys.path.insert(0, "../../")
 from youtube_audioset import get_recursive_sound_names, get_all_sound_names
 from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, \
-                             HUMAN_SOUNDS, NATURE_SOUNDS, DOMESTIC_SOUNDS, TOOLS_SOUNDS, BIRD
+                             HUMAN_SOUNDS, NATURE_SOUNDS, DOMESTIC_SOUNDS, TOOLS_SOUNDS
 
 
 
@@ -37,7 +38,10 @@ PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-path_for_dataframe_with_features', '--path_for_dataframe_with_features',
                     action='store', help='Input the path for dataframe(.pkl format) with features')
 PARSER.add_argument('-save_misclassified_examples', '--save_misclassified_examples',
-                    action='store', help='Input the path with filename (.pkl)')
+                    action='store', help='Input the directory')
+PARSER.add_argument('-path_to_save_prediction_csv', '--path_to_save_prediction_csv',
+                    action='store', help='Input the path to save predictions (.csv)')
+
 RESULT = PARSER.parse_args()
 
 
@@ -45,15 +49,13 @@ RESULT = PARSER.parse_args()
 ##############################################################################
             # Get all sound names
 ##############################################################################
-AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names()
-explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS)
-motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS)
-wood_sounds = get_recursive_sound_names(WOOD_SOUNDS)
-human_sounds = get_recursive_sound_names(HUMAN_SOUNDS)
-nature_sounds = get_recursive_sound_names(NATURE_SOUNDS)
-domestic_sounds = get_recursive_sound_names(DOMESTIC_SOUNDS)
-tools = get_recursive_sound_names(TOOLS_SOUNDS)
-bird = get_recursive_sound_names(BIRD)
+explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS, "../../")
+motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS, "../../")
+wood_sounds = get_recursive_sound_names(WOOD_SOUNDS, "../../")
+human_sounds = get_recursive_sound_names(HUMAN_SOUNDS, "../../")
+nature_sounds = get_recursive_sound_names(NATURE_SOUNDS, "../../")
+domestic_sounds = get_recursive_sound_names(DOMESTIC_SOUNDS, "../../")
+tools = get_recursive_sound_names(TOOLS_SOUNDS, "../../")
 #wild_animals=get_recursive_sound_names(Wild_animals)
 
 
@@ -75,13 +77,40 @@ ALL_SOUND_NAMES = ['Motor_sound',
                    'Explosion_sound',
                    'Human_sound',
                    'Nature_sound',
-                   'Domestic_animals',
-                   'Tools']
+                   'Domestic_sound',
+                   'Tools_sound']
 
 
 ALL_SOUND_LIST = explosion_sounds + motor_sounds + human_sounds + \
                  nature_sounds + domestic_sounds + tools
 
+
+##############################################################################
+         # Automatically get the labels that are present in data
+##############################################################################
+def get_labels_present(dataframe):
+    columns = dataframe.columns
+    present_columns = []
+    for each_column in ALL_SOUND_NAMES:
+        if each_column in columns:
+            present_columns.append(each_column)
+        else:
+            pass
+    return present_columns
+
+
+
+##############################################################################
+            # Get the labels that are not present in the data
+##############################################################################
+def get_remaining_columns(present_columns):
+    absence_column = []
+    for each_column in ALL_SOUND_NAMES:
+        if not each_column in present_columns:
+            absence_column.append(each_column)
+        else:
+            pass
+    return absence_column
 
 
 ##############################################################################
@@ -92,18 +121,13 @@ DATA_FRAME['labels_new'] = DATA_FRAME['labels_name'].apply(lambda arr: ['Motor_s
 DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Explosion_sound' if x  in explosion_sounds else x for x in arr])
 DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Nature_sound' if x  in nature_sounds else x for x in arr])
 DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Human_sound' if x  in human_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Domestic_animals' if x  in domestic_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Tools' if x  in tools else x for x in arr])
+DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Domestic_sounds' if x  in domestic_sounds else x for x in arr])
+DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Tools_sound' if x  in tools else x for x in arr])
 # DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Wood_sound' if x  in wood_sounds else x for x in arr])
 # DATA_FRAME['labels_new'] = DATA_FRAME['labels_name'].apply(lambda arr: ['Bird_sound' if x in bird else x for x in arr])
 # DATA_FRAME['labels_new']=DATA_FRAME['labels_new'].apply(lambda arr: ['Wild_animals' if x  in Wild_animals else x for x in arr])
 
 
-##############################################################################
-            # print out the shape and sample data
-##############################################################################
-print DATA_FRAME.head()
-print DATA_FRAME.shape
 
 
 ##############################################################################
@@ -112,29 +136,34 @@ print DATA_FRAME.shape
 NAME_BIN = MultiLabelBinarizer().fit(DATA_FRAME['labels_new'])
 NEW_LABELS_BINARIZED = NAME_BIN.transform(DATA_FRAME['labels_new'])
 NEW_LABELS_BINARIZED_ALL = pd.DataFrame(NEW_LABELS_BINARIZED, columns=NAME_BIN.classes_)
-NEW_LABELS_BINARIZED = NEW_LABELS_BINARIZED_ALL[ALL_SOUND_NAMES]
+COLUMNS_PRESENT = get_labels_present(NEW_LABELS_BINARIZED_ALL)
+print COLUMNS_PRESENT
+if COLUMNS_PRESENT:
+    NEW_LABELS_BINARIZED = NEW_LABELS_BINARIZED_ALL[COLUMNS_PRESENT]
+else:
+    print "No Relevant Labels Found"
+    sys.exit(1)
 
 
 
 ###############################################################################
       # UnComment any of the labels which are not in the dataset
 ##############################################################################
-# NEW_LABELS_BINARIZED["Motor_sound"] = [0] * DATA_FRAME.shape[0]
-# NEW_LABELS_BINARIZED["Domestic_animals"] = [0] * DATA_FRAME.shape[0]
-# NEW_LABELS_BINARIZED["Tools"] = [0] * DATA_FRAME.shape[0]
-# NEW_LABELS_BINARIZED["Nature_sound"] = [0] * DATA_FRAME.shape[0]
-# NEW_LABELS_BINARIZED["Human_sound"] = [0] * DATA_FRAME.shape[0]
-# LABELS_BINARIZED["Bird_sound"] = [0] * DATA_FRAME.shape[0]
-# NEW_LABELS_BINARIZED["Explosion_sound"] = [0] * DATA_FRAME.shape[0]
+ABSENT_COLUMNS = get_remaining_columns(COLUMNS_PRESENT)
+if ABSENT_COLUMNS:
+    for each_col in ABSENT_COLUMNS:
+        NEW_LABELS_BINARIZED[each_col] = [0] * DATA_FRAME.shape[0]
+else:
+    pass
 
 
-
-##############################################################################
-      # Create a datafame with only which are available
-##############################################################################
-LABELS_BINARIZED = pd.DataFrame()
-LABELS_BINARIZED["Domestic"] = NEW_LABELS_BINARIZED['Domestic_animals']
+###############################################################################
+     # Arrange all the labels in manner same as trained
+###############################################################################
+LABELS_BINARIZED = NEW_LABELS_BINARIZED[ALL_SOUND_NAMES]
 print LABELS_BINARIZED.mean()
+
+
 
 
 ##############################################################################
@@ -180,7 +209,8 @@ def create_keras_model():
     # reshaping the test data so as to align with input for model
 ##############################################################################
 CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
-CLF2_TRAIN_TARGET = LABELS_FILTERED
+CLF2_TRAIN_TARGET_ = LABELS_FILTERED
+
 
 
 ##############################################################################
@@ -188,93 +218,84 @@ CLF2_TRAIN_TARGET = LABELS_FILTERED
 ##############################################################################
 MODEL = create_keras_model()
 
-CLF2_TRAIN_PREDICTION = []
 CLF2_TRAIN_PREDICTION_PROB = []
 
-for each_embedding in DF_TRAIN["features"].values.tolist():
-    prediction_list = []
-    prediction_rounded = []
-    for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-        pred_prob, pred_round = generate_before_predict_BR.main(True, 1, each_embedding, each_model)
-        pred_prob = pred_prob[0][0] * 100
-        pred_round = pred_round[0][0]
-        prediction_list.append("{0:.2f}".format(pred_prob))
-        prediction_rounded.append(pred_round)
-    CLF2_TRAIN_PREDICTION.append(prediction_list)
-    CLF2_TRAIN_PREDICTION_PROB.append(prediction_rounded)
 
 
+for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
+    prediciton_prob, prediction = model_function_binary_relevance.predictions_batch_wavfiles(CLF2_TRAIN, each_model)
+    CLF2_TRAIN_PREDICTION = prediction.ravel()
+    CLF2_TRAIN_TARGET = LABELS_FILTERED[each_model+"_sound"]
+    print CLF2_TRAIN_TARGET.shape
+    DF_TRAIN[each_model+"_Probability"] = prediciton_prob.ravel()
+    DF_TRAIN[each_model+"_Prediction"] = prediction.ravel()
 
-##############################################################################
-      # Predict on train and test data
-##############################################################################
-# CLF2_TRAIN_PREDICTION  = np.array([[0] if value<=0.40 else [1] for value in CLF2_TRAIN_PREDICTION_PROB])
+
+    ##############################################################################
+          # Predict on train and test data
+    ##############################################################################
+    # CLF2_TRAIN_PREDICTION  = np.array([[0] if value<=0.40 else [1] for value in CLF2_TRAIN_PREDICTION_PROB])
 
 
 
 
-##############################################################################
-          # To get the Misclassified examples
-##############################################################################
-DF_TRAIN['actual_labels'] = np.split(CLF2_TRAIN_TARGET.values, DF_TRAIN.shape[0])
-DF_TRAIN['predicted_labels'] = np.split(CLF2_TRAIN_PREDICTION, DF_TRAIN.shape[0])
-DF_TRAIN['predicted_prob'] = np.split(CLF2_TRAIN_PREDICTION_PROB, DF_TRAIN.shape[0])
-MISCLASSIFED_ARRAY = CLF2_TRAIN_PREDICTION != CLF2_TRAIN_TARGET
-MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
-print 'Misclassified number of examples :', DF_TRAIN[MISCLASSIFIED_EXAMPLES].shape[0]
+    ##############################################################################
+              # To get the Misclassified examples
+    ##############################################################################
+    DF_TRAIN[each_model+'_actual_labels'] = CLF2_TRAIN_TARGET
+    MISCLASSIFED_ARRAY = CLF2_TRAIN_PREDICTION != CLF2_TRAIN_TARGET
+    print '\n\nMisclassified number of examples for '+ each_model + " :", DF_TRAIN.loc[MISCLASSIFED_ARRAY].shape[0]
+
+
+    ##############################################################################
+              #  misclassified examples are to be saved
+    ##############################################################################
+    if RESULT.save_misclassified_examples:
+        with open(RESULT.save_misclassified_examples+"misclassified_examples_br_model_"+each_model+".pkl", "w") as f:
+            pickle.dump(DF_TRAIN[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
+    else:
+        pass
 
 
 
-##############################################################################
-          # uncomment if misclassified examples are to be saved
-##############################################################################
-if RESULT.save_misclassified_examples:
-    with open("misclassified_examples_br_model.pkl", "w") as f:
-        pickle.dump(DF_TRAIN[MISCLASSIFIED_EXAMPLES][["wav_file",
-                                                      "actual_labels",
-                                                      "predicted_labels",
-                                                      "predicted_prob"]], f)
-else:
-    pass
+    ##############################################################################
+              # Print confusion matrix and classification_report
+    ##############################################################################
+    print 'Confusion Matrix for '+ each_model
+    print '============================================'
+    RESULT_ = confusion_matrix(CLF2_TRAIN_TARGET.values,
+                               CLF2_TRAIN_PREDICTION)
+    print RESULT_
 
 
 
-##############################################################################
-          # Print confusion matrix and classification_report
-##############################################################################
-print CLF2_TRAIN_TARGET.values.argmax(axis=1).shape
-print '        Confusion Matrix          '
-print '============================================'
-RESULT = confusion_matrix(CLF2_TRAIN_TARGET.values.argmax(axis=1),
-                          CLF2_TRAIN_PREDICTION.argmax(axis=1))
-print RESULT
+    ##############################################################################
+            # print classification report
+    ##############################################################################
+    print 'Classification Report for '+ each_model
+    print '============================================'
+    CL_REPORT = classification_report(CLF2_TRAIN_TARGET.values,
+                                      CLF2_TRAIN_PREDICTION)
+    print CL_REPORT
 
 
 
-##############################################################################
-        # print classification report
-##############################################################################
-print '                 Classification Report      '
-print '============================================'
-CL_REPORT = classification_report(CLF2_TRAIN_TARGET.values.argmax(axis=1),
-                                  CLF2_TRAIN_PREDICTION.argmax(axis=1))
-print CL_REPORT
-
-
-
-##############################################################################
-        # calculate accuracy and hamming loss
-##############################################################################
-ACCURACY = accuracy_score(CLF2_TRAIN_TARGET.values.argmax(axis=1),
-                          CLF2_TRAIN_PREDICTION.argmax(axis=1))
-HL = hamming_loss(CLF2_TRAIN_TARGET.values.argmax(axis=1), CLF2_TRAIN_PREDICTION.argmax(axis=1))
-print 'Hamming Loss :', HL
-print 'Accuracy :', ACCURACY
+    ##############################################################################
+            # calculate accuracy and hamming loss
+    ##############################################################################
+    ACCURACY = accuracy_score(CLF2_TRAIN_TARGET.values,
+                              CLF2_TRAIN_PREDICTION)
+    HL = hamming_loss(CLF2_TRAIN_TARGET.values, CLF2_TRAIN_PREDICTION)
+    print 'Hamming Loss :', HL
+    print 'Accuracy :', ACCURACY
 
 
 
 ##############################################################################
         # save the prediction in pickle format
 ##############################################################################
-with open("predictions.pkl", "w") as file_obj:
-    pickle.dump(DF_TRAIN, file_obj)
+
+if RESULT.path_to_save_prediction_csv:
+    DF_TRAIN.drop(["features"], axis=1).to_csv(RESULT.path_to_save_prediction_csv)
+else:
+    pass
