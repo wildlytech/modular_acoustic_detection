@@ -47,6 +47,11 @@ import vggish_params
 import vggish_postprocess
 import vggish_slim
 
+
+
+#######################################################################################
+             # Arguments some have default values which dont't need to be changed
+#######################################################################################
 flags = tf.app.flags
 
 flags.DEFINE_string(
@@ -73,6 +78,10 @@ flags.DEFINE_string(
 FLAGS = flags.FLAGS
 
 
+########################################################################################
+                    # Main Function
+########################################################################################
+
 def main(_):
     """
     Gnerates the embeddings for the wav files at specified path
@@ -89,7 +98,7 @@ def main(_):
         wav_file_list.append(wav_file_path.split('/')[-1])
 
     for wav_file, wav_file_name in zip(wav_files_path, wav_file_list):
-        pkl = str(wav_file_name)[:11]+'.pkl'
+        pkl = str(wav_file_name)[:-4]+'.pkl'
         print (wav_file)
         #No need to generate the embeddings that are already generated.
         if pkl in pickle_files:
