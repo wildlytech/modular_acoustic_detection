@@ -33,6 +33,13 @@ RESULT = PARSER.parse_args()
 
 
 
+
+LABELS_NAME_COLUMNS = ['Label_1', "Label_2", "Label_3", "Label_4"]
+
+
+###########################################################################
+
+###########################################################################
 def read_data_files(filename):
     """
     read the annotated file
@@ -125,12 +132,15 @@ def preprocess_data(data_frame, label_columns_list, data_file_name):
 def check_for_unknown_label(data_frame, label_columns_list):
     """
     """
+    labels_not_found = []
     for col in label_columns_list:
         for each_label in data_frame[col].values.tolist():
             if each_label in SET_DICTIONARY.keys() or each_label in SET_DICTIONARY.values():
                 pass
             else:
-                print "Label Not Found (Error might occur): ", each_label
+                labels_not_found.append(each_label)
+
+    print "Labels not found in Dictionary: \n", list(set(labels_not_found))
 
 
 
@@ -158,9 +168,9 @@ def initiate_preprocessing(data_file_name, path_to_embeddings):
     reading data file
     """
     data_file = read_data_files(data_file_name)
-    check_for_unknown_label(data_file, ['Label_1', "Label_2", "Label_3"])
-    data = preprocess_data(data_file, ['Label_1', "Label_2", "Label_3"], data_file_name)
-    data = data.drop(['Label_1', "Label_2", "Label_3", "Location"], axis=1)
+    check_for_unknown_label(data_file, LABELS_NAME_COLUMNS)
+    data = preprocess_data(data_file, LABELS_NAME_COLUMNS, data_file_name)
+    data = data.drop(LABELS_NAME_COLUMNS, axis=1)
 
     #read all the embeddings
     if path_to_embeddings:
