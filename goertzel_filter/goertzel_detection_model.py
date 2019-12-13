@@ -18,9 +18,9 @@ from keras.layers.core import Lambda
 from keras.optimizers import RMSprop
 from keras_tqdm import TQDMNotebookCallback
 from keras.layers.core import Dropout
-import frequency_component_files
+import balancing_dataset_goertzel
 sys.path.insert(0, "../")
-from youtube_audioset import explosion_sounds, motor_sounds, wood_sounds, human_sounds, nature_sounds, Wild_animals,domestic_sounds
+from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS, WILD_ANIMALS,DOMESTIC_SOUNDS, TOOLS_SOUNDS
 from youtube_audioset import get_data, get_recursive_sound_names, get_all_sound_names
 
 
@@ -47,35 +47,22 @@ RESULT = PARSER.parse_args()
 #################################################################################
            # get the data of each sounds seperately
 #################################################################################
-MOT, HUM, WOD, EXP, DOM, TOOLS, WILD, NAT = frequency_component_files.get_req_sounds(RESULT.path_for_goertzel_components)
+DATA_FRAME = balancing_dataset_goertzel.balanced_data(audiomoth_flag=0, mixed_sounds_flag=0)
 
-
-
-#################################################################################
-            # Try to balance the number of examples.`
-            # balance as Impact Vs Ambient , but not as multilabel sounds
-#################################################################################
-DATA_FRAME = pd.concat([MOT[:1000],
-                        HUM[:1000],
-                        EXP[:1000],
-                        DOM[:1000],
-                        TOOLS[:1000],
-                        NAT[:5000]],
-                       ignore_index=True)
 
 
 
 #################################################################################
               # getting recursive label names
 #################################################################################
-AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names()
-EXPLOSION = get_recursive_sound_names(explosion_sounds)
-MOTOR = get_recursive_sound_names(motor_sounds)
-WOOD = get_recursive_sound_names(wood_sounds)
-HUMAN = get_recursive_sound_names(human_sounds)
-NATURE = get_recursive_sound_names(nature_sounds)
-DOMESTIC = get_recursive_sound_names(domestic_sounds)
-
+AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names("../")
+EXPLOSION = get_recursive_sound_names(EXPLOSION_SOUNDS, "../")
+MOTOR = get_recursive_sound_names(MOTOR_SOUNDS, "../")
+WOOD = get_recursive_sound_names(WOOD_SOUNDS, "../")
+HUMAN = get_recursive_sound_names(HUMAN_SOUNDS, "../")
+NATURE = get_recursive_sound_names(NATURE_SOUNDS, "../")
+DOMESTIC = get_recursive_sound_names(DOMESTIC_SOUNDS, "../")
+DOMESTIC = get_recursive_sound_names(TOOLS_SOUNDS, "../")
 
 
 
@@ -116,7 +103,7 @@ print "Percentage Ambient Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1)
 #################################################################################
 DF_TRAIN, DF_TEST, LABELS_BINARIZED_TRAIN, LABELS_BINARIZED_TEST = train_test_split(DATA_FRAME,
                                                                                     LABELS_BINARIZED,
-                                                                                    test_size=0.1,
+                                                                                    test_size=0.33,
                                                                                     random_state=42
                                                                                    )
 
@@ -178,20 +165,17 @@ print 'Reading Test files ..!'
 #################################################################################
             # Read all the test data first
 #################################################################################
-for wav_file in DF_TEST['wav_file'].tolist():
+for each_emb, each_wav in zip(DF_TEST['features'].tolist(), DF_TEST["wav_file"].tolist()):
     # Read all the files that are splitted as test in the path directory specified
     try:
-        with open(RESULT.path_for_goertzel_components + wav_file[:-4]+'.pkl', 'rb') as f:
-            arb_wav = pickle.load(f)
-        CLF1_TEST.append(np.dstack((arb_wav[0].reshape((10, 8000)),
-                                    arb_wav[1].reshape((10, 8000)),
-                                    arb_wav[2].reshape((10, 8000)),
-                                    arb_wav[3].reshape((10, 8000)))))
+        CLF1_TEST.append(np.dstack((each_emb[0].reshape((10, 8000)),
+                                    each_emb[1].reshape((10, 8000)),
+                                    each_emb[2].reshape((10, 8000)),
+                                    each_emb[3].reshape((10, 8000)))))
 
     #except any error then remove that file manually and then run the process again
     except :
-        print 'Test Pickling Error'
-        print wav_file
+        print 'Test Pickling Error: ', each_wav
 
 
 
@@ -210,18 +194,15 @@ CLF1_TEST = CLF1_TEST / np.linalg.norm(CLF1_TEST)
               # Reading Trainging Files
 #################################################################################
 print "Reading Training files..!!"
-for wav in DF_TRAIN['wav_file'].tolist():
+for each_emb, each_wav in zip(DF_TRAIN['features'].tolist(), DF_TRAIN["wav_file"].tolist()):
     # Read all the files that are splitted as train in the path directory specified
     try:
-        with open(RESULT.path_for_goertzel_components + wav[:-4]+'.pkl', 'rb') as f:
-            arb_wav = pickle.load(f)
-        CLF1_TRAIN_MINI.append(np.dstack((arb_wav[0].reshape((10, 8000)),
-                                          arb_wav[1].reshape((10, 8000)),
-                                          arb_wav[2].reshape((10, 8000)),
-                                          arb_wav[3].reshape((10, 8000)))))
+        CLF1_TRAIN_MINI.append(np.dstack((each_emb[0].reshape((10, 8000)),
+                                          each_emb[1].reshape((10, 8000)),
+                                          each_emb[2].reshape((10, 8000)),
+                                          each_emb[3].reshape((10, 8000)))))
     except:
-        print 'Train pickling Error '
-        print wav
+        print 'Train pickling Error ', each_wav
 
 
 
