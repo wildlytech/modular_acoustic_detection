@@ -20,13 +20,23 @@ import time
 import downsampling_and_goertzel_filter
 
 
-# Read all the global variables i.e weights and Inputs. 
-with open("pretrained_weights_goertzel_model", "rb") as f:
-    WEIGHTS_VALUE = pickle.load(f)
+
+
+#############################################################################
+            # Read all the global variables i.e weights and Inputs.
+#############################################################################
+with open("weights_goertzel_model_layers.pkl", "rb") as file_obj:
+    WEIGHTS_VALUE = pickle.load(file_obj)
 ARCHITECTURE_CSV = pd.read_csv("test_architecture.csv")
-TEN_SEC_INPUT_DATA = np.random.uniform(low=0.00000002, high=0.00001, size=(10, 8000, 4))
+TEN_SEC_INPUT_DATA = np.random.uniform(low=0.000002, high=0.001, size=(10, 8000, 4))
 
 
+
+
+
+#############################################################################
+            # Implementation of convolutional layer
+#############################################################################
 class ConvolutionalNeuralNetwork(object):
 
     """
@@ -34,12 +44,13 @@ class ConvolutionalNeuralNetwork(object):
     without any libraries
     """
 
-    def __init__(self, units, input_data, weights, activation, bias):
+    def __init__(self, units, input_data, weights, activation, bias, layer_index):
         self.units = units
         self.input_data = input_data
         self.weights = weights
         self.activation = activation
         self.bias = bias
+        self.layer_index = layer_index
 
 
     def padding(self, filter_size, stride_length, type_padding):
@@ -47,7 +58,10 @@ class ConvolutionalNeuralNetwork(object):
         apply padding to the input data
         """
         if type_padding == "same" and stride_length > 1:
-            self.input_data = self.input_data + [[0 for cols in range(len(self.input_data[0]))]for rows in range(stride_length)]
+            if type(self.input_data)==list:
+                self.input_data = self.input_data + [[0 for col in range(len(self.input_data[0]))] for row in range(stride_length)]
+            else:
+                self.input_data = self.input_data.tolist() + [[0 for col in range(len(self.input_data[0]))] for row in range(stride_length)]
             return np.array(self.input_data, dtype='float64').tolist()
         else:
             self.input_data = self.input_data + [[0 for col in range(len(self.input_data[0]))] for row in range(filter_size-1)]
@@ -58,8 +72,9 @@ class ConvolutionalNeuralNetwork(object):
         """
         implement matrix multiplication
         """
-        result = [[0] * len(self.weights[nested_index][0])]
-        # result = np.zeros((1, len(self.weights[nested_index][0]))).tolist()
+        # print nested_index
+        result = [[0 for col in range(len(self.weights[nested_index][0]))] for row in range(len(data))]
+
         # Iterate thorugh rows of X
         for i in range(len(data)):
            # Iterate through columns of Y
@@ -110,15 +125,14 @@ class ConvolutionalNeuralNetwork(object):
         self.input_data = self.padding(filter_size, stride_length, type_padding)
         index_range = self.get_index_for_window_movement(stride_length)
 
-
         for inter_index, index in enumerate(index_range[:initial_input_data_length]):
             for nested_index, data_index in enumerate(range(index, index+filter_size)):
                 if  nested_index == 0:
                     result_after_mat_mull = []
-                    result_after_mat_mull = self.matrix_multiplication([self.input_data[data_index]], nested_index)
+                    result_after_mat_mull = self.matrix_multiplication(self.input_data, nested_index)
                 else:
                     result_after_mat_mull = [sum(example) for example in zip(result_after_mat_mull[0],
-                                                                             self.matrix_multiplication([self.input_data[data_index]], nested_index)[0])]
+                                                                             self.matrix_multiplication(self.input_data, nested_index)[0])]
                     result_after_mat_mull = [result_after_mat_mull]
             result_after_mat_mull = self.add_bias_terms(result_after_mat_mull)
             result_final[inter_index] = np.array(self.relu(result_after_mat_mull), dtype='float64').tolist()
@@ -127,6 +141,11 @@ class ConvolutionalNeuralNetwork(object):
 
 
 
+
+
+#############################################################################
+             # Implementation of Dense Layer (Fully connected layer)
+#############################################################################
 class FullyConnectedLayer(object):
 
     """
@@ -135,7 +154,6 @@ class FullyConnectedLayer(object):
     def __init__(self, units, input_data, weights, activation, bias):
         self.units = units
         self.input_data = input_data
-        # self.input_shape = input_data.shape
         self.weights = weights
         self.activation = activation
         self.bias = bias
@@ -145,7 +163,8 @@ class FullyConnectedLayer(object):
         implement matrix multiplication
         """
 
-        result = np.zeros((len(data), self.units)).tolist()
+        result = [[0 for col in range(len(self.weights[0]))] for row in range(len(data))]
+        # result = np.zeros((len(data), self.units)).tolist()
         # Iterate thorugh rows of X
         for i in range(len(data)):
            # Iterate through columns of Y
@@ -209,6 +228,11 @@ class FullyConnectedLayer(object):
 
 
 
+
+
+#############################################################################   
+                # Implementation of Maxpool Layer
+#############################################################################
 class MaxPoolingLayer(object):
     """
     implements maxpooling layer
@@ -241,6 +265,10 @@ class MaxPoolingLayer(object):
 
 
 
+
+#############################################################################
+                # Check for shape
+#############################################################################
 class InitialCheckForShape(object):
 
     """
@@ -282,6 +310,10 @@ class InitialCheckForShape(object):
 
 
 
+
+#############################################################################
+             # Archictecture unrolling as per test_architecture.csv
+#############################################################################
 def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
     """
     Initiates the neural network calculation as per the layer
@@ -290,11 +322,12 @@ def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
         if layer_name == "conv":
             cnn_rolled = ConvolutionalNeuralNetwork(units=int(arch_dict['units']),
                                                     input_data=input_data,
-                                                    weights=np.array(WEIGHTS_VALUE[layer_index+1][0],
+                                                    weights=np.array(WEIGHTS_VALUE[layer_index][0],
                                                                      dtype="float64").tolist(),
                                                     activation=arch_dict['activation'],
-                                                    bias=np.array(WEIGHTS_VALUE[layer_index+1][1],
-                                                                  dtype="float64").tolist())
+                                                    bias=np.array(WEIGHTS_VALUE[layer_index][1],
+                                                                  dtype="float64").tolist(),
+                                                    layer_index=layer_index)
             resut_value = cnn_rolled.start_window_moment(stride_length=int(arch_dict['stride_length']),
                                                          filter_size=int(arch_dict['filter_size']),
                                                          type_padding=arch_dict['type_padding'])
@@ -307,20 +340,25 @@ def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
         elif layer_name == "dense":
             fully_connected = FullyConnectedLayer(units=int(arch_dict['units']),
                                                   input_data=input_data,
-                                                  weights=np.array(WEIGHTS_VALUE[layer_index+1][0],
+                                                  weights=np.array(WEIGHTS_VALUE[layer_index][0],
                                                                    dtype="float64").tolist(),
                                                   activation=arch_dict['activation'],
-                                                  bias=np.array(WEIGHTS_VALUE[layer_index+1][1],
+                                                  bias=np.array(WEIGHTS_VALUE[layer_index][1],
                                                                 dtype="float64").tolist())
             return fully_connected.dense_layer()
         else:
             print Fore.RED + "ERROR: Invalid Layer used \n"
             sys.exit("try valid layer"+ Style.RESET_ALL)
-    except:
+    except OSError:
         print Fore.RED + "MismatchError: Layer and Weights mismatch\n"
         sys.exit("Input the correct order"+Style.RESET_ALL)
 
 
+
+
+#############################################################################
+                # Downsampling implementation
+#############################################################################
 def flag_for_downsampling(audiofilepath):
     """
     Implements three things.
@@ -341,31 +379,23 @@ def flag_for_downsampling(audiofilepath):
     for seconds_index in range(0, samples_only.shape[0], samplingrate_samples[0])[:10]:
         down_library = downsampling_and_goertzel_filter.DownsampleUsingLibrary(samples_only[seconds_index:seconds_index+samplingrate_samples[0]], samplingrate_samples[0])
         resampled_using_lib = down_library.resample_using_resampy(8000)
-
+        goertzel_components = np.zeros((4, 8000)).tolist()
         # Applying the goertzel filter on the downsampled audio
-        for freqs in [400, 500, 2000, 2300]:
-            if freqs == 400:
-                goertzel = downsampling_and_goertzel_filter.GoertzelComponents(samples=resampled_using_lib,
-                                                                               sample_rate=8000,
-                                                                               target_frequency=freqs,
-                                                                               number_samples=8000)
-                goertzel_components = goertzel.goertzel_filter().tolist()
-            else:
-                goertzel = downsampling_and_goertzel_filter.GoertzelComponents(samples=resampled_using_lib,
-                                                                               sample_rate=8000,
-                                                                               target_frequency=freqs,
-                                                                               number_samples=8000)
-                goertzel_components_1 = goertzel.goertzel_filter().tolist()
-
-                # Applying stacking on the axis =1
-                for indices in range(len(goertzel_components)):
-                    goertzel_components[indices].append(goertzel_components_1[indices][0])
+        for ind, freqs in enumerate([400, 500, 2000, 2300]):
+            # if freqs == 400:
+            goertzel = downsampling_and_goertzel_filter.GoertzelComponents(samples=resampled_using_lib,
+                                                                           sample_rate=8000,
+                                                                           target_frequency=freqs,
+                                                                           number_samples=8000)
+            goertzel_ = goertzel.goertzel_filter()
+            goertzel_components[ind] = goertzel_
 
         # Normalizing the data
-        goertzel_components = goertzel_components / np.linalg.norm(goertzel_components)
-
+        goertzel_components = goertzel_components/np.linalg.norm(goertzel_components)
+        
         # Predicting using the goertzel model for each second
         for each_second in [goertzel_components]:
+            each_second = each_second.T
             start_time = time.time()
             for layer_index, layer_name in enumerate(ARCHITECTURE_CSV['layer_name'].values.tolist()):
                 print Fore.GREEN + str(layer_index)+ " "+layer_name + " " +str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2]+ Style.RESET_ALL
@@ -388,6 +418,11 @@ def flag_for_downsampling(audiofilepath):
             print Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL
 
 
+
+
+#############################################################################
+                # Predictions on each second for 10second audio file
+#############################################################################
 def predict_on_goertzelcomponents(ten_sec_data):
     """
     Predicts for a given goertzel components
@@ -419,16 +454,22 @@ def predict_on_goertzelcomponents(ten_sec_data):
         end_time = time.time() - start_time
         print Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL
 
+
+
+
+
+#############################################################################
+                # Main Function
+#############################################################################
 if __name__ == "__main__":
-    print "start"
     '''
     If
     FLAG is set to 0, it takes audio file as input and starts the process of prediction from initial stage
     FLAG is set to 1, it takes generated goertzel frequency componets as input and gives the prediction
     '''
-    FLAG = 0
+    FLAG = 1
     if FLAG == 0:
-        flag_for_downsampling("-0RZOr28TNE-0.0-10.0.wav")
+        flag_for_downsampling("speech.wav")
 
     else:
         predict_on_goertzelcomponents(TEN_SEC_INPUT_DATA)
