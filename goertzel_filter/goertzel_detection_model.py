@@ -293,3 +293,15 @@ print 'F1 score is  : ', F1_SCORE
           # save the model
 #################################################################################
 MODEL.save_weights('Goertzel_model_8k_weights_time.h5')
+
+
+
+#################################################################################
+          # save the model weights for each layer separately
+#################################################################################
+WEIGHTS_LIST = []
+for layer in MODEL.layers:
+    WEIGHTS_LIST.append(layer.get_weights())
+
+with open("weights_goertzel_model_layers.pkl", "wb") as f:
+    pickle.dump(WEIGHTS_LIST, f)
