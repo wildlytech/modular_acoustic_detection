@@ -119,18 +119,16 @@ def create_keras_model():
     for parameter sharing of each second
     """
     model = Sequential()
-    model.add(TimeDistributed(Conv1D(100,
-                                     kernel_size=200,
-                                     strides=100,
-                                     activation='relu',
-                                     padding='same'),
-                              input_shape=(10, 8000, 4)))
-    model.add(TimeDistributed(Conv1D(100,
-                                     kernel_size=4,
+    model.add(TimeDistributed(MaxPooling1D(80), input_shape=(10, 8000, 4)))
+    model.add(TimeDistributed(Conv1D(20,
+                                     kernel_size=100,
+                                     strides=50,
                                      activation='relu',
                                      padding='same')))
-    model.add(TimeDistributed(MaxPooling1D(80)))
-    model.add(TimeDistributed(Dense(60, activation='relu')))
+    model.add(TimeDistributed(MaxPooling1D(2)))
+    model.add(TimeDistributed(Dense(50, activation='relu')))
+    model.add(TimeDistributed(Dense(50, activation='relu')))
+    model.add(TimeDistributed(Dense(50, activation='relu')))
     model.add(TimeDistributed(Dense(50, activation='relu')))
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
     model.add(MaxPooling2D((10, 1)))
