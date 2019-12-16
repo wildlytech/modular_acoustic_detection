@@ -1,9 +1,7 @@
 layer_name,units,filter_size,stride_length,max_pool_length,activation,type_padding
-maxpool,,,,4,,
-conv,30,200,100,,relu,same
+maxpool,,,,80,,
+conv,20,100,50,,relu,same
 maxpool,,,,2,,
-conv,30,6,1,,relu,same
-maxpool,,,,10,,
 dense,50,,,,relu,
 dense,50,,,,relu,
 dense,50,,,,relu,
