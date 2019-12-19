@@ -1,12 +1,36 @@
 # Modular Acoustic Detection
+<br>
 
-## Environment Setup
+## 1. Environment Setup
 
-To download all the relevant Ubuntu packages:
+### 1.1 Ubuntu Environment Setup
+*Note*: Recommended to install Anaconda to manage the different environment and to avoid package/library version conflicts
+Download: [Download Anaconda](https://www.anaconda.com/distribution/)
 
-You can do it by two ways:
+- ##### Create a separate environment with python 2.7 Version
+```shell
+$ conda create -n env_name python=2.7
+```
+**Note**: Change ```env_name``` to your convenient name
 
+- ##### Activate the created environment
+```shell
+$ conda activate env_name
+```
+**Note**: After successful activation of the environment terminal should display something similar to above
+```shell
+(env_name)$
+``` 
+
+### 1.2 Python environment Setup
+To install all the required library python packages at one go. Type in the command mentioned below
 ##### Approach 1:
+```shell
+$ python install -r requirements.txt
+```
+**Note**: Preferred method as all the packages are freezed automatically here.
+
+##### Approach 2:
 ```shell
 # Make script executable
 $ chmod 777 ubuntu_packages_install.sh
@@ -14,21 +38,19 @@ $ chmod 777 ubuntu_packages_install.sh
 # Run script to install
 $ ./ubuntu_packages_install.sh
 ```
-##### Approach 2:
+
+### 1.3 Local Repository setup
+
+- #####  Clone the Repository
 ```shell
-$ pip install -r requirements.txt
+$ git clone https://github.com/wildlytech/modular_acoustic_detection.git
 ```
 
-## Local repo setup
-
-##### 1. To load all git submodules :
-
+- #####  To load all git sub modules :
 ```shell
 $ git submodule update --init --recursive
 ```
-<br>
-
-##### 2. To download all the data files :
+- ##### To download all the data files :
 ```shell
 # Make script executable
 $ chmod 777 download_data_files.sh
@@ -37,95 +59,131 @@ $ ./download_data_files.sh
 ```
 <br>
 
-##### 3. To download all the sound files : 
+## 2. Getting Audio Data
+- This process is to get the audio files ```(.wav format)``` from YouTube which are labelled by Google
+- We can more details about the data-set and its annotation on the mentioned link. [Google Audioset](https://research.google.com/audioset/)
+- For getting wav files from the above mentioned source we have enter to the ```get_data/``` directory.
 
-This is a really lengthy process and hence is not advisable unless you absolutely have to
-
+Follow the command to navigate into ```get_data/```
 ```shell
-$ python download_all_sounds.py
+$ cd get_data/
 ```
-<br>
-
-##### 4. To download only your sounds of Interest : 
-
-
-This will download the sounds ( _.wav files_ ) that you are interested in, from enlisted sounds of  [Google audioset](https://research.google.com/audioset/). you can see the list for class of sounds by using ```[-h]``` argument for script in command line .
-
-```
-$ python download_soi.py [-h] [-target_sounds TARGET_SOUNDS] [-target_path TARGET_PATH]
-
-```
-###### Output of the above script will return:
-- Creates a base dataframe file with name ```downloaded_base_dataframe.pkl``` having details like ```[ YTID, start_seconds, end_seconds, positive_labels, labels_name, wav_file ]``` of each audio file.
-- Downloads all the target sounds
+**Note**: [Navigate to get_data/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/get_data)
 
 <br>
 
-##### 5. To generate the embeddings for the downloaded audio files :
+## 3.  Audio Augmentation
+- Audio Augmentation is a process wherein we  perform operations like mixing multiple sounds, Time shift the audio data, Scale the audio, change the volume of the audio etc to make it audible differently  than the original sound but also at the same making sure it is realistic
+- To perform operations related augmentation navigate to [augmentation/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/augmentation)
+- Follow the command in terminal to navigate to augmentation directory
+- ``` $ cd augmentation/ ```
 
-This will download the embeddings in ```.pkl``` files at the directory where you specify. This script requires additional functional scripts found at [Tensorflow-models-repo](https://github.com/tensorflow/models/tree/9b57f41ce21cd7264c52140c9ab31cdfc5169fcd/research/audioset).
+<br>
+
+## 4. Generate Embeddings 
+This will download the embeddings as ```.pkl``` files at the directory where you specify. This script requires additional functional scripts found at [Tensorflow-models-repo](https://github.com/tensorflow/models/tree/9b57f41ce21cd7264c52140c9ab31cdfc5169fcd/research/audioset).
 
 ```shell
-$ python generating_embeddings.py   --wav_file /path/to/a/wav/file \
-				    --path_to_write_embeddings /path/to/write/embeddings
+$ python generating_embeddings.py   --wav_file
+				    --path_to_write_embeddings
 ```
 ###### Output of above script will return :
-- embeddings in ```.pkl``` files for each downloaded audio file at specified directory. 
+- Embeddings in ```.pkl``` files for each downloaded audio file at specified directory. (```--wav_file``` requires the directory path where ```.wav``` files are saved )
 
 <br>
 
-##### 6. To add generated embeddings of each audio file to _base dataframe_ :
-This will add the generated embedding values of each audio file to base dataframe columns. Final dataframe will now have one extra column when compared with ```downloaded_base_dataframe.pkl``` ie with ```[features]```
+## 5. Create Base Dataframe
+- This will add the generated embedding values of each audio file to base dataframe columns if it already exists ```(TYPE 1)```, otherwise it creates base dataframe with ```["wav_file", "features"]``` columns i.e ```(TYPE 2)```. Final dataframe will now have one extra column when compared with ```downloaded_base_dataframe.pkl``` i.e with ```["features"]```
+- About Arguments:
+	-  ```-dataframe_without_feature``` : If ```TYPE 1``` dataframe exists already, path of it should be given otherwise it can be ignored
+	-  ```-path_for_saved_embeddings``` : Directory path where all the ```.pkl``` files are saved 
+	-  ```-path_to_write_dataframe``` : Path along with name of the file with ```.pkl``` extension to write the final dataframe
 ```shell
-$ python add_embeddings_to_base_df.py [-h] [-path_to_embeddings PATH_WHERE_EMBEDDINGS_SAVED]
+$ python create_base_dataframe.py [-h] -dataframe_without_feature
+				       -path_for_saved_embeddings
+				       -path_to_write_dataframe
 ```
 ###### Output of this script will return :
-- ```downloaded_final_dataframe.pkl``` file is generated with columns ```[YTID, start_seconds, end_seconds, positive_labels, labels_name, wav_file, features]``` ie ```[features]``` column is added to base dataframe 
+-  If  ```-dataframe_without_feature``` ```(TYPE 1)``` dataframe is inputted then ```["features]``` column is added to same dataframe, if not a new dataframe with ```["wav_file", "features"]``` columns is stored
 
 <br>
 
-##### 7. To separate out the different sounds based on labeling :
-This script will read the ```downloaded_final_dataframe.pkl``` generated from ```add_embeddings_to_base_df.py``` and separates out the sounds based on labeling. You can check [coarse_labels.csv](https://github.com/wildlytech/modular_acoustic_detection/blob/master/coarse_labels.csv) file to know the mapping of the labels and the separation of each sounds takes place. 
-
-```
-$ python seperating_different_sounds.py [-h] [-path_to_write_different_sounds PATH_TO_WRITE_DIFFERENT_SOUNDS ]
-```
-###### Output of this script return :
-- Dataframes with type of sound and number of examples of that sound as name of file in specified path directory.
+## 6.  Separating Sounds Based on Labels
+- This script will read the dataframe ```(TYPE 1)``` i.e it should have ```["labels_name"]``` column in it ,  separates out the sounds based on labeling, creates a different dataframe as per labels and writes at target path given. 
+- You can check [coarse_labels.csv](https://github.com/wildlytech/modular_acoustic_detection/blob/master/coarse_labels.csv) file to know the mapping of the labels and the separation of each sounds takes place
+- To separate sounds based on labels navigate to [data_preprocessing_cleaning/separating_different_sounds.py](https://github.com/wildlytech/modular_acoustic_detection/blob/master/data_preprocessing_cleaning/seperating_different_sounds.py)
+- Follow the command below to navigate to the directory and execute the script to separate sounds
+- ``` $ cd data_preprocessing_cleaning/ ```
 
 <br>
 
-##### 8. To Balance the data :
-This script reads all the dataframes that are generated by running ```seperating_different_sounds.py``` and concats all the dataframes and balances the percentages of each sound examples .
-
+## 7.  Training ML/DL Models 
+- Once we have required audioset consisting of different labelled audio clips ```labels_name``` each of 10 seconds and their appropriate embeddings ```features```  in a dataframe format (preferably) we can use these dataframe files for training ML / DL models
+- Any Dataframe file with these columns in it can be included into training data i.e ```["wav_file", "labels_name", "features]```
+- We have to add the path of that required dataframe (Includes above mentioned columns) in [balanced_data.py](https://github.com/wildlytech/modular_acoustic_detection/blob/master/balancing_dataset.py)
+- Once the path of the required datframe is placed in above mentioned script navigate to ```models/``` to train different types of ML and DL models
+- To navigate follow the command below
+```shell
+$ cd models/
 ```
-$ python balancing_dataset.py
-```
-###### output returns :
-- Dataframe with equal percentage of different sounds.
+**Note**: [Navigate to models/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/models)
 
 <br>
 
-##### 9. To train the Binary model :
-This is will call the ```balancing_dataset.py``` function to get the balanced dataframe for training the binary model. It detects anomaly as ```Impact sounds``` and non-anomaly as ```Ambinet sounds```. Impact sounds are given ```1``` 's and Ambient sounds as ```0```'s. 
+## 8. Predicting on Audio files using trained ML/DL models
+- This folder consists of scripts used to predict audio files using different types of ML/DL trained models
+- After training ML/DL models we will able to save the trained model weights in ```.h5``` file for each model. To predict any audio file we will be using these model weights file to make predictions
+- Navigate to ```predictions/``` folder to start predictng on single/multiple audio files using different models
+- To navigate follow the command below
+```shell
+$ cd predictions/
 ```
-$ python binary_model.py [-h] [-save_weights SAVE_WEIGHTS]
-```
-###### output returns:
-- ```.h5```  file is saved consists of weights of the trained ```binary_model.py```
+**Note**: [Navigate to predictions/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/predictions)
 
 <br>
 
-##### 10. To train a Multi-label model :
-This will call ```balancing_dataset.py``` function to get the balanced dataframe for training the multi-label model. 
+## 9. Compressing & Decompressing of Audio Files
+- Definition of Audio Compression: [Wikipedia Source](https://en.wikipedia.org/wiki/Audio_compression_(data))
+- Two different types of Audio compression
+     -  Lossy Audio Compression    
+     - Lossless Audio Compression
+
+To perform various types of audio compression techniques & decompressing back the compressed audio files navigate to ```compression/``` directory. To navigate follow the command below
+```shell
+$ cd compression/
 ```
-$ python multilabel_model.py [-h] [-save_weights SAVE_WEIGHTS] 
+**Note**: [Navigate to compression/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/compression)
+
+<br>
+
+## 10. Goertzel Algorithm
+
+-   Definition of Goertzel Filter: [Wikipedia Source](https://en.wikipedia.org/wiki/Goertzel_algorithm)
+- Navigate to goertzel_filter/ directory if you want to :
+	- Visualize the audio file in spectrogram after applying goertzel filter 
+	- Extract  particular frequency components of an audio file
+- To navigate to ```goertzel_filter/``` directory follow the below command
+```shell
+$ cd goertzel_filter/
 ```
+**Note**: [Navigate to goertzel_filter/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/goertzel_filter)
 
-###### output returns:
+<br>
 
-- ```.h5``` file is saved consists of weights of the trained ```multiclass_model.py```
-
-
+## 11. Dash User Interface Applications
+- About Dash Framework: [Dash | Plotly](https://plot.ly/dash/)
+- We have used Dash framework for building local web apps for different purposes stated below
+	- **Audio Annotation** : We can annotate audio files (.wav format) in any folder present locally and save all the annotations in ```.csv file```. It also enables to view spectrogram and see the model's prediction for that wavfile
+		- To annotate audio files navigate to [Dash_integration/annotation/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/annotation)
+		- Follow the command to navigate to that folder in terminal
+		- ``` $ cd Dash_integraion/annotation/```
+	- **Device Report** : Enables to see generate a concise report for each device that is uploading files in FTP server. Device parameters such as Battery performance, Location Details etc can be visualized using this app 
+		- To generate report navigate to  [Dash_integration/device_report/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/device_report)
+		- Follow the command to navigate to this folder in terminal 
+		- ``` $ cd Dash_integraion/device_report/```
+	- **Monitoring and Alert** : Enables user to monitor FTP server directories, Device(s), get alert based on detection of any sounds of interest, upload multiple audio wavfiles to see the predictions etc
+		- To monitor and get alerts via SMS navigate to [Dash_integration/monitoring_alert/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/monitoring_alert)
+		- Follow the command in terminal to navigate to this
+		- ``` $ cd Dash_integration/monitoring_alert/ ```
 
 
