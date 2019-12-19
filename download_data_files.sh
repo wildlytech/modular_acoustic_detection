@@ -18,6 +18,7 @@ curl -O http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/unbalanc
 curl -O http://storage.googleapis.com/us_audioset/youtube_corpus/v1/qa/qa_true_counts.csv
 curl -O http://storage.googleapis.com/us_audioset/youtube_corpus/v1/qa/rerated_video_ids.txt
 curl -O http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_indices.csv
+curl -O https://github.com/audioset/ontology/blob/master/ontology.json
 
 # Download the feature embeddings
 curl -O http://storage.googleapis.com/us_audioset/youtube_corpus/v1/features/features.tar.gz
