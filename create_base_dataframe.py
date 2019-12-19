@@ -104,7 +104,7 @@ def replace_pkl_files_to_wavfiles(pklfiles_list):
     """
     wavfiles_list = []
     for each_value in pklfiles_list:
-        wavfiles_list.append(each_value[:-3]+"wav")
+        wavfiles_list.append(each_value.split("/")[-1][:-3]+"wav")
     return wavfiles_list
 
 
