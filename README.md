@@ -3,7 +3,7 @@
 
 ## 1. Environment Setup
 
-### 1.1 Ubuntu Environment Setup
+#### 1.1 Ubuntu Environment Setup
 *Note*: Recommended to install Anaconda to manage the different environment and to avoid package/library version conflicts
 Download: [Download Anaconda](https://www.anaconda.com/distribution/)
 
@@ -22,13 +22,13 @@ $ conda activate env_name
 (env_name)$
 ``` 
 
-### 1.2 Python environment Setup
+#### 1.2 Python environment Setup
 To install all the required library python packages at one go. Type in the command mentioned below
 ##### Approach 1:
 ```shell
 $ python install -r requirements.txt
 ```
-**Note**: Preferred method as all the packages are freezed automatically here.
+**Note** :  Approach 1 is Preferred method as all the packages are freezed automatically here.
 
 ##### Approach 2:
 ```shell
@@ -39,7 +39,7 @@ $ chmod 777 ubuntu_packages_install.sh
 $ ./ubuntu_packages_install.sh
 ```
 
-### 1.3 Local Repository setup
+#### 1.3 Local Repository setup
 
 - #####  Clone the Repository
 ```shell
