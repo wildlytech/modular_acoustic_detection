@@ -267,9 +267,9 @@ def next_content_tab(value):
                      scale_by_freq=True)
         plt.ylabel('Frequency [Hz]')
         plt.xlabel('Time [sec]')
-        plt.savefig(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".jpg")
-        encoded_image = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".jpg", 'rb').read())
-        os.remove(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".jpg")
+        plt.savefig(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
+        encoded_image = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png", 'rb').read())
+        os.remove(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
 
         return html.Div([html.Img(src='data:image/png;base64,{}'.format(encoded_image))],
                         style={"margin-top":"10%",
@@ -506,9 +506,9 @@ def initial_content_tab(value):
                      scale_by_freq=True)
         plt.ylabel('Frequency [Hz]')
         plt.xlabel('Time [sec]')
-        plt.savefig(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".jpg")
-        encoded_image = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".jpg", 'rb').read())
-        os.remove(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".jpg")
+        plt.savefig(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
+        encoded_image = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png", 'rb').read())
+        os.remove(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
 
         return html.Div([html.Img(src='data:image/png;base64,{}'.format(encoded_image))],
                         style={"margin-top":"10%",
