@@ -9,6 +9,7 @@
 
 ``` $ cd annotation/```
 
+**Note**: [Navigate to annotation/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/annotation)
 <br>
 
 ***
@@ -18,6 +19,8 @@
 -  Follow the command to navigate to this folder in terminal 
  
  ``` $ cd device_report/```
+ 
+**Note** : [Navigate to device_report/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/device_report)
 
 <br>
  
@@ -28,4 +31,6 @@
 - Follow the command in terminal to navigate to this
 
 ``` $ cd monitoring_alert/ ```
+
+Note: [Navigate to monitoring_alert/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/monitoring_alert)
 
