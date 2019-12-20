@@ -1,4 +1,4 @@
-# Predictions using Dense Layer Model
+# Predictions using Binary Relevance Models
 
 <br>
 
