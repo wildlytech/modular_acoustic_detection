@@ -5,7 +5,7 @@
 
 ##### 1. From  [Google Audioset](https://research.google.com/audioset/) 
 -  Download only Sounds of Interest
-This will download the sounds ```( .wav files )``` that you are interested in, from enlisted sounds of . you can see the list for class of sounds by using ```[-h]``` argument for script in command line .
+	- This will download the sounds ```( .wav files )``` that you are interested in, from enlisted sounds of . you can see the list for class of sounds by using ```[-h]``` argument for script in command line .
 
 ``` $ python download_soi.py [-h] -target_sounds -target_path```
 
@@ -48,4 +48,6 @@ NUMBER_AUDIOCLIPS_LIMIT = 10
 ```shell
 $ python youtube_script.py
 ```
+
+
 
