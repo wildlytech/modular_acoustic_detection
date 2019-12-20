@@ -10,6 +10,7 @@
 ``` $ cd annotation/```
 
 **Note**: [Navigate to annotation/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/annotation)
+
 <br>
 
 ***
@@ -32,5 +33,5 @@
 
 ``` $ cd monitoring_alert/ ```
 
-**Note**: [Navigate to monitoring_alert/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/monitoring_alert)
+Note: [Navigate to monitoring_alert/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/monitoring_alert)
 
