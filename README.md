@@ -22,24 +22,7 @@ $ conda activate env_name
 (env_name)$
 ``` 
 
-#### 1.2 Python environment Setup
-To install all the required library python packages at one go. Type in the command mentioned below
-##### Approach 1:
-```shell
-$ python install -r requirements.txt
-```
-**Note** :  Approach 1 is Preferred method as all the packages are freezed automatically here.
-
-##### Approach 2:
-```shell
-# Make script executable
-$ chmod 777 ubuntu_packages_install.sh
-
-# Run script to install
-$ ./ubuntu_packages_install.sh
-```
-
-#### 1.3 Local Repository setup
+#### 1.2 Local Repository setup
 
 - #####  Clone the Repository
 ```shell
@@ -56,6 +39,23 @@ $ git submodule update --init --recursive
 $ chmod 777 download_data_files.sh
 
 $ ./download_data_files.sh
+```
+
+#### 1.3 Python environment Setup
+To install all the required library python packages at one go. Type in the command mentioned below
+##### Approach 1:
+```shell
+$ python install -r requirements.txt
+```
+**Note** :  Approach 1 is Preferred method as all the packages are freezed automatically here.
+
+##### Approach 2:
+```shell
+# Make script executable
+$ chmod 777 ubuntu_packages_install.sh
+
+# Run script to install
+$ ./ubuntu_packages_install.sh
 ```
 <br>
 
@@ -185,5 +185,6 @@ $ cd goertzel_filter/
 		- To monitor and get alerts via SMS navigate to [Dash_integration/monitoring_alert/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/monitoring_alert)
 		- Follow the command in terminal to navigate to this
 		- ``` $ cd Dash_integration/monitoring_alert/ ```
+
 
 
