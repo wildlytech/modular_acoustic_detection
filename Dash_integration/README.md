@@ -1,19 +1,31 @@
-##  Dash for creating a UI
-  
+# Dash User Interface Applications
 
-##### DASH is used to create a simple UI that aimed at doing two things basicaly :
+<br>
 
-1. Upload an audio file from the local drive to run the analyis and see the predictions.
-2. Scrape through the remote FTP server for any ```.wav``` files and download it to local drive to run analysis on it.
+####  1. Audio Annotation : 
+- We can annotate audio files (.wav format) in any folder present locally and save all the annotations in ```.csv file```. It also enables to view spectrogram and see the model's prediction for that wavfile
+- To annotate audio files navigate to [annotation/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/annotation)
+		- Follow the command to navigate to that folder in terminal
 
-##### To create a UI in your local host:
-```
-$ python dash_integrate.py 
-```
+``` $ cd annotation/```
 
- ###### UI consists of 3 pages :
- - ##### Home Page
- - ##### Input audio :
-   This page lets you to upload a ```.wav``` file from your local drive to run the analysis and see the predictions.
- - ##### FTP status :
-   This will scrape the remote ftp server and download if any ```.wav``` file is uploaded.
+<br>
+
+***
+#### 2. Device Report : 
+- Enables to see generate a concise report for each device that is uploading files in FTP server. Device parameters such as Battery performance, Location Details etc can be visualized using this app 
+- To generate report navigate to  [device_report/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/device_report)
+-  Follow the command to navigate to this folder in terminal 
+ 
+ ``` $ cd device_report/```
+
+<br>
+ 
+ ***
+#### 3. Monitoring and Alert : 
+- Enables user to monitor FTP server directories, Device(s), get alert based on detection of any sounds of interest, upload multiple audio ```.wav``` files to see the predictions etc
+- To monitor and get alerts via SMS navigate to [monitoring_alert/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/monitoring_alert)
+- Follow the command in terminal to navigate to this
+
+``` $ cd monitoring_alert/ ```
+
