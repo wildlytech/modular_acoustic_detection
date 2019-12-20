@@ -15,7 +15,7 @@ CHECKLIST_DISPLAY = ["Nature", "Bird", "Wind", "Vehicle", "Honking", "Conversati
 ```
 - To start running the local server and annotate files use the following command
 ```shell
-$ python annotation.py
+$ python audio_annotation.py
 ```
 **Note**: Check for Link [http://127.0.0.1:8050/](http://127.0.0.1:8050/) from your browser to view & interact with the  application
 
