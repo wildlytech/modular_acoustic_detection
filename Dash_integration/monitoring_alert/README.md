@@ -1,5 +1,6 @@
 # Monitoring FTP server & SMS Alert application
 
+<br>
 
 ## Monitoring and Alerting
 - Layout: We have taken the layout of the device report from one of the dash open source gallery [Dash bio Gallery - Clustergram](https://github.com/plotly/dash-bio/blob/master/tests/dashbio_demos/app_clustergram.py)
