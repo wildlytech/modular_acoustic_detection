@@ -152,7 +152,7 @@ def read_embeddings(data_frame, path_to_embeddings):
     test_index = []
     for each_file in data_frame['wav_file'].values.tolist():
         try:
-            with open(path_to_embeddings+each_file+".pkl", 'rb') as file_obj:
+            with open(path_to_embeddings+each_file[:-4]+".pkl", 'rb') as file_obj:
                 embeddings_list.append(pickle.load(file_obj))
         except:
             test_index.append(data_frame['wav_file'].values.tolist().index(each_file))
