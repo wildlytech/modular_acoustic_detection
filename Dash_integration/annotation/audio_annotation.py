@@ -26,7 +26,7 @@ app = dash.Dash()
 app.config.suppress_callback_exceptions = True
 FILE_COUNT = 0
 CSV_FILENAME = "New_annotation.csv"
-CHECKLIST_DISPLAY = ["Nature", "Bird", "Wind", "Vehicle", "Honking", "Conversation"]
+CHECKLIST_DISPLAY = ["Bird", "Wind", "Vehicle", "Honking", "Conversation"]
 
 
 # WHEN SUBMITTED FROM NEXT CONTENT
@@ -410,7 +410,7 @@ def initial_content_tab(value):
         TOTAL_FOLDER_WAV_FILES = glob.glob(TEXT_PATH+"/*.wav")
         if os.path.exists(CSV_FILENAME):
             annotated_files = pd.read_csv(CSV_FILENAME, error_bad_lines=False)
-            annotated_files = annotated_files['Filename'].values.tolist()
+            annotated_files = annotated_files['wav_file'].values.tolist()
             NUMBER_OF_WAVFILES = []
             for i in TOTAL_FOLDER_WAV_FILES:
                 if i.split("/")[-1] not in annotated_files:
@@ -723,7 +723,7 @@ def check_for_duplicate(filename):
     Checks if annotations are already submitted
     """
     annotated_files = pd.read_csv(CSV_FILENAME, error_bad_lines=False)
-    all_filenames = annotated_files["Filename"].values.tolist()
+    all_filenames = annotated_files["wav_file"].values.tolist()
     if filename in all_filenames:
         return True
     else:
@@ -809,11 +809,11 @@ def submit_initial_button(n_clicks, value):
         else:
             with open(CSV_FILENAME, "w") as file_object:
                 wavfile_information_object = csv.writer(file_object)
-                wavfile_information_object.writerow(["Filename",
-                                                     "Label1",
-                                                     "Label2",
-                                                     "Label3",
-                                                     "Label4"])
+                wavfile_information_object.writerow(["wav_file",
+                                                     "Label_1",
+                                                     "Label_2",
+                                                     "Label_3",
+                                                     "Label_4"])
                 wavfile_information_object.writerow([NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1]] + ast.literal_eval(value))
                 print "submitted initial else"
                 print value
@@ -851,7 +851,7 @@ def submit_next_button(n_clicks, value):
         else:
             with open(CSV_FILENAME, "w") as file_object:
                 wavfile_information_object = csv.writer(file_object)
-                wavfile_information_object.writerow(["Filename", "Label1", "Label2", "Label3", "Label4"])
+                wavfile_information_object.writerow(["wav_file", "Label_1", "Label_2", "Label_3", "Label_4"])
                 wavfile_information_object.writerow([NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1]]+ ast.literal_eval(value))
                 print "submitted next else"
                 print value
