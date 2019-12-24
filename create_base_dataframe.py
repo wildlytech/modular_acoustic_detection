@@ -83,7 +83,7 @@ def start_from_initial(embedding_filespath):
     embeddins_names_with_path = glob.glob(embedding_filespath+"*.pkl")
     for each_value in embeddins_names_with_path:
         embeddings_value.append(read_pickle_file(each_value))
-        embeddings_name.append(each_value.split("/")[1][:-3]+"wav")
+        embeddings_name.append(each_value.split("/")[-1][:-3]+"wav")
     dataframe_inside_scope = create_dataframe(["wav_file", "features"])
     dataframe_inside_scope["wav_file"] = embeddings_name
     dataframe_inside_scope["features"] = embeddings_value
