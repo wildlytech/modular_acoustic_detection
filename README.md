@@ -45,7 +45,7 @@ $ ./download_data_files.sh
 To install all the required library python packages at one go. Type in the command mentioned below
 ##### Approach 1:
 ```shell
-$ python install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 **Note** :  Approach 1 is Preferred method as all the packages are freezed automatically here.
 
