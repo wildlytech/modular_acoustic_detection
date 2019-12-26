@@ -4,7 +4,7 @@
 
 #### 1. Separating Sounds Based on Labels
 - This script will read the dataframe ```(TYPE 1)``` i.e it should have ```["labels_name"]``` column in it ,  separates out the sounds based on labeling, creates a different dataframe as per labels and writes at target path given. 
-- You can check [coarse_labels.csv](https://github.com/wildlytech/modular_acoustic_detection/blob/master/coarse_labels.csv) file to know how  mapping of the labels and the separation of each sounds takes place.
+- You can check [coarse_labels.csv](https://github.com/wildlytech/modular_acoustic_detection/blob/master/data_preprocessing_cleaning/coarse_labels.csv) file to know how  mapping of the labels and the separation of each sounds takes place.
 - To separate sounds based on labels navigate to [separating_different_sounds.py](https://github.com/wildlytech/modular_acoustic_detection/blob/master/data_preprocessing_cleaning/seperating_different_sounds.py)
 - Follow the command below to execute the script
 - About Arguments
