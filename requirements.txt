@@ -11,7 +11,7 @@ backports.weakref==1.0.post1
 BeautifulSoup==3.2.1
 beautifulsoup4==4.6.0
 biopython==1.75
-bleach==1.5.0
+bleach==3.1.4
 boto3==1.9.198
 botocore==1.12.198
 bs4==0.0.1
