@@ -7,6 +7,7 @@ import librosa
 from pydub import AudioSegment
 from pydub.utils import make_chunks
 from colorama import Fore, Style
+import glob
 
 
 
@@ -15,19 +16,18 @@ from colorama import Fore, Style
 ######################################################################################
 
 DESCRIPTION = " Splits the long duration audio files into chunks of 10 seconds"
-HELP = "Input the wav file path that is to be splitted"
+HELP = "Input path for wav files directory or input single wav file path to split into chunks of 10seconds"
 
 
 ######################################################################################
             # Parse the arguments
 ######################################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
-PARSER.add_argument('-target_audio_file', '--target_audio_file', action='store',
+PARSER.add_argument('-path_for_wavfiles', '--path_for_wavfiles', action='store',
                     help=HELP)
 PARSER.add_argument('-path_to_write_chunks', '--path_to_write_chunks', action='store',
                     help="Input the path to write the splitted chunks of wav files")
 RESULT = PARSER.parse_args()
-
 
 
 ######################################################################################
@@ -45,43 +45,67 @@ def start_splitting(chunk_length_ms, wav_file):
     into chunks of length specified
     """
     file_name = wav_file.split('/')[-1].split(".")[0]
-    print "splitting audio files into chunks of 10 seconds :", file_name
+    print "splitting audio files into chunks of", chunk_length_ms / 1000.0, "seconds :", file_name
     myaudio = AudioSegment.from_wav(wav_file)
     chunks = make_chunks(myaudio, chunk_length_ms)
     #Export all of the individual chunks as wav files
     for i, chunk in enumerate(chunks):
         chunk_name = file_name+"_"+str(i)+'.wav'
+
+        # if the last chunk is not of length, then pad it with silence
+        if len(chunk) < chunk_length_ms:
+            print "Padding last file with", (chunk_length_ms - len(chunk)) / 1000.0, "seconds of silence"
+            chunk = chunk + AudioSegment.silent(duration = chunk_length_ms - len(chunk),
+                                                frame_rate=chunk.frame_rate)
+
         chunk.export(RESULT.path_to_write_chunks+chunk_name, format="wav")
     return len(chunks)
 
 
-def initiate_audio_split(wav_file, chunk_length_ms):
+def audio_split_single_file(wav_file, chunk_length_ms):
     """
     make the initiation of process by
     calculating the number of wav files
     """
+    # Get length in seconds
+    chunk_length_sec = chunk_length_ms / 1000.0
+
     # for wav in wav_file:
     total_duration_seconds = get_duration_wav_file(wav_file)
-    if total_duration_seconds > 20.0:
-        if total_duration_seconds%10 == 0:
-            num_wav_files = total_duration_seconds/10
-        else:
-            num_wav_files = int(total_duration_seconds) - 1
-        number_of_chunks_generated = start_splitting(chunk_length_ms, wav_file)
-        if num_wav_files == number_of_chunks_generated:
-            print Fore.GREEN + "\nTotal number of wav files splitted from" + wav_file.split('/')[-1].split(".")[0] +": ", number_of_chunks_generated
-            print Style.RESET_ALL
-        else:
-            print  Fore.GREEN + "\nTotal number of wav files splitted from" + wav_file.split('/')[-1].split(".")[0] +": ", number_of_chunks_generated
-            print Style.RESET_ALL
-    else:
-        print Fore.RED + "\nWARNING :Audio File must be atleast greater than 20seconds to split"
+
+    if total_duration_seconds <= chunk_length_sec:
+        print Fore.RED + "\nWARNING :Audio File must be at least greater than", chunk_length_sec, "seconds to split"
         print Style.RESET_ALL
+
+    num_wav_files = (total_duration_seconds // chunk_length_sec) + ((total_duration_seconds % chunk_length_sec) == 0)
+
+    number_of_chunks_generated = start_splitting(chunk_length_ms, wav_file)
+    if num_wav_files == number_of_chunks_generated:
+        print Fore.GREEN + "\nTotal number of wav files splitted from", wav_file.split('/')[-1].split(".")[0], ":", number_of_chunks_generated
+        print Style.RESET_ALL
+    else:
+        print  Fore.GREEN + "\nTotal number of wav files splitted from", wav_file.split('/')[-1].split(".")[0], ":", number_of_chunks_generated
+        print Style.RESET_ALL
+
+
+def audio_split_directory(path_for_wavfiles, chunk_length_ms):
+    """
+    make the initiation of process by
+    calculating the number of wav files
+    """
+    # get all the wav files in the given directory
+    wav_files_list = glob.glob(path_for_wavfiles+"*.wav") + glob.glob(path_for_wavfiles+"*.WAV")
+    # iterate all the wav files in the list to split
+    for wav_file in wav_files_list:
+        audio_split_single_file(wav_file, chunk_length_ms)
 
 
 ######################################################################################
             # Main Function
 ######################################################################################
 if __name__ == "__main__":
-    initiate_audio_split(RESULT.target_audio_file, 10000)
-
+    if (RESULT.path_for_wavfiles.split(".")[-1] == 'wav') or \
+    (RESULT.path_for_wavfiles.split(".")[-1] == 'WAV'):
+        audio_split_single_file(RESULT.path_for_wavfiles, 10000)
+    else:
+        audio_split_directory(RESULT.path_for_wavfiles, 10000)
