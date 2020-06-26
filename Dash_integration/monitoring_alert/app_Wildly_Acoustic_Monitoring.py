@@ -1,5 +1,6 @@
 """
 """
+import argparse
 from time import strptime
 import itertools
 import threading
@@ -21,12 +22,16 @@ from datetime import datetime
 from datetime import timedelta
 import urllib
 import dash_table
-import generate_before_predict_BR
 import numpy as np
 import csv
+import re
 import requests
 from scipy.io import wavfile
 
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + "/../../")
+from predictions.binary_relevance_model import generate_before_predict_BR,\
+                                               get_results_binary_relevance,\
+                                               predict_on_wavfile_binary_relevance
 
 
 
@@ -40,10 +45,9 @@ if __name__ == '__main__':
 ####################################################################################
                 # FTP path and defining soi
 ####################################################################################
-ftp_path = "BNP/"
-LABELS_ALIGNED = ["Motor Sounds", "Explosion Sounds", "Human Sounds", "Nature Sounds", "Domestic Sounds", "Tools Sounds"]
-SOI = ["Motor Sounds", "Explosion Sounds", "Human Sounds", "Domestic Sounds", "Tools Sounds"]
-
+CONFIG_DATAS = {}
+FTP_PATH = "BNP/"
+NON_SOI = ["[Nature]Vs[EverythingElse]"]
 
 
 
@@ -61,8 +65,6 @@ else:
 ####################################################################################
          # FTP credentials & Message Authorisation token from fast2sms.com
 ####################################################################################
-FTP_USERNAME = 'user-u0xzU'
-FTP_PASSWORD = '**********'
 FTP_HOST = '34.211.117.196'
 AUTHORIZATION_TOKEN = "***********"
 
@@ -185,9 +187,9 @@ def last_ftp_time(ftp_path):
         if dir_n_time_inside_scope[2] == 'active':
             if len(dir_n_time_inside_scope[1].split(' ')) != 1:
                 time_diff = datetime.strptime(timestamp2, datetimeformat_2) - datetime.strptime(dir_n_time_inside_scope[1], datetimeformat_2)
-                directories_time_list_inside_scope.append(str(time_diff))
+                directories_time_list_inside_scope.append(time_diff)
         else:
-            directories_time_list_inside_scope.append('inactive')
+            directories_time_list_inside_scope.append(timedelta.max)
     return dir_n_timestamp_inside_scope, directories_time_list_inside_scope
 
 
@@ -200,24 +202,12 @@ def active_or_inactive(dir_n_timestamp, directories_time_list):
     """
     status = []
     for td in directories_time_list:
-        if td == 'inactive':
-            status.append('Inactive')
+        seconds = td.total_seconds()
+
+        if seconds <= 300:
+            status.append('Active')
         else:
-            if len(td.split(' ')) == 1:
-                hours = int(td.split(":")[0])
-                month = int(td.split(":")[1])
-                seconds_ = int(td.split(":")[2])
-                seconds = hours*60*60 + month*60 + seconds_
-            else:
-                days = td.split(" ")[0]
-                hours = td.split(" ")[2].split(":")[0]
-                month = td.split(" ")[2].split(":")[1]
-                seconds_ = td.split(" ")[2].split(":")[2]
-                seconds = days*24*60*60 + hours*60*60 + month*60 + seconds_
-            if seconds <= 300:
-                status.append('Active')
-            else:
-                status.append('Inactive')
+            status.append('Inactive')
     return dir_n_timestamp, status
 
 
@@ -235,36 +225,12 @@ def connect(ftp_path):
     ftp.cwd(ftp_path)
 
 
-
-####################################################################################
-        # Connecting ftp server and listing all directories
-####################################################################################
-connect(ftp_path)
-DIR_AND_TIME, DIRECTORIES, TIMESTAMPS = get_directories_listed(ftp_path)
-DIR_AND_TIMESTAMP, DIRECTORIES_TIME_LIST = last_ftp_time(ftp_path)
-DIR_AND_TIMESTAMP, STATUS = active_or_inactive(DIR_AND_TIMESTAMP, DIRECTORIES_TIME_LIST)
-DATAFRAME_REQUIRED = pd.DataFrame()
-
-
-
 ####################################################################################
             # Returns the deviceid from directory name
 ####################################################################################
 def get_devid_from_dir(dir_name):
     device_id = dir_name.split("_")[0][3:]
     return device_id
-
-
-####################################################################################
-            # Creatin a dataframe to display
-####################################################################################
-DEVIDS = []
-for each in DIRECTORIES:
-    DEVIDS.append(get_devid_from_dir(each))
-DATAFRAME_REQUIRED['Directories'] = DIRECTORIES
-DATAFRAME_REQUIRED["TimeStamps"] = TIMESTAMPS
-DATAFRAME_REQUIRED["Status"] = STATUS
-
 
 
 ####################################################################################
@@ -285,24 +251,24 @@ def header_colors():
 ####################################################################################
 def predictions_from_models(wavfile_path, embeddings):
     """
+    Get predictions from embeddings
     """
-    prediction_list = []
-    prediction_rounded = []
-    for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-        pred_prob, pred_round = generate_before_predict_BR.main(wavfile_path, 1, embeddings, each_model)
-        pred_prob = pred_prob[0][0] * 100
-        pred_round = pred_round[0][0]
-        prediction_list.append("{0:.2f}".format(pred_prob))
-        prediction_rounded.append(pred_round)
-    return prediction_list, prediction_rounded
+    global CONFIG_DATAS
 
+    prediction_probs, prediction_rounded = \
+            predict_on_wavfile_binary_relevance.predict_on_embedding(\
+                                                embedding = embeddings,
+                                                label_names = CONFIG_DATAS.keys(),
+                                                config_datas = CONFIG_DATAS)
 
+    return prediction_probs, prediction_rounded
 
 ####################################################################################
         # Generates embeddings for each file and calls for predictions
 ####################################################################################
 def get_predictions(wavfile_path):
     """
+    Get predictions from wav file path
     """
     try:
         embeddings = generate_before_predict_BR.main(wavfile_path, 0, 0, 0)
@@ -310,19 +276,99 @@ def get_predictions(wavfile_path):
         print('\033[1m'+ "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1])
         return None, None
     try:
-        prediction_list = []
-        prediction_rounded = []
-        for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-            pred_prob, pred_round = generate_before_predict_BR.main(wavfile_path, 1, embeddings, each_model)
-            pred_prob = pred_prob[0][0] * 100
-            pred_round = pred_round[0][0]
-            prediction_list.append("{0:.2f}".format(pred_prob))
-            prediction_rounded.append(pred_round)
-
-        return prediction_list, prediction_rounded
+        return predictions_from_models(wavfile_path, embeddings)
     except OSError:
         return None, None
 
+
+def format_label_name(name):
+    """
+    Format string label name to remove negative label if it is
+    EverythingElse
+    """
+    m = re.match("\[([A-Za-z0-9]+)\]Vs\[EverythingElse\]", name)
+
+    if m is None:
+        return name
+    else:
+        return m.group(1)
+
+def get_formatted_detected_sounds(prediction_rounded):
+    """
+    Get names of detected output sounds as a single string.
+    Array will be converted to comma-separated single string.
+    No Elements will return None.
+    """
+    global CONFIG_DATAS
+
+    # Determine which output sounds were detected
+    output_sound = []
+    for index, key in enumerate(CONFIG_DATAS.keys()):
+        if prediction_rounded[index] == 1:
+            output_sound += [key]
+
+    # Format output sound variable to be string
+    output_sound = [format_label_name(x) for x in output_sound]
+    if len(output_sound) == 0:
+        output_sound = 'None'
+    else:
+        output_sound = ', '.join(output_sound)
+
+    return output_sound
+
+def get_prediction_bar_graph(filepath):
+    """
+    Generate dash bar graph object based off predictions
+    """
+    global CONFIG_DATAS
+
+    if not filepath.lower().endswith('.wav'):
+        # Not a wav file so nothing to return
+        return None
+
+    prediction_probs, prediction_rounded = get_predictions(filepath)
+
+    if prediction_probs is None:
+        # Something went wrong with predictions, so exit
+        return None
+
+    output_sound = get_formatted_detected_sounds(prediction_rounded)
+
+    return  prediction_probs, \
+            prediction_rounded, \
+            output_sound, \
+            dcc.Graph(id='example',
+                      figure={
+                          'data':[{'x':[format_label_name(x) for x in CONFIG_DATAS.keys()],
+                                   'y':["{0:.2f}".format(x) for x in prediction_probs],
+                                   'text':["{0:.2f}%".format(x) for x in prediction_probs],
+                                   'textposition':'auto',
+                                   'type':'bar'}],
+                          'layout': {
+                              'title':'probabilistic prediction graph ',
+                              'titlefont':{
+                                  'family':'Courier New, monospace',
+                                  'size':22,
+                                  'color':'#e4e4e4'},
+
+                              'xaxis':{
+                                  'title': 'Labels of the sound',
+                                  'titlefont':{
+                                      'family':'Courier New, monospace',
+                                      'size':18,
+                                      'color':'#e4e4e4'}},
+                              'yaxis':{
+                                  'title': 'Percentage probabality',
+                                  'titlefont':{
+                                      'family':'Courier New, monospace',
+                                      'size':18,
+                                      'color':'#e4e4e4'}},
+                              'height':400,
+                              'paper_bgcolor':'#232323',
+                              'plot_bgcolor':'#232323',
+                              'font': {'color':'#e4e4e4'}}},
+                        style={'marginBottom': 0,
+                               'marginTop': 10})
 
 ####################################################################################
                     # Saves the audio file / Downloads audio file
@@ -367,7 +413,7 @@ def check_path_for_downloading(wavfile_path):
     if os.path.exists(wavfile_path):
         return
     else:
-        os.mkdir(wavfile_path)
+        os.makedirs(wavfile_path)
         return
 
 
@@ -381,7 +427,7 @@ def sort_on_filenames(files_list):
     wav_files_list = []
     wav_files_number = []
     for name in files_list:
-        if (name[-3:] == 'wav') or (name[-3:] == 'WAV'):
+        if name[-3:].lower() == 'wav':
             character = name[0:1]
             extension = name[-4:]
             only_wavfiles.append(name)
@@ -426,43 +472,21 @@ def download_files(each_wav_file, path_to_download, blockalign, samplerate,ftp_o
 def write_csv_prediction(direct_name, filename, device_id, prediction_list, csv_filename):
     """
     """
+    global CONFIG_DATAS
+
     if os.path.exists(csv_filename):
         with open(csv_filename, "a") as file_object:
             wav_information_object = csv.writer(file_object)
-            wav_information_object.writerow([direct_name,
-                                             filename,
-                                             device_id,
-                                             prediction_list[0],
-                                             prediction_list[1],
-                                             prediction_list[2],
-                                             prediction_list[3],
-                                             prediction_list[4],
-                                             prediction_list[5]])
+            wav_information_object.writerow([direct_name, filename, device_id] + prediction_list)
             file_object.flush()
 
     else:
-        header_names = ["Directory",
-                        "Filename",
-                        "DeviceID",
-                        "Motor",
-                        "Explosion",
-                        "Human",
-                        "Nature",
-                        "Domestic",
-                        "Tools"]
+        header_names = ["Directory", "Filename", "DeviceID"] + CONFIG_DATAS.keys()
         with open(csv_filename, "w") as file_object:
             wav_information_object = csv.writer(file_object)
             wav_information_object.writerow(header_names)
             file_object.flush()
-            wav_information_object.writerow([direct_name,
-                                             filename,
-                                             device_id,
-                                             prediction_list[0],
-                                             prediction_list[1],
-                                             prediction_list[2],
-                                             prediction_list[3],
-                                             prediction_list[4],
-                                             prediction_list[5]])
+            wav_information_object.writerow([direct_name, filename, device_id] + prediction_list)
             file_object.flush()
 
 
@@ -470,16 +494,16 @@ def write_csv_prediction(direct_name, filename, device_id, prediction_list, csv_
 ####################################################################################
         # Checks if the predicted sounds consist of sound iof interest
 ####################################################################################
-def check_for_soi(prediction_list_rounded, LABELS_ALIGNED):
+def check_for_soi(prediction_list_rounded, labels_aligned):
     """
     """
-    global SOI
+    global NON_SOI
     soi_predicted = []
     for index, each_pred in enumerate(prediction_list_rounded):
         if each_pred:
-            pred_label_name = LABELS_ALIGNED[index]
-            if pred_label_name in SOI:
-                soi_predicted.append(pred_label_name)
+            pred_label_name = labels_aligned[index]
+            if pred_label_name not in NON_SOI:
+                soi_predicted.append(format_label_name(pred_label_name))
             else:
                 pass
         else:
@@ -496,8 +520,10 @@ def check_for_soi(prediction_list_rounded, LABELS_ALIGNED):
 def directory_procedure(directory_listing, selected_device, ftp_obj):
     """
     """
+    global CONFIG_DATAS
+    global FTP_PATH
     global done
-    ftp_obj.cwd(ftp_path)
+    ftp_obj.cwd(FTP_PATH)
     print(ftp_obj.pwd())
     ftp_obj.cwd(directory_listing[0]+"/")
     for each_ in directory_listing:
@@ -508,7 +534,7 @@ def directory_procedure(directory_listing, selected_device, ftp_obj):
             wavfiles = sort_on_filenames(wavfiles)
             if wavfiles:
                 for each_file in wavfiles:
-                    wavheader, _ = get_wavheader_extraheader(each_file, ftp_obj)
+                    wavheader = get_wavheader_subchunk1(each_file, ftp_obj)
                     if check_ftp_wav_file_size(each_file,
                                                wavheader["BlockAlign"],
                                                wavheader["SampleRate"],
@@ -526,7 +552,7 @@ def directory_procedure(directory_listing, selected_device, ftp_obj):
                                                  selected_device,
                                                  prediction_list,
                                                  "downloaded_audio_files/"+each_+".csv")
-                            decide_to_alert = check_for_soi(prediction_rounded, LABELS_ALIGNED)
+                            decide_to_alert = check_for_soi(prediction_rounded, CONFIG_DATAS.keys())
                             print "decide to alert:",decide_to_alert
                             if decide_to_alert:
                                 write_csv_prediction(each_,
@@ -555,9 +581,11 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
     """
     Loops over directories for processing
     """
+    global CONFIG_DATAS
+    global FTP_PATH
     global GLOBAL_STOP_THREAD
     global done
-    ftp_obj.cwd(ftp_path)
+    ftp_obj.cwd(FTP_PATH)
     print(ftp_obj.pwd())
     ftp_obj.cwd(directory_listing[0]+"/")
     for each in directory_listing:
@@ -569,7 +597,7 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
             if wavfiles:
                 for each_file in wavfiles:
                     if not GLOBAL_STOP_THREAD:
-                        wavheader, _ = get_wavheader_extraheader(each_file, ftp_obj)
+                        wavheader = get_wavheader_subchunk1(each_file, ftp_obj)
                         if check_ftp_wav_file_size(each_file,
                                                    wavheader["BlockAlign"],
                                                    wavheader["SampleRate"],
@@ -587,7 +615,7 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
                                                      selected_device,
                                                      prediction_list,
                                                      "downloaded_audio_files/"+each+".csv")
-                                decide_to_alert = check_for_soi(prediction_rounded, LABELS_ALIGNED)
+                                decide_to_alert = check_for_soi(prediction_rounded, CONFIG_DATAS.keys())
                                 print "decide to alert:", decide_to_alert
                                 if decide_to_alert:
                                     write_csv_prediction(each,
@@ -627,15 +655,7 @@ def get_alerted(wavfile_path, soi_found, prediction_list, phoneNo):
     if phoneNo:
         get_text = ""
         for each_ in soi_found:
-            if "Motor" in each_.split(" "):
-                get_text = get_text +"Motor,"
-            if "Explosion" in each_.split(" "):
-                get_text = get_text+ "Explosion,"
-            if "Human" in each_.split(" "):
-                get_text = get_text + "Human,"
-            if "Tools" in each_.split(" "):
-                get_text = get_text+ "Tools,"
-
+            get_text = get_text + each_ + ","
 
         wavfile_ = wavfile_path.split("/")[-1]
 
@@ -726,9 +746,9 @@ class FtpFile:
 
 
 ####################################################################################
-            # returns wavheader and extraheader information
+            # returns wavheader information
 ####################################################################################
-def get_wavheader_extraheader(name,ftp_obj):
+def get_wavheader_subchunk1(name,ftp_obj):
     '''
     To read wav file header details
     '''
@@ -748,153 +768,59 @@ def get_wavheader_extraheader(name,ftp_obj):
             file_header_info.read(16))
         chunkoffset = file_header_info.tell()
 
-        struct.unpack('<4sI', file_header_info.read(8))
-        struct.unpack('<4s4sI', file_header_info.read(12))
-        chunkoffset = file_header_info.tell()
+        wav_header = [riff, size, fformat, subchunkid, \
+                      subchunksize, aformat, channels, \
+                      samplerate, byterate, blockalign, bps]
 
-        extra_header = file_header_info.read(200)
-        chunkoffset = file_header_info.tell()
-
-        file_header_info.seek(chunkoffset)
-        subchunk2id, subchunk2size = struct.unpack('<4sI', file_header_info.read(8))
-        chunkoffset = file_header_info.tell()
-
-        wav_header = [riff, size, fformat, subchunkid, subchunksize, aformat, \
-        channels, samplerate, byterate, blockalign, bps, subchunk2id, subchunk2size]
-
-        for each_value in zip(wav_header, ["ChunkID", "TotalSize", "Format", "SubChunk1ID", \
-            "SubChunk1Size", "AudioFormat", "NumChannels", "SampleRate", "ByteRate", \
-            "BlockAlign", "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]):
+        for each_value in zip(wav_header, \
+                              ["ChunkID", "TotalSize", "Format", \
+                               "SubChunk1ID", "SubChunk1Size", "AudioFormat", \
+                               "NumChannels", "SampleRate", "ByteRate", \
+                                "BlockAlign", "BitsPerSample"]):
             wavheader_dict[each_value[1]] = each_value[0]
 
-
-        extra_header_info = extra_header.decode("ascii").split(',')
-        return wavheader_dict, extra_header_info
+        return wavheader_dict
 
 
 
 ####################################################################################
                 # Parse the single file input
 ####################################################################################
+
 def parse_contents(contents, filename, date):
     """
     Read the file contents
     """
-    if filename[-3:] == 'wav' or 'WAV':
-        if not os.path.exists("FTP_downloaded/"):
-            os.makedirs("FTP_downloaded/")
-        save_file(filename, contents)
-        encoded_image_uploaded_file = 'FTP_downloaded/'+ filename
-        encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read())
-        prediction_list, _ = get_predictions('FTP_downloaded/'+ filename)
-        print "Predictions:", prediction_list
-        if prediction_list:
-            return plot_prediction_graph('FTP_downloaded/'+ filename)
-        else:
-            return html.Div(html.P("Error occured. Please try Again or Input proper Wav File.",
-                                   style={"textAlign":"center"}))
 
+    # content_type, content_string = contents.split(',')
 
+    directory_path = "FTP_downloaded/"
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+    save_file(filename, contents)
+    filepath = directory_path + filename
+    encoded_image_uploaded_file = base64.b64encode(open(filepath, 'rb').read())
 
-####################################################################################
-        # Prediction plot
-####################################################################################
-def plot_prediction_graph(filepath):
-    """
-    Read the file contents
-    """
-    encoded_image_uploaded_file = filepath
-    encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read())
-    prediction_list, prediction_rounded = get_predictions(filepath)
+    bar_graph_info = get_prediction_bar_graph(filepath)
 
-    if prediction_list:
-        return  html.Div(style={'color': 'green', 'fontSize':14}, children=[
-            html.Div(children=[
-            html.Audio(id='myaudio',
-                       src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
-                       controls=True,
-                       )],style={"margin-left":"27%"}),
-            dcc.Graph(id='example',
-                      figure={
-                          'data':[{
-                              'x':["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"],
-                              'y':[i for i in prediction_list],
-                              "text": [i for i in prediction_list],
-                              "textposition":"auto",
-                              'type':'bar'}],
-                          'layout': {
-                              'title':'probablistic prediction graph ',
-                              'titlefont':{
-                                  'family':'Courier New, monospace',
-                                  'size':22,
-                                  'color':'#e4e4e4'},
+    if bar_graph_info is not None:
+        # unpack bar graph information
+        _, _, _, bar_graph = bar_graph_info
 
-                              'xaxis':{
-                                  'title': 'Labels of the sound',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color': '#e4e4e4'}},
-                              'yaxis':{
-                                  'title': 'Percenatge probabality',
-                                  'range':[0, 100],
-                                  'dtick':20,
-                                  'autorange':False,
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'#e4e4e4'}},
-                              'paper_bgcolor':'#232323',
-                              'plot_bgcolor':'#232323',
-                              'font': {
-                                  'color':'#e4e4e4'}}},
-                      config={"staticPlot":True},
-                      style={'marginBottom': 0,
-                             'marginTop': 10}),
-            html.Div(children=[
-            html.P('Uploaded File : '+ filepath.split("/")[-1],
-                   style={'color': '#FFBF01',
-                          'fontSize': 12,
-                          "text-align":"center"})])])
+        return  html.Div(style={'color': '#e4e4e4', 'fontSize':14},
+                         children=[ html.Div(children=[html.Audio(id='myaudio',
+                                                                  src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
+                                                                  controls=True)],
+                                             style={"margin-left":"27%"}),
+                                    bar_graph,
+                                    html.P('Uploaded File : '+ filename)])
     else:
+
+        # Since the file is not a wav file or has problems, delete the file
+        os.remove(filepath)
+
         return html.Div(html.P("Error occured. Please try Again or Input proper Wav File.",
-                               style={"textAlign":"center"}))
-
-
-
-####################################################################################
-                # Batch of FTP files input
-####################################################################################
-def table_for_ftp_batch_files(dataframe, list_of_malformed):
-    """
-    Returns the predicted values as the data table
-    """
-    if list_of_malformed:
-        list_of_malformed = str(list_of_malformed)
-    else:
-        list_of_malformed = "None"
-    return html.Div([
-        html.Br(),
-        html.P("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
-               style={"color":"white",
-                      'text-decoration':'underline'}),
-        html.P("Error while prediciton: " + list_of_malformed,
-               style={"color":"white"}),
-        html.Hr(),
-        dash_table.DataTable(id='datatable-interactivity-predictions',
-                             columns=[{"name": i,
-                                       "id": i,
-                                       "deletable": True} for i in dataframe.columns],
-                             data=dataframe.to_dict("rows"),
-                             style_header={'backgroundColor': 'rgb(30, 30, 30)',
-                                           "fontWeight": "bold",
-                                           'border': '1px solid white'},
-                             style_cell={'backgroundColor': 'rgb(50, 50, 50)',
-                                         'color': 'white'},
-                             row_selectable="single",
-                             selected_rows=[]),
-        html.Hr(style={"marginTop":"30px"}),
-        html.Br()])
+                                   style={"textAlign":"center"}))
 
 
 
@@ -922,35 +848,43 @@ def get_colored_for_soi_columns(value_list):
 ####################################################################################
 
 ####################################################################################
-def call_for_data_offline(dataframe, list_of_malformed):
+def format_html_data_table(dataframe, list_of_malformed, addLineBreak=False):
     """
     Returns the predicted values as the data table
     """
     if list_of_malformed:
         list_of_malformed = str(list_of_malformed)
     else:
-        list_of_malformed = "None Found"
-    return html.Div([
-        html.P("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
-               style={"color":"white",
-                      'text-decoration':'underline'}),
-        html.P("Error while prediciton: " + list_of_malformed, style={"color":"white"}),
-        html.Hr(),
-        dash_table.DataTable(id='datatable-interactivity-predictions',
-                             columns=[{"name": i,
-                                       "id": i,
-                                       "deletable": True} for i in dataframe.columns],
-                             data=dataframe.to_dict("rows"),
-                             style_header={'backgroundColor': 'rgb(30, 30, 30)',
-                                           "fontWeight": "bold",
-                                           'border': '1px solid white'},
-                             style_cell={'backgroundColor': 'rgb(50, 50, 50)',
-                                         'color': 'white'},
-                             row_selectable="single",
-                             style_table={"maxHeight":"350px",
-                                          "overflowY":"scroll"},
-                             selected_rows=[]),
-        html.Hr()])
+        list_of_malformed = "None"
+
+    # format numeric data into string format
+    for column_name in dataframe.select_dtypes(include=[np.float]).columns:
+        dataframe[column_name] = dataframe[column_name].apply(lambda x: "{0:.2f}%".format(x))
+
+    return html.Div([html.P("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
+                            style={"color":"white",
+                                   'text-decoration':'underline'}),
+                     html.P("Error while prediction: " + list_of_malformed,
+                            style={"color":"white"})] + \
+                    ([html.Br()] if addLineBreak else []) + \
+                    [html.Hr(),
+                     dash_table.DataTable(id='datatable-interactivity-predictions',
+                                          columns=[{"name": format_label_name(i),
+                                                    "id": i,
+                                                    "deletable": True} for i in dataframe.columns],
+                                          data=dataframe.to_dict("rows"),
+                                          style_header={'backgroundColor': 'rgb(30, 30, 30)',
+                                                        "fontWeight": "bold",
+                                                        'border': '1px solid white'},
+                                          style_cell={'backgroundColor': 'rgb(50, 50, 50)',
+                                                      'color': 'white',
+                                                      'whiteSpace':'normal',
+                                                      'maxWidth': '240px'},
+                                          style_table={"maxHeight":"350px",
+                                                       "overflowY":"scroll",
+                                                       "overflowX":"auto"}),
+                     html.Hr()] + \
+                    ([html.Br()] if addLineBreak else []))
 
 
 
@@ -962,6 +896,8 @@ def parse_contents_batch(contents, names, dates):
     """
     Multiple files that are uploaded are handled
     """
+    global CONFIG_DATAS
+
     emb = []
     malformed = []
     dum_df = pd.DataFrame()
@@ -982,44 +918,26 @@ def parse_contents_batch(contents, names, dates):
     dum_df['features'] = emb
     if len(dum_df["FileNames"].tolist()) == 1:
         try:
-            prediction_list = []
-            prediction_rounded = []
-            pred_df = pd.DataFrame(columns=["File Name",
-                                            "Motor",
-                                            "Explosion",
-                                            "Human",
-                                            "Nature",
-                                            "Domestic",
-                                            "Tools"])
-            for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-                pred_prob, pred_round = generate_before_predict_BR.main("FTP_downloaded/"+dum_df["FileNames"].tolist()[0], 1, dum_df["features"].tolist()[0], each_model)
-                pred_prob = pred_prob[0][0] * 100
-                pred_round = pred_round[0][0]
-                prediction_list.append("{0:.2f}".format(pred_prob))
-                prediction_rounded.append(pred_round)
-            pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_list
-            return call_for_data_offline(pred_df, malformed)
+            prediction_probs, prediction_rounded = predictions_from_models("FTP_downloaded/"+dum_df["FileNames"].tolist()[0], dum_df["features"].tolist()[0])
+
+            pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+            pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
+
+            return format_html_data_table(pred_df, list_of_malformed = malformed)
         except:
             return html.Div(html.P("Got Error while Predictions"))
     else:
-        pred_df = pd.DataFrame(columns=["File Name", "Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"])
+        pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+
         for index, each_file, each_embeddings in zip(range(0, dum_df.shape[0]), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
             try:
-                prediction_list = []
-                prediction_rounded = []
-                for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-                    pred_prob, pred_round = generate_before_predict_BR.main("FTP_downloaded/"+each_file, 1, each_embeddings, each_model)
-                    pred_prob = pred_prob[0][0] * 100
-                    pred_round = pred_round[0][0]
-                    print(pred_prob)
-                    prediction_list.append("{0:.2f}".format(pred_prob))
-                    prediction_rounded.append(pred_round)
+                prediction_probs, prediction_rounded = predictions_from_models("FTP_downloaded/"+each_file, each_embeddings)
 
-                pred_df.loc[index] = [each_file] + prediction_list
+                pred_df.loc[index] = [each_file] + prediction_probs
             except:
                 pass
 
-        return call_for_data_offline(pred_df, malformed)
+        return format_html_data_table(pred_df, list_of_malformed = malformed)
 
 
 
@@ -1029,11 +947,14 @@ def parse_contents_batch(contents, names, dates):
 ####################################################################################
 def layout():
 
+    global CONFIG_DATAS
+    global FTP_PATH
+
     return html.Div(id='clustergram-body', className='app-body',
         children=[
-            html.Div(id='clustergram-control-tabs', className='control-tabs', 
+            html.Div(id='clustergram-control-tabs', className='control-tabs',
             children=[
-            dcc.Tabs(id='clustergram-tabs', value='graph', 
+            dcc.Tabs(id='clustergram-tabs', value='graph',
                 children=[
                 ####################################################################################
                                 # Monitoring Tab
@@ -1044,7 +965,7 @@ def layout():
                     children=[
                         html.Div(className='control-tab', children=[
                             html.Div('Select DeviceID',
-                                     title="Available directories from "+ ftp_path + "  directory",
+                                     title="Available directories from "+ FTP_PATH + "  directory",
                                      className='fullwidth-app-controls-name',
                                      style={"fontWeight":"bold",
                                             "color": '#FFBF01',
@@ -1076,12 +997,7 @@ def layout():
                                                 "color":"white",
                                                 "fontWeight":"bold"}),
                                 dcc.Dropdown(id='sound-labels-dropdown-alert-tab',
-                                             options=[{'label': 'Motor', 'value': 'Motor'},
-                                                      {'label': 'Explosion', 'value': 'Explosion'},
-                                                      {'label': 'Human', 'value': 'Human'},
-                                                      {'label': 'Nature', 'value': 'Nature'},
-                                                      {'label': 'Domestic', 'value': 'Domestic'},
-                                                      {'label': 'Tools', 'value': 'Tools'}],
+                                             options=[{'label': format_label_name(x), 'value': x} for x in CONFIG_DATAS.keys()],
                                              multi=True,
                                              value=None),
                                 html.Br(),
@@ -1128,7 +1044,7 @@ def layout():
                     children=html.Div(className='control-tab', children=[
                         html.Div(id='file-upload-name'),
                         html.Div(id='clustergram-file-upload-container',
-                                 title='Upload your here.',
+                                 title='Upload your files here.',
                                  children=[
                                      dcc.Upload(id='upload-data', multiple=True, children=[
                                          html.A(html.Button(className='control-download',
@@ -1154,7 +1070,7 @@ def layout():
                     children=html.Div(className='control-tab', children=[
                         html.Div(
                             'Available Directories',
-                            title="Available directories from "+ ftp_path + "  directory",
+                            title="Available directories from "+ FTP_PATH + "  directory",
                             className='fullwidth-app-controls-name',
                             style={"fontWeight":"bold",
                                    "color": '#FFBF01',
@@ -1230,7 +1146,7 @@ def callbacks(_app):
         [Input('clustergram-datasets1', 'value')])
     def get_selected_filter(value):
         """
-        Display based on selection 
+        Display based on selection
         """
         if value == "status":
             DATAFRAME_DEVICE_STATUS = pd.DataFrame()
@@ -1268,7 +1184,7 @@ def callbacks(_app):
 
 
     ####################################################################################
-                # Play selected audio   
+                # Play selected audio
     ####################################################################################
     @_app.callback(
         Output('prediction-audio', 'children'),
@@ -1402,7 +1318,7 @@ def callbacks(_app):
 
 
     ####################################################################################
-                # Displays all the directories of selected status 
+                # Displays all the directories of selected status
     ####################################################################################
     @_app.callback(
         Output('display-directory-on-status-selection', 'children'),
@@ -1413,12 +1329,14 @@ def callbacks(_app):
         """
          Displays all the directories of selected status
         """
+        global FTP_PATH
+
         if indices is not None and indices != []:
             pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
             directory_selected = pred_df.iloc[indices]["Directories"].tolist()[0]
             print directory_selected
             if directory_selected:
-                connect(ftp_path+"/"+directory_selected+"/")
+                connect(FTP_PATH+"/"+directory_selected+"/")
                 print ftp.pwd()
                 list_all_wavfiles = ftp.nlst("*.wav")
                 sort_list_of_all_wavfiles = sort_on_filenames(list_all_wavfiles)
@@ -1456,6 +1374,7 @@ def callbacks(_app):
         check for upload of the files
         """
         if list_of_names:
+            print "len of files: ", (list_of_names)
             if len(list_of_names) == 1:
                 if list_of_contents is not None:
                     children = [
@@ -1463,7 +1382,6 @@ def callbacks(_app):
                         zip(list_of_contents, list_of_names, list_of_dates)]
                     return children
             else:
-                print "len of files: ", (list_of_names)
                 return parse_contents_batch(list_of_contents, list_of_names, list_of_dates)
 
 
@@ -1490,14 +1408,15 @@ def callbacks(_app):
         """
         check for upload of the files
         """
-        global  SOI
+        global CONFIG_DATAS
+        global NON_SOI
         global GLOBAL_STOP_THREAD, directory_threads, t
         if indices is not None and indices != [] and select_dev_clicks >= 1 and not GLOBAL_STOP_THREAD:
             all_directories = pd.DataFrame(rows, columns=[c['name'] for c in columns])
             selected_directories = all_directories.iloc[indices]["Directories"].tolist()
             print selected_directories
             if value_soi:
-                SOI = [i + " Sounds" for i in value_soi]
+                NON_SOI = filter(lambda x: x not in value_soi, CONFIG_DATAS.keys())
             else:
                 pass
             if value_interval:
@@ -1552,12 +1471,20 @@ def callbacks(_app):
         """
         Refreshs continuously the div element to display predictions
         """
+
+        global CONFIG_DATAS
+
         if all_act_dev_clicks >= 1:
             if os.path.exists("downloaded_audio_files/soi_csv_file.csv"):
                 dataframe = pd.read_csv("downloaded_audio_files/soi_csv_file_active_device.csv")
+
+                # format numeric data into string format
+                for column_name in dataframe.select_dtypes(include=[np.float]).columns:
+                    dataframe[column_name] = dataframe[column_name].apply(lambda x: "{0:.2f}%".format(x))
+
                 return html.Div([html.Hr(),
                                  dash_table.DataTable(id='datatable-interactivity-predictions-graph-tab',
-                                                      columns=[{"name": i,
+                                                      columns=[{"name": format_label_name(i),
                                                                 "id": i,
                                                                 "deletable": True} for i in dataframe.columns],
                                                       data=dataframe.to_dict("rows"),
@@ -1567,9 +1494,7 @@ def callbacks(_app):
                                                                     "fontWeight": "bold",
                                                                     'border': '1px solid white'},
                                                       style_cell={'backgroundColor': 'rgb(50, 50, 50)',
-                                                                  'color': 'white'},
-                                                      row_selectable="single",
-                                                      selected_rows=[]),
+                                                                  'color': 'white'}),
                                  html.Hr(),
                                  html.Br(),
                                  html.Button(id='button-to-stop-threads',
@@ -1581,34 +1506,31 @@ def callbacks(_app):
                                                     "margin-left":"20px",
                                                     "color":"white"})])
             else:
-                html.Div([html.P("Waiting For getting SOI", style={"textAlign":"center"})])
-        else:
-            pass
+                return html.Div([html.P("Waiting For getting SOI", style={"textAlign":"center"})])
+
         if select_dev_clicks >= 1:
             if os.path.exists("downloaded_audio_files/soi_csv_file.csv"):
                 dataframe = pd.read_csv("downloaded_audio_files/soi_csv_file.csv")
+
+                # format numeric data into string format
+                for column_name in dataframe.select_dtypes(include=[np.float]).columns:
+                    dataframe[column_name] = dataframe[column_name].apply(lambda x: "{0:.2f}%".format(x))
+
                 dataframe["No."] = range(1, dataframe.shape[0]+1)
                 devids = []
                 for each_ in dataframe["Directory"]:
                     devids.append(get_devid_from_dir(each_))
                 del dataframe["Directory"]
                 dataframe["DeviceID"] = devids
-                dataframe = dataframe[["No.",
-                                       "DeviceID",
-                                       "Filename",
-                                       "Motor",
-                                       "Explosion",
-                                       "Human",
-                                       "Nature",
-                                       "Domestic",
-                                       "Tools"]]
+                dataframe = dataframe[["No.", "DeviceID", "Filename"] + CONFIG_DATAS.keys()]
+
                 if soi_list:
                     color_coding = get_colored_for_soi_columns(soi_list)
                 else:
                     color_coding = []
                 return html.Div([html.Hr(),
                                  dash_table.DataTable(id='datatable-interactivity-predictions-graph-tab',
-                                                      columns=[{"name": i,
+                                                      columns=[{"name": format_label_name(i),
                                                                 "id": i,
                                                                 "deletable": True} for i in dataframe.columns],
                                                       data=dataframe.to_dict("rows"),
@@ -1633,7 +1555,7 @@ def callbacks(_app):
                                                     "margin-left":"20px",
                                                     "color":"white"})])
             else:
-                return html.Div([html.P("Waiting For getting SOI", style={"textAlign":"center"})])            
+                return html.Div([html.P("Waiting For getting SOI", style={"textAlign":"center"})])
 
 
 
@@ -1688,6 +1610,8 @@ def callbacks(_app):
         """
         Downloading the selected batch of files and processing them to model
         """
+        global CONFIG_DATAS
+
         if n_clicks >= 1:
             global display_upload_graph
             emb = []
@@ -1710,35 +1634,41 @@ def callbacks(_app):
                     os.remove(path)
             dum_df['features'] = emb
             if len(dum_df["File Name"].tolist()) == 1:
-                for each_file in zip(dum_df["File Name"].tolist(), dum_df['features'].values.tolist()):
-                    pred_prob, pred = predictions_from_models(each_file[0], each_file[1])
-                dum_df["Motor"] = pred_prob[0]
-                dum_df["Explosion"] = pred_prob[1]
-                dum_df["Human"] = pred_prob[2]
-                dum_df["Nature"] = pred_prob[3]
-                dum_df["Domestic"] = pred_prob[4]
-                dum_df["Tools"] = pred_prob[5]
+
+                each_file = dum_df["File Name"].tolist()[0]
+                features = dum_df['features'].values.tolist()[0]
+
+                pred_prob, pred = predictions_from_models(each_file, features)
+
+                # populate dataframe with prediction probability
+                for index, label_name in enumerate(CONFIG_DATAS.keys()):
+                    dum_df[label_name] = pred_prob[index]
+
                 display_upload_graph = False
-                return table_for_ftp_batch_files(dum_df[dum_df.drop("features", axis=1).columns], malformed)
+                return format_html_data_table(dum_df[dum_df.drop("features", axis=1).columns],
+                                              list_of_malformed = malformed,
+                                              addLineBreak = True)
 
             elif len(dum_df["File Name"] > 1):
+
                 whole_pred_prob = []
                 whole_pred = []
-                for each_file in zip(dum_df["File Name"].tolist(), dum_df['features'].values.tolist()):
-                    pred_prob, pred = predictions_from_models(each_file[0], each_file[1])
+
+                for each_file, features in zip(dum_df["File Name"].tolist(), dum_df['features'].values.tolist()):
+                    pred_prob, pred = predictions_from_models(each_file, features)
                     whole_pred_prob.append(pred_prob)
                     whole_pred.append(pred)
+
                 whole_pred_prob = np.array(whole_pred_prob)
                 whole_pred = np.array(whole_pred)
-                print [i for i in whole_pred_prob[:, 0].tolist()]
-                dum_df["Motor"] = [i for i in whole_pred_prob[:, 0].tolist()]
-                dum_df["Explosion"] = [i for i in whole_pred_prob[:, 1].tolist()]
-                dum_df["Human"] = [i for i in whole_pred_prob[:, 2].tolist()]
-                dum_df["Nature"] = [i for i in whole_pred_prob[:, 3].tolist()]
-                dum_df["Domestic"] = [i for i in whole_pred_prob[:, 4].tolist()]
-                dum_df["Tools"] = [i for i in whole_pred_prob[:, 5].tolist()]
-                return table_for_ftp_batch_files(dum_df[dum_df.drop("features", axis=1).columns],
-                                                 malformed)
+
+                # populate dataframe with prediction probability
+                for index, label_name in enumerate(CONFIG_DATAS.keys()):
+                    dum_df[label_name] = whole_pred_prob[:,index]
+
+                return format_html_data_table(dum_df[dum_df.drop("features", axis=1).columns],
+                                              list_of_malformed = malformed,
+                                              addLineBreak = True)
 
             else:
                 return html.Div([html.H3("Something went Wrong, Try again",
@@ -1751,7 +1681,7 @@ def callbacks(_app):
 
 
     ####################################################################################
-                # Disbaling div elements that are not required
+                # Disabling div elements that are not required
     ####################################################################################
     @_app.callback(
         Output('graph-output-ftp', 'style'),
@@ -1782,6 +1712,60 @@ def callbacks(_app):
         if value == "what-is" or value == "datasets":
             return {"display":"none"}
 
+if __name__ == '__main__':
+
+    ##############################################################################
+              # Description and Help
+    ##############################################################################
+    DESCRIPTION = 'Runs the Audio Annotation Tool.'
+
+    ##############################################################################
+              # Parsing the inputs given
+    ##############################################################################
+    ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+    OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
+
+    REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
+    REQUIRED_NAMED.add_argument('-ftp_username', '--ftp_username', action='store',
+                                help='Input FTP username', required=True)
+    REQUIRED_NAMED.add_argument('-ftp_password', '--ftp_password', action='store',
+                                help='Input FTP Password', required=True)
+
+
+    OPTIONAL_NAMED.add_argument('-predictions_cfg_json',
+                            '--predictions_cfg_json', action='store',
+                            help='Input json configuration file for predictions output',
+                            default='../../predictions/binary_relevance_model/binary_relevance_prediction_config.json')
+
+    ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
+    PARSED_ARGS = ARGUMENT_PARSER.parse_args()
+
+    ##############################################################################
+              # Import json data and get ftp credentials
+    ##############################################################################
+    CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(PARSED_ARGS.predictions_cfg_json)
+    FTP_USERNAME = PARSED_ARGS.ftp_username
+    FTP_PASSWORD = PARSED_ARGS.ftp_password
+
+    ####################################################################################
+        # Connecting ftp server and listing all directories
+    ####################################################################################
+    connect(FTP_PATH)
+    DIR_AND_TIME, DIRECTORIES, TIMESTAMPS = get_directories_listed(FTP_PATH)
+    DIR_AND_TIMESTAMP, DIRECTORIES_TIME_LIST = last_ftp_time(FTP_PATH)
+    DIR_AND_TIMESTAMP, STATUS = active_or_inactive(DIR_AND_TIMESTAMP, DIRECTORIES_TIME_LIST)
+    DATAFRAME_REQUIRED = pd.DataFrame()
+
+
+    ####################################################################################
+                # Creatin a dataframe to display
+    ####################################################################################
+    DEVIDS = []
+    for each in DIRECTORIES:
+        DEVIDS.append(get_devid_from_dir(each))
+    DATAFRAME_REQUIRED['Directories'] = DIRECTORIES
+    DATAFRAME_REQUIRED["TimeStamps"] = TIMESTAMPS
+    DATAFRAME_REQUIRED["Status"] = STATUS
 
 ####################################################################################
         # only declare app/server if the file is being run directly

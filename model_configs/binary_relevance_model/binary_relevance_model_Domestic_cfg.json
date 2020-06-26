@@ -1,0 +1,78 @@
+{
+    "name": "DomesticAnimals",
+    "description": "Identifies Domestic Animals vs other audio in forest areas",
+    "aggregatePositiveLabelName": "DomesticAnimals",
+    "aggregateNegativeLabelName": "EverythingElse",
+    "positiveLabels": [
+        "Dog",
+        "Bark",
+        "Howl",
+        "Bow-wow",
+        "Growling",
+        "Bay",
+        "Livestock, farm animals, working animals",
+        "Yip",
+        "Cattle, bovinae",
+        "Moo",
+        "Cowbell",
+        "Goat",
+        "Bleat",
+        "Sheep",
+        "Squawk",
+        "Domestic animals, pets"
+    ],
+    "negativeLabels": null,
+    "ontology": {
+        "useYoutubeAudioSet": true,
+        "extension": null
+    },
+    "networkCfgJson": "topology/Conv1D500-128x128_Dense500_Dense500_Dense500_Dense1_MaxPool.json",
+    "train": {
+        "epochs": 100,
+        "batchSize": 500,
+        "validationSplit": 0.3,
+        "inputDataFrames": [
+            {
+                "path": "../../diff_class_datasets/Datasets/pure/Explosion/pure_exp_7957.pkl",
+                "positiveSubsample": 0,
+                "negativeSubsample": 2000
+            },
+            {
+                "path": "../../diff_class_datasets/Datasets/pure/Motor/pure_mot_76045.pkl",
+                "positiveSubsample": 0,
+                "negativeSubsample": 2000
+            },
+            {
+                "path": "../../diff_class_datasets/Datasets/pure/Human_sounds/pure_hum_46525.pkl",
+                "positiveSubsample": 0,
+                "negativeSubsample": 2000
+            },
+            {
+                "path": "../../diff_class_datasets/Datasets/pure/Wood/pure_wod_1115.pkl",
+                "positiveSubsample": 0,
+                "negativeSubsample": 1000
+            },
+            {
+                "path": "../../diff_class_datasets/Datasets/pure/Nature_sounds/pure_nat_13527.pkl",
+                "positiveSubsample": 0,
+                "negativeSubsample": 2000
+            },
+            {
+                "path": "../../diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl",
+                "positiveSubsample": 13000,
+                "negativeSubsample": 0
+            },
+            {
+                "path": "../../diff_class_datasets/Datasets/pure/Tools/pure_tools_8113.pkl",
+                "positiveSubsample": 0,
+                "negativeSubsample": 2000
+            },
+            {
+                "path": "../../diff_class_datasets/Datasets/pure/Wild/pure_wild_7061.pkl",
+                "positiveSubsample": 0,
+                "negativeSubsample": 2000
+            }
+        ],
+        "outputWeightFile": "../../predictions/binary_relevance_model/Binary_Relevance_Models/Domestic_BR_Model/binary_relevance_domestic_realised_multilabel_weights_mixedsounds_DM_DT_DH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5"
+    }
+}

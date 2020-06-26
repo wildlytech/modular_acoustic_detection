@@ -1,106 +1,185 @@
 """
-Traning a Mulit-label Model
+Traning a Binary Relevance Model
 """
 #Import the necessary functions and libraries
-import sys
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-from keras.models import Sequential
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten,AtrousConvolution1D
+import argparse
+import json
+from keras.models import model_from_json, Sequential
+from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from keras.optimizers import Adam
+import numpy as np
+import os
+import pandas as pd
+import pickle
+from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
+import sys
+
 sys.path.insert(0, "../")
-from youtube_audioset import get_recursive_sound_names, get_all_sound_names
-from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, \
-                             HUMAN_SOUNDS, NATURE_SOUNDS, DOMESTIC_SOUNDS, TOOLS_SOUNDS
-import balancing_dataset
+from youtube_audioset import get_recursive_sound_names
 
+#############################################################################
+                # Description and help
+#############################################################################
 
+DESCRIPTION = "Reads the configuration file to train a particular \
+               label and outputs the model"
+
+#############################################################################
+          # Parse the input arguments given from command line
+#############################################################################
+
+ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
+REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
+REQUIRED_NAMED.add_argument('-model_cfg_json', '--model_cfg_json',
+                            help='Input json configuration file for label',
+                            required=True)
+OPTIONAL_NAMED.add_argument('-output_weight_file', '--output_weight_file', help='Output weight file name')
+ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
+PARSED_ARGS = ARGUMENT_PARSER.parse_args()
+
+#############################################################################
+          # Parse the arguments
+#############################################################################
+
+with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
+  CONFIG_DATA = json.load(json_file_obj)
+
+PATH_TO_DIRECTORY_OF_CONFIG = '/'.join(PARSED_ARGS.model_cfg_json.split('/')[:-1]) + '/'
+
+FULL_NAME = CONFIG_DATA["aggregatePositiveLabelName"] + 'vs' + CONFIG_DATA["aggregateNegativeLabelName"]
+
+if PARSED_ARGS.output_weight_file is None:
+  # Set default output weight file name
+  OUTPUT_WEIGHT_FILE = CONFIG_DATA["train"]["outputWeightFile"]
+else:
+  # Use argument weight file name
+  OUTPUT_WEIGHT_FILE = PARSED_ARGS.output_weight_file
+
+# create directory to the folder
+pathToFileDirectory = PATH_TO_DIRECTORY_OF_CONFIG + '/'.join(OUTPUT_WEIGHT_FILE.split('/')[:-1]) + '/'
+if not os.path.exists(pathToFileDirectory):
+  os.makedirs(pathToFileDirectory)
 
 #############################################################################
           # Get all sound names
 #############################################################################
-explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS, "../")
-motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS, "../")
-wood_sounds = get_recursive_sound_names(WOOD_SOUNDS, "../")
-human_sounds = get_recursive_sound_names(HUMAN_SOUNDS, "../")
-nature_sounds = get_recursive_sound_names(NATURE_SOUNDS, "../")
-domestic_sounds = get_recursive_sound_names(DOMESTIC_SOUNDS, "../")
-tools = get_recursive_sound_names(TOOLS_SOUNDS, "../")
-#wild_animals=get_recursive_sound_names(Wild_animals)
+POSITIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["positiveLabels"], "../")
 
-
-
-#############################################################################
-          # Importing balanced data from the function
-#############################################################################
-DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag=0)
+# If negative labels were provided, then collect them
+# Otherwise, assume all examples that are not positive are negative
+if CONFIG_DATA["negativeLabels"] is None:
+  NEGATIVE_LABELS = None
+else:
+  NEGATIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["negativeLabels"], "../")
 
 
 #############################################################################
-          # Different classes of sounds.
-          # You can add new class
+          # Importing dataframes from the function
 #############################################################################
-ALL_SOUND_NAMES = ['Motor_sound', 'Explosion_sound', 'Human_sound',
-                   'Nature_sound', 'Domestic_animals', 'Tools']
-ALL_SOUND_LIST = explosion_sounds + motor_sounds + human_sounds + \
-                 nature_sounds + domestic_sounds + tools
 
 
+def subsample_dataframe(dataframe, subsample):
+  """
+  Subsample examples from the dataframe
+  """
+  if subsample is not None:
+    if subsample > 0:
+      # If subsample is less than size of dataframe, then
+      # don't allow replacement when sampling
+      # Otherwise, the intention is to oversample
+      dataframe = dataframe.sample(subsample, replace=(subsample > dataframe.shape[0]))
+    else:
+      dataframe = pd.DataFrame([], columns=dataframe.columns)
 
-#############################################################################
-        # Map all the sounds into their respective classes
-#############################################################################
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_name'].apply(lambda arr: ['Motor_sound' if x  in motor_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Explosion_sound' if x  in explosion_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Nature_sound' if x  in nature_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Human_sound' if x  in human_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Domestic_animals' if x  in domestic_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Tools' if x  in tools else x for x in arr])
+  return dataframe
 
 
+def import_dataframes(dataframe_file_list,
+                      positive_label_filter_arr,
+                      negative_label_filter_arr,
+                      path_to_directory_of_json):
+  """
+  Iterate through each pickle file and import a subset of the dataframe
+  """
+  list_of_dataframes = []
 
+  for input_file_dict in dataframe_file_list:
 
-#############################################################################
-        #  Binarize the labels. Its a Multi-label binarizer
-#############################################################################
-NAME_BIN = MultiLabelBinarizer().fit(DATA_FRAME['labels_new'])
-NEW_LABELS_BINARIZED = NAME_BIN.transform(DATA_FRAME['labels_new'])
-NEW_LABELS_BINARIZED_ALL = pd.DataFrame(NEW_LABELS_BINARIZED, columns=NAME_BIN.classes_)
-NEW_LABELS_BINARIZED = NEW_LABELS_BINARIZED_ALL[ALL_SOUND_NAMES]
+    print "Importing", input_file_dict["path"], "..."
+
+    with open(path_to_directory_of_json + input_file_dict["path"], 'rb') as file_obj:
+
+      # Load the file
+      df = pickle.load(file_obj)
+
+      # Filtering the sounds that are exactly 10 seconds
+      # Examples should be exactly 10 seconds. Anything else
+      # is not a valid input to the model
+      df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+
+      # Only use examples that have a label in label filter array
+      positive_examples_df = df.loc[df['labels_name'].apply(lambda arr: np.any([x in positive_label_filter_arr for x in arr]))]
+
+      if negative_label_filter_arr is not None:
+        negative_examples_df = df.loc[df['labels_name'].apply(lambda arr: np.any([x in negative_label_filter_arr for x in arr]))]
+      else:
+        negative_examples_df = df.loc[df['labels_name'].apply(lambda arr: not np.any([x in positive_label_filter_arr for x in arr]))]
+
+      # No longer need df after this point
+      del df
+
+      positive_examples_df = subsample_dataframe(positive_examples_df, input_file_dict["positiveSubsample"])
+      negative_examples_df = subsample_dataframe(negative_examples_df, input_file_dict["negativeSubsample"])
+
+      # append to overall list of examples
+      list_of_dataframes += [positive_examples_df, negative_examples_df]
+
+  df = pd.concat(list_of_dataframes, ignore_index=True)
+
+  print "Import done."
+
+  return df
+
+DATA_FRAME = import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
+                               positive_label_filter_arr=POSITIVE_LABELS,
+                               negative_label_filter_arr=NEGATIVE_LABELS,
+                               path_to_directory_of_json=PATH_TO_DIRECTORY_OF_CONFIG)
 
 
 #############################################################################
         # To Train each class-label change to appropiate label
 #############################################################################
 LABELS_BINARIZED = pd.DataFrame()
-LABELS_BINARIZED["Domestic"] = NEW_LABELS_BINARIZED['Domestic_animals']
-
-
-#############################################################################
-        # print out the number and percenatge of each class examples
-#############################################################################
-print LABELS_BINARIZED.mean()
-
-
+LABELS_BINARIZED[FULL_NAME] = 1.0 * DATA_FRAME['labels_name'].apply(lambda arr: np.any([x in POSITIVE_LABELS for x in arr]))
 
 #############################################################################
-        # Filtering the sounds that are exactly 10 seconds
+        # print out the number and percentage of each class examples
 #############################################################################
-DF_FILTERED = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
-LABELS_FILTERED = LABELS_BINARIZED.loc[DF_FILTERED.index, :]
+
+print "NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
+      LABELS_BINARIZED.shape[0], "/", \
+      (LABELS_BINARIZED[FULL_NAME] == 1).sum(), "/", \
+      (LABELS_BINARIZED[FULL_NAME] == 0).sum()
+
+print "PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100*LABELS_BINARIZED[FULL_NAME].mean())
 
 
 
 #############################################################################
         # split the data into train and test data
 #############################################################################
-DF_TRAIN, DF_TEST, LABELS_BINARIZED_TRAIN, LABELS_BINARIZED_TEST = train_test_split(DF_FILTERED, LABELS_FILTERED,
-                                                                                    test_size=0.30, random_state=42)
+TRAIN_TEST_SHUFFLE_SPLIT = StratifiedShuffleSplit(n_splits=1,
+                                                  test_size=CONFIG_DATA["train"]["validationSplit"],
+                                                  random_state=42)
 
+TRAIN_INDICES, TEST_INDICES = next(TRAIN_TEST_SHUFFLE_SPLIT.split(DATA_FRAME, LABELS_BINARIZED))
 
+DF_TRAIN  = DATA_FRAME.iloc[TRAIN_INDICES]
+DF_TEST   = DATA_FRAME.iloc[TEST_INDICES]
+LABELS_BINARIZED_TRAIN  = LABELS_BINARIZED.iloc[TRAIN_INDICES]
+LABELS_BINARIZED_TEST   = LABELS_BINARIZED.iloc[TEST_INDICES]
 
 #############################################################################
         # preprecess the data into required structure
@@ -140,19 +219,48 @@ def create_keras_model():
 #############################################################################
 CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
 CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
-CLF2_TRAIN_TARGET = LABELS_BINARIZED_TRAIN
-CLF2_TEST_TARGET = LABELS_BINARIZED_TEST
+CLF2_TRAIN_TARGET = LABELS_BINARIZED_TRAIN.values
+CLF2_TEST_TARGET = LABELS_BINARIZED_TEST.values
 
+#############################################################################
+   # assign class weights to ensure balanced datasets during training
+#############################################################################
 
+TRAIN_TARGET_POSITIVE_PERCENTAGE = CLF2_TRAIN_TARGET.mean()
+
+print "TRAIN NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
+      CLF2_TRAIN_TARGET.shape[0], "/", \
+      (CLF2_TRAIN_TARGET == 1).sum(), "/", \
+      (CLF2_TRAIN_TARGET == 0).sum()
+print "TRAIN PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100*TRAIN_TARGET_POSITIVE_PERCENTAGE)
+
+if TRAIN_TARGET_POSITIVE_PERCENTAGE > 0.5:
+  CLASS_WEIGHT_0 = TRAIN_TARGET_POSITIVE_PERCENTAGE / (1-TRAIN_TARGET_POSITIVE_PERCENTAGE)
+  CLASS_WEIGHT_1 = 1
+else:
+  CLASS_WEIGHT_0 = 1
+  CLASS_WEIGHT_1 = (1-TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
 
 #############################################################################
       # Implementing using the keras usual training techinque
 #############################################################################
-MODEL = create_keras_model()
-MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
-                           epochs=100, batch_size=500, verbose=1,
-                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
+if CONFIG_DATA["networkCfgJson"] is None:
+  MODEL = create_keras_model()
+else:
+  # load json and create model
+  json_file = open(PATH_TO_DIRECTORY_OF_CONFIG + CONFIG_DATA["networkCfgJson"], 'r')
+  loaded_model_json = json_file.read()
+  json_file.close()
+  MODEL = model_from_json(loaded_model_json)
+  MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+                metrics=['accuracy'])
 
+MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
+                           epochs=CONFIG_DATA["train"]["epochs"],
+                           batch_size=CONFIG_DATA["train"]["batchSize"],
+                           class_weight={0: CLASS_WEIGHT_0, 1: CLASS_WEIGHT_1},
+                           verbose=1,
+                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
 
 #############################################################################
       # Predict on train and test data
@@ -167,30 +275,27 @@ CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 #############################################################################
       # To get the Misclassified examples
 #############################################################################
-DF_TEST['actual_labels'] = np.split(LABELS_BINARIZED_TEST.values, DF_TEST.shape[0])
-DF_TEST['predicted_labels'] = np.split(CLF2_TEST_PREDICTION, DF_TEST.shape[0])
-DF_TEST['predicted_prob'] = np.split(CLF2_TEST_PREDICTION_PROB, DF_TEST.shape[0])
+# DF_TEST['actual_labels'] = np.split(LABELS_BINARIZED_TEST.values, DF_TEST.shape[0])
+# DF_TEST['predicted_labels'] = np.split(CLF2_TEST_PREDICTION, DF_TEST.shape[0])
+# DF_TEST['predicted_prob'] = np.split(CLF2_TEST_PREDICTION_PROB, DF_TEST.shape[0])
 MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
-MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
-# with open("misclassified_version_BR.pkl",'wb') as f:
-#   pickle.dump(DF_TEST[MISCLASSIFIED_EXAMPLES], f)
 
 
 
 #############################################################################
         # print misclassified number of examples
 #############################################################################
-print 'Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shape[0]
+print 'Misclassified number of examples :', MISCLASSIFED_ARRAY.sum()
 
 
 
 #############################################################################
         # Print confusion matrix and classification_report
 #############################################################################
-print CLF2_TEST_TARGET.values.argmax(axis=1).shape
+print CLF2_TEST_TARGET.shape
 print '        Confusion Matrix          '
 print '============================================'
-RESULT = confusion_matrix(CLF2_TEST_TARGET.values,
+RESULT = confusion_matrix(CLF2_TEST_TARGET,
                           CLF2_TEST_PREDICTION)
 print RESULT
 
@@ -201,7 +306,7 @@ print RESULT
 #############################################################################
 print '                 Classification Report      '
 print '============================================'
-CL_REPORT = classification_report(CLF2_TEST_TARGET.values,
+CL_REPORT = classification_report(CLF2_TEST_TARGET,
                                   CLF2_TEST_PREDICTION)
 print CL_REPORT
 
@@ -209,9 +314,9 @@ print CL_REPORT
 #############################################################################
         # calculate accuracy and hamming loss
 #############################################################################
-ACCURACY = accuracy_score(CLF2_TEST_TARGET.values.argmax(axis=1),
-                          CLF2_TEST_PREDICTION.argmax(axis=1))
-HL = hamming_loss(CLF2_TEST_TARGET.values.argmax(axis=1), CLF2_TEST_PREDICTION.argmax(axis=1))
+ACCURACY = accuracy_score(CLF2_TEST_TARGET,
+                          CLF2_TEST_PREDICTION)
+HL = hamming_loss(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION)
 print 'Hamming Loss :', HL
 print 'Accuracy :', ACCURACY
 
@@ -220,5 +325,5 @@ print 'Accuracy :', ACCURACY
 #############################################################################
         # save model weights. Change as per the model type
 #############################################################################
-MODEL.save_weights('binary_relevance_domestic_model.h5')
+MODEL.save_weights(PATH_TO_DIRECTORY_OF_CONFIG + OUTPUT_WEIGHT_FILE)
 

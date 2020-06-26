@@ -68,23 +68,11 @@ MODEL.save_weights('multilabel_model_maxpool_version.h5')
 -   Training here involves creating a separate model for each label. Hence as many labels to be detected so many binary relevance models should be created or saved
 -  Prerequisite :  Balancing of data in Binary Relevance Models. It’s a one v/s all kind of Balancing method.
 -   For example the model to be trained is a Motor Binary Relevance Model, then ```Impact sound(1’s)``` will be Motor and rest other sounds are ```Ambient (0’s)``` i.e [Explosion, Human, Nature, Domestic and Tools ] and if model to be trained is an Explosion Binary Relevance Model then Impact sounds(1’s) will be Explosion and rest other sounds are Ambient(0’s) i.e [Motor, Human, Nature, Domestic and Tools]
-- Toggle the flag in below snippet of  [binary_relevance_model.py](https://github.com/wildlytech/modular_acoustic_detection/blob/master/models/binary_relevance_model.py) if we need include audiomoth sounds, mixed sounds as well. By default only Google audioset is used.
-```python
-DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag=0)
-```
-- Change column names as per the label's that are to be detected and start the training process. Below the snippet that needs to changed to for different Binary Relevance Models. 
-- Example shown is Domestic Binary Relevance Model training. [Line 79: binary_relevance_model.py](https://github.com/wildlytech/modular_acoustic_detection/blob/28a38658a659ddabbd4d73cfad3c91132ab3736e/models/binary_relevance_model.py#L79)
-```python
-LABELS_BINARIZED["Domestic"] = NEW_LABELS_BINARIZED['Domestic_animals']
-```
-- Change also the weight file name as per the model in [Line 223: binary_relevance_model.py](https://github.com/wildlytech/modular_acoustic_detection/blob/28a38658a659ddabbd4d73cfad3c91132ab3736e/models/binary_relevance_model.py#L223)
-```python
-MODEL.save_weights('binary_relevance_domestic_model.h5')
+- Balancing can be achieved within the model configuration json file, which is a parameter to train the binary relevance model.  Under ```["train"]["inputDataFrames"]``` lies a list of all the dataframes with sound embedding features and labels. The ```subsample``` parameter allows for taking only a subset or upsampled set of the examples in the pickle file. Use this parameter to balance data from different sources.
 ```
 - To train a Binary Relevance model follow the command shown below
 ```shell
-$ python binary_relevance_model.py
+$ python binary_relevance_model.py 	[-h]	-model_cfg_json MODEL_CONFIG_JSON_FILE
+                                            [-output_weight_file OUTPUT_WEIGHT_FILE]
 ```
-
-
 

@@ -1,5 +1,5 @@
 
-#This code is copied from
+#This code is copied and modified from
 #https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
 
 r"""A simple demonstration of running VGGish in inference mode.
@@ -36,90 +36,58 @@ import sys
 import tensorflow as tf
 from keras import backend as K
 import model_function_binary_relevance
-sys.path.insert(0, '../../externals/tensorflow_models/research/audioset/')
+import os
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + \
+                   '/../../externals/tensorflow_models/research/audioset/')
 import vggish_input
 import vggish_params
 import vggish_postprocess
 import vggish_slim
 
 
-
-flags = tf.app.flags
-
-
-##############################################################################
-       # Flag for input argument
-##############################################################################
-flags.DEFINE_string(
-    'local_folder_path', None, help='Path to the VGGish checkpoint file.')
-flags.DEFINE_string(
-    'remote_ftp_path', None, help='Path to the VGGish checkpoint file.')
-flags.DEFINE_string(
-    'csv_filename', None, help='Path to the VGGish checkpoint file.')
-flags.DEFINE_string(
-    'ftp_username', None, help='Path to the VGGish checkpoint file.')
-flags.DEFINE_string(
-    'ftp_host', None, help='Path to the VGGish checkpoint file.')
-flags.DEFINE_string(
-    'ftp_password', None, help='Path to the VGGish checkpoint file.')
-flags.DEFINE_string(
-    'path_for_wavfile', None, help='Path to the wavfile.')
-
-
 ##############################################################################
       # Defining the flags before hand
 ##############################################################################
-flags.DEFINE_string(
-    'pca_params', '../../externals/tensorflow_models/research/audioset/vggish_pca_params.npz',
-    'Path to the VGGish PCA parameters file.')
-
-
-flags.DEFINE_string(
-    'checkpoint', '../../externals/tensorflow_models/research/audioset/vggish_model.ckpt',
-    'Path to the VGGish checkpoint file.')
-
-flags.DEFINE_string(
-    'tfrecord_file', None,
-    'Path to a TFRecord file where embeddings will be written.')
-
-FLAGS = flags.FLAGS
-
-
+FLAGS = {
+    'pca_params' : '../../externals/tensorflow_models/research/audioset/vggish_pca_params.npz',
+    'checkpoint' : '../../externals/tensorflow_models/research/audioset/vggish_model.ckpt'
+}
 
 ##############################################################################
 
 ##############################################################################
 def main(wav_file, flag_for_data, data,model_type):
     """
-    #Specify the path for the downloaded or recorded audio files and
-    #also path for writing the embeddings or pickle files
+    Specify the path for the downloaded or recorded audio files and
+    also path for writing the embeddings or pickle files
     """
     if flag_for_data == 0:
         if wav_file:
             pkl = wav_file[:-4]+'.pkl'
-          # print (pkl)
+            # print (pkl)
         examples_batch = vggish_input.wavfile_to_examples(wav_file)
 
-      # Prepare a postprocessor to munge the model embeddings.
-        pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
+
+        # Prepare a postprocessor to munge the model embeddings.
+        pproc = vggish_postprocess.Postprocessor(FLAGS['pca_params'])
 
         with tf.Graph().as_default(), tf.Session() as sess:
 
             # Define the model in inference mode, load the checkpoint, and
             # locate input and output tensors.
             vggish_slim.define_vggish_slim(training=False)
-            vggish_slim.load_vggish_slim_checkpoint(sess, FLAGS.checkpoint)
+            vggish_slim.load_vggish_slim_checkpoint(sess, FLAGS['checkpoint'])
             features_tensor = sess.graph.get_tensor_by_name(
                 vggish_params.INPUT_TENSOR_NAME)
             embedding_tensor = sess.graph.get_tensor_by_name(
                 vggish_params.OUTPUT_TENSOR_NAME)
 
-         # Run inference and postprocessing.
+            # Run inference and postprocessing.
             [embedding_batch] = sess.run([embedding_tensor],
                                          feed_dict={features_tensor: examples_batch})
             postprocessed_batch = pproc.postprocess(embedding_batch)
+            # print(postprocessed_batch)
             return postprocessed_batch
-        # print(postprocessed_batch)
     elif flag_for_data == 1:
         predict_prob, predictions = model_function_binary_relevance.predictions_wavfile(data, model_type)
         K.clear_session()

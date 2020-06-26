@@ -18,10 +18,16 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
-import generate_before_predict_dense
 import dash_table
 import pymongo
 from pymongo import MongoClient
+import re
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + "/../../")
+from predictions.binary_relevance_model import generate_before_predict_BR,\
+                                               get_results_binary_relevance,\
+                                               predict_on_wavfile_binary_relevance
 
 
 ########################################################################
@@ -45,36 +51,199 @@ HELP = "Give the Required Arguments"
 ########################################################################
                   #parse the input arguments
 ########################################################################
-PARSER = argparse.ArgumentParser(description=DESCRIPTION)
-PARSER.add_argument('-remote_ftp_path', '--remote_ftp_path', action='store',
-                    help=HELP)
-PARSER.add_argument('-local_folder_path', '--local_folder_path', action='store',
-                    help='Input the path')
-PARSER.add_argument('-csv_filename', '--csv_filename', action='store',
-                    help='Input the name of csv file to save results', default='wav_file_results.csv')
-PARSER.add_argument('-ftp_password', '--ftp_password', action='store',
-                    help='Input FTP Password')
-PARSER.add_argument('-ftp_username', '--ftp_username', action='store',
-                    help='Input FTP username')
-PARSER.add_argument('-ftp_host', '--ftp_host', action='store',
-                    help='Input host name of FTP server', default='34.211.117.196')
-RESULT = PARSER.parse_args()
+ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
 
+REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
+REQUIRED_NAMED.add_argument('-ftp_username', '--ftp_username', action='store',
+                            help='Input FTP username', required=True)
+REQUIRED_NAMED.add_argument('-ftp_password', '--ftp_password', action='store',
+                            help='Input FTP Password', required=True)
+REQUIRED_NAMED.add_argument('-remote_ftp_path', '--remote_ftp_path', action='store',
+                            help='Directory path on remote FTP server', required=True)
+REQUIRED_NAMED.add_argument('-local_folder_path', '--local_folder_path', action='store',
+                            help='Directory path on local machine', required=True)
+
+OPTIONAL_NAMED.add_argument('-ftp_host', '--ftp_host', action='store',
+                            help='Input host name of FTP server', default='34.211.117.196')
+OPTIONAL_NAMED.add_argument('-predictions_cfg_json',
+                            '--predictions_cfg_json', action='store',
+                            help='Input json configuration file for predictions output',
+                            default='../../predictions/binary_relevance_model/binary_relevance_prediction_config.json')
+OPTIONAL_NAMED.add_argument('-csv_filename', '--csv_filename', action='store',
+                            help='Input the name of csv file to save results', default='wav_file_results.csv')
+
+ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
+PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
 
 
 ########################################################################
                       #set the FTP Taregt folder#
 ########################################################################
-TARGET_FTP_FOLDER = RESULT.remote_ftp_path
-FOLDER_FILES_PATH = RESULT.local_folder_path
-CSV_FILENAME = RESULT.csv_filename
-FTP_USER_NAME = RESULT.ftp_username
-FTP_HOST_NAME = RESULT.ftp_host
-FTP_PASSWORD = RESULT.ftp_password
+TARGET_FTP_FOLDER = PARSED_ARGS.remote_ftp_path
+FOLDER_FILES_PATH = PARSED_ARGS.local_folder_path
+CSV_FILENAME = PARSED_ARGS.csv_filename
+FTP_USER_NAME = PARSED_ARGS.ftp_username
+FTP_HOST_NAME = PARSED_ARGS.ftp_host
+FTP_PASSWORD = PARSED_ARGS.ftp_password
+PREDICTIONS_CFG_JSON = PARSED_ARGS.predictions_cfg_json
+
+##############################################################################
+          # Import json data
+##############################################################################
+CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(PREDICTIONS_CFG_JSON)
 
 
+####################################################################################
+                # Loop through all the models and get predictions
+####################################################################################
+def predictions_from_models(wavfile_path, embeddings):
+    """
+    Get predictions from embeddings
+    """
+    global CONFIG_DATAS
 
+    prediction_probs, prediction_rounded = \
+            predict_on_wavfile_binary_relevance.predict_on_embedding(\
+                                                embedding = embeddings,
+                                                label_names = CONFIG_DATAS.keys(),
+                                                config_datas = CONFIG_DATAS)
+
+    return prediction_probs, prediction_rounded
+
+####################################################################################
+        # Generates embeddings for each file and calls for predictions
+####################################################################################
+def get_predictions(wavfile_path):
+    """
+    Get predictions from wav file path
+    """
+    try:
+        embeddings = generate_before_predict_BR.main(wavfile_path, 0, 0, 0)
+    except:
+        print('\033[1m'+ "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1])
+        return None, None
+    try:
+        return predictions_from_models(wavfile_path, embeddings)
+    except OSError:
+        return None, None
+
+def format_label_name(name):
+    """
+    Format string label name to remove negative label if it is
+    EverythingElse
+    """
+    m = re.match("\[([A-Za-z0-9]+)\]Vs\[EverythingElse\]", name)
+
+    if m is None:
+        return name
+    else:
+        return m.group(1)
+
+def get_formatted_detected_sounds(prediction_rounded):
+    """
+    Get names of detected output sounds as a single string.
+    Array will be converted to comma-separated single string.
+    No Elements will return None.
+    """
+    global CONFIG_DATAS
+
+    # Determine which output sounds were detected
+    output_sound = []
+    for index, key in enumerate(CONFIG_DATAS.keys()):
+        if prediction_rounded[index] == 1:
+            output_sound += [key]
+
+    # Format output sound variable to be string
+    output_sound = [format_label_name(x) for x in output_sound]
+    if len(output_sound) == 0:
+        output_sound = 'None'
+    else:
+        output_sound = ', '.join(output_sound)
+
+    return output_sound
+
+def get_prediction_bar_graph(filepath):
+    """
+    Generate dash bar graph object based off predictions
+    """
+    global CONFIG_DATAS
+
+    if not filepath.lower().endswith('.wav'):
+        # Not a wav file so nothing to return
+        return None
+
+    prediction_probs, prediction_rounded = get_predictions(filepath)
+
+    if prediction_probs is None:
+        # Something went wrong with predictions, so exit
+        return None
+
+    output_sound = get_formatted_detected_sounds(prediction_rounded)
+
+    return  prediction_probs, \
+            prediction_rounded, \
+            output_sound, \
+            dcc.Graph(id='example',
+                      figure={
+                          'data':[{'x':[format_label_name(x) for x in CONFIG_DATAS.keys()],
+                                   'y':["{0:.2f}".format(x) for x in prediction_probs],
+                                   'text':["{0:.2f}%".format(x) for x in prediction_probs],
+                                   'textposition':'auto',
+                                   'marker':{
+                                        'color':['rgba(26, 118, 255,0.8)', 'rgba(222,45,38,0.8)',
+                                                 'rgba(204,204,204,1)', 'rgba(0,150,0,0.8)',
+                                                 'rgba(204,204,204,1)', 'rgba(55, 128, 191, 0.7)']},
+                                   'type':'bar'}],
+                          'layout': {
+                              'title':'probabilistic prediction graph ',
+                              'titlefont':{
+                                  'family':'Courier New, monospace',
+                                  'size':22,
+                                  'color':'green'},
+
+                              'xaxis':{
+                                  'title': 'Labels of the sound',
+                                  'titlefont':{
+                                      'family':'Courier New, monospace',
+                                      'size':18,
+                                      'color':'green'}},
+                              'yaxis':{
+                                  'title': 'Percentage probabality',
+                                  'titlefont':{
+                                      'family':'Courier New, monospace',
+                                      'size':18,
+                                      'color':'green'}},
+                              'height':400,
+                              'paper_bgcolor':'rgba(0,0,0,0)',
+                              'plot_bgcolor':'rgba(0,0,0,0)',
+                              'font': {'color':'#7f7f7f'}}},
+                        style={'marginBottom': 20,
+                               'marginTop': 45,
+                               'color':'black'})
+
+
+def get_data_table_from_dataframe(dataframe):
+    """
+    Returns the predicted values as the dash data table
+    """
+
+    # format numeric data into string format
+    for column_name in dataframe.select_dtypes(include=[np.float]).columns:
+        dataframe[column_name] = dataframe[column_name].apply(lambda x: "{0:.2f}%".format(x))
+
+    return dash_table.DataTable(id='datatable-interactivity-predictions',
+                                columns=[{"name": format_label_name(i),
+                                          "id": i,
+                                          "deletable": True} for i in dataframe.columns],
+                                data=dataframe.to_dict("rows"),
+                                style_header={"fontWeight": "bold"},
+                                style_cell={'whiteSpace':'normal',
+                                            'maxWidth': '240px'},
+                                style_table={"maxHeight":"350px",
+                                             "overflowY":"scroll",
+                                             "overflowX":"auto"})
 
 def check_pre_requiste_files():
 
@@ -93,6 +262,34 @@ def check_pre_requiste_files():
         pickle.dump(files, file_obj)
     if not os.path.exists('uploaded_files_from_dash/'):
         os.makedirs('uploaded_files_from_dash/')
+
+
+
+#############################################################################
+                  # Sound Library Helper:
+            # Returns the data table based on the applied filters
+#############################################################################
+def call_for_data(dataframe,
+                  titleElementType,
+                  titleColorStyle,
+                  numPaddedLineBreaks=0,
+                  list_of_malformed=None):
+    """
+    Returns the data table based on the applied filters
+    """
+    if list_of_malformed:
+        list_of_malformed = ', '.join(list_of_malformed)
+    else:
+        list_of_malformed = "None"
+
+    return html.Div([titleElementType("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
+                                      style={"color":titleColorStyle,
+                                             "text-decoration":"underline"}),
+                     titleElementType("Error while prediction: " + list_of_malformed,
+                                      style={"color":"white"}),
+                     get_data_table_from_dataframe(dataframe)] + \
+                    [html.Br() for x in range(numPaddedLineBreaks)])
+
 
 
 ################################################################################
@@ -134,15 +331,15 @@ INDEX_PAGE = html.Div(children=[html.Div(children=[html.Div(children=[html.H1('W
                                                                       html.Div(children=[dcc.Link('Input audio file',
                                                                                                   href='/page-1',
                                                                                                   style={'fontSize': '100%',
+                                                                                                         'color': 'solid green',
                                                                                                          'border':'3px solid green',
-                                                                                                         'color': 'white',
                                                                                                          'text-decoration': 'none'}),
                                                                                          html.Br()]),
                                                                       html.Br(),
                                                                       dcc.Link('FTP status',
                                                                                href='/page-3',
                                                                                style={'fontSize': '100%',
-                                                                                      'color': 'white',
+                                                                                      'color': 'solid green',
                                                                                       'border':'3px solid green',
                                                                                       'position': 'relative',
                                                                                       'display':'inline',
@@ -153,12 +350,12 @@ INDEX_PAGE = html.Div(children=[html.Div(children=[html.Div(children=[html.H1('W
                                                                       dcc.Link('Sound Library',
                                                                                href='/page-4',
                                                                                style={'fontSize': '100%',
-                                                                                      'color': 'white',
+                                                                                      'color': 'solid green',
                                                                                       'border':'3px solid green',
                                                                                       'position': 'relative',
                                                                                       'text-decoration': 'none'}),
                                                                       html.Br()])]),
-                                html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ',
+                                html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2020 ',
                                             style={"position":"fixed",
                                                    "left":"0",
                                                    "bottom":"0",
@@ -229,7 +426,7 @@ PAGE_1_LAYOUT = html.Div(id='out-upload-data',
                                    html.Div(id='page1',
                                             children=[html.Br(),
                                                       html.Br()]),
-                                   html.Footer('\xc2\xa9'+' Copyright WildlyTech Inc. 2019 .',
+                                   html.Footer('\xc2\xa9'+' Copyright WildlyTech Inc. 2020 .',
                                                style={"position":"fixed",
                                                       "left":"0",
                                                       "bottom":"0",
@@ -248,128 +445,63 @@ def save_file(name, content):
         file_p.write(base64.b64decode(data))
 
 
+
 def parse_contents(contents, filename, date):
     """
     Read the file contents
     """
+
     # content_type, content_string = contents.split(',')
-    if filename[-3:] == 'wav' or 'WAV':
-        if not os.path.exists("uploaded_files_from_dash/"):
-            os.makedirs("uploaded_files_from_dash/")
-        save_file(filename, contents)
-        encoded_image_uploaded_file = 'uploaded_files_from_dash/'+ filename
-        encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read())
-        embeddings = generate_before_predict_dense.main('uploaded_files_from_dash/'+filename, 0, 0)
-        predictions_prob, predictions = generate_before_predict_dense.main('uploaded_files_from_dash/'+filename, 1, embeddings)
-        predictions_prob = [float(i) for i in predictions_prob[0]]
-        if predictions[0][0] == 1:
-            output_sound = 'Motor sound'
-        elif predictions[0][1] == 1:
-            output_sound = 'Explosion sound '
-        elif predictions[0][2] == 1:
-            output_sound = 'Human sound'
-        elif predictions[0][3] == 1:
-            output_sound = 'Nature sound'
-        elif predictions[0][4] == 1:
-            output_sound = 'Domestic animal sound'
-        elif predictions[0][5] == 1:
-            output_sound = 'Tools sound'
-        else:
-            output_sound = 'None of the above'
-        return  html.Div(style={'color': 'green', 'fontSize':14}, children=[
-            html.Audio(id='myaudio',
-                       src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
-                       controls=True),
-            html.H4('predictions rounded will be: '+ str(predictions[0])),
-            html.H4('Predictions seems to be '+ output_sound,
-                    style={'color':'green',
-                           'fontSize': 30,
-                           'textAlign':'center',
-                           'text-decoration':'underline'}),
-            dcc.Graph(id='example',
-                      figure={
-                          'data':[{'x':['Motor', 'Explosion', 'Human', 'Nature', 'Domestic', 'Tools'],
-                                   'y':[i*100 for i in predictions_prob], 'marker':{
-                                       'color':['rgba(26, 118, 255,0.8)', 'rgba(222,45,38,0.8)',
-                                                'rgba(204,204,204,1)', 'rgba(0,150,0,0.8)',
-                                                'rgba(204,204,204,1)', 'rgba(55, 128, 191, 0.7)']},
-                                   'type':'bar'}],
-                          'layout': {
-                              'title':'probablistic prediction graph ',
-                              'titlefont':{
-                                  'family':'Courier New, monospace',
-                                  'size':22,
-                                  'color':'green'},
 
-                              'xaxis':{
-                                  'title': 'Labels of the sound',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'green'}},
-                              'yaxis':{
-                                  'title': 'Percenatge probabality',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'green'}},
-                              'height':400,
-                              'paper_bgcolor':'rgba(0,0,0,0)',
-                              'plot_bgcolor':'rgba(0,0,0,0)',
-                              'font': {
-                                  'color':'#7f7f7f'}}},
-                      style={'marginBottom': 20,
-                             'marginTop': 45,
-                             'color':'black'}),
-            html.P('Uploaded File : '+ filename,
-                   style={'color': 'black',
-                          'fontSize': 12})])
+    directory_path = "uploaded_files_from_dash/"
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+    save_file(filename, contents)
+    filepath = directory_path + filename
+    encoded_image_uploaded_file = base64.b64encode(open(filepath, 'rb').read())
+
+    bar_graph_info = get_prediction_bar_graph(filepath)
+
+    if bar_graph_info is not None:
+        # unpack bar graph information
+        _, prediction_rounded, output_sound, bar_graph = bar_graph_info
+
+        return  html.Div(style={'color': 'green', 'fontSize':14},
+                         children=[ html.Audio(id='myaudio',
+                                               src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
+                                               controls=True),
+                                    html.H4('Predictions rounded will be: '+ str(prediction_rounded)),
+                                    html.H4('Prediction seems to be '+ output_sound,
+                                               style={'color':'green',
+                                                      'fontSize': 30,
+                                                      'textAlign':'center',
+                                                      'text-decoration':'underline'}),
+                                    bar_graph,
+                                    html.P('Uploaded File : '+ filename)] + [html.Br() for x in range(3)])
     else:
-        return html.Div([
-            html.Div(style={'color': 'blue', 'fontSize': 14}),
-            html.H5('Unkown file type',
-                    style={'marginBottom':20,
-                           'marginTop':45,
-                           'color': 'red',
-                           'fontSize':14}),
-            html.P('Uploaded File : '+filename, style={'color': 'black', 'fontSize': 12}),
-            html.P('Last Modified : '+ str(datetime.datetime.fromtimestamp(date)),
-                   style={'color':'black',
-                          'fontSize': 12}),
-        ])
 
-def call_for_data_offline(dataframe, list_of_malformed):
-    """
-    Returns the predicted values as the data table
-    """
-    return html.Div([
-        html.H4("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
-                style={"color":"white",
-                       'text-decoration':'underline'}),
-        html.H4("Error while prediciton: " + str(list_of_malformed), style={"color":"white"}),
-        dash_table.DataTable(id='datatable-interactivity-predictions',
-                             columns=[{"name": i,
-                                       "id": i,
-                                       "deletable": True} for i in dataframe.columns],
-                             data=dataframe.to_dict("rows"),
-                             filtering=True,
-                             sorting=True,
-                             # n_fixed_rows=1,
-                             style_cell={'width': '50px'},
-                             sorting_type="multi",
-                             row_selectable="single",
-                             style_table={"maxHeight":"400",
-                                          "overflowY":"scroll"},
-                             selected_rows=[]),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br()])
+        # Since the file is not a wav file or has problems, delete the file
+        os.remove(filepath)
+
+        return html.Div([
+                          html.Div(style={'color': 'blue', 'fontSize': 14}),
+                          html.H5('Unkown file type',
+                                  style={'marginBottom':20,
+                                         'marginTop':45,
+                                         'color': 'red',
+                                         'fontSize':14}),
+                          html.P('Uploaded File : '+filename),
+                          html.P('Last Modified : '+ str(datetime.datetime.fromtimestamp(date)),
+                                 style={'color':'black',
+                                        'fontSize': 12}),
+                        ] + [html.Br() for x in range(3)])
 
 def parse_contents_batch(contents, names, dates):
     """
     Multiple files that are uploaded are handled
     """
+    global CONFIG_DATAS
+
     emb = []
     malformed = []
     dum_df = pd.DataFrame()
@@ -386,7 +518,7 @@ def parse_contents_batch(contents, names, dates):
             # with open(path, 'wb') as file_obj:
             #     ftp.retrbinary('RETR '+ i, file_obj.write)
         try:
-            emb.append(generate_before_predict_dense.main(path, 0, 0))
+            emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
             os.remove(path)
         except ValueError:
             print "malformed index", dum_df.loc[dum_df["FileNames"] == i[1]].index
@@ -396,27 +528,34 @@ def parse_contents_batch(contents, names, dates):
           # continue
     dum_df['features'] = emb
     if len(dum_df["FileNames"].tolist()) == 1:
-        pred_prob, pred = generate_before_predict_dense.main(path, 1, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
+        prediction_probs, prediction_rounded = predictions_from_models(path, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
 
-        dum_df["Motor_probability"] = "{0:.2f}".format(pred_prob[0][0])
-        dum_df["Explosion_probability"] = "{0:.2f}".format(pred_prob[0][1])
-        dum_df["Human_probability"] = "{0:.2f}".format(pred_prob[0][2])
-        dum_df["Nature_probability"] = "{0:.2f}".format(pred_prob[0][3])
-        dum_df["Domestic_probability"] = "{0:.2f}".format(pred_prob[0][4])
-        dum_df["Tools_probability"] = "{0:.2f}".format(pred_prob[0][5])
-        return call_for_data_offline(dum_df[dum_df.drop("features", axis=1).columns], malformed)
+
+        pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+        pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
+
+        return call_for_data(pred_df,
+                             titleElementType=html.H4,
+                             titleColorStyle='white',
+                             numPaddedLineBreaks=4,
+                             list_of_malformed=malformed)
 
     elif len(dum_df["FileNames"] > 1):
-        pred_prob, pred = generate_before_predict_dense.main(path, 1, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
+        pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
 
-        dum_df["Motor_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 0].tolist()]
-        dum_df["Explosion_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 1].tolist()]
-        dum_df["Human_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 2].tolist()]
-        dum_df["Nature_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred, dum_df.shape[0]))[:, 3].tolist()]
-        dum_df["Domestic_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 4].tolist()]
-        dum_df["Tools_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 5].tolist()]
-        return call_for_data_offline(dum_df[dum_df.drop("features", axis=1).columns],
-                               malformed)
+        for index, each_file, each_embedding in zip(range(0, dum_df.shape[0]), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
+            try:
+                prediction_probs, prediction_rounded = predictions_from_models(path, each_embedding)
+
+                pred_df.loc[index] = [each_file] + prediction_probs
+            except:
+                pass
+
+        return call_for_data(pred_df,
+                             titleElementType=html.H4,
+                             titleColorStyle='white',
+                             numPaddedLineBreaks=4,
+                             list_of_malformed=malformed)
 
 
 # callback function for
@@ -444,103 +583,38 @@ def start_batch_run_ftp_live(path_for_folder):
     """
     Writes the predicted results  on to csvfile row wise
     """
+    global CONFIG_DATAS
+
     all_wav_files_path = glob.glob(path_for_folder+"*.WAV") + glob.glob(path_for_folder+"*.wav")
     all_wav_files = [each_file.split("/")[-1] for each_file in all_wav_files_path]
     print 'len:', len(all_wav_files)
     dum_df = pd.DataFrame()
     dum_df["FileNames"] = all_wav_files
     malformed_specific = []
-    tag_names = ["FileNames", "Motor_probability", "Explosion_probability",
-                 "Human_probability", "Nature_probability", "Domestic_probability",
-                 "Tools_probability"]
+    tag_names = ["FileNames"] + CONFIG_DATAS.keys()
 
 
     # Check if the csv file is already existing or not. If it is existing then append the result
     # to same csv file based on the downloaded file
-    if os.path.exists(CSV_FILENAME):
-        with open(CSV_FILENAME, "a") as file_object:
-            wav_information_object = csv.writer(file_object)
-            file_object.flush()
-            for each_file in dum_df['FileNames'].tolist():
-                try:
-                    emb = generate_before_predict_dense.main(path_for_folder+each_file, 0, 0)
-                except ValueError:
-                    print "malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index
-                    dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
-                    malformed_specific.append(each_file)
-                    continue
-
-                # Predict the result and save the result to the csv file
-                pred_prob, pred = generate_before_predict_dense.main(path_for_folder+each_file, 1, np.array(emb.flatten().tolist()))
-                motor_probability = "{0:.2f}".format(pred_prob[0][0])
-                explosion_probability = "{0:.2f}".format(pred_prob[0][1])
-                human_probability = "{0:.2f}".format(pred_prob[0][2])
-                nature_probabilty = "{0:.2f}".format(pred_prob[0][3])
-                domestic = "{0:.2f}".format(pred_prob[0][4])
-                tools = "{0:.2f}".format(pred_prob[0][5])
-                wav_information_object.writerow([each_file, motor_probability,
-                                                 explosion_probability, human_probability,
-                                                 nature_probabilty, domestic, tools])
-                file_object.flush()
+    csv_file_exists = os.path.exists(CSV_FILENAME)
 
     # Is there is no csv file then create one and write the result onto it.
-    else:
-        with open(CSV_FILENAME, "w") as file_object:
-            wav_information_object = csv.writer(file_object)
+    with open(CSV_FILENAME, "a" if csv_file_exists else "w") as file_object:
+        wav_information_object = csv.writer(file_object)
+
+        if not csv_file_exists:
             wav_information_object.writerow(tag_names)
+
+        file_object.flush()
+
+        # Loop over the files
+        for each_file in dum_df['FileNames'].tolist():
+
+            # Predict the result and save the result to the csv file
+            pred_prob, pred = get_predictions(path_for_folder+each_file)
+
+            wav_information_object.writerow([each_file] + ["{0:.2f}".format(x) for x in pred_prob])
             file_object.flush()
-
-            # Loop over the files
-            for each_file in dum_df['FileNames'].tolist():
-                try:
-                    emb = generate_before_predict_dense.main(path_for_folder+each_file, 0, 0)
-                except ValueError:
-                    print "malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index
-                    dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
-                    malformed_specific.append(each_file)
-                    continue
-
-                pred_prob, pred = generate_before_predict_dense.main(path_for_folder+each_file, 1, np.array(emb.flatten().tolist()))
-                motor_probability = "{0:.2f}".format(pred_prob[0][0])
-                explosion_probability = "{0:.2f}".format(pred_prob[0][1])
-                human_probability = "{0:.2f}".format(pred_prob[0][2])
-                nature_probabilty = "{0:.2f}".format(pred_prob[0][3])
-                domestic = "{0:.2f}".format(pred_prob[0][4])
-                tools = "{0:.2f}".format(pred_prob[0][5])
-                wav_information_object.writerow([each_file, motor_probability,
-                                                 explosion_probability, human_probability,
-                                                 nature_probabilty, domestic, tools])
-                file_object.flush()
-
-def call_for_data_to_display(dataframe, list_of_malformed):
-    """
-    Returns the predicted values as the data table
-    """
-    return html.Div([
-        html.H4("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
-                style={"color":"white",
-                       'text-decoration':'underline'}),
-        html.H4("Error while prediciton: " + str(list_of_malformed), style={"color":"white"}),
-        dash_table.DataTable(id='datatable-interactivity-predictions',
-                             columns=[{"name": i,
-                                       "id": i,
-                                       "deletable": True} for i in dataframe.columns],
-                             data=dataframe.to_dict("rows"),
-                             filtering=True,
-                             sorting=True,
-                             # n_fixed_rows=1,
-                             style_cell={'width': '50px'},
-                             sorting_type="multi",
-                             row_selectable="single",
-                             style_table={"maxHeight":"700",
-                                          "overflowY":"scroll"},
-                             selected_rows=[]),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br()])
-
-
 
 #####################################################################################################
                       #1A UPLOAD PAGE : Reloading for Folder file results#
@@ -559,8 +633,11 @@ def display_reloading_csv(n_intervals):
     Reads csv file after every interval and displays the results
     """
     dataframe = pd.read_csv(CSV_FILENAME)
-    return call_for_data_to_display(dataframe, [])
 
+    return call_for_data(dataframe,
+                         titleElementType=html.H4,
+                         titleColorStyle='white',
+                         numPaddedLineBreaks=4)
 
 @app.callback(Output('button1', 'style'),
               [Input('button1', 'n_clicks')])
@@ -642,7 +719,7 @@ PAGE_2_LAYOUT = html.Div(id='Wildly listen', children=[
                     'marginTop': 45,
                     'text-decoration':'none',
                     'fontSize': 14}),
-    html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ',
+    html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2020 ',
                 style={"position":"fixed",
                        "left":"0",
                        "bottom":"0",
@@ -689,15 +766,14 @@ def check_for_wav_only(list_values):
     return wav_files
 
 
-
-
 def call_for_ftp():
     """
     Connect to FTP and display all the wav files present in directory
     """
     global ftp
+    print "Connecting to FTP..."
     ftp = FTP(FTP_HOST_NAME, user=FTP_USER_NAME, passwd=FTP_PASSWORD)
-    print "connected to FTP"
+    print "Connected to FTP!"
     ftp.cwd(TARGET_FTP_FOLDER)
     ex = ftp.nlst()
     wav_files_only = check_for_wav_only(ex)
@@ -705,37 +781,6 @@ def call_for_ftp():
     dataframe["FileNames"] = wav_files_only
     dataframe = dataframe.sort_values(["FileNames"], ascending=[1])
     return dataframe
-
-def call_for_data_1(dataframe):
-    """
-    Returns the data table consiting of all the wav files onto the webpage
-    """
-    return html.Div([
-        html.H4("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
-                style={"color":"green",
-                       'text-decoration':'underline'}),
-        dash_table.DataTable(id='datatable-interactivity',
-                             columns=[{"name": i,
-                                       "id": i,
-                                       "deletable": True} for i in dataframe.columns],
-                             data=dataframe.to_dict("rows"),
-                             filtering=True,
-                             sorting=True,
-                             # n_fixed_rows=1,
-                             style_cell={'width': '50px'},
-                             sorting_type="multi",
-                             row_selectable="multi",
-                             style_cell_conditional=[{'if': {'column_id': 'FileNames'},
-                                                      'width': '50%'}],
-                             style_table={"maxHeight":"400",
-                                          "overflowY":"scroll"},
-                             selected_rows=[]),
-        html.Br(),
-        html.Br()])
-
-
-
-
 
 ###############################################################################
                    # FTP STATUS PAGE : Layout and callbacks
@@ -767,7 +812,10 @@ def ftp_data_display(n_clicks):
     """
     if n_clicks >= 1:
         dataframe = call_for_ftp()
-        return call_for_data_1(dataframe)
+        return call_for_data(dataframe,
+                             titleElementType=html.H4,
+                             titleColorStyle='green',
+                             numPaddedLineBreaks=2)
 
 
 ###############################################################################
@@ -788,37 +836,6 @@ def display_output(rows, columns, indices):
         df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
         df = df.iloc[indices]
         return html.Div([html.Button('Input Batch to Model', id='button_batch')])
-
-
-
-def call_for_data_2(dataframe, list_of_malformed):
-    """
-    Returns the predicted values as the data table
-    """
-    return html.Div([
-        html.H4("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
-                style={"color":"white",
-                       'text-decoration':'underline'}),
-        html.H4("Error while prediciton: " + str(list_of_malformed),
-                style={"color":"white"}),
-        dash_table.DataTable(id='datatable-interactivity-predictions',
-                             columns=[{"name": i,
-                                       "id": i,
-                                       "deletable": True} for i in dataframe.columns],
-                             data=dataframe.to_dict("rows"),
-                             filtering=True,
-                             sorting=True,
-                             # n_fixed_rows=1,
-                             style_cell={'width': '50px'},
-                             sorting_type="multi",
-                             row_selectable="single",
-                             style_table={"maxHeight":"400",
-                                          "overflowY":"scroll"},
-                             selected_rows=[]),
-        html.Br(),
-        html.Br(),
-        html.Br(),
-        html.Br()])
 
 
 
@@ -886,6 +903,8 @@ def batch_downloading_and_predict(n_clicks):
     """
     Downloading the selected batch of files and processing them to model
     """
+    global CONFIG_DATAS
+
     if n_clicks >= 1:
         emb = []
         malformed = []
@@ -901,7 +920,7 @@ def batch_downloading_and_predict(n_clicks):
                 with open(path, 'wb') as file_obj:
                     ftp.retrbinary('RETR '+ i, file_obj.write)
             try:
-                emb.append(generate_before_predict_dense.main(path, 0, 0))
+                emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
             except ValueError:
                 print "malformed index", dum_df.loc[dum_df["FileNames"] == i].index
                 dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == i].index)
@@ -910,27 +929,34 @@ def batch_downloading_and_predict(n_clicks):
               # continue
         dum_df['features'] = emb
         if len(dum_df["FileNames"].tolist()) == 1:
-            pred_prob, pred = generate_before_predict_dense.main(path, 1, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
+            prediction_probs, prediction_rounded = predictions_from_models(path, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
 
-            dum_df["Motor_probability"] = "{0:.2f}".format(pred_prob[0][0])
-            dum_df["Explosion_probability"] = "{0:.2f}".format(pred_prob[0][1])
-            dum_df["Human_probability"] = "{0:.2f}".format(pred_prob[0][2])
-            dum_df["Nature_probability"] = "{0:.2f}".format(pred_prob[0][3])
-            dum_df["Domestic_probability"] = "{0:.2f}".format(pred_prob[0][4])
-            dum_df["Tools_probability"] = "{0:.2f}".format(pred_prob[0][5])
-            return call_for_data_2(dum_df[dum_df.drop("features", axis=1).columns], malformed)
+
+            pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+            pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
+
+            return call_for_data(pred_df,
+                                 titleElementType=html.H4,
+                                 titleColorStyle='white',
+                                 numPaddedLineBreaks=4,
+                                 list_of_malformed=malformed)
 
         elif len(dum_df["FileNames"] > 1):
-            pred_prob, pred = generate_before_predict_dense.main(path, 1, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
+            pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
 
-            dum_df["Motor_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 0].tolist()]
-            dum_df["Explosion_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 1].tolist()]
-            dum_df["Human_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 2].tolist()]
-            dum_df["Nature_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred, dum_df.shape[0]))[:, 3].tolist()]
-            dum_df["Domestic_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 4].tolist()]
-            dum_df["Tools_probability"] = ["{0:.2f}".format(i) for i in np.array(np.split(pred_prob, dum_df.shape[0]))[:, 5].tolist()]
-            return call_for_data_2(dum_df[dum_df.drop("features", axis=1).columns],
-                                   malformed)
+            for index, each_file, each_embedding in zip(range(0, dum_df.shape[0]), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
+                try:
+                    prediction_probs, prediction_rounded = predictions_from_models(path, each_embedding)
+
+                    pred_df.loc[index] = [each_file] + prediction_probs
+                except:
+                    pass
+
+            return call_for_data(pred_df,
+                                 titleElementType=html.H4,
+                                 titleColorStyle='white',
+                                 numPaddedLineBreaks=4,
+                                 list_of_malformed=malformed)
 
         else:
             return html.Div([html.H3("Something went Wrong, Try again",
@@ -947,148 +973,6 @@ def batch_downloading_and_predict(n_clicks):
                     # SOUND LIBRARY - Requires MongoDB server
 ################################################################################
 
-
-EXPLOSION_SOUNDS = [
-    'Fireworks',
-    'Burst, pop',
-    'Eruption',
-    'Gunshot, gunfire',
-    'Explosion',
-    'Boom',
-    'Fire'
-]
-
-MOTOR_SOUNDS = [
-    'Chainsaw',
-    'Medium engine (mid frequency)',
-    'Light engine (high frequency)',
-    'Heavy engine (low frequency)',
-    'Engine starting',
-    'Engine',
-    'Motor vehicle (road)',
-    'Vehicle'
-]
-
-WOOD_SOUNDS = [
-    'Wood',
-    'Chop',
-    'Splinter',
-    'Crack'
-]
-
-HUMAN_SOUNDS = [
-    'Chatter',
-    'Conversation',
-    'Speech',
-    'Narration, monologue',
-    'Babbling',
-    'Whispering',
-    'Laughter',
-    'Chatter',
-    'Crowd',
-    'Hubbub, speech noise, speech babble',
-    'Children playing',
-    'Whack, thwack',
-    'Smash, crash',
-    'Breaking',
-    'Crushing',
-    'Tearing',
-    'Run',
-    'Walk, footsteps',
-    'Clapping'
-
-]
-
-
-DOMESTIC_SOUNDS = [
-    'Dog',
-    'Bark',
-    'Howl',
-    'Bow-wow',
-    'Growling',
-    'Bay',
-    'Livestock, farm animals, working animals',
-    'Yip',
-    'Cattle, bovinae',
-    'Moo',
-    'Cowbell',
-    'Goat',
-    'Bleat',
-    'Sheep',
-    'Squawk',
-    'Domestic animals, pets'
-
-]
-
-
-TOOLS_SOUNDS = [
-    'Jackhammer',
-    'Sawing',
-    'Tools',
-    'Hammer',
-    'Filing (rasp)',
-    'Sanding',
-    'Power tool'
-]
-
-
-WILD_ANIMALS = [
-    'Roaring cats (lions, tigers)',
-    'Roar',
-    'Bird',
-    'Bird vocalization, bird call, bird song',
-    'Squawk',
-    'Pigeon, dove',
-    'Chirp, tweet',
-    'Coo',
-    'Crow',
-    'Caw',
-    'Owl',
-    'Hoot',
-    'Gull, seagull',
-    'Bird flight, flapping wings',
-    'Canidae, dogs, wolves',
-    'Rodents, rats, mice',
-    'Mouse',
-    'Chipmunk',
-    'Patter',
-    'Insect',
-    'Cricket',
-    'Mosquito',
-    'Fly, housefly',
-    'Buzz',
-    'Bee, wasp, etc.',
-    'Frog',
-    'Croak',
-    'Snake',
-    'Rattle'
-]
-
-NATURE_SOUNDS = [
-    "Silence",
-    "Stream",
-    "Wind noise (microphone)",
-    "Wind",
-    "Rustling leaves",
-    "Howl",
-    "Raindrop",
-    "Rain on surface",
-    "Rain",
-    "Thunderstorm",
-    "Thunder",
-    'Crow',
-    'Caw',
-    'Bird',
-    'Bird vocalization, bird call, bird song',
-    'Chirp, tweet',
-    'Owl',
-    'Hoot'
-
-]
-
-
-TOTAL_LABELS = EXPLOSION_SOUNDS + NATURE_SOUNDS + MOTOR_SOUNDS + \
-               HUMAN_SOUNDS + NATURE_SOUNDS  + DOMESTIC_SOUNDS + TOOLS_SOUNDS + WOOD_SOUNDS
 CLIENT = MongoClient('localhost', 27017)
 DATA_BASE = CLIENT.audio_library
 
@@ -1108,20 +992,14 @@ PAGE_4_LAYOUT = html.Div([
             style={"color":"green",
                    'text-decoration':'underline'}),
     dcc.Dropdown(id="select-class",
-                 options=[{"label":"Explosion", "value":"explosion_collection"},
-                          {"label":"Motor Vehicle", "value":"motor_collection"},
-                          {"label":"Human", "value":"human_collection"},
-                          {"label":"Nature / Ambient", "value":"nature_collection"},
-                          {"label":"Domestic animals", "value":"dom_collection"},
-                          {"label":"Tools", "value":"tool_collection"},
-                          {"label":"Wood", "value":"wood_collection"}],
+                 options=[{"label":i, "value":i} for i in CONFIG_DATAS.keys()],
                  multi=False,
                  placeholder="Search for Audio Category"),
     html.Div(id='output_dropdown'),
     html.Div(id='output_data'),
     html.Div(id="datatable-interactivity-container-2"),
     html.Div(id="page-4-content-2"),
-    html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ',
+    html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2020 ',
                 style={"position":"fixed",
                        "left":"0",
                        "bottom":"0",
@@ -1144,7 +1022,7 @@ def call_for_labels(data):
     """
     labels = []
     for label in list(set(np.concatenate(data["labels_name"].values.tolist()))):
-        if label in TOTAL_LABELS:
+        if label in CONFIG_DATAS.keys():
             labels.append({"label":str(label), "value":str(label)})
     return labels
 
@@ -1162,9 +1040,9 @@ def select_class(value):
     """
     print value
     final_d = []
-    global collection
-    collection = DATA_BASE[str(value)]
-    for labels in collection.find({}, {"labels_name":1}):
+    global COLLECTION
+    COLLECTION = DATA_BASE[str(value)]
+    for labels in COLLECTION.find({}, {"labels_name":1}):
         final_d.append(labels)
     data = pd.DataFrame(final_d)
     labels = call_for_labels(data)
@@ -1177,33 +1055,6 @@ def select_class(value):
                      multi=True,
                      # value=labels[0]["value"],
                      placeholder="Search for Label")])
-
-
-
-#############################################################################
-                  # Sound Library Helper:
-            # Returns the data table based on the applied filters
-#############################################################################
-def call_for_data(dataframe):
-    """
-    Returns the data table based on the applied filters
-    """
-    return html.Div([
-        html.P("Total Number of Audio Clips : "+ str(dataframe.shape[0]), style={"color":"green"}),
-        dash_table.DataTable(id='datatable-interactivity',
-                             columns=[{"name": i,
-                                       "id": i,
-                                       "deletable": True} for i in dataframe.columns],
-                             data=dataframe.to_dict("rows"),
-                             n_fixed_rows=1,
-                             style_cell={'width':'50px'},
-                             filtering=True,
-                             sorting=True,
-                             sorting_type="multi",
-                             row_selectable="single",
-                             selected_rows=[],
-                             style_cell_conditional=[{'if': {'column_id': 'FileNames'},
-                                                      'width': '75%'}])])
 
 
 
@@ -1260,7 +1111,7 @@ def generate_layout(value):
     else:
         if len(value) == 1:
             final_d = []
-            for each_name in collection.find({"labels_name":str(value[0])}):
+            for each_name in COLLECTION.find({"labels_name":str(value[0])}):
                 final_d.append(each_name)
             try:
                 data_frame = pd.DataFrame(final_d).drop(["positive_labels", "len"],
@@ -1273,10 +1124,10 @@ def generate_layout(value):
                                                     "start_seconds",
                                                     "end_seconds",
                                                     "labels_name"]].astype(str)
-            return call_for_data(data_frame)
+            return call_for_data(data_frame, titleElementType=html.P, titleColorStyle='green')
         elif len(value) == 2:
             final_d = []
-            for each_name in collection.find({"$and":[{"labels_name":str(value[0])},
+            for each_name in COLLECTION.find({"$and":[{"labels_name":str(value[0])},
                                                       {"labels_name":str(value[1])}]}):
                 final_d.append(each_name)
             try:
@@ -1290,7 +1141,7 @@ def generate_layout(value):
                                                     "start_seconds",
                                                     "end_seconds",
                                                     "labels_name"]].astype(str)
-            return call_for_data(data_frame)
+            return call_for_data(data_frame, titleElementType=html.P, titleColorStyle='green')
         else:
             return html.H5("Select Less number of Filter labels", style={"color":"green"})
 
@@ -1315,7 +1166,7 @@ def display_output_from_data(rows, columns, indices):
                         children=[html.P("Select Any audio ",
                                          style={"color":"green"})])
     else:
-        global input_name
+        global INPUT_NAME
         path = subprocess.Popen("find /media/wildly/1TB-HDD/ -name "+\
                              df_inner.iloc[indices]["YTID"].astype(str)+"-"+\
                              df_inner.iloc[indices]["start_seconds"].astype(str)+"-"+\
@@ -1327,7 +1178,7 @@ def display_output_from_data(rows, columns, indices):
         print "path ", path.split("\n")
         encoded_image_from_path = base64.b64encode(open(path, 'rb').read())
         print "len of indices ", len(indices)
-        input_name = path
+        INPUT_NAME = path
         return html.Div(style={"padding-bottom":"10%"}, children=[
             html.Br(),
             html.Br(),
@@ -1350,67 +1201,32 @@ def predict_on_downloaded_file(n_clicks):
     """
     actual predictions takes place here
     """
-    print input_name
+    global INPUT_NAME
+    print INPUT_NAME
+
     if n_clicks >= 1:
-        if input_name[-3:] == 'wav' or 'WAV':
-            get_emb = generate_before_predict_dense.main(input_name, 0, 0)
-            predictions_prob, predictions = generate_before_predict_dense.main(input_name, 1,
-                                                                               get_emb)
-            predictions_prob = [float(i) for i in predictions_prob]
-            if predictions[0] == 1:
-                output_sound = 'Motor sound'
-            elif predictions[1] == 1:
-                output_sound = 'Explosion sound '
-            elif predictions[2] == 1:
-                output_sound = 'Human sound'
-            elif predictions[3] == 1:
-                output_sound = 'Nature sound'
-            elif predictions[4] == 1:
-                output_sound = 'Domestic animal sound'
-            elif predictions[5] == 1:
-                output_sound = 'Tools sound'
-            else:
-                output_sound = 'None of the above'
+        bar_graph_info = get_prediction_bar_graph(INPUT_NAME)
+
+        if bar_graph_info is not None:
+
+            # unpack bar graph information
+            prediction_probs, prediction_rounded, output_sound, bar_graph = bar_graph_info
+
+            filename = INPUT_NAME.split("/")[-1]
+
             return  html.Div(style={'color': 'green',
                                     'fontSize': 14,
                                     "padding-top":"-50%",
                                     "padding-bottom":"10px"},
-                             children=[html.H4('predictions for: '+input_name.split("/")[-1]),
-                                       html.H4('predictions rounded will be: '+ str(predictions)),
-                                       html.H4('Predictions seems to be '+ output_sound,
+                             children=[html.H4('predictions for: ' + filename),
+                                       html.H4('Predictions rounded will be: '+ str(prediction_rounded)),
+                                       html.H4('Prediction seems to be '+ output_sound,
                                                style={'color': 'green',
                                                       'fontSize': 30,
                                                       'textAlign': 'center',
                                                       'text-decoration':'underline'}),
-                                       dcc.Graph(id='example',
-                                                 figure={'data':[{'x':['Motor',
-                                                                       'Explosion',
-                                                                       'Human',
-                                                                       'Nature',
-                                                                       'Domestic',
-                                                                       'Tools'],
-                                                                  'y':[i*100 for i in predictions_prob],
-                                                                  'marker':{'color':['rgba(26, 118, 255,0.8)', 'rgba(222,45,38,0.8)',
-                                                                                     'rgba(204,204,204,1)', 'rgba(0,150,0,0.8)',
-                                                                                     'rgba(204,204,204,1)', 'rgba(55, 128, 191, 0.7)']},
-                                                                  'type':'bar'}],
-                                                         'layout': {'title':'probablistic prediction graph ',
-                                                                    'titlefont':{'family':'Courier New, monospace',
-                                                                                 'size':22,
-                                                                                 'color':'green'},
-
-                                                                    'xaxis':{'title': 'Labels of the sound',
-                                                                             'titlefont':{'family':'Courier New, monospace',
-                                                                                          'size':18,
-                                                                                          'color':'green'}},
-                                                                    'yaxis':{'title':'Percenatge probabality',
-                                                                             'titlefont':{'family':'Courier New, monospace',
-                                                                                          'size':18,
-                                                                                          'color':'green'}},
-                                                                    'height':400,
-                                                                    'paper_bgcolor':'rgba(0,0,0,0)',
-                                                                    'plot_bgcolor':'rgba(0,0,0,0)',
-                                                                    'font': {'color':'#7f7f7f'}}})])
+                                       bar_graph,
+                                       html.P('Uploaded File : '+ filename)] + [html.Br() for x in range(3)])
 
 
 

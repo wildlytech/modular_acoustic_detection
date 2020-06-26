@@ -1,22 +1,28 @@
 """
 Audio Annotation Tool
 """
-import os
-import base64
-import glob
-import csv
+import argparse
 import ast
-from scipy.io import wavfile
-import numpy as np
+import base64
+import csv
 import dash
 import dash.dependencies
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
-import pandas as pd
 import dash_table
+import glob
 import matplotlib.pyplot as plt
-import generate_before_predict_BR
+import numpy as np
+import os
+import pandas as pd
+from scipy.io import wavfile
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + "/../../")
+from predictions.binary_relevance_model import generate_before_predict_BR,\
+                                               get_results_binary_relevance,\
+                                               predict_on_wavfile_binary_relevance
 
 
 ##########################################################################################
@@ -25,6 +31,7 @@ import generate_before_predict_BR
 app = dash.Dash()
 app.config.suppress_callback_exceptions = True
 FILE_COUNT = 0
+CONFIG_DATAS = {}
 CSV_FILENAME = "New_annotation.csv"
 CHECKLIST_DISPLAY = ["Bird", "Wind", "Vehicle", "Honking", "Conversation"]
 
@@ -50,18 +57,18 @@ app.layout = html.Div([html.Div([html.H1("Audio Annotation",
                        html.Div(dcc.Textarea(id="name_area",
                                              placeholder="User Name"),
                                 style={"margin-top":"10px", "margin-left":"45%"}),
-    		               html.Div(id='previous_next_button_display'),
-    		               html.Div(id='initial_content_display'),
-            		       html.Div(id='next_button_content_display'),
+                       html.Div(id='previous_next_button_display'),
+                       html.Div(id='initial_content_display'),
+                       html.Div(id='next_button_content_display'),
                        html.Div(id="intial_tab_content"),
                        html.Div(id="next_tab_content"),
-            		       html.Div(id='previous_button_content_display'),
-            		       html.Div(id="play_audio"),
+                       html.Div(id='previous_button_content_display'),
+                       html.Div(id="play_audio"),
                        html.Div(id="play_audio1"),
-            		       html.Br(),
-            		       html.Div(children=[html.Button("Start Annotation", id='button')],
+                       html.Br(),
+                       html.Div(children=[html.Button("Start Annotation", id='button')],
                               style={"margin-left":"45%", "margin-top":"20px"}),
-              		     html.Br(),
+                       html.Br(),
                        html.Div(id="initial_submission"),
                        html.Div(id="next_submission"),
                        html.Div(id="prediction-audio"),
@@ -88,7 +95,7 @@ def previous_next_button_content(n_clicks):
     """
     Previous and Next Audio click buttons
     """
-    if n_clicks >= 1:        
+    if n_clicks >= 1:
         return html.Div(children=[html.Br(),
                                   html.Div(children=[html.Button("Previous Audio",
                                                                  value="previous",
@@ -97,7 +104,7 @@ def previous_next_button_content(n_clicks):
                                            style={"margin-left":'8%',
                                                   "width":"65%",
                                                   'display': 'inline-block'}),
-        						                    html.Div(children=[html.Button("Next Audio",
+                                        html.Div(children=[html.Button("Next Audio",
                                                                  value="next",
                                                                  id='next_button',
                                                                  style={"width" : "200px"})],
@@ -127,8 +134,199 @@ TAB_SELECTED_STYLE = {
     'padding': '6px'
 }
 
+def model_prediction_tab():
 
+    global NUMBER_OF_WAVFILES, FILE_COUNT, CONFIG_DATAS
 
+    encoded_image_uploaded_file = NUMBER_OF_WAVFILES[FILE_COUNT]
+    encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read())
+    embeddings = generate_before_predict_BR.main(NUMBER_OF_WAVFILES[FILE_COUNT], 0, 0, 0)
+
+    ##############################################################################
+            # Get label names
+    ##############################################################################
+    label_names = CONFIG_DATAS.keys()
+
+    ##############################################################################
+          # Implementing using the keras usual training techinque
+    ##############################################################################
+
+    prediction_probs, prediction_rounded = \
+            predict_on_wavfile_binary_relevance.predict_on_embedding(\
+                                                embedding = embeddings,
+                                                label_names = label_names,
+                                                config_datas = CONFIG_DATAS)
+
+    output_sound = []
+    for label_name, pred_round in zip(label_names, prediction_rounded):
+        if pred_round == 1:
+            output_sound += [label_name]
+
+    if len(output_sound) == 1:
+        output_sound = output_sound[0]
+    elif len(output_sound) == 0:
+        output_sound = 'None of the below'
+    else:
+        output_sound = str(output_sound)
+
+    return  html.Div(style={'color': 'green', 'fontSize':14}, children=[
+        html.Audio(id='myaudio',
+                   src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
+                   controls=True,
+                   style={"margin-top":"20px"}),
+        html.H4('Predictions rounded will be: '+ str(prediction_rounded)),
+        dcc.Graph(id='example',
+                  figure={
+                      'data':[{'x':label_names,
+                               'y':prediction_probs, 'marker':{
+                                   'color':'rgb(158,202,225)'},
+                               'type':'bar',
+                               "text":["{0:.2f}%".format(i) for i in prediction_probs],
+                               "textposition" : 'auto',}],
+                      'layout': {
+                          'title':'probabilistic prediction graph ',
+                          'titlefont':{
+                              'family':'Courier New, monospace',
+                              'size':22,
+                              'color':'green'},
+                          'xaxis':{
+                              'title': 'Labels of the sound',
+                              'titlefont':{
+                                  'family':'Courier New, monospace',
+                                  'size':18,
+                                  'color':'green'}},
+                          'yaxis':{
+                              'title': 'Percentage probabality',
+                              'titlefont':{
+                                  'family':'Courier New, monospace',
+                                  'size':18,
+                                  'color':'green'}},
+                          'height':400,
+                          'font': {
+                              'color':'#7f7f7f'}}},
+                  style={'marginBottom': 20,
+                         'marginTop': 45,
+                         'color':'black'}),
+        html.P('Selected File : '+ NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
+               style={'color': 'white',
+                      'fontSize': 15})])
+
+def spectrogram_tab():
+
+    global NUMBER_OF_WAVFILES, FILE_COUNT
+
+    sample_rate, samples = wavfile.read(NUMBER_OF_WAVFILES[FILE_COUNT])
+    try:
+        if samples.shape[1] == 2:
+            samples = np.array([i[0] for i in samples])
+    except:
+        samples = samples
+    plt.specgram(samples[:],
+                 Fs=sample_rate,
+                 xextent=(0, int(len(samples)/sample_rate)),
+                 mode="psd",
+                 cmap=plt.get_cmap('hsv'),
+                 noverlap=5,
+                 scale_by_freq=True)
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.savefig(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
+    encoded_image = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png", 'rb').read())
+    os.remove(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
+
+    return html.Div([html.Img(src='data:image/png;base64,{}'.format(encoded_image))],
+                    style={"margin-top":"10%",
+                           "text-align":"center"})
+
+def annotation_tab(initial):
+    try:
+        global FILE_COUNT, LABELS_LIST_DROPDOWN_NEXT, NUMBER_OF_WAVFILES, LABELS_LIST_CHECKLIST_NEXT, LABELS_LIST_DROPDOWN_INITIAL
+        LABELS_LIST_DROPDOWN_NEXT = []
+        LABELS_LIST_CHECKLIST_NEXT = []
+        LABELS_LIST_DROPDOWN_INITIAL = []
+
+        if initial:
+            FILE_COUNT = 0
+            TOTAL_FOLDER_WAV_FILES = glob.glob(TEXT_PATH+"/*.wav")
+            if os.path.exists(CSV_FILENAME):
+                annotated_files = pd.read_csv(CSV_FILENAME, error_bad_lines=False)
+                annotated_files = annotated_files['wav_file'].values.tolist()
+                NUMBER_OF_WAVFILES = []
+                for i in TOTAL_FOLDER_WAV_FILES:
+                    if i.split("/")[-1] not in annotated_files:
+                        # print(i)
+                        NUMBER_OF_WAVFILES.append(i)
+                print len(NUMBER_OF_WAVFILES)
+            else:
+                NUMBER_OF_WAVFILES = TOTAL_FOLDER_WAV_FILES
+            print "total wavfiles :", len(NUMBER_OF_WAVFILES)
+
+        encoded_image_to_play = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT], 'rb').read())
+        dataframe = pd.DataFrame()
+        dataframe["Labels Name"] = CHECKLIST_DISPLAY
+        return html.Div([html.Div([html.Br(),
+                                   html.H2(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
+                                           style={"text-align":"center",
+                                                  "color":"green",
+                                                  'text-decoration':'underline'}),
+                                   html.Audio(id='myaudio',
+                                              src='data:audio/WAV;base64,{}'.format(encoded_image_to_play),
+                                              controls=True,
+                                              style={"margin-top":"20px",
+                                                     "verticalAlign":"middle",
+                                                     "margin-bottom":"30px"})]),
+                         dash_table.DataTable(id='datatable-interactivity-' + ('inside' if initial else 'next'),
+                                              columns=[{"name": i,
+                                                        "id": i,
+                                                        "deletable": True} for i in dataframe.columns],
+                                              data=dataframe.to_dict("rows"),
+                                              row_selectable="multi",
+                                              style_table={"maxHeight":"300px",
+                                                           "maxWidth" :"300px",
+                                                           "overflowY":"scroll"},
+                                              selected_rows=[]),
+                         dcc.Dropdown(id="dropdown_data_" + ("initial" if initial else "next"),
+                                      options=[{'label': 'Nature ', 'value': 'Nature'},
+                                               {'label': 'Birds Chirping ', 'value': 'Bird'},
+                                               {'label': 'Wind Gushing', 'value': 'Wind'},
+                                               {'label': 'Vehicle  ', 'value': 'Vehicle'},
+                                               {'label': 'Honking  ', 'value': 'Honking'},
+                                               {'label': 'Conversation  ', 'value': 'Conversation'},
+                                               {'label': 'Dog Barking  ', 'value': 'Dog Barking'},
+                                               {'label': 'Tools  ', 'value': 'Tools'},
+                                               {'label': 'Axe  ', 'value': 'Axe'}],
+                                      value="",
+                                      placeholder="Search For Label..",
+                                      style={"fontSize":"17",
+                                             "margin-top": ("20" if initial else "40") + "px",
+                                             "display":"inline-block",
+                                             "font":"bold",
+                                             "width":"40%"}),
+                         dcc.Textarea(id="text_area_" + ("inside" if initial else "next"),
+                                      placeholder='Selected Annotation',
+                                      value="",
+                                      style={"width":"50%",
+                                             "margin-left":"25%",
+                                             "fontSize":"16",
+                                             "text-align":"center"}),
+                         html.Div([html.Button("Submit",
+                                               id="submit_" + ("initial" if initial else "next"),
+                                               style={"width":"200px",
+                                                      "margin-top":"10px"})],
+                                  style={"text-align":"center"}),
+                         html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ',
+                                     style={"position":"fixed",
+                                            "left":"0",
+                                            "bottom":"0",
+                                            "height":"2%",
+                                            "width":"100%",
+                                            "background-color":"black",
+                                            "color":"white",
+                                            "padding":"20px",
+                                            "textAlign":"center"})])
+    except ValueError:
+        return html.Div([html.H5("Something wrong with Audio: -"+ NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
+                                 style={"display":"center"})])
 
 
 ##########################################################################################
@@ -137,7 +335,7 @@ TAB_SELECTED_STYLE = {
 
 @app.callback(Output('next_button_content_display', 'children'),
               [Input('next_button', "n_clicks")])
-def next_audio_content(n_clicks):	
+def next_audio_content(n_clicks):
     """
     Display the TABS for selection with default Value
     """
@@ -175,185 +373,11 @@ def next_content_tab(value):
   Displaying HTML page as per the TABS selection
   """
   if value == "annotation-tab":
-        try:
-            global FILE_COUNT, LABELS_LIST_DROPDOWN_NEXT, NUMBER_OF_WAVFILES, LABELS_LIST_CHECKLIST_NEXT, LABELS_LIST_DROPDOWN_INITIAL
-            LABELS_LIST_DROPDOWN_NEXT = []
-            LABELS_LIST_CHECKLIST_NEXT = []
-            LABELS_LIST_DROPDOWN_INITIAL = []
-            encoded_image_to_play = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT], 'rb').read())
-            dataframe = pd.DataFrame()
-            dataframe["Labels Name"] = CHECKLIST_DISPLAY
-            return html.Div([html.Div([html.Br(),
-                                       html.H2(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
-                                               style={"text-align":"center",
-                                                      "color":"green",
-                                                      'text-decoration':'underline'}),
-                                       html.Audio(id='myaudio',
-                                                  src='data:audio/WAV;base64,{}'.format(encoded_image_to_play),
-                                                  controls=True,
-                                                  style={"margin-top":"20px",
-                                                         "verticalAlign":"middle",
-                                                         "margin-bottom":"30px"})]),
-                             dash_table.DataTable(id='datatable-interactivity-next',
-                                                  columns=[{"name": i,
-                                                            "id": i,
-                                                            "deletable": True} for i in dataframe.columns],
-                                                  data=dataframe.to_dict("rows"),
-                                                  row_selectable="multi",
-                                                  style_table={"maxHeight":"300px",
-                                                               "maxWidth" :"300px",
-                                                               "overflowY":"scroll"},
-                                                  selected_rows=[]),
-                             dcc.Dropdown(id="dropdown_data_next",
-                                          options=[{'label': 'Nature ', 'value': 'Nature'},
-                                                   {'label': 'Birds Chirping ', 'value': 'Bird'},
-                                                   {'label': 'Wind Gushing', 'value': 'Wind'},
-                                                   {'label': 'Vehicle  ', 'value': 'Vehicle'},
-                                                   {'label': 'Honking  ', 'value': 'Honking'},
-                                                   {'label': 'Conversation  ', 'value': 'Conversation'},
-                                                   {'label': 'Dog Barking  ', 'value': 'Dog Barking'},
-                                                   {'label': 'Tools  ', 'value': 'Tools'},
-                                                   {'label': 'Axe  ', 'value': 'Axe'}],
-                                          value="",
-                                          placeholder="Search For Label..",
-                                          style={"fontSize":"17",
-                                                 "margin-top":"40px",
-                                                 "display":"inline-block",
-                                                 "font":"bold",
-                                                 "width":"40%"}),
-                             dcc.Textarea(id="text_area_next",
-                                          placeholder='Selected Annotation',
-                                          value="",
-                                          style={"width":"50%",
-                                                 "margin-left":"25%",
-                                                 "fontSize":"16",
-                                                 "text-align":"center"}),
-                             html.Div([html.Button("Submit",
-                                                   id="submit_next",
-                                                   style={"width":"200px",
-                                                          "margin-top":"10px"})],
-                                      style={"text-align":"center"}),
-                             html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ',
-                                         style={"position":"fixed",
-                                                "left":"0",
-                                                "bottom":"0",
-                                                "height":"2%",
-                                                "width":"100%",
-                                                "background-color":"black",
-                                                "color":"white",
-                                                "padding":"20px",
-                                                "textAlign":"center"})])
-        except ValueError:
-            return html.Div([html.H5("Something wrong with Audio: -"+ NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
-                                     style={"display":"center"})])
-
-
-  ##########################################################################################
-        # Spectrogram Tab selection
-  ##########################################################################################
+      return annotation_tab(False)
   elif value == "spectrogram-tab":
-        sample_rate, samples = wavfile.read(NUMBER_OF_WAVFILES[FILE_COUNT])
-        try:
-            if samples.shape[1] == 2:
-                samples = np.array([i[0] for i in samples])
-        except:
-            samples = samples
-        plt.specgram(samples[:],
-                     Fs=sample_rate,
-                     xextent=(0, int(len(samples)/sample_rate)),
-                     mode="psd",
-                     cmap=plt.get_cmap('hsv'),
-                     noverlap=5,
-                     scale_by_freq=True)
-        plt.ylabel('Frequency [Hz]')
-        plt.xlabel('Time [sec]')
-        plt.savefig(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
-        encoded_image = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png", 'rb').read())
-        os.remove(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
-
-        return html.Div([html.Img(src='data:image/png;base64,{}'.format(encoded_image))],
-                        style={"margin-top":"10%",
-                               "text-align":"center"})
-
-
-  ##########################################################################################
-            # Model Prediction tab
-  ##########################################################################################
+      return spectrogram_tab()
   elif value == "model-prediction-tab":
-        encoded_image_uploaded_file = NUMBER_OF_WAVFILES[FILE_COUNT]
-        encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read())
-        embeddings = generate_before_predict_BR.main(NUMBER_OF_WAVFILES[FILE_COUNT], 0, 0, 0)
-        predictions = []
-        predictions_prob = []
-        for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-            pred_prob, pred_round = generate_before_predict_BR.main(NUMBER_OF_WAVFILES[FILE_COUNT], 1, embeddings, each_model)
-            pred_prob = pred_prob[0][0] * 100
-            pred_round = pred_round[0][0]
-            predictions_prob.append(pred_prob)
-            predictions.append(pred_round)
-        predictions_prob = [float(i) for i in predictions_prob]
-        if predictions[0] == 1:
-            output_sound = 'Motor sound'
-        elif predictions[1] == 1:
-            output_sound = 'Explosion sound '
-        elif predictions[2] == 1:
-            output_sound = 'Human sound'
-        elif predictions[3] == 1:
-            output_sound = 'Nature sound'
-        elif predictions[4] == 1:
-            output_sound = 'Domestic animal sound'
-        elif predictions[5] == 1:
-            output_sound = 'Tools sound'
-        else:
-            output_sound = 'None of the above'
-        return  html.Div(style={'color': 'green', 'fontSize':14}, children=[
-            html.Audio(id='myaudio',
-                       src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
-                       controls=True,
-                       style={"margin-top":"20px"}),
-            html.H4('predictions rounded will be: '+ str(predictions[0])),
-            html.H4('Predictions seems to be '+ output_sound,
-                    style={'color':'green',
-                           'fontSize': 30,
-                           'textAlign':'center',
-                           'text-decoration':'underline'}),
-            dcc.Graph(id='example',
-                      figure={
-                          'data':[{'x':['Motor', 'Explosion', 'Human', 'Nature', 'Domestic', 'Tools'],
-                                   'y':[i for i in predictions_prob], 'marker':{
-                                       'color':['black', 'rgb(158,202,225)',
-                                                'rgb(158,202,225)', 'rgb(158,202,225)',
-                                                'rgb(158,202,225)', 'rgb(158,202,225)']},
-                                   'type':'bar',
-                                   "text":["{0:.2f}".format(i) for i in predictions_prob],
-                                   "textposition" : 'auto',}],
-                          'layout': {
-                              'title':'probablistic prediction graph ',
-                              'titlefont':{
-                                  'family':'Courier New, monospace',
-                                  'size':22,
-                                  'color':'green'},
-                              'xaxis':{
-                                  'title': 'Labels of the sound',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'green'}},
-                              'yaxis':{
-                                  'title': 'Percenatge probabality',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'green'}},
-                              'height':400,
-                              'font': {
-                                  'color':'#7f7f7f'}}},
-                      style={'marginBottom': 20,
-                             'marginTop': 45,
-                             'color':'black'}),
-            html.P('Selected File : '+ NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
-                   style={'color': 'white',
-                          'fontSize': 15})])
+      return model_prediction_tab()
 
 
 
@@ -402,201 +426,11 @@ def initial_content_tab(value):
   Returning HTML pages as per the TAB selection
   """
   if value == "annotation-tab":
-        global FILE_COUNT, NUMBER_OF_WAVFILES, LABELS_LIST_DROPDOWN_INITIAL, TEXT_PATH, LABELS_LIST_CHECKLIST_NEXT, LABELS_LIST_DROPDOWN_NEXT
-        LABELS_LIST_DROPDOWN_NEXT = []
-        LABELS_LIST_CHECKLIST_NEXT = []
-        LABELS_LIST_DROPDOWN_INITIAL = []
-        FILE_COUNT = 0
-        TOTAL_FOLDER_WAV_FILES = glob.glob(TEXT_PATH+"/*.wav")
-        if os.path.exists(CSV_FILENAME):
-            annotated_files = pd.read_csv(CSV_FILENAME, error_bad_lines=False)
-            annotated_files = annotated_files['wav_file'].values.tolist()
-            NUMBER_OF_WAVFILES = []
-            for i in TOTAL_FOLDER_WAV_FILES:
-                if i.split("/")[-1] not in annotated_files:
-                    # print(i)
-                    NUMBER_OF_WAVFILES.append(i)
-            print len(NUMBER_OF_WAVFILES)
-        else:
-            NUMBER_OF_WAVFILES = TOTAL_FOLDER_WAV_FILES
-        print "total wavfiles :", len(NUMBER_OF_WAVFILES)
-        encoded_image_to_play = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT], 'rb').read())
-        dataframe = pd.DataFrame()
-        dataframe["Labels Name"] = CHECKLIST_DISPLAY
-        return html.Div([html.Div([html.Br(),
-                                   html.H2(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
-                                           style={"text-align":"center",
-                                                  "color":"green",
-                                                  'text-decoration':'underline'}),
-                                   html.Audio(id='myaudio',
-                                              src='data:audio/WAV;base64,{}'.format(encoded_image_to_play),
-                                              controls=True,
-                                              style={"margin-top":"20px",
-                                                     "verticalAlign":"middle",
-                                                     "margin-bottom":"30px"})]),
-                         dash_table.DataTable(id='datatable-interactivity-inside',
-                                              columns=[{"name": i,
-                                                        "id": i,
-                                                        "deletable": True} for i in dataframe.columns],
-                                              data=dataframe.to_dict("rows"),
-                                              row_selectable="multi",
-                                              style_table={"maxHeight":"300px",
-                                                           "maxWidth" :"300px",
-                                                           "overflowY":"scroll"},
-                                              selected_rows=[]),
-                         dcc.Dropdown(id="dropdown_data_initial",
-                                      options=[{'label': 'Nature ', 'value': 'Nature'},
-                                               {'label': 'Birds Chirping ', 'value': 'Bird'},
-                                               {'label': 'Wind Gushing', 'value': 'Wind'},
-                                               {'label': 'Vehicle  ', 'value': 'Vehicle'},
-                                               {'label': 'Honking  ', 'value': 'Honking'},
-                                               {'label': 'Conversation  ', 'value': 'Conversation'},
-                                               {'label': 'Dog Barking  ', 'value': 'Dog Barking'},
-                                               {'label': 'Tools  ', 'value': 'Tools'},
-                                               {'label': 'Axe  ', 'value': 'Axe'}],
-                                      value="",
-                                      placeholder="Search For Label..",
-                                      style={"fontSize":"17",
-                                             "margin-top":"20px",
-                                             "display":"inline-block",
-                                             "font":"bold",
-                                             "width":"40%"}),
-                         dcc.Textarea(id="text_area_inside",
-                                      placeholder='Selected Annotation',
-                                      value="",
-                                      style={"width":"50%",
-                                             "margin-left":"25%",
-                                             "fontSize":"16",
-                                             "text-align":"center"}),
-                         html.Div([html.Button("Submit",
-                                               id="submit_initial",
-                                               style={"width":"200px",
-                                                      "margin-top":"10px"})],
-                                  style={"text-align":"center"}),
-                         html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2019 ',
-                                     style={"position":"fixed",
-                                            "left":"0",
-                                            "bottom":"0",
-                                            "height":"2%",
-                                            "width":"100%",
-                                            "background-color":"black",
-                                            "color":"white",
-                                            "padding":"20px",
-                                            "textAlign":"center"})])
-
-
-
-
-  ##########################################################################################
-                # Initial: Spectrogram Tab
-  ##########################################################################################
+      return annotation_tab(True)
   elif value == "spectrogram-tab":
-        sample_rate, samples = wavfile.read(NUMBER_OF_WAVFILES[FILE_COUNT])
-        try:
-            if samples.shape[1] == 2:
-                samples = np.array([i[0] for i in samples])
-        except:
-            samples = samples
-        plt.specgram(samples[:],
-                     Fs=sample_rate,
-                     xextent=(0, int(len(samples)/sample_rate)),
-                     mode="magnitude",
-                     cmap=plt.get_cmap('hsv'),
-                     noverlap=5,
-                     scale_by_freq=True)
-        plt.ylabel('Frequency [Hz]')
-        plt.xlabel('Time [sec]')
-        plt.savefig(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
-        encoded_image = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png", 'rb').read())
-        os.remove(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
-
-        return html.Div([html.Img(src='data:image/png;base64,{}'.format(encoded_image))],
-                        style={"margin-top":"10%",
-                               "text-align":"center"})
-
-
-
-  ##########################################################################################
-                # Initial: Model Prediction tab
-  ##########################################################################################  
+      return spectrogram_tab()
   elif value == "model-prediction-tab":
-
-        encoded_image_uploaded_file = NUMBER_OF_WAVFILES[FILE_COUNT]
-        encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read())
-        embeddings = generate_before_predict_BR.main(NUMBER_OF_WAVFILES[FILE_COUNT], 0, 0, 0)
-        predictions = []
-        predictions_prob = []
-        for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-            pred_prob, pred_round = generate_before_predict_BR.main(NUMBER_OF_WAVFILES[FILE_COUNT], 1, embeddings, each_model)
-            pred_prob = pred_prob[0][0] * 100
-            pred_round = pred_round[0][0]
-            predictions_prob.append(pred_prob)
-            predictions.append(pred_round)
-        print predictions_prob
-        predictions_prob = [float(i) for i in predictions_prob]
-        if predictions[0] == 1:
-            output_sound = 'Motor sound'
-        elif predictions[1] == 1:
-            output_sound = 'Explosion sound '
-        elif predictions[2] == 1:
-            output_sound = 'Human sound'
-        elif predictions[3] == 1:
-            output_sound = 'Nature sound'
-        elif predictions[4] == 1:
-            output_sound = 'Domestic animal sound'
-        elif predictions[5] == 1:
-            output_sound = 'Tools sound'
-        else:
-            output_sound = 'None of the above'
-        return  html.Div(style={'color': 'green', 'fontSize':14}, children=[
-            html.Audio(id='myaudio',
-                       src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
-                       controls=True,
-                       style={"margin-top":"20px"}),
-            html.H4('predictions rounded will be: '+ str(predictions[0])),
-            html.H4('Predictions seems to be '+ output_sound,
-                    style={'color':'green',
-                           'fontSize': 30,
-                           'textAlign':'center',
-                           'text-decoration':'underline'}),
-            dcc.Graph(id='example',
-                      figure={
-                          'data':[{'x':['Motor', 'Explosion', 'Human', 'Nature', 'Domestic', 'Tools'],
-                                   'y':[i for i in predictions_prob], 'marker':{
-                                       'color':['black', 'rgb(158,202,225)',
-                                                'rgb(158,202,225)', 'rgb(158,202,225)',
-                                                'rgb(158,202,225)', 'rgb(158,202,225)']},
-                                   'type':'bar',
-                                   "text":["{0:.2f}".format(i) for i in predictions_prob],
-                                   "textposition" : 'auto',}],
-                          'layout': {
-                              'title':'probablistic prediction graph ',
-                              'titlefont':{
-                                  'family':'Courier New, monospace',
-                                  'size':22,
-                                  'color':'green'},
-                              'xaxis':{
-                                  'title': 'Labels of the sound',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'green'}},
-                              'yaxis':{
-                                  'title': 'Percenatge probabality',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'green'}},
-                              'height':400,
-                              'font': {
-                                  'color':'#7f7f7f'}}},
-                      style={'marginBottom': 20,
-                             'marginTop': 45,
-                             'color':'black'}),
-            html.P('Selected File : '+ NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
-                   style={'color': 'white',
-                          'fontSize': 15})])
-
+      return model_prediction_tab()
 
 
 
@@ -802,7 +636,7 @@ def submit_initial_button(n_clicks, value):
                                              style={"color":"white",
                                                     "fontSize":"15"})])
                 else:
-      					    return html.Div([html.H5("Already Submitted: - " +NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
+                    return html.Div([html.H5("Already Submitted: - " +NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
                                              style={"color":"white",
                                                     "fontSize":"15",
                                                     "margin-right":"70%"})])
@@ -845,7 +679,7 @@ def submit_next_button(n_clicks, value):
                                              style={"color":"white",
                                                     "fontSize":"15"})])
                 else:
-          			    return html.Div([html.H5("Already Submitted: - " +NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
+                    return html.Div([html.H5("Already Submitted: - " +NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
                                              style={"color":"white",
                                                     "fontSize":"15"})])
         else:
@@ -865,4 +699,30 @@ def submit_next_button(n_clicks, value):
         # Main Function
 ##########################################################################################
 if __name__ == '__main__':
+
+    ##############################################################################
+              # Description and Help
+    ##############################################################################
+    DESCRIPTION = 'Runs the Audio Annotation Tool.'
+
+    ##############################################################################
+              # Parsing the inputs given
+    ##############################################################################
+    ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+    OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
+
+    REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
+    REQUIRED_NAMED.add_argument('-predictions_cfg_json',
+                                '--predictions_cfg_json',
+                                help='Input json configuration file for predictions output',
+                                required=True)
+
+    ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
+    PARSED_ARGS = ARGUMENT_PARSER.parse_args()
+
+    ##############################################################################
+              # Import json data
+    ##############################################################################
+    CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(PARSED_ARGS.predictions_cfg_json)
+
     app.run_server(debug=True, use_reloader=True)
