@@ -10,7 +10,7 @@ import os
 import pandas as pd
 
 
-base_link = 'https://www.xeno-canto.org/explore?query='
+BASE_LINK = 'https://www.xeno-canto.org/explore?query='
 
 DESCRIPTION = 'Scrape XenoCanto'
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
@@ -22,50 +22,53 @@ RequiredArguments.add_argument('-path_to_save_audio_files', action='store', \
     help='Input path to save audio files')
 RESULT = PARSER.parse_args()
 
-bird_species_keyword = RESULT.bird_species
-audio_files_path = RESULT.path_to_save_audio_files
+BIRD_SPECIES_KEYWORD = RESULT.bird_species
+AUDIO_FILES_PATH = RESULT.path_to_save_audio_files
 
-print "\nBird species keyword:", bird_species_keyword
-print "Audio files path:", audio_files_path, '\n'
+print "\nBird species keyword:", BIRD_SPECIES_KEYWORD
+print "Audio files path:", AUDIO_FILES_PATH, '\n'
 
-bird_species = bird_species_keyword.lower()
+BIRD_SPECIES = BIRD_SPECIES_KEYWORD.lower()
 # replace whitespace with underscore for bird_species name
-bird_species_name_ws = bird_species.replace(' ', '_')
+BIRD_SPECIES_NAME_WS = BIRD_SPECIES.replace(' ', '_')
 
 # csv file name appended with bird species
-csv_filename = audio_files_path+bird_species_name_ws+'/'+"xenocanto_bird_"+bird_species_name_ws+".csv"
+CSV_FILENAME = AUDIO_FILES_PATH+BIRD_SPECIES_NAME_WS+'/'+"xenocanto_bird_"+BIRD_SPECIES_NAME_WS+".csv"
 
-print "csv file path:", csv_filename
+print "csv file path:", CSV_FILENAME
 #if not exists create directory with bird species name to save audio files
-if not os.path.exists(audio_files_path+bird_species_name_ws):
-    os.mkdir(audio_files_path+bird_species_name_ws)
+if not os.path.exists(AUDIO_FILES_PATH+BIRD_SPECIES_NAME_WS):
+    os.mkdir(AUDIO_FILES_PATH+BIRD_SPECIES_NAME_WS)
 else:
     pass
 
-# Make a GET request to fetch the raw HTML content
-r1 = requests.get(base_link+bird_species)
-page1 = r1.text
-soup1 = bs(page1, 'html.parser')
-
-########################################################################################
-
-# get number of pages in xento-canto for given bird species
-
-result_pages = soup1.findAll('nav', attrs={'class':'results-pages'})
-number_of_webpages = []
-for result_page in result_pages:
-    pages = result_page.find_all('li')
-    for page1 in pages:
-        number_of_webpages.append(page1.text.replace('\n', ' ').strip().encode('ascii'))
-last_page = number_of_webpages[-2]
-print "\nLast page for given Bird species:", last_page
-
 ###################################################################################################
+
+def number_of_pages(baselink, birdspecies):
+    '''get number of web pages for given bird species'''
+    # Make a GET request to fetch the raw HTML content
+    r1 = requests.get(baselink+birdspecies)
+    page1 = r1.text
+    soup1 = bs(page1, 'html.parser')
+
+    # get number of pages in xento-canto for given bird species
+    result_pages = soup1.findAll('nav', attrs={'class':'results-pages'})
+
+    if not result_pages:
+        last_page = '1'
+    else:
+        number_of_webpages = []
+        for result_page in result_pages:
+            pages = result_page.find_all('li')
+            for page1 in pages:
+                number_of_webpages.append(page1.text.replace('\n', ' ').strip().encode('ascii'))
+        last_page = number_of_webpages[-2]
+    return last_page
 
 def get_info_from_raw_html(page_number):
     # Make a GET request to fetch the raw HTML content
-    r = requests.get(base_link+bird_species+'&pg='+str(page_number))
-    print "\nPage link:", base_link+bird_species+'&pg='+str(page_number)
+    r = requests.get(BASE_LINK+BIRD_SPECIES+'&pg='+str(page_number))
+    print "\nPage link:", BASE_LINK+BIRD_SPECIES+'&pg='+str(page_number)
     page = r.text
     soup = bs(page, 'html.parser')
 
@@ -102,7 +105,7 @@ def download_xc_audio(xc_audio_ID):
     # download xc audio file in the given path
     audio_link = 'https://www.xeno-canto.org/' + audio_ID[0][2:]+ '/download'
     print audio_link
-    ydl_opts = {'outtmpl': audio_files_path+bird_species_name_ws+'/'+xc_audio_ID[0]+'.%(ext)s'}
+    ydl_opts = {'outtmpl': AUDIO_FILES_PATH+BIRD_SPECIES_NAME_WS+'/'+xc_audio_ID[0]+'.%(ext)s'}
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([audio_link])
 
@@ -111,20 +114,24 @@ def download_xc_audio(xc_audio_ID):
 column_tags = ['XenoCanto_ID', 'Common name/Scientific', 'Length', 'Recordist', 'Date', \
 'Time', 'Country', 'Location', 'Elev(m)', 'Type', 'Remarks']
 
-csv_file_exists = os.path.exists(csv_filename)
+# get number of pages for given bird species
+web_pages = number_of_pages(BASE_LINK, BIRD_SPECIES)
+print "Web Page(s):", web_pages
+
+csv_file_exists = os.path.exists(CSV_FILENAME)
 file_permission = 'a' if csv_file_exists else 'w'
 
 # writing audio file information to csv
-with open(csv_filename, file_permission) as csvfile:
+with open(CSV_FILENAME, file_permission) as csvfile:
     csvwriter = csv.writer(csvfile)
     if csv_file_exists:
-        xc_csv = pd.read_csv(csv_filename, error_bad_lines=False)
+        xc_csv = pd.read_csv(CSV_FILENAME, error_bad_lines=False)
         xc_id_in_csv = xc_csv["XenoCanto_ID"].values.tolist()
     else:
         csvwriter.writerow(column_tags)
 
     # iterate through all the pages
-    for i in range(1, int(last_page)+1):
+    for i in range(1, int(web_pages)+1):
         row_data_lists = get_info_from_raw_html(i)
 
         for row1 in row_data_lists:
