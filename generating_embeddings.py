@@ -1,6 +1,6 @@
 
 
-#This code is slightly modified from :
+#This code is modified from :
 #https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
 
 r"""A simple demonstration of running VGGish in inference mode.
@@ -33,6 +33,7 @@ Usage:
 """
 
 from __future__ import print_function
+import argparse
 import sys
 import pickle
 import glob
@@ -50,103 +51,92 @@ import vggish_slim
 
 
 #######################################################################################
-             # Arguments some have default values which dont't need to be changed
+                    # Constants
 #######################################################################################
-flags = tf.app.flags
 
-flags.DEFINE_string(
-    'wav_file', None,
-    'Path to a wav file. Should contain signed 16-bit PCM samples. '
-    'If none is provided, a synthetic sound is used.')
-
-flags.DEFINE_string(
-    'checkpoint', 'externals/tensorflow_models/research/audioset/vggish_model.ckpt',
-    'Path to the VGGish checkpoint file.')
-
-flags.DEFINE_string(
-    'pca_params', 'externals/tensorflow_models/research/audioset/vggish_pca_params.npz',
-    'Path to the VGGish PCA parameters file.')
-
-flags.DEFINE_string(
-    'tfrecord_file', None,
-    'Path to a TFRecord file where embeddings will be written.')
-
-flags.DEFINE_string(
-    'path_to_write_embeddings', None,
-    'path where the embeddings should be written')
-
-FLAGS = flags.FLAGS
-
+VGGISH_MODEL_CHECKPOINT_FILE = 'externals/tensorflow_models/research/audioset/vggish_model.ckpt'
+PCA_PARAMS_FILE = 'externals/tensorflow_models/research/audioset/vggish_pca_params.npz'
 
 ########################################################################################
-                    # Main Function
+                    # Functions
 ########################################################################################
 
-def main(_):
+def generate(path_to_write_embeddings, path_to_wav_files):
     """
-    Gnerates the embeddings for the wav files at specified path
+    Generates the embeddings for the wav files at specified path
     """
+    # append a slash at the end of the path to read wav files
+    # if it is not there already
+    if not path_to_wav_files.endswith('/'):
+        path_to_wav_files += '/'
+
+    # append a slash at the end of the path to generate embeddings
+    # if it is not there already
+    if not path_to_write_embeddings.endswith('/'):
+        path_to_write_embeddings += '/'
+
     # create a path if there is no path
-    if not os.path.exists(FLAGS.path_to_write_embeddings):
-        os.makedirs(FLAGS.path_to_write_embeddings)
+    if not os.path.exists(path_to_write_embeddings):
+        os.makedirs(path_to_write_embeddings)
 
     #glob all the wave files and embeddings if any .
-    wav_files_path = glob.glob(FLAGS.wav_file + '*.wav')
-    pickle_files = glob.glob(FLAGS.path_to_write_embeddings + '*.pkl')
+    wav_files_path = glob.glob(path_to_wav_files + '*.wav')
+    pickle_files = glob.glob(path_to_write_embeddings + '*.pkl')
     wav_file_list = []
     for wav_file_path in wav_files_path:
         wav_file_list.append(wav_file_path.split('/')[-1])
 
     for wav_file, wav_file_name in zip(wav_files_path, wav_file_list):
-        pkl = str(wav_file_name)[:-4]+'.pkl'
+        path_to_pickle_file = path_to_write_embeddings + str(wav_file_name)[:-4] + '.pkl'
         print (wav_file)
         #No need to generate the embeddings that are already generated.
-        if pkl in pickle_files:
-            print ('Embeddings are already Generated for', pkl)
+        if path_to_pickle_file in pickle_files:
+            print ('Embeddings are already Generated for', path_to_pickle_file)
 
         # In this simple example, we run the examples from a single audio file through
         # the model. If none is provided, we generate a synthetic input.
         else:
-            if FLAGS.wav_file:
-                wav_file = wav_file
-            else:
-                # Write a WAV of a sine wav into an in-memory file object.
-                num_secs = 5
-                freq = 1000
-                sampling_rate = 44100
-                time_space = np.linspace(0, num_secs, int(num_secs * sampling_rate))
-                theta = np.sin(2 * np.pi * freq * time_space)
-                # Convert to signed 16-bit samples.
-                samples = np.clip(theta * 32768, -32768, 32767).astype(np.int16)
-                wav_file = six.BytesIO()
-                wavfile.write(wav_file, sampling_rate, samples)
-                wav_file.seek(0)
             examples_batch = vggish_input.wavfile_to_examples(wav_file)
-            print(examples_batch)
+            # print(examples_batch)
 
             # Prepare a postprocessor to munge the model embeddings.
-            pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
+            pproc = vggish_postprocess.Postprocessor(PCA_PARAMS_FILE)
 
             with tf.Graph().as_default(), tf.Session() as sess:
                 # Define the model in inference mode, load the checkpoint, and
                 # locate input and output tensors.
                 vggish_slim.define_vggish_slim(training=False)
-                vggish_slim.load_vggish_slim_checkpoint(sess, FLAGS.checkpoint)
+                vggish_slim.load_vggish_slim_checkpoint(sess, VGGISH_MODEL_CHECKPOINT_FILE)
                 features_tensor = sess.graph.get_tensor_by_name(
                     vggish_params.INPUT_TENSOR_NAME)
                 embedding_tensor = sess.graph.get_tensor_by_name(
                     vggish_params.OUTPUT_TENSOR_NAME)
 
-            # Run inference and postprocessing.
+                # Run inference and postprocessing.
                 [embedding_batch] = sess.run([embedding_tensor],
                                              feed_dict={features_tensor: examples_batch})
-                print(embedding_batch)
+                # print(embedding_batch)
                 postprocessed_batch = pproc.postprocess(embedding_batch)
-                print(postprocessed_batch)
+                # print(postprocessed_batch)
 
             #write the embeddings as pickle files
-            with open(FLAGS.path_to_write_embeddings + pkl, 'w') as file_obj:
+            with open(path_to_pickle_file, 'w') as file_obj:
                 pickle.dump(postprocessed_batch, file_obj)
 
 if __name__ == '__main__':
-    tf.app.run()
+    DESCRIPTION = 'Generate Embeddings for wav files'
+    PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+    REQUIRED_ARGUMENTS = PARSER.add_argument_group('required arguments')
+    REQUIRED_ARGUMENTS.add_argument('-wav_file', '--wav_file',
+                                    action='store',
+                                    help='Path to directory with wav files',
+                                    required=True)
+    REQUIRED_ARGUMENTS.add_argument('-path_to_write_embeddings', '--path_to_write_embeddings',
+                                    action='store',
+                                    help='Output path to save pkl files',
+                                    required=True)
+    RESULT = PARSER.parse_args()
+
+
+    generate(path_to_write_embeddings = RESULT.path_to_write_embeddings,
+             path_to_wav_files = RESULT.wav_file)

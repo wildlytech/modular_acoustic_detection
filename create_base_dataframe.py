@@ -2,32 +2,7 @@ import os
 import pickle
 import glob
 import argparse
-import pandas as pd 
-
-
-#########################################################################################
-               # description and Help
-#########################################################################################
-
-DESCRIPTION = '1. Input the path for base dataframe [wav_file, labels_name] or \n \
-               2. Input the path for embeddings only, if base dataframe not present'
-HELP = 'Input the path'
-
-
-
-#########################################################################################
-            # Arguments and parsing
-#########################################################################################
-PARSER = argparse.ArgumentParser(description=DESCRIPTION)
-PARSER.add_argument('-dataframe_without_feature', '--dataframe_without_feature', action='store',
-                    help=HELP)
-PARSER.add_argument('-path_for_saved_embeddings', '--path_for_saved_embeddings', action='store',
-                    help='Input the path')
-PARSER.add_argument('-path_to_write_dataframe', '--path_to_write_dataframe', action='store',
-                    help='Input the path')
-RESULT = PARSER.parse_args()
-
-
+import pandas as pd
 
 #########################################################################################
             # Helper Functions
@@ -42,14 +17,14 @@ def read_pickle_file(filename):
 
 
 
-def get_embeddings_path(audio_files_list):
+def get_embeddings_path(path_for_saved_embeddings, audio_files_list):
     """
     Returns path of only existing embeddings file
     """
     found_embeddings_paths = []
     for each_value in audio_files_list:
-        if os.path.exists(RESULT.path_for_saved_embeddings+each_value[:-3]+"pkl"):
-            found_embeddings_paths.append(RESULT.path_for_saved_embeddings+each_value[:-3]+"pkl")
+        if os.path.exists(path_for_saved_embeddings+each_value[:-3]+"pkl"):
+            found_embeddings_paths.append(path_for_saved_embeddings+each_value[:-3]+"pkl")
         else:
             pass
     print "No. Embeddings found as per given audio Filenames in dataframe: ", len(found_embeddings_paths)
@@ -108,14 +83,51 @@ def replace_pkl_files_to_wavfiles(pklfiles_list):
     return wavfiles_list
 
 
+def create_new_dataframe(path_for_saved_embeddings, path_to_write_dataframe):
+    """
+    Creates a new dataframe from the embeddings
+    """
+    new_dataframe = start_from_initial(path_for_saved_embeddings)
+    write_dataframe(path_to_write_dataframe, new_dataframe)
 
 #########################################################################################
             # Main function
 #########################################################################################
 if __name__ == "__main__":
+
+    #####################################################################################
+                   # description and Help
+    #####################################################################################
+
+    DESCRIPTION = '1. Input the path for base dataframe [wav_file, labels_name] or \n \
+                   2. Input the path for embeddings only, if base dataframe not present'
+    HELP = 'Input the path'
+
+    #####################################################################################
+                # Arguments and parsing
+    #####################################################################################
+    PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+    REQUIRED_ARGUMENTS = PARSER.add_argument_group('required arguments')
+    OPTIONAL_ARGUMENTS = PARSER.add_argument_group('optional arguments')
+
+    REQUIRED_ARGUMENTS.add_argument('-path_for_saved_embeddings', '--path_for_saved_embeddings',
+                                    action='store',
+                                    help='Input the path for the folder where the embedding files (*.pkl) are saved',
+                                    required=True)
+    REQUIRED_ARGUMENTS.add_argument('-path_to_write_dataframe', '--path_to_write_dataframe',
+                                    action='store',
+                                    help='Input the path to write the dataframe (*.pkl)',
+                                    required=True)
+    OPTIONAL_ARGUMENTS.add_argument('-dataframe_without_feature', '--dataframe_without_feature',
+                                    action='store',
+                                    help='Input the path to existing dataframe (*.pkl) without features column')
+    RESULT = PARSER.parse_args()
+
     if RESULT.dataframe_without_feature:
+        assert(RESULT.dataframe_without_feature.endswith(".pkl"))
         ORIGINAL_DATAFRAME = read_pickle_file(RESULT.dataframe_without_feature)
-        GET_LIST_EMBEDDINGS_PRESENT = get_embeddings_path(ORIGINAL_DATAFRAME["wav_file"].tolist())
+        GET_LIST_EMBEDDINGS_PRESENT = get_embeddings_path(path_for_saved_embeddings=RESULT.path_for_saved_embeddings,
+                                                          audio_files_list=ORIGINAL_DATAFRAME["wav_file"].tolist())
         FEATURES_LIST = read_all_embeddings(GET_LIST_EMBEDDINGS_PRESENT)
         NEW_DATAFRAME = create_dataframe(["wav_file", "features"])
         NEW_DATAFRAME["wav_file"] = replace_pkl_files_to_wavfiles(GET_LIST_EMBEDDINGS_PRESENT)
@@ -124,7 +136,7 @@ if __name__ == "__main__":
         write_dataframe(RESULT.path_to_write_dataframe, NEW_DATAFRAME)
 
     else:
-        if RESULT.path_for_saved_embeddings:
-            NEW_DATAFRAME = start_from_initial(RESULT.path_for_saved_embeddings)
-            write_dataframe(RESULT.path_to_write_dataframe, NEW_DATAFRAME)
+        assert(RESULT.path_to_write_dataframe.endswith(".pkl"))
+        create_new_dataframe(path_for_saved_embeddings=RESULT.path_for_saved_embeddings,
+                             path_to_write_dataframe=RESULT.path_to_write_dataframe)
 
