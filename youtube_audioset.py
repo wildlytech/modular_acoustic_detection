@@ -1,6 +1,7 @@
 """
 Reading all the data files and also Downloads audio files from youtube
 """
+import json
 from subprocess import check_call, CalledProcessError
 import threading
 import pickle
@@ -371,23 +372,39 @@ def read_audio_record(audio_record, output_to_file=None):
 ############################################################################################
                     # Read the recursive names from JSON file
 ############################################################################################
-def get_recursive_sound_names(designated_sound_names, path_to_ontology):
+def get_recursive_sound_names(designated_sound_names, path_to_ontology, ontology_extension_paths=[]):
     """
     Read the recursive names from JSON file
     """
-    if path_to_ontology:
-        ontology_dict = pd.read_json(path_to_ontology+"data/audioset/ontology.json")
+    if path_to_ontology is None:
+        path_to_ontology = "data/audioset/ontology.json"
     else:
-        ontology_dict = pd.read_json("data/audioset/ontology.json")
+        path_to_ontology = path_to_ontology+"data/audioset/ontology.json"
 
-    ontology_dict_from_name = ontology_dict.copy()
-    ontology_dict_from_name.index = ontology_dict_from_name['name']
-    ontology_dict_from_name = ontology_dict_from_name.T
+    ontology_entries = json.load(open(path_to_ontology, 'r'))
 
-    ontology_dict_from_id = ontology_dict.copy()
-    ontology_dict_from_id.index = ontology_dict_from_id.id
-    ontology_dict_from_id = ontology_dict_from_id.T
-    del ontology_dict
+    # Create two lookup tables (one with name as key and another with id as key)
+    ontology_dict_from_id = {}
+    ontology_dict_from_name = {}
+    for entry in ontology_entries:
+        ontology_dict_from_name[entry['name']] = entry
+        ontology_dict_from_id[entry['id']] = entry
+
+    del ontology_entries
+
+    # Collect extensions and amend the ontology
+    for ontology_extension_path in ontology_extension_paths:
+        ontology_entries = json.load(open(ontology_extension_path, 'r'))
+
+        for entry in ontology_entries:
+            # If applicable, attach this node to the audioset ontology tree
+            if entry['audioset_parent_id'] is not None:
+                ontology_dict_from_id[entry['audioset_parent_id']]['child_ids'] += [entry['id']]
+
+            ontology_dict_from_name[entry['name']] = entry
+            ontology_dict_from_id[entry['id']] = entry
+
+        del ontology_entries
 
     designated_sound_ids = map(lambda sound: ontology_dict_from_name[sound]['id'],
                                designated_sound_names)
@@ -396,16 +413,21 @@ def get_recursive_sound_names(designated_sound_names, path_to_ontology):
         Get the ID of the sounds
         """
         id_list = [id]
-        for child_id in ontology_dict_from_id[id].child_ids:
+        for child_id in ontology_dict_from_id[id]['child_ids']:
             id_list += get_ids(child_id)
         return id_list
+
     recursive_sound_ids = []
     for id in designated_sound_ids:
         recursive_sound_ids += get_ids(id)
     recursive_sound_ids = list(set(recursive_sound_ids))
 
-    recursive_sound_names = map(lambda sound_id: ontology_dict_from_id[sound_id]['name'],
+    recursive_sound_names = map(lambda sound_id: ontology_dict_from_id[sound_id]['name'].lower(),
                                 recursive_sound_ids)
+
+    # Every sound name should be unique
+    recursive_sound_names = set(recursive_sound_names)
+
     return recursive_sound_names
 
 def get_all_sound_names(path_to_ontology):

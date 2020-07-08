@@ -65,15 +65,34 @@ if not os.path.exists(pathToFileDirectory):
 #############################################################################
           # Get all sound names
 #############################################################################
-POSITIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["positiveLabels"], "../")
+
+# Model training only supports using audio set as main ontology
+assert(CONFIG_DATA["ontology"]["useYoutubeAudioSet"])
+
+# List of paths to json files that will be used to extend
+# existing youtube ontology
+ontologyExtFiles = CONFIG_DATA["ontology"]["extension"]
+
+# If single file or null, then convert to list
+if ontologyExtFiles is None:
+  ontologyExtFiles = []
+elif type(ontologyExtFiles) != list:
+  ontologyExtFiles = [ontologyExtFiles]
+
+# All paths to ontology extension files are relative to the location of the
+# model configuration file.
+ontologyExtFiles = map(lambda x: PATH_TO_DIRECTORY_OF_CONFIG + x, ontologyExtFiles)
+
+# Grab all the positive labels
+POSITIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["positiveLabels"], "../", ontologyExtFiles)
 
 # If negative labels were provided, then collect them
 # Otherwise, assume all examples that are not positive are negative
 if CONFIG_DATA["negativeLabels"] is None:
   NEGATIVE_LABELS = None
 else:
-  NEGATIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["negativeLabels"], "../")
-
+  # Grab all the negative labels
+  NEGATIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["negativeLabels"], "../", ontologyExtFiles)
 
 #############################################################################
           # Importing dataframes from the function
@@ -120,18 +139,31 @@ def import_dataframes(dataframe_file_list,
       df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
       # Only use examples that have a label in label filter array
-      positive_examples_df = df.loc[df['labels_name'].apply(lambda arr: np.any([x in positive_label_filter_arr for x in arr]))]
+      positive_example_select_vector = df['labels_name'].apply(lambda arr: np.any([x.lower() in positive_label_filter_arr for x in arr]))
+      positive_examples_df = df.loc[positive_example_select_vector]
 
       if negative_label_filter_arr is not None:
-        negative_examples_df = df.loc[df['labels_name'].apply(lambda arr: np.any([x in negative_label_filter_arr for x in arr]))]
+        negative_example_select_vector = df['labels_name'].apply(lambda arr: np.any([x.lower() in negative_label_filter_arr for x in arr]))
       else:
-        negative_examples_df = df.loc[df['labels_name'].apply(lambda arr: not np.any([x in positive_label_filter_arr for x in arr]))]
+        negative_example_select_vector = ~positive_example_select_vector
+      negative_examples_df = df.loc[negative_example_select_vector]
 
       # No longer need df after this point
       del df
 
-      positive_examples_df = subsample_dataframe(positive_examples_df, input_file_dict["positiveSubsample"])
-      negative_examples_df = subsample_dataframe(negative_examples_df, input_file_dict["negativeSubsample"])
+      positive_subsample = input_file_dict["positiveSubsample"]
+      if (positive_examples_df.shape[0] == 0) and (positive_subsample > 0):
+        print "No positive examples to subsample from!"
+        assert(False)
+      else:
+        positive_examples_df = subsample_dataframe(positive_examples_df, positive_subsample)
+
+      negative_subsample = input_file_dict["negativeSubsample"]
+      if (negative_examples_df.shape[0] == 0) and (negative_subsample > 0):
+        print "No negative examples to subsample from!"
+        assert(False)
+      else:
+        negative_examples_df = subsample_dataframe(negative_examples_df, input_file_dict["negativeSubsample"])
 
       # append to overall list of examples
       list_of_dataframes += [positive_examples_df, negative_examples_df]
@@ -152,7 +184,7 @@ DATA_FRAME = import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDa
         # To Train each class-label change to appropiate label
 #############################################################################
 LABELS_BINARIZED = pd.DataFrame()
-LABELS_BINARIZED[FULL_NAME] = 1.0 * DATA_FRAME['labels_name'].apply(lambda arr: np.any([x in POSITIVE_LABELS for x in arr]))
+LABELS_BINARIZED[FULL_NAME] = 1.0 * DATA_FRAME['labels_name'].apply(lambda arr: np.any([x.lower() in POSITIVE_LABELS for x in arr]))
 
 #############################################################################
         # print out the number and percentage of each class examples

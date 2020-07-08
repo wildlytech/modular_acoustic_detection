@@ -39,6 +39,26 @@ def import_predict_configuration_json(predictions_cfg_json):
                 config_data["train"]["outputWeightFile"] = directory_of_filepath + \
                                                            config_data["train"]["outputWeightFile"]
 
+                # Model only supports using audio set as main ontology
+                assert(config_data["ontology"]["useYoutubeAudioSet"])
+
+                # List of paths to json files that will be used to extend
+                # existing youtube ontology
+                ontologyExtFiles = config_data["ontology"]["extension"]
+
+                # If single file or null, then convert to list
+                if ontologyExtFiles is None:
+                  ontologyExtFiles = []
+                elif type(ontologyExtFiles) != list:
+                  ontologyExtFiles = [ontologyExtFiles]
+
+                # All paths to ontology extension files are relative to the location of the
+                # model configuration file.
+                ontologyExtFiles = map(lambda x: directory_of_filepath + x, ontologyExtFiles)
+
+                # Update extension paths in dictionary
+                config_data["ontology"]["extension"] = ontologyExtFiles
+
                 label_name = '['+config_data["aggregatePositiveLabelName"] + ']Vs[' + \
                              config_data["aggregateNegativeLabelName"] + ']'
 
@@ -96,11 +116,12 @@ def main(predictions_cfg_json,
 
             config_data = CONFIG_DATAS[label_name]
 
-            positiveLabels = get_recursive_sound_names(config_data["positiveLabels"], "../../")
+            positiveLabels = get_recursive_sound_names(designated_sound_names = config_data["positiveLabels"],
+                                                       path_to_ontology = "../../",
+                                                       ontology_extension_paths = config_data["ontology"]["extension"])
 
             LABELS_BINARIZED[label_name] = 1.0 * DATA_FRAME['labels_name'].apply( \
-                                           lambda arr: np.any([x in positiveLabels for x in arr]))
-
+                                           lambda arr: np.any([x.lower() in positiveLabels for x in arr]))
 
     ##############################################################################
           # Filtering the sounds that are exactly 10 seconds
