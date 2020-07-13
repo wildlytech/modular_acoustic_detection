@@ -13,7 +13,7 @@ import numpy as np
 import os
 import pandas as pd
 import pickle
-from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
 import sys
 
@@ -95,6 +95,8 @@ if CONFIG_DATA["negativeLabels"] is None:
 else:
   # Grab all the negative labels
   NEGATIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["negativeLabels"], "../", ontologyExtFiles)
+  # Make sure there is no overlap between negative and positive labels
+  NEGATIVE_LABELS = NEGATIVE_LABELS.difference(POSITIVE_LABELS)
 
 #############################################################################
           # Importing dataframes from the function
@@ -116,15 +118,47 @@ def subsample_dataframe(dataframe, subsample):
 
   return dataframe
 
+def split_and_subsample_dataframe(dataframe, validation_split, subsample):
+  """
+  Perform validation split and sub/over sampling of dataframe
+  Returns train and test dataframe
+  """
+  # split before sub/oversampling to ensure there is no leakage between train and test sets
+  train_df, test_df = train_test_split(dataframe,
+                                       test_size=validation_split,
+                                       random_state=42)
+
+  test_subsample = int(subsample*validation_split)
+  train_subsample = subsample - test_subsample
+
+  if (train_df.shape[0] == 0) and (train_subsample > 0):
+    print Fore.RED, "No examples to subsample from!", Style.RESET_ALL
+    assert(False)
+  else:
+    train_df = subsample_dataframe(train_df, train_subsample)
+
+  if (test_df.shape[0] == 0) and (test_subsample > 0):
+    print Fore.RED, "No examples to subsample from!", Style.RESET_ALL
+    assert(False)
+  else:
+    test_df = subsample_dataframe(test_df, test_subsample)
+
+  return train_df, test_df
+
+def get_select_vector(dataframe, label_filter_arr):
+  """
+  Get the boolean select vector on the dataframe from the label filter
+  """
+  return dataframe['labels_name'].apply(lambda arr: np.any([x.lower() in label_filter_arr for x in arr]))
 
 def import_dataframes(dataframe_file_list,
                       positive_label_filter_arr,
                       negative_label_filter_arr,
-                      path_to_directory_of_json):
+                      path_to_directory_of_json,
+                      validation_split):
   """
   Iterate through each pickle file and import a subset of the dataframe
   """
-  list_of_dataframes = []
 
   # All entries that have a pattern path need special handling
   # Specifically, all the files that match the pattern path
@@ -182,6 +216,8 @@ def import_dataframes(dataframe_file_list,
       dataframe_file_list += [fixed_path_dict]
 
   # Proceed with importing all dataframe files
+  list_of_train_dataframes = []
+  list_of_test_dataframes = []
   for input_file_dict in dataframe_file_list:
 
     assert("patternPath" not in input_file_dict.keys())
@@ -200,79 +236,75 @@ def import_dataframes(dataframe_file_list,
       df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
       # Only use examples that have a label in label filter array
-      positive_example_select_vector = df['labels_name'].apply(lambda arr: np.any([x.lower() in positive_label_filter_arr for x in arr]))
+      positive_example_select_vector = get_select_vector(df, positive_label_filter_arr)
       positive_examples_df = df.loc[positive_example_select_vector]
 
+      # This ensures there no overlap between positive and negative examples
+      negative_example_select_vector = ~positive_example_select_vector
       if negative_label_filter_arr is not None:
-        negative_example_select_vector = df['labels_name'].apply(lambda arr: np.any([x.lower() in negative_label_filter_arr for x in arr]))
-      else:
-        negative_example_select_vector = ~positive_example_select_vector
+        # Exclude even further examples that don't fall into the negative label filter
+        negative_example_select_vector &= get_select_vector(df, negative_label_filter_arr)
       negative_examples_df = df.loc[negative_example_select_vector]
 
       # No longer need df after this point
       del df
 
-      positive_subsample = input_file_dict["positiveSubsample"]
-      if (positive_examples_df.shape[0] == 0) and (positive_subsample > 0):
-        print Fore.RED, "No positive examples to subsample from!", Style.RESET_ALL
-        assert(False)
-      else:
-        positive_examples_df = subsample_dataframe(positive_examples_df, positive_subsample)
+      train_positive_examples_df, test_positive_examples_df = \
+                split_and_subsample_dataframe(dataframe=positive_examples_df,
+                                              validation_split=validation_split,
+                                              subsample=input_file_dict["positiveSubsample"])
+      del positive_examples_df
 
-      negative_subsample = input_file_dict["negativeSubsample"]
-      if (negative_examples_df.shape[0] == 0) and (negative_subsample > 0):
-        print Fore.RED, "No negative examples to subsample from!", Style.RESET_ALL
-        assert(False)
-      else:
-        negative_examples_df = subsample_dataframe(negative_examples_df, input_file_dict["negativeSubsample"])
+      train_negative_examples_df, test_negative_examples_df = \
+                split_and_subsample_dataframe(dataframe=negative_examples_df,
+                                              validation_split=validation_split,
+                                              subsample=input_file_dict["negativeSubsample"])
+      del negative_examples_df
 
       # append to overall list of examples
-      list_of_dataframes += [positive_examples_df, negative_examples_df]
+      list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
+      list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
 
-  df = pd.concat(list_of_dataframes, ignore_index=True)
+  train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
+  test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
 
   print "Import done."
 
-  return df
+  return train_df, test_df
 
-DATA_FRAME = import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
-                               positive_label_filter_arr=POSITIVE_LABELS,
-                               negative_label_filter_arr=NEGATIVE_LABELS,
-                               path_to_directory_of_json=PATH_TO_DIRECTORY_OF_CONFIG)
+DF_TRAIN, DF_TEST = \
+    import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
+                      positive_label_filter_arr=POSITIVE_LABELS,
+                      negative_label_filter_arr=NEGATIVE_LABELS,
+                      path_to_directory_of_json=PATH_TO_DIRECTORY_OF_CONFIG,
+                      validation_split=CONFIG_DATA["train"]["validationSplit"])
 
 
 #############################################################################
-        # To Train each class-label change to appropiate label
+        # Turn the target labels into one binarized vector
 #############################################################################
-LABELS_BINARIZED = pd.DataFrame()
-LABELS_BINARIZED[FULL_NAME] = 1.0 * DATA_FRAME['labels_name'].apply(lambda arr: np.any([x.lower() in POSITIVE_LABELS for x in arr]))
+LABELS_BINARIZED_TRAIN = pd.DataFrame()
+LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(DF_TRAIN, POSITIVE_LABELS)
+
+LABELS_BINARIZED_TEST = pd.DataFrame()
+LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
 
 #############################################################################
         # print out the number and percentage of each class examples
 #############################################################################
 
+TOTAL_TRAIN_TEST_EXAMPLES = LABELS_BINARIZED_TRAIN.shape[0] + LABELS_BINARIZED_TEST.shape[0]
+TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES = (LABELS_BINARIZED_TRAIN[FULL_NAME] == 1).sum() + \
+                                     (LABELS_BINARIZED_TEST[FULL_NAME] == 1).sum()
+TOTAL_TRAIN_TEST_NEGATIVE_EXAMPLES = (LABELS_BINARIZED_TRAIN[FULL_NAME] == 0).sum() + \
+                                     (LABELS_BINARIZED_TEST[FULL_NAME] == 0).sum()
+
 print "NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
-      LABELS_BINARIZED.shape[0], "/", \
-      (LABELS_BINARIZED[FULL_NAME] == 1).sum(), "/", \
-      (LABELS_BINARIZED[FULL_NAME] == 0).sum()
+      TOTAL_TRAIN_TEST_EXAMPLES, "/", \
+      TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES, "/", \
+      TOTAL_TRAIN_TEST_NEGATIVE_EXAMPLES
 
-print "PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100*LABELS_BINARIZED[FULL_NAME].mean())
-
-
-
-#############################################################################
-        # split the data into train and test data
-#############################################################################
-TRAIN_TEST_SHUFFLE_SPLIT = StratifiedShuffleSplit(n_splits=1,
-                                                  test_size=CONFIG_DATA["train"]["validationSplit"],
-                                                  random_state=42)
-
-TRAIN_INDICES, TEST_INDICES = next(TRAIN_TEST_SHUFFLE_SPLIT.split(DATA_FRAME, LABELS_BINARIZED))
-
-DF_TRAIN  = DATA_FRAME.iloc[TRAIN_INDICES]
-DF_TEST   = DATA_FRAME.iloc[TEST_INDICES]
-LABELS_BINARIZED_TRAIN  = LABELS_BINARIZED.iloc[TRAIN_INDICES]
-LABELS_BINARIZED_TEST   = LABELS_BINARIZED.iloc[TEST_INDICES]
+print "PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100.0*TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES/TOTAL_TRAIN_TEST_EXAMPLES)
 
 #############################################################################
         # preprecess the data into required structure
