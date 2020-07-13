@@ -3,6 +3,8 @@ Traning a Binary Relevance Model
 """
 #Import the necessary functions and libraries
 import argparse
+from colorama import Fore, Style
+from glob import glob
 import json
 from keras.models import model_from_json, Sequential
 from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
@@ -124,7 +126,66 @@ def import_dataframes(dataframe_file_list,
   """
   list_of_dataframes = []
 
+  # All entries that have a pattern path need special handling
+  # Specifically, all the files that match the pattern path
+  # need to be determined
+  pattern_file_dicts =  filter(lambda x: "patternPath" in x.keys(), dataframe_file_list)
+
+  # Keep just the entries that don't have a pattern path
+  # We'll add entries for each pattern path separately
+  dataframe_file_list = filter(lambda x: "patternPath" not in x.keys(), dataframe_file_list)
+
+  # Expand out each pattern path entry into individual ones with fixed paths
+  for input_file_dict in pattern_file_dicts:
+    pattern_path = input_file_dict["patternPath"]
+
+    # Get list of any exclusions that should be made
+    if "excludePaths" in input_file_dict.keys():
+      exclude_paths = input_file_dict["excludePaths"]
+
+      if exclude_paths is None:
+        exclude_paths = []
+      elif type(exclude_paths) != list:
+        exclude_paths = [exclude_paths]
+    else:
+      exclude_paths = []
+
+    # Make excluded paths a set for fast lookup
+    exclude_paths = set(exclude_paths)
+
+    # Search for all paths that match this pattern
+    search_results = glob(path_to_directory_of_json + pattern_path)
+
+    # Remove path to directory of json as prefix to the path
+    # It will be added back later
+    search_results = map(lambda x: x[len(path_to_directory_of_json):], search_results)
+
+    # If path is in the excluded paths, then ignore it
+    search_results = filter(lambda x: x not in exclude_paths, search_results)
+
+    if len(search_results) == 0:
+      print Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths, Style.RESET_ALL
+      assert(False)
+
+    for path in search_results:
+      # Add an entry with fixed path
+      fixed_path_dict = input_file_dict.copy()
+
+      # Remove keys that are used for pattern path entry
+      # Most other keys should be the same as the pattern path entry
+      del fixed_path_dict["patternPath"]
+      if "excludePaths" in fixed_path_dict.keys():
+        del fixed_path_dict["excludePaths"]
+
+      # Make it look like a fixed path entry
+      fixed_path_dict["path"] = path
+      dataframe_file_list += [fixed_path_dict]
+
+  # Proceed with importing all dataframe files
   for input_file_dict in dataframe_file_list:
+
+    assert("patternPath" not in input_file_dict.keys())
+    assert("path" in input_file_dict.keys())
 
     print "Importing", input_file_dict["path"], "..."
 
@@ -153,14 +214,14 @@ def import_dataframes(dataframe_file_list,
 
       positive_subsample = input_file_dict["positiveSubsample"]
       if (positive_examples_df.shape[0] == 0) and (positive_subsample > 0):
-        print "No positive examples to subsample from!"
+        print Fore.RED, "No positive examples to subsample from!", Style.RESET_ALL
         assert(False)
       else:
         positive_examples_df = subsample_dataframe(positive_examples_df, positive_subsample)
 
       negative_subsample = input_file_dict["negativeSubsample"]
       if (negative_examples_df.shape[0] == 0) and (negative_subsample > 0):
-        print "No negative examples to subsample from!"
+        print Fore.RED, "No negative examples to subsample from!", Style.RESET_ALL
         assert(False)
       else:
         negative_examples_df = subsample_dataframe(negative_examples_df, input_file_dict["negativeSubsample"])
