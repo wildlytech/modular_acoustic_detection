@@ -150,13 +150,12 @@ def scrape(audio_files_path, bird_species):
             for row1 in row_data_lists:
                 rows_info, audio_ID = get_rows_info(row1)
                 # check if csv file exists and duplication of audio info in csv file
-                if csv_file_exists and (audio_ID[0] in xc_id_in_csv):
-                    continue
-                else:
+                if (not csv_file_exists) or (audio_ID[0] not in xc_id_in_csv):
                     csvwriter.writerow(audio_ID+rows_info[1:])
 
-                # download the audio file
-                download_xc_audio(dir_path, audio_ID)
+                if not os.path.isfile(dir_path+audio_ID[0]+".mp3"):
+                    # download the audio file
+                    download_xc_audio(dir_path, audio_ID)
 
     print "\nDone..!\n"
 

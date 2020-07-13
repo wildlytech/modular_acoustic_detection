@@ -6,6 +6,8 @@ from data_preprocessing_cleaning import mp3_stereo_to_wav_mono
 from data_preprocessing_cleaning import split_wav_file
 import generating_embeddings
 from get_data import xenocanto_scrape
+import glob
+import os
 import pandas as pd
 import pickle
 import re
@@ -78,7 +80,12 @@ def add_labels_to_dataframe(path_to_feature_dataframe, path_to_label_csv_file):
     return feature_dataframe
 
 
-def xenocanto_to_dataframe(bird_species, output_path):
+def xenocanto_to_dataframe(bird_species,
+                           output_path,
+                           delete_mp3_files = False,
+                           delete_wav_files = True,
+                           delete_split_wav_files = True,
+                           delete_embeddings = False):
     """
     Download xeno-canto sound files for particular bird species
     and perform entire data preprocessing pipeline to generate dataframe
@@ -120,6 +127,26 @@ def xenocanto_to_dataframe(bird_species, output_path):
     add_labels_to_dataframe(path_to_feature_dataframe=path_to_write_dataframe,
                             path_to_label_csv_file=csv_filename)
 
+    if delete_mp3_files:
+        print "Cleaning up intermediate mp3 files..."
+        for f in glob.glob(path_to_src_files + "*.mp3"):
+            os.remove(f)
+
+    if delete_wav_files:
+        print "Cleaning up intermediate wav files converted from mp3..."
+        for f in glob.glob(path_to_src_files + "*.wav"):
+            os.remove(f)
+
+    if delete_split_wav_files:
+        print "Cleaning up intermediate split wav files..."
+        for f in glob.glob(path_to_split_files + "*.wav"):
+            os.remove(f)
+
+    if delete_embeddings:
+        print "Cleaning up embeddings..."
+        for f in glob.glob(path_to_embeddings + "*.pkl"):
+            os.remove(f)
+
     print "Finished!"
 
 ########################################################################
@@ -130,6 +157,7 @@ if __name__ == "__main__":
     DESCRIPTION = 'Scrape XenoCanto and generate dataframe with labeled examples\
                    that can be used for training/evaluation'
     PARSER = argparse.ArgumentParser(description=DESCRIPTION)
+    OPTIONAL_ARGUMENTS = PARSER._action_groups.pop()
     REQUIRED_ARGUMENTS = PARSER.add_argument_group('required arguments')
     REQUIRED_ARGUMENTS.add_argument('-b', '--bird_species',
                                     action='store',
@@ -141,7 +169,30 @@ if __name__ == "__main__":
                                     action='store',
                                     help='Input new folder path to save downloaed and generated data',
                                     required=True)
+
+    for fileType in ['mp3', 'wav', 'split_wav', 'embeddings']:
+        OPTIONAL_ARGUMENTS.add_argument('--delete_'+ fileType +'_files',
+                                        dest='delete_' + fileType + '_files',
+                                        action='store_true',
+                                        help='Delete downloaded ' + fileType + ' files when script finishes')
+        OPTIONAL_ARGUMENTS.add_argument('--dont_delete_'+ fileType +'_files',
+                                        dest='delete_' + fileType + '_files',
+                                        action='store_false',
+                                        help='Don\'t delete downloaded ' + fileType + ' files when script finishes')
+
+    # We don't normally delete the mp3 and embeddings files because
+    # they usually take the longest to generate. If we were to re-run
+    # the script, the time it takes to regenerate these can be saved.
+    OPTIONAL_ARGUMENTS.set_defaults(delete_mp3_files=False,
+                                    delete_wav_files=True,
+                                    delete_split_wav_files=True,
+                                    delete_embeddings_files=False)
+    PARSER._action_groups.append(OPTIONAL_ARGUMENTS)
     RESULT = PARSER.parse_args()
 
     xenocanto_to_dataframe(bird_species=RESULT.bird_species,
-                           output_path=RESULT.output_path)
+                           output_path=RESULT.output_path,
+                           delete_mp3_files = RESULT.delete_mp3_files,
+                           delete_wav_files = RESULT.delete_wav_files,
+                           delete_split_wav_files = RESULT.delete_split_wav_files,
+                           delete_embeddings = RESULT.delete_embeddings_files)
