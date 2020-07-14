@@ -33,6 +33,11 @@ def predict_on_embedding(embedding, label_names, config_datas):
               # Predict on test data
         ##############################################################################
 
+        if embedding.shape[0] < 10:
+            # Pad by repeating the last second in embedding till we get to 10 seconds
+            padding = np.ones((10-embedding.shape[0], embedding.shape[1]))*embedding[-1,:]
+            embedding = np.vstack([embedding, padding])
+
         # If the clip is longer then 10 seconds, then predict on multiple 10-second
         # windows within the clip. Take the max probability across all windows.
         pred_prob = 0
