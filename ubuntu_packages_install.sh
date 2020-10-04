@@ -1,16 +1,21 @@
 #!/bin/sh
 
-sudo apt-get install python-numpy python-scipy python-matplotlib ipython python-pip python-dev python-setuptools ffmpeg
-sudo pip install --upgrade pip
-sudo pip install --upgrade pandas
-sudo pip install pydub peakutils librosa
-sudo pip install matplotlib seaborn statsmodels sqlalchemy
-sudo pip install --upgrade youtube_dl
-sudo pip install scikit-learn xgboost xgbfir
-sudo pip install keras
-sudo pip install tensorflow
-sudo pip install dash==0.31.1  
-sudo pip install dash-html-components==0.13.2  
-sudo pip install dash-core-components==0.39.0 
-sudo pip install argparse
-sudo pip install resampy 
+# Get python3.8
+apt-get install python3.8 python3.8-dev python3.8-distutils python3.8-gdbm python3.8-lib2to3 python3.8-minimal python3.8-tk python3-setuptools python3-pip
+
+# Set default python to python3 (if not already) and default python3 to python 3.8
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+
+# Another way to alias python3 but dependencies don't line up
+# echo '' >> ~/.bashrc
+# echo 'alias python3=/usr/bin/python3.8' >> ~/.bashrc
+# echo 'alias python=python3' >> ~/.bashrc
+# echo '' >> ~/.bashrc
+
+# Minimum needed for loading requirements file is pip and virtualenv
+pip install --upgrade pip
+pip install virtualenv
+
+# Other libraries
+apt-get install ffmpeg

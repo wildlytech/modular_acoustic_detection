@@ -38,12 +38,12 @@ def plot_function(dataframe):
         values_color_dict = dict(color=list(map(SetColor, dataframe['Network_Status'])))
         values_color_list = values_color_dict["color"]
         unique_colors, counts = np.unique(np.array(values_color_list),return_counts=True)
-        names_counts_dict = dict(zip(unique_colors, counts))
-        if len(names_counts_dict.values()) > 1:
+        names_counts_dict = dict(list(zip(unique_colors, counts)))
+        if len(list(names_counts_dict.values())) > 1:
             max_value = max(names_counts_dict.values())
-            get_index = names_counts_dict.values().index(max_value)
-            color_main = names_counts_dict.keys()[get_index]
-            print color_main
+            get_index = list(names_counts_dict.values()).index(max_value)
+            color_main = list(names_counts_dict.keys())[get_index]
+            print(color_main)
             if color_main =="red":
                 name = "Network Quality:- BAD"
             elif color_main =="yellow":
@@ -53,14 +53,14 @@ def plot_function(dataframe):
             else:
                 pass
         else:
-            color_main = names_counts_dict.keys()[0]
+            color_main = list(names_counts_dict.keys())[0]
             if color_main == "red":
                 name = "Network Quality:- BAD"
             elif color_main == "green":
                 name = "Network Quality:- GOOD"
             elif color_main == "yellow":
                 name = "Network Quality:- AVERAGE"
-        data = go.Scatter(x=pd.Series(range(0,20000,1)),text=values_list,mode="markers",hoverinfo="text", 
+        data = go.Scatter(x=pd.Series(list(range(0,20000,1))),text=values_list,mode="markers",hoverinfo="text", 
                             name=name,marker = dict(color=list(map(SetColor, dataframe['Network_Status']))),
                             y=dataframe['Battery_Percentage'])
         return data
@@ -77,7 +77,7 @@ def plot_function(dataframe):
                 name = "Network Quality:- "+list(values_color)[0]+ "=GOOD"
         else:
             name = "Network Quality"
-        data = go.Scatter(x=pd.Series(range(0,10000,1)),text=values_list,mode="markers", name="Network Quality",hoverinfo="text",
+        data = go.Scatter(x=pd.Series(list(range(0,10000,1))),text=values_list,mode="markers", name="Network Quality",hoverinfo="text",
                        marker = {"color":"blue"},y=dataframe['Battery_Percentage'])
         return data
 

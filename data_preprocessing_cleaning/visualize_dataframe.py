@@ -32,7 +32,7 @@ with open(filepath, 'rb') as file_obj:
     df = pickle.load(file_obj)
 
 if not df.columns.contains("dBFS"):
-    print "DataFrame does not contain dBFS column"
+    print("DataFrame does not contain dBFS column")
 else:
     fig = plt.figure()
     (-df.dBFS.replace(-np.inf,1)).hist()
@@ -43,7 +43,7 @@ else:
     plt.savefig(outputFile, dpi=fig.dpi)
     plt.close(fig)
     plt.clf()
-    print "Created", outputFile
+    print("Created", outputFile)
 
 if df.columns.contains("start_seconds") and df.columns.contains("end_seconds"):
     duration = df.end_seconds - df.start_seconds
@@ -51,7 +51,7 @@ elif df.columns.contains("features"):
     duration = df.features.apply(lambda x: len(x))
 else:
     duration = None
-    print "DataFrame does not contain time counts"
+    print("DataFrame does not contain time counts")
 
 if duration is not None:
     fig = plt.figure()
@@ -63,10 +63,10 @@ if duration is not None:
     plt.savefig(outputFile, dpi=fig.dpi)
     plt.close(fig)
     plt.clf()
-    print "Created", outputFile
+    print("Created", outputFile)
 
 if not df.columns.contains("labels_name"):
-    print "DataFrame does not contain labels"
+    print("DataFrame does not contain labels")
 else:
     fig = plt.figure()
     df.labels_name.apply(lambda x: len(x)).hist()
@@ -77,7 +77,7 @@ else:
     plt.savefig(outputFile, dpi=fig.dpi)
     plt.close(fig)
     plt.clf()
-    print "Created", outputFile
+    print("Created", outputFile)
 
     binarized_labels = pd.DataFrame()
     setOfLabels = list(set(chain.from_iterable(df.labels_name)))
@@ -86,7 +86,7 @@ else:
     label_percentages = binarized_labels.mean().sort_values(ascending=False)
     outputFile = filepath+"_label_percent.csv"
     label_percentages.to_csv(outputFile)
-    print "Created", outputFile
+    print("Created", outputFile)
 
     label_combo_percentages = {}
     for index, label_name1 in enumerate(setOfLabels):
@@ -97,9 +97,9 @@ else:
                 label_combo_percentages['['+label_name1 + ']+[' + label_name2 + ']'] = combo_percentage
 
     if len(label_combo_percentages) == 0:
-        print "All examples have only one label, so there are no label combos to report"
+        print("All examples have only one label, so there are no label combos to report")
     else:
         label_combo_percentages = pd.Series(label_combo_percentages).sort_values(ascending=False)
         outputFile = filepath+"_label_combo_percent.csv"
         label_combo_percentages.to_csv(outputFile)
-        print "Created", outputFile
+        print("Created", outputFile)

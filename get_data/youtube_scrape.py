@@ -68,7 +68,7 @@ for item in VIDEO_LIST[:NUMBER_AUDIOCLIPS_LIMIT]:
         except CalledProcessError:
 
             # do nothing
-            print "Exception CalledProcessError!"
+            print("Exception CalledProcessError!")
     else:
         pass
 

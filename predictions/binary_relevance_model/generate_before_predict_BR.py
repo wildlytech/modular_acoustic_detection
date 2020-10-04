@@ -31,7 +31,7 @@ Usage:
   $ python vggish_inference_demo.py
 """
 
-from __future__ import print_function
+
 import sys
 import tensorflow as tf
 from keras import backend as K

@@ -50,14 +50,14 @@ NUMBER_OF_SECONDS = 10
 #################################################################################
 SAMPLE_RATE, READ_FILE = scipy.io.wavfile.read(RESULT.wavfile_path_to_filter)
 WAV_FILE = np.array([i[0] for i in READ_FILE])
-print WAV_FILE.shape
+print(WAV_FILE.shape)
 
 
 #################################################################################
             # resampling the wave file
 #################################################################################
 WAV_FILE = resampy.resample(WAV_FILE, SAMPLE_RATE, RESAMPLING_RATE)
-print WAV_FILE.shape
+print(WAV_FILE.shape)
 
 
 
@@ -95,7 +95,7 @@ def Goertzel_filter(sample, sample_rate, target_frequency, number_samples):
         result_mag[index] = math.sqrt(magnitude)
         index += 1
     end = time.time()
-    print 'Time elapsed :', (end-start)
+    print('Time elapsed :', (end-start))
     return  result_mag
 
 
@@ -104,7 +104,7 @@ def Goertzel_filter(sample, sample_rate, target_frequency, number_samples):
 #################################################################################
 MAGNITUDE = Goertzel_filter(WAV_FILE, RESAMPLING_RATE,
                             TARGET_FREQUENCY, RESAMPLING_RATE*NUMBER_OF_SECONDS)
-MAGNITUDE = map(int, MAGNITUDE)
+MAGNITUDE = list(map(int, MAGNITUDE))
 SAMPLE_RATE = SAMPLE_RATE
 TIME_SPACE = np.linspace(0, NUMBER_OF_SECONDS, RESAMPLING_RATE*10)
 

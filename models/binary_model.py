@@ -60,8 +60,8 @@ LABELS_BINARIZED = pd.DataFrame(LABELS_BINARIZED, columns=NAME_BIN.classes_)
 ########################################################################
             # print the percentage of Impact and Ambinet sounds
 ########################################################################
-print "Percentage Impact Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1) > 0).mean()
-print "Percentage Ambient Sounds:", (LABELS_BINARIZED[AMBIENT_SOUNDS].sum(axis=1) > 0).mean()
+print("Percentage Impact Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1) > 0).mean())
+print("Percentage Ambient Sounds:", (LABELS_BINARIZED[AMBIENT_SOUNDS].sum(axis=1) > 0).mean())
 
 
 
@@ -99,12 +99,12 @@ Y_TEST = (LABELS_BINARIZED_TEST[IMPACT_SOUNDS].any(axis=1)*1).values
 ########################################################################
             # Print the percentage of each sounds in whole data
 ########################################################################
-print LABELS_FILTERED.loc[:, explosion_sounds].any(axis=1).mean()
-print LABELS_FILTERED.loc[:, motor_sounds].any(axis=1).mean()
-print LABELS_FILTERED.loc[:, wood_sounds].any(axis=1).mean()
-print LABELS_FILTERED.loc[:, human_sounds].any(axis=1).mean()
-print LABELS_FILTERED.loc[:, nature_sounds].any(axis=1).mean()
-print LABELS_FILTERED.loc[:, IMPACT_SOUNDS].any(axis=1).mean()
+print(LABELS_FILTERED.loc[:, explosion_sounds].any(axis=1).mean())
+print(LABELS_FILTERED.loc[:, motor_sounds].any(axis=1).mean())
+print(LABELS_FILTERED.loc[:, wood_sounds].any(axis=1).mean())
+print(LABELS_FILTERED.loc[:, human_sounds].any(axis=1).mean())
+print(LABELS_FILTERED.loc[:, nature_sounds].any(axis=1).mean())
+print(LABELS_FILTERED.loc[:, IMPACT_SOUNDS].any(axis=1).mean())
 
 
 
@@ -130,7 +130,7 @@ CLF1_TEST_TARGET = LABELS_BINARIZED_TEST.loc[:, IMPACT_SOUNDS].any(axis=1)
 ########################################################################
         # fit the train data to LR model
 ########################################################################
-print "Trainging Logistic Regression Model.."
+print("Trainging Logistic Regression Model..")
 CLF1_.fit(CLF1_TRAIN, CLF1_TRAIN_TARGET)
 
 
@@ -146,12 +146,12 @@ CLF1_TEST_PREDICTION_PROB = CLF1_.predict_proba(CLF1_TEST)[:, 1]
         # Print out the confusion matrix for Train data
 ########################################################################
 CLF1_CONF_TRAIN_MAT = pd.crosstab(CLF1_TRAIN_TARGET, CLF1_TRAIN_PREDICTION, margins=True)
-print 'Train precsion and recall for Logistic regression'
-print '============================================='
-print "Train Precision:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT[True]['All'])
-print "Train Recall:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT['All'][True])
-print "Train Accuracy:", (CLF1_TRAIN_PREDICTION == CLF1_TRAIN_TARGET).mean()
-print CLF1_CONF_TRAIN_MAT
+print('Train precsion and recall for Logistic regression')
+print('=============================================')
+print("Train Precision:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT[True]['All']))
+print("Train Recall:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT['All'][True]))
+print("Train Accuracy:", (CLF1_TRAIN_PREDICTION == CLF1_TRAIN_TARGET).mean())
+print(CLF1_CONF_TRAIN_MAT)
 
 
 
@@ -159,12 +159,12 @@ print CLF1_CONF_TRAIN_MAT
         # Print out the confusion matrix for test data
 ########################################################################
 CLF1_CONF_TEST_MAT = pd.crosstab(CLF1_TEST_TARGET, CLF1_TEST_PREDICTION, margins=True)
-print 'Test precsion and recall for Logistic regression'
-print '============================================='
-print "Test Precision:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT[True]['All'])
-print "Test Recall:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT['All'][True])
-print "Test Accuracy:", (CLF1_TEST_PREDICTION == CLF1_TEST_TARGET).mean()
-print CLF1_CONF_TEST_MAT
+print('Test precsion and recall for Logistic regression')
+print('=============================================')
+print("Test Precision:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT[True]['All']))
+print("Test Recall:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT['All'][True]))
+print("Test Accuracy:", (CLF1_TEST_PREDICTION == CLF1_TEST_TARGET).mean())
+print(CLF1_CONF_TEST_MAT)
 
 
 
@@ -184,7 +184,7 @@ def create_keras_model():
     model.add(Dense(1, activation='sigmoid'))
     model.add(MaxPooling1D(10))
     model.add(Flatten())
-    print model.summary()
+    print(model.summary())
     # Compile model
     model.compile(loss='binary_crossentropy', optimizer=RMSprop(lr=1e-4), metrics=['accuracy'])
     return model
@@ -220,20 +220,20 @@ CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST).ravel()
 ########################################################################
         # Accuracy of Train and test
 ########################################################################
-print "Train Accuracy:", (CLF2_TRAIN_PREDICTION == CLF2_TRAIN_TARGET).mean()
-print "Test Accuracy:", (CLF2_TEST_PREDICTION == CLF2_TEST_TARGET).mean()
+print("Train Accuracy:", (CLF2_TRAIN_PREDICTION == CLF2_TRAIN_TARGET).mean())
+print("Test Accuracy:", (CLF2_TEST_PREDICTION == CLF2_TEST_TARGET).mean())
 
 
 ########################################################################
         # print out the confusion matrix for train data
 ########################################################################
 CLF2_CONF_TRAIN_MAT = pd.crosstab(CLF2_TRAIN_TARGET, CLF2_TRAIN_PREDICTION, margins=True)
-print "Training Precision and recall for Keras model"
-print '============================================='
-print "Train Precision:", CLF2_CONF_TRAIN_MAT[True][True] / float(CLF2_CONF_TRAIN_MAT[True]['All'])
-print "Train Recall:", CLF2_CONF_TRAIN_MAT[True][True] / float(CLF2_CONF_TRAIN_MAT['All'][True])
-print "Train Accuracy:", (CLF2_TRAIN_PREDICTION == CLF2_TRAIN_TARGET).mean()
-print CLF2_CONF_TRAIN_MAT
+print("Training Precision and recall for Keras model")
+print('=============================================')
+print("Train Precision:", CLF2_CONF_TRAIN_MAT[True][True] / float(CLF2_CONF_TRAIN_MAT[True]['All']))
+print("Train Recall:", CLF2_CONF_TRAIN_MAT[True][True] / float(CLF2_CONF_TRAIN_MAT['All'][True]))
+print("Train Accuracy:", (CLF2_TRAIN_PREDICTION == CLF2_TRAIN_TARGET).mean())
+print(CLF2_CONF_TRAIN_MAT)
 
 
 
@@ -241,9 +241,9 @@ print CLF2_CONF_TRAIN_MAT
         # print out the confusion matrix for test data
 ########################################################################
 CLF2_CONF_TEST_MAT = pd.crosstab(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION, margins=True)
-print "Testing Precision and recall for Keras model"
-print '============================================='
-print "Test Precision:", CLF2_CONF_TEST_MAT[True][True] / float(CLF2_CONF_TEST_MAT[True]['All'])
-print "Test Recall:", CLF2_CONF_TEST_MAT[True][True] / float(CLF2_CONF_TEST_MAT['All'][True])
-print "Test Accuracy:", (CLF2_TEST_PREDICTION == CLF2_TEST_TARGET).mean()
-print CLF2_CONF_TEST_MAT
+print("Testing Precision and recall for Keras model")
+print('=============================================')
+print("Test Precision:", CLF2_CONF_TEST_MAT[True][True] / float(CLF2_CONF_TEST_MAT[True]['All']))
+print("Test Recall:", CLF2_CONF_TEST_MAT[True][True] / float(CLF2_CONF_TEST_MAT['All'][True]))
+print("Test Accuracy:", (CLF2_TEST_PREDICTION == CLF2_TEST_TARGET).mean())
+print(CLF2_CONF_TEST_MAT)

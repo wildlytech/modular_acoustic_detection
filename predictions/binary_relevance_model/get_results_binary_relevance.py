@@ -54,7 +54,7 @@ def import_predict_configuration_json(predictions_cfg_json):
 
                 # All paths to ontology extension files are relative to the location of the
                 # model configuration file.
-                ontologyExtFiles = map(lambda x: directory_of_filepath + x, ontologyExtFiles)
+                ontologyExtFiles = [directory_of_filepath + x for x in ontologyExtFiles]
 
                 # Update extension paths in dictionary
                 config_data["ontology"]["extension"] = ontologyExtFiles
@@ -98,21 +98,21 @@ def main(predictions_cfg_json,
           # read the dataframe with feature and labels_name column
     ##############################################################################
 
-    print "Importing Data..."
+    print("Importing Data...")
     with open(path_for_dataframe_with_features, "rb") as file_obj:
         DATA_FRAME = pickle.load(file_obj)
-        DATA_FRAME.index = range(0, DATA_FRAME.shape[0])
+        DATA_FRAME.index = list(range(0, DATA_FRAME.shape[0]))
 
     IS_DATAFRAME_LABELED = 'labels_name' in DATA_FRAME.columns
 
     if IS_DATAFRAME_LABELED:
-        print "Categorizing labels in dataframe..."
+        print("Categorizing labels in dataframe...")
         ##############################################################################
                 # Check if labels fall into positive label designation
         ##############################################################################
         LABELS_BINARIZED = pd.DataFrame()
 
-        for label_name in CONFIG_DATAS.keys():
+        for label_name in list(CONFIG_DATAS.keys()):
 
             config_data = CONFIG_DATAS[label_name]
 
@@ -149,13 +149,13 @@ def main(predictions_cfg_json,
         # Implementing using the keras usual prediction technique
     ##############################################################################
 
-    for label_name in CONFIG_DATAS.keys():
+    for label_name in list(CONFIG_DATAS.keys()):
 
         config_data = CONFIG_DATAS[label_name]
 
         MODEL = load_model(config_data["networkCfgJson"], config_data["train"]["outputWeightFile"])
 
-        print("\nLoaded " + label_name + " model from disk")
+        print(("\nLoaded " + label_name + " model from disk"))
 
         ##############################################################################
               # Predict on test data
@@ -173,15 +173,15 @@ def main(predictions_cfg_json,
                     # Target for the test labels
             ##############################################################################
             CLF2_TEST_TARGET = LABELS_FILTERED[label_name].values
-            print 'Target shape:', CLF2_TEST_TARGET.shape
+            print('Target shape:', CLF2_TEST_TARGET.shape)
 
             ##############################################################################
                     # To get the Misclassified examples
             ##############################################################################
             DF_TEST.insert(len(DF_TEST.columns), label_name+'_Actual', CLF2_TEST_TARGET)
             MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
-            print '\nMisclassified number of examples for '+ label_name + " :", \
-                  DF_TEST.loc[MISCLASSIFED_ARRAY].shape[0]
+            print('\nMisclassified number of examples for '+ label_name + " :", \
+                  DF_TEST.loc[MISCLASSIFED_ARRAY].shape[0])
 
 
             ##############################################################################
@@ -197,21 +197,21 @@ def main(predictions_cfg_json,
             ##############################################################################
                     # Print confusion matrix and classification_report
             ##############################################################################
-            print 'Confusion Matrix for '+ label_name
-            print '============================================'
+            print('Confusion Matrix for '+ label_name)
+            print('============================================')
             RESULT_ = confusion_matrix(CLF2_TEST_TARGET,
                                        CLF2_TEST_PREDICTION)
-            print RESULT_
+            print(RESULT_)
 
 
             ##############################################################################
                   # print classification report
             ##############################################################################
-            print 'Classification Report for '+ label_name
-            print '============================================'
+            print('Classification Report for '+ label_name)
+            print('============================================')
             CL_REPORT = classification_report(CLF2_TEST_TARGET,
                                               CLF2_TEST_PREDICTION)
-            print CL_REPORT
+            print(CL_REPORT)
 
 
             ##############################################################################
@@ -220,8 +220,8 @@ def main(predictions_cfg_json,
             ACCURACY = accuracy_score(CLF2_TEST_TARGET,
                                       CLF2_TEST_PREDICTION)
             HL = hamming_loss(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION)
-            print 'Hamming Loss :', HL
-            print 'Accuracy :', ACCURACY
+            print('Hamming Loss :', HL)
+            print('Accuracy :', ACCURACY)
 
     ##############################################################################
           # save the prediction in pickle format

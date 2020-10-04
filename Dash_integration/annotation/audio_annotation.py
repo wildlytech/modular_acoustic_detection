@@ -145,7 +145,7 @@ def model_prediction_tab():
     ##############################################################################
             # Get label names
     ##############################################################################
-    label_names = CONFIG_DATAS.keys()
+    label_names = list(CONFIG_DATAS.keys())
 
     ##############################################################################
           # Implementing using the keras usual training techinque
@@ -256,10 +256,10 @@ def annotation_tab(initial):
                     if i.split("/")[-1] not in annotated_files:
                         # print(i)
                         NUMBER_OF_WAVFILES.append(i)
-                print len(NUMBER_OF_WAVFILES)
+                print(len(NUMBER_OF_WAVFILES))
             else:
                 NUMBER_OF_WAVFILES = TOTAL_FOLDER_WAV_FILES
-            print "total wavfiles :", len(NUMBER_OF_WAVFILES)
+            print("total wavfiles :", len(NUMBER_OF_WAVFILES))
 
         encoded_image_to_play = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT], 'rb').read())
         dataframe = pd.DataFrame()
@@ -454,7 +454,7 @@ def initial_content_annotation(rows, columns, indices, value_drop):
     LABELS_LIST_CHECKLIST_INITIAL = []
     if indices is not None and indices != []:
         pred_df = pred_df.iloc[indices]["Labels Name"]
-        print pred_df.values.tolist()
+        print(pred_df.values.tolist())
         LABELS_LIST_CHECKLIST_INITIAL = pred_df.values.tolist()
     else:
         pass
@@ -481,7 +481,7 @@ def next_audio_content_annotation(rows, columns, indices, value_drop):
     if indices is not None and indices != []:
         pred_df = pred_df.iloc[indices]["Labels Name"]
         LABELS_LIST_CHECKLIST_NEXT = pred_df.values.tolist()
-        print "Hello :", LABELS_LIST_CHECKLIST_NEXT
+        print("Hello :", LABELS_LIST_CHECKLIST_NEXT)
     else:
         pass
     if value_drop:
@@ -630,8 +630,8 @@ def submit_initial_button(n_clicks, value):
                 wavfile_information_object = csv.writer(file_object)
                 if not check_for_duplicate(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1]):
                     wavfile_information_object.writerow([NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1]] + ast.literal_eval(value))
-                    print "submitted initial if"
-                    print value
+                    print("submitted initial if")
+                    print(value)
                     return html.Div([html.H5("Last Submitted: - " +NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
                                              style={"color":"white",
                                                     "fontSize":"15"})])
@@ -649,8 +649,8 @@ def submit_initial_button(n_clicks, value):
                                                      "Label_3",
                                                      "Label_4"])
                 wavfile_information_object.writerow([NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1]] + ast.literal_eval(value))
-                print "submitted initial else"
-                print value
+                print("submitted initial else")
+                print(value)
                 return html.Div([html.H5("Last Submitted: - " +NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
                                          style={"color":"white"})])
 
@@ -673,8 +673,8 @@ def submit_next_button(n_clicks, value):
                 wavfile_information_object = csv.writer(file_object)
                 if not check_for_duplicate(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1]):
                     wavfile_information_object.writerow([NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1]] + ast.literal_eval(value))
-                    print "submitted next if"
-                    print value
+                    print("submitted next if")
+                    print(value)
                     return html.Div([html.H5("Last Submitted: - " +NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
                                              style={"color":"white",
                                                     "fontSize":"15"})])
@@ -687,8 +687,8 @@ def submit_next_button(n_clicks, value):
                 wavfile_information_object = csv.writer(file_object)
                 wavfile_information_object.writerow(["wav_file", "Label_1", "Label_2", "Label_3", "Label_4"])
                 wavfile_information_object.writerow([NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1]]+ ast.literal_eval(value))
-                print "submitted next else"
-                print value
+                print("submitted next else")
+                print(value)
                 return html.Div([html.H5("Last Submitted: - " +NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
                                          style={"color":"white"})])
 

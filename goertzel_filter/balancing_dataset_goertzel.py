@@ -271,12 +271,12 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
     ###########################################################################################
                     # Shuffling the data
     ###########################################################################################
-    mot_req = mot.loc[random.sample(range(0, mot.shape[0]), 2000)]
-    exp_req = exp.loc[random.sample(range(0, exp.shape[0]), 2000)]
-    hum_req = hum.loc[random.sample(range(0, hum.shape[0]), 2000)]
-    nat_req = nat.loc[random.sample(range(0, nat.shape[0]), 10000)]
-    dom_req = dom.loc[random.sample(range(0, dom.shape[0]), 2000)]
-    tools_req = tools.loc[random.sample(range(0, tools.shape[0]), 2000)]
+    mot_req = mot.loc[random.sample(list(range(0, mot.shape[0])), 2000)]
+    exp_req = exp.loc[random.sample(list(range(0, exp.shape[0])), 2000)]
+    hum_req = hum.loc[random.sample(list(range(0, hum.shape[0])), 2000)]
+    nat_req = nat.loc[random.sample(list(range(0, nat.shape[0])), 10000)]
+    dom_req = dom.loc[random.sample(list(range(0, dom.shape[0])), 2000)]
+    tools_req = tools.loc[random.sample(list(range(0, tools.shape[0])), 2000)]
     # wood_req = wood.loc[random.sample(range(0,wood.shape0]), wood.shape[0])]
     # wild_req = wild.loc[random.sample(range(0,wild.shape[0]),1000)]
 
@@ -308,7 +308,7 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
                 #concat the required sounds
     ###########################################################################################
     data_frame = pd.concat(sounds_to_concatenate, ignore_index=True)
-    print 'Final dataframe shape :', data_frame.shape
+    print('Final dataframe shape :', data_frame.shape)
 
     ###########################################################################################
                 #Free up the space

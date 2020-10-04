@@ -81,7 +81,7 @@ LABELS_BINARIZED = LABELS_BINARIZED_ALL[ALL_SOUND_NAMES]
 ########################################################################
       # print out the number and percenatge of each class examples
 ########################################################################
-print LABELS_BINARIZED.mean()
+print(LABELS_BINARIZED.mean())
 
 
 
@@ -130,7 +130,7 @@ def create_keras_model():
     model.add(MaxPooling1D(10))
     model.add(Dense(6, activation='sigmoid'))
     model.add(Flatten())
-    print model.summary()
+    print(model.summary())
     # Compile model
     model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
                   metrics=['accuracy'])
@@ -187,24 +187,24 @@ MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 ########################################################################
       # print misclassified number of examples
 ########################################################################
-print 'Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shape[0]
+print('Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shape[0])
 
 
 
 ########################################################################
       # Print confusion matrix and classification_report
 ########################################################################
-print CLF2_TEST_TARGET.values.argmax(axis=1).shape
-print '        Confusion Matrix          '
-print '============================================'
+print(CLF2_TEST_TARGET.values.argmax(axis=1).shape)
+print('        Confusion Matrix          ')
+print('============================================')
 RESULT = confusion_matrix(CLF2_TEST_TARGET.values.argmax(axis=1),
                           CLF2_TEST_PREDICTION.argmax(axis=1))
-print RESULT
-print '        Classification Report      '
-print '============================================'
+print(RESULT)
+print('        Classification Report      ')
+print('============================================')
 CL_REPORT = classification_report(CLF2_TEST_TARGET.values.argmax(axis=1),
                                   CLF2_TEST_PREDICTION.argmax(axis=1))
-print CL_REPORT
+print(CL_REPORT)
 
 
 
@@ -215,8 +215,8 @@ print CL_REPORT
 ACCURACY = accuracy_score(CLF2_TEST_TARGET.values.argmax(axis=1),
                           CLF2_TEST_PREDICTION.argmax(axis=1))
 HL = hamming_loss(CLF2_TEST_TARGET.values.argmax(axis=1), CLF2_TEST_PREDICTION.argmax(axis=1))
-print 'Hamming Loss :', HL
-print 'Accuracy :', ACCURACY
+print('Hamming Loss :', HL)
+print('Accuracy :', ACCURACY)
 
 
 

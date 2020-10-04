@@ -154,11 +154,11 @@ if __name__ == "__main__":
     if ARGS.output_file:
         OUT_FILE = ARGS.output_file[0] + ".csv"
         DATA_FRAME.to_csv(OUT_FILE, index=False)
-        print "\nResults written to " + OUT_FILE
+        print("\nResults written to " + OUT_FILE)
     else:
-        print DATA_FRAME
+        print(DATA_FRAME)
 
     if ARGS.extract_dir:
         extract_sound_clips(FILENAME_W_EXTENSION, DATA_FRAME, ARGS.extract_dir[0])
-        print "Sound clips extracted!"
+        print("Sound clips extracted!")
         

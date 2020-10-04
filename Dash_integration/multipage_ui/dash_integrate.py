@@ -107,7 +107,7 @@ def predictions_from_models(wavfile_path, embeddings):
     prediction_probs, prediction_rounded = \
             predict_on_wavfile_binary_relevance.predict_on_embedding(\
                                                 embedding = embeddings,
-                                                label_names = CONFIG_DATAS.keys(),
+                                                label_names = list(CONFIG_DATAS.keys()),
                                                 config_datas = CONFIG_DATAS)
 
     return prediction_probs, prediction_rounded
@@ -122,7 +122,7 @@ def get_predictions(wavfile_path):
     try:
         embeddings = generate_before_predict_BR.main(wavfile_path, 0, 0, 0)
     except:
-        print('\033[1m'+ "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1])
+        print(('\033[1m'+ "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1]))
         return None, None
     try:
         return predictions_from_models(wavfile_path, embeddings)
@@ -187,7 +187,7 @@ def get_prediction_bar_graph(filepath):
             output_sound, \
             dcc.Graph(id='example',
                       figure={
-                          'data':[{'x':[format_label_name(x) for x in CONFIG_DATAS.keys()],
+                          'data':[{'x':[format_label_name(x) for x in list(CONFIG_DATAS.keys())],
                                    'y':["{0:.2f}".format(x) for x in prediction_probs],
                                    'text':["{0:.2f}%".format(x) for x in prediction_probs],
                                    'textposition':'auto',
@@ -511,9 +511,9 @@ def parse_contents_batch(contents, names, dates):
             os.makedirs("uploaded_files_from_dash/")
         path = "uploaded_files_from_dash/"+i[1]
         if os.path.exists(path):
-            print "path Exists"
+            print("path Exists")
         else:
-            print "Downloading and generating embeddings ", i[1]
+            print("Downloading and generating embeddings ", i[1])
             save_file(i[1], i[0])
             # with open(path, 'wb') as file_obj:
             #     ftp.retrbinary('RETR '+ i, file_obj.write)
@@ -521,7 +521,7 @@ def parse_contents_batch(contents, names, dates):
             emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
             os.remove(path)
         except ValueError:
-            print "malformed index", dum_df.loc[dum_df["FileNames"] == i[1]].index
+            print("malformed index", dum_df.loc[dum_df["FileNames"] == i[1]].index)
             dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == i[1]].index)
             malformed.append(i[1])
             os.remove(path)
@@ -531,7 +531,7 @@ def parse_contents_batch(contents, names, dates):
         prediction_probs, prediction_rounded = predictions_from_models(path, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
 
 
-        pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+        pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
         pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
 
         return call_for_data(pred_df,
@@ -541,9 +541,9 @@ def parse_contents_batch(contents, names, dates):
                              list_of_malformed=malformed)
 
     elif len(dum_df["FileNames"] > 1):
-        pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+        pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
 
-        for index, each_file, each_embedding in zip(range(0, dum_df.shape[0]), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
+        for index, each_file, each_embedding in zip(list(range(0, dum_df.shape[0])), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
             try:
                 prediction_probs, prediction_rounded = predictions_from_models(path, each_embedding)
 
@@ -575,7 +575,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
                     zip(list_of_contents, list_of_names, list_of_dates)]
                 return children
         else:
-            print "len of files: ", (list_of_names)
+            print("len of files: ", (list_of_names))
             return parse_contents_batch(list_of_contents, list_of_names, list_of_dates)
 
 
@@ -587,11 +587,11 @@ def start_batch_run_ftp_live(path_for_folder):
 
     all_wav_files_path = glob.glob(path_for_folder+"*.WAV") + glob.glob(path_for_folder+"*.wav")
     all_wav_files = [each_file.split("/")[-1] for each_file in all_wav_files_path]
-    print 'len:', len(all_wav_files)
+    print('len:', len(all_wav_files))
     dum_df = pd.DataFrame()
     dum_df["FileNames"] = all_wav_files
     malformed_specific = []
-    tag_names = ["FileNames"] + CONFIG_DATAS.keys()
+    tag_names = ["FileNames"] + list(CONFIG_DATAS.keys())
 
 
     # Check if the csv file is already existing or not. If it is existing then append the result
@@ -771,9 +771,9 @@ def call_for_ftp():
     Connect to FTP and display all the wav files present in directory
     """
     global ftp
-    print "Connecting to FTP..."
+    print("Connecting to FTP...")
     ftp = FTP(FTP_HOST_NAME, user=FTP_USER_NAME, passwd=FTP_PASSWORD)
-    print "Connected to FTP!"
+    print("Connected to FTP!")
     ftp.cwd(TARGET_FTP_FOLDER)
     ex = ftp.nlst()
     wav_files_only = check_for_wav_only(ex)
@@ -914,15 +914,15 @@ def batch_downloading_and_predict(n_clicks):
                 os.makedirs("FTP_downloaded/")
             path = "FTP_downloaded/"+i
             if os.path.exists(path):
-                print "path Exists"
+                print("path Exists")
             else:
-                print "Downloading and generating embeddings ", i
+                print("Downloading and generating embeddings ", i)
                 with open(path, 'wb') as file_obj:
                     ftp.retrbinary('RETR '+ i, file_obj.write)
             try:
                 emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
             except ValueError:
-                print "malformed index", dum_df.loc[dum_df["FileNames"] == i].index
+                print("malformed index", dum_df.loc[dum_df["FileNames"] == i].index)
                 dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == i].index)
                 malformed.append(i)
                 os.remove(path)
@@ -932,7 +932,7 @@ def batch_downloading_and_predict(n_clicks):
             prediction_probs, prediction_rounded = predictions_from_models(path, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
 
 
-            pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+            pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
             pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
 
             return call_for_data(pred_df,
@@ -942,9 +942,9 @@ def batch_downloading_and_predict(n_clicks):
                                  list_of_malformed=malformed)
 
         elif len(dum_df["FileNames"] > 1):
-            pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+            pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
 
-            for index, each_file, each_embedding in zip(range(0, dum_df.shape[0]), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
+            for index, each_file, each_embedding in zip(list(range(0, dum_df.shape[0])), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
                 try:
                     prediction_probs, prediction_rounded = predictions_from_models(path, each_embedding)
 
@@ -992,7 +992,7 @@ PAGE_4_LAYOUT = html.Div([
             style={"color":"green",
                    'text-decoration':'underline'}),
     dcc.Dropdown(id="select-class",
-                 options=[{"label":i, "value":i} for i in CONFIG_DATAS.keys()],
+                 options=[{"label":i, "value":i} for i in list(CONFIG_DATAS.keys())],
                  multi=False,
                  placeholder="Search for Audio Category"),
     html.Div(id='output_dropdown'),
@@ -1022,7 +1022,7 @@ def call_for_labels(data):
     """
     labels = []
     for label in list(set(np.concatenate(data["labels_name"].values.tolist()))):
-        if label in CONFIG_DATAS.keys():
+        if label in list(CONFIG_DATAS.keys()):
             labels.append({"label":str(label), "value":str(label)})
     return labels
 
@@ -1038,7 +1038,7 @@ def select_class(value):
     """
     Return the sub-labels based on the selected class label
     """
-    print value
+    print(value)
     final_d = []
     global COLLECTION
     COLLECTION = DATA_BASE[str(value)]
@@ -1175,9 +1175,9 @@ def display_output_from_data(rows, columns, indices):
                                 stdout=subprocess.PIPE)
 
         path = path.stdout.read().split("\n")[0]
-        print "path ", path.split("\n")
+        print("path ", path.split("\n"))
         encoded_image_from_path = base64.b64encode(open(path, 'rb').read())
-        print "len of indices ", len(indices)
+        print("len of indices ", len(indices))
         INPUT_NAME = path
         return html.Div(style={"padding-bottom":"10%"}, children=[
             html.Br(),
@@ -1202,7 +1202,7 @@ def predict_on_downloaded_file(n_clicks):
     actual predictions takes place here
     """
     global INPUT_NAME
-    print INPUT_NAME
+    print(INPUT_NAME)
 
     if n_clicks >= 1:
         bar_graph_info = get_prediction_bar_graph(INPUT_NAME)

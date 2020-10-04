@@ -67,7 +67,7 @@ def main(predictions_cfg_json, path_for_wavfile):
             # Import json data
     ##############################################################################
     CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(predictions_cfg_json)
-    LABEL_NAMES = CONFIG_DATAS.keys()
+    LABEL_NAMES = list(CONFIG_DATAS.keys())
 
     ##############################################################################
           # Implementing using the keras usual training techinque
@@ -89,7 +89,7 @@ def main(predictions_cfg_json, path_for_wavfile):
           # Print results
     ##############################################################################
     results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB), columns=LABEL_NAMES)
-    print results
+    print(results)
 
 if __name__ == "__main__":
 

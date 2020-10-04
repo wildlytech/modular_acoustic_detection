@@ -57,7 +57,7 @@ DENSE_5 = TimeDistributed(Dense(1, activation='sigmoid'))(DENSE_4)
 MAX_POOL_3 = MaxPooling2D((10, 1))(DENSE_5)
 PREDICTIONS = Flatten()(MAX_POOL_3)
 MODEL = Model(inputs=[INPUTS], outputs=[PREDICTIONS])
-print MODEL.summary()
+print(MODEL.summary())
 
 
 
@@ -68,7 +68,7 @@ print MODEL.summary()
 if RESULT.path_for_saved_weights:
     MODEL.load_weights(RESULT.path_for_saved_weights)
 else:
-    print "No weights File given."
+    print("No weights File given.")
     sys.exit(1)
 
 #################################################################################
@@ -78,7 +78,7 @@ if RESULT.path_dataframe_with_features:
     with open(RESULT.path_dataframe_with_features, "rb") as file_obj:
         DF_TEST = pickle.load(file_obj)
 else:
-    print "Dataframe not Found."
+    print("Dataframe not Found.")
     sys.exit(1)
 
 
@@ -86,7 +86,7 @@ else:
             # Read all the test data first
 #################################################################################
 CLF1_TEST = []
-print 'Reading Test files ..!'
+print('Reading Test files ..!')
 
 for each_emb, each_wav in zip(DF_TEST['features'].tolist(), DF_TEST["wav_file"].tolist()):
     # Read all the files that are splitted as test in the path directory specified
@@ -98,7 +98,7 @@ for each_emb, each_wav in zip(DF_TEST['features'].tolist(), DF_TEST["wav_file"].
 
     #except any error then remove that file manually and then run the process again
     except OSError:
-        print 'Test Pickling Error: ', each_wav
+        print('Test Pickling Error: ', each_wav)
 
 
 #################################################################################
@@ -122,4 +122,4 @@ DF_TEST['predictions'] = PREDICTIONS.ravel().round()
 if RESULT.path_to_write_prediction_csv:
     DF_TEST.drop(["features"], axis=1).to_csv(RESULT.path_to_write_prediction_csv)
 else:
-    print "Predictions are not saved. Give appropiate argument to save the predictions"
+    print("Predictions are not saved. Give appropiate argument to save the predictions")

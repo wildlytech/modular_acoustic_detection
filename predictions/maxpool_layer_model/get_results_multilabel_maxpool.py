@@ -71,7 +71,7 @@ tools = get_recursive_sound_names(TOOLS_SOUNDS, "../../")
 ##################################################################################
 with open(RESULT.path_for_dataframe_with_FL, 'rb') as file_obj:
     DATA_FRAME = pickle.load(file_obj)
-DATA_FRAME.index = range(0, DATA_FRAME.shape[0])
+DATA_FRAME.index = list(range(0, DATA_FRAME.shape[0]))
 
 
 
@@ -147,7 +147,7 @@ COLUMNS_PRESENT = get_labels_present(LABELS_BINARIZED_ALL)
 if COLUMNS_PRESENT:
     LABELS_BINARIZED = LABELS_BINARIZED_ALL[COLUMNS_PRESENT]
 else:
-    print "No Relevant Labels Found"
+    print("No Relevant Labels Found")
     sys.exit(1)
 
 
@@ -167,7 +167,7 @@ else:
           # Arrange them in the order same as training
 ##################################################################################
 LABELS_BINARIZED = LABELS_BINARIZED[ALL_SOUND_NAMES]
-print LABELS_BINARIZED.mean()
+print(LABELS_BINARIZED.mean())
 
 
 
@@ -204,7 +204,7 @@ def create_keras_model():
     model.add(Dense(6, activation='sigmoid'))
     model.add(MaxPooling1D(10))
     model.add(Flatten())
-    print model.summary()
+    print(model.summary())
     # Compile model
     model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
                   metrics=['accuracy'])
@@ -265,23 +265,23 @@ MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 ##################################################################################
           # Print confusion matrix
 ##################################################################################
-print CLF2_TRAIN_TARGET.values.argmax(axis=1).shape
-print '        Confusion Matrix          '
-print '============================================'
+print(CLF2_TRAIN_TARGET.values.argmax(axis=1).shape)
+print('        Confusion Matrix          ')
+print('============================================')
 RESULT_ = confusion_matrix(CLF2_TRAIN_TARGET.values.argmax(axis=1),
                            CLF2_TRAIN_PREDICTION.argmax(axis=1))
-print RESULT_
+print(RESULT_)
 
 
 
 ##################################################################################
           # print classification report
 ##################################################################################
-print '                 Classification Report      '
-print '============================================'
+print('                 Classification Report      ')
+print('============================================')
 CL_REPORT = classification_report(CLF2_TRAIN_TARGET.values.argmax(axis=1),
                                   CLF2_TRAIN_PREDICTION.argmax(axis=1))
-print CL_REPORT
+print(CL_REPORT)
 
 
 
@@ -292,8 +292,8 @@ ACCURACY = accuracy_score(CLF2_TRAIN_TARGET.values.argmax(axis=1),
                           CLF2_TRAIN_PREDICTION.argmax(axis=1))
 HL = hamming_loss(CLF2_TRAIN_TARGET.values.argmax(axis=1), CLF2_TRAIN_PREDICTION.argmax(axis=1))
 
-print 'Hamming Loss :', HL
-print 'Accuracy :', ACCURACY
+print('Hamming Loss :', HL)
+print('Accuracy :', ACCURACY)
 
 
 ##################################################################################
@@ -303,9 +303,9 @@ if RESULT.path_to_save_prediciton_dataframe:
     with open(RESULT.path_to_save_prediciton_dataframe, "w") as file_obj:
         pickle.dump(DF_TRAIN, file_obj)
 else:
-    print "Predictions not saved in DataFrame format (.pkl). \
+    print("Predictions not saved in DataFrame format (.pkl). \
 You won't be able to see Multilabel predictions metrics \
-To save, pass the appropiate command line argument."
+To save, pass the appropiate command line argument.")
 
 
 
@@ -315,6 +315,6 @@ To save, pass the appropiate command line argument."
 if RESULT.csvfilename_to_save_predictions:
     DF_TRAIN.drop(["features"], axis=1).to_csv(RESULT.csvfilename_to_save_predictions)
 else:
-    print "Predictions not saved in csv file. \
-To save pass the appropiate command line argument."
+    print("Predictions not saved in csv file. \
+To save pass the appropiate command line argument.")
 

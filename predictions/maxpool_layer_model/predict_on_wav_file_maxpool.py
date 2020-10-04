@@ -31,7 +31,7 @@ Usage:
   $ python vggish_inference_demo.py
 """
 
-from __future__ import print_function
+
 import sys
 import tensorflow as tf
 sys.path.insert(0, '../../externals/tensorflow_models/research/audioset/')

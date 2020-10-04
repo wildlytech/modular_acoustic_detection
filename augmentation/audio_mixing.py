@@ -139,7 +139,7 @@ def get_samplerate_44_48(dataframe):
     # Get different sampling rates audio Files in separate lists (When paths are given)
 #########################################################################################
 def get_samplerate_44_48_paths(wavfiles_list):
-    print "Sorting Files"
+    print("Sorting Files")
     samp_44k = []
     samp_48k = []
     for each in wavfiles_list:
@@ -177,7 +177,7 @@ def get_selected_type(type_sound):
         # Mixing audio clips (Youtube)
 #########################################################################################
 def start_mixing_two_audioclips(wavfile_list1, wavfile_list2, min_examples):
-    print "started mixing audio clips"
+    print("started mixing audio clips")
     for each_file in zip(wavfile_list1[:min_examples], wavfile_list2[:min_examples]):
         if os.path.exists(RESULT.path_to_save_mixed_sounds+each_file[0][:-4]+"__mix__"+each_file[1][:-4]+".wav"):
             pass
@@ -194,7 +194,7 @@ def start_mixing_two_audioclips(wavfile_list1, wavfile_list2, min_examples):
         # Mixing audio clips from paths given
 #########################################################################################
 def start_mixing_two_audioclips_from_path(wavfile_list1, wavfile_list2, min_examples):
-    print "started mixing"
+    print("started mixing")
     for each_file in zip(wavfile_list1[:min_examples], wavfile_list2[:min_examples]):
         if os.path.exists(RESULT.path_to_save_mixed_sounds+each_file[0].split("/")[-1][:-4]+"__mix__"+each_file[1].split("/")[-1][:-4]+".wav"):
             pass
@@ -218,20 +218,20 @@ if __name__ == "__main__":
             if TYPEONE_INDEX:
                 TYPEONE44K, TYPEONE48K = get_samplerate_44_48(DATAFRAME[int(TYPEONE_INDEX)][:MAXIMUM_LIMIT_EXAMPLES])
             else:
-                print "Invalid type one sound Selected"
+                print("Invalid type one sound Selected")
                 sys.exit(1)
         else:
-            print "Select type of sounds to mix"
+            print("Select type of sounds to mix")
             sys.exit(1)
         if RESULT.type_two:
             TYPETWO_INDEX = get_selected_type(RESULT.type_two)
             if TYPETWO_INDEX:
                 TYPETWO44K, TYPETWO48K = get_samplerate_44_48(DATAFRAME[int(TYPETWO_INDEX)][:MAXIMUM_LIMIT_EXAMPLES])
             else:
-                print "Invalid type two sound Selected"
+                print("Invalid type two sound Selected")
                 sys.exit(1)
         else:
-            print "Select type of sounds to mix"
+            print("Select type of sounds to mix")
             sys.exit(1)
 
         MIN_44K = min(len(TYPEONE44K), len(TYPETWO44K))
@@ -244,12 +244,12 @@ if __name__ == "__main__":
             TYPEONE_FILES_PATH = glob.glob(RESULT.path_type_one_audio_files+"*.wav") + \
                                  glob.glob(RESULT.path_type_one_audio_files+"*.WAV")
         else:
-            print "Input path for type of sound"
+            print("Input path for type of sound")
         if RESULT.path_type_two_audio_files:
             TYPETWO_FILES_PATH = glob.glob(RESULT.path_type_two_audio_files+"*.wav") + \
                                  glob.glob(RESULT.path_type_two_audio_files+"*.WAV")
         else:
-            print "Input path for type of sound"
+            print("Input path for type of sound")
 
         TYPEONE44K, TYPEONE48K = get_samplerate_44_48_paths(TYPEONE_FILES_PATH)
         TYPETWO44K, TYPETWO48K = get_samplerate_44_48_paths(TYPETWO_FILES_PATH)

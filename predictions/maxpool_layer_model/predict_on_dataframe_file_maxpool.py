@@ -62,7 +62,7 @@ def create_keras_model():
     model.add(Dense(6, activation='sigmoid'))
     model.add(MaxPooling1D(10))
     model.add(Flatten())
-    print model.summary()
+    print(model.summary())
     # Compile model
     model.compile(loss='binary_crossentropy',
                   optimizer=Adam(lr=1e-4, epsilon=1e-8),
@@ -86,7 +86,7 @@ else:
         # Filter out sounds which are not equal to 10 seconds
 ##############################################################################
 DF_FILTERED = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
-DF_FILTERED.index = range(0, DF_FILTERED.shape[0])
+DF_FILTERED.index = list(range(0, DF_FILTERED.shape[0]))
 
 
 ##############################################################################

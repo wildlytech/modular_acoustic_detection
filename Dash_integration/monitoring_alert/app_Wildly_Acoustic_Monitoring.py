@@ -20,7 +20,7 @@ import dash_html_components as html
 import dash_daq as daq
 from datetime import datetime
 from datetime import timedelta
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import dash_table
 import numpy as np
 import csv
@@ -85,7 +85,7 @@ def Table(dataframe, column_name):
                 csv_string = pd.read_csv("data_downloaded/"+dataframe.iloc[i][1]+".csv")
                 csv_string = csv_string.to_csv(index=False,
                                                encoding='utf-8')
-                csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.quote(csv_string)
+                csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
                 if col == column_name:
                     cell = html.Td(html.A(id="download-report",
                                           href=csv_string,
@@ -258,7 +258,7 @@ def predictions_from_models(wavfile_path, embeddings):
     prediction_probs, prediction_rounded = \
             predict_on_wavfile_binary_relevance.predict_on_embedding(\
                                                 embedding = embeddings,
-                                                label_names = CONFIG_DATAS.keys(),
+                                                label_names = list(CONFIG_DATAS.keys()),
                                                 config_datas = CONFIG_DATAS)
 
     return prediction_probs, prediction_rounded
@@ -273,7 +273,7 @@ def get_predictions(wavfile_path):
     try:
         embeddings = generate_before_predict_BR.main(wavfile_path, 0, 0, 0)
     except:
-        print('\033[1m'+ "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1])
+        print(('\033[1m'+ "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1]))
         return None, None
     try:
         return predictions_from_models(wavfile_path, embeddings)
@@ -339,7 +339,7 @@ def get_prediction_bar_graph(filepath):
             output_sound, \
             dcc.Graph(id='example',
                       figure={
-                          'data':[{'x':[format_label_name(x) for x in CONFIG_DATAS.keys()],
+                          'data':[{'x':[format_label_name(x) for x in list(CONFIG_DATAS.keys())],
                                    'y':["{0:.2f}".format(x) for x in prediction_probs],
                                    'text':["{0:.2f}%".format(x) for x in prediction_probs],
                                    'textposition':'auto',
@@ -435,7 +435,7 @@ def sort_on_filenames(files_list):
         else:
             pass
     if wav_files_number:
-        wav_files_toint = map(int, wav_files_number)
+        wav_files_toint = list(map(int, wav_files_number))
         sorted_wavfiles = sorted(wav_files_toint)
 
         for sorted_file in sorted_wavfiles:
@@ -481,7 +481,7 @@ def write_csv_prediction(direct_name, filename, device_id, prediction_list, csv_
             file_object.flush()
 
     else:
-        header_names = ["Directory", "Filename", "DeviceID"] + CONFIG_DATAS.keys()
+        header_names = ["Directory", "Filename", "DeviceID"] + list(CONFIG_DATAS.keys())
         with open(csv_filename, "w") as file_object:
             wav_information_object = csv.writer(file_object)
             wav_information_object.writerow(header_names)
@@ -524,7 +524,7 @@ def directory_procedure(directory_listing, selected_device, ftp_obj):
     global FTP_PATH
     global done
     ftp_obj.cwd(FTP_PATH)
-    print(ftp_obj.pwd())
+    print((ftp_obj.pwd()))
     ftp_obj.cwd(directory_listing[0]+"/")
     for each_ in directory_listing:
         while True:
@@ -552,8 +552,8 @@ def directory_procedure(directory_listing, selected_device, ftp_obj):
                                                  selected_device,
                                                  prediction_list,
                                                  "downloaded_audio_files/"+each_+".csv")
-                            decide_to_alert = check_for_soi(prediction_rounded, CONFIG_DATAS.keys())
-                            print "decide to alert:",decide_to_alert
+                            decide_to_alert = check_for_soi(prediction_rounded, list(CONFIG_DATAS.keys()))
+                            print("decide to alert:",decide_to_alert)
                             if decide_to_alert:
                                 write_csv_prediction(each_,
                                                      each_file,
@@ -586,7 +586,7 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
     global GLOBAL_STOP_THREAD
     global done
     ftp_obj.cwd(FTP_PATH)
-    print(ftp_obj.pwd())
+    print((ftp_obj.pwd()))
     ftp_obj.cwd(directory_listing[0]+"/")
     for each in directory_listing:
         while not GLOBAL_STOP_THREAD:
@@ -615,8 +615,8 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
                                                      selected_device,
                                                      prediction_list,
                                                      "downloaded_audio_files/"+each+".csv")
-                                decide_to_alert = check_for_soi(prediction_rounded, CONFIG_DATAS.keys())
-                                print "decide to alert:", decide_to_alert
+                                decide_to_alert = check_for_soi(prediction_rounded, list(CONFIG_DATAS.keys()))
+                                print("decide to alert:", decide_to_alert)
                                 if decide_to_alert:
                                     write_csv_prediction(each,
                                                          each_file,
@@ -666,7 +666,7 @@ def get_alerted(wavfile_path, soi_found, prediction_list, phoneNo):
                    'Content-Type': "application/x-www-form-urlencoded",
                    'Cache-Control': "no-cache"}
         response = requests.request("POST", url, data=payload, headers=headers)
-        print(response.text)
+        print((response.text))
         return text
     else:
         return
@@ -905,14 +905,14 @@ def parse_contents_batch(contents, names, dates):
     for i in zip(contents, names, dates):
         path = "FTP_downloaded/"+i[1]
         if os.path.exists(path):
-            print "path Exists"
+            print("path Exists")
         else:
-            print "Downloading and generating embeddings ", i[1]
+            print("Downloading and generating embeddings ", i[1])
             save_file(i[1], i[0])
         try:
             emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
         except ValueError:
-            print "malformed index", dum_df.loc[dum_df["FileNames"] == i[1]].index
+            print("malformed index", dum_df.loc[dum_df["FileNames"] == i[1]].index)
             dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == i[1]].index)
             malformed.append(i[1])
     dum_df['features'] = emb
@@ -920,16 +920,16 @@ def parse_contents_batch(contents, names, dates):
         try:
             prediction_probs, prediction_rounded = predictions_from_models("FTP_downloaded/"+dum_df["FileNames"].tolist()[0], dum_df["features"].tolist()[0])
 
-            pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+            pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
             pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
 
             return format_html_data_table(pred_df, list_of_malformed = malformed)
         except:
             return html.Div(html.P("Got Error while Predictions"))
     else:
-        pred_df = pd.DataFrame(columns=["File Name"] + CONFIG_DATAS.keys())
+        pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
 
-        for index, each_file, each_embeddings in zip(range(0, dum_df.shape[0]), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
+        for index, each_file, each_embeddings in zip(list(range(0, dum_df.shape[0])), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
             try:
                 prediction_probs, prediction_rounded = predictions_from_models("FTP_downloaded/"+each_file, each_embeddings)
 
@@ -997,7 +997,7 @@ def layout():
                                                 "color":"white",
                                                 "fontWeight":"bold"}),
                                 dcc.Dropdown(id='sound-labels-dropdown-alert-tab',
-                                             options=[{'label': format_label_name(x), 'value': x} for x in CONFIG_DATAS.keys()],
+                                             options=[{'label': format_label_name(x), 'value': x} for x in list(CONFIG_DATAS.keys())],
                                              multi=True,
                                              value=None),
                                 html.Br(),
@@ -1298,7 +1298,7 @@ def callbacks(_app):
         if indices is not None and indices != []:
             batch_ftp_file_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
             batch_ftp_file_df = batch_ftp_file_df.iloc[indices]
-            print batch_ftp_file_df
+            print(batch_ftp_file_df)
             return  html.Div(id='selected-files-input-button',
                              children=[
                                  html.Div(className='app-controls-name', children=[
@@ -1334,10 +1334,10 @@ def callbacks(_app):
         if indices is not None and indices != []:
             pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
             directory_selected = pred_df.iloc[indices]["Directories"].tolist()[0]
-            print directory_selected
+            print(directory_selected)
             if directory_selected:
                 connect(FTP_PATH+"/"+directory_selected+"/")
-                print ftp.pwd()
+                print(ftp.pwd())
                 list_all_wavfiles = ftp.nlst("*.wav")
                 sort_list_of_all_wavfiles = sort_on_filenames(list_all_wavfiles)
                 DATAFRAME_DEVICE_STATUS = pd.DataFrame()
@@ -1374,7 +1374,7 @@ def callbacks(_app):
         check for upload of the files
         """
         if list_of_names:
-            print "len of files: ", (list_of_names)
+            print("len of files: ", (list_of_names))
             if len(list_of_names) == 1:
                 if list_of_contents is not None:
                     children = [
@@ -1414,9 +1414,9 @@ def callbacks(_app):
         if indices is not None and indices != [] and select_dev_clicks >= 1 and not GLOBAL_STOP_THREAD:
             all_directories = pd.DataFrame(rows, columns=[c['name'] for c in columns])
             selected_directories = all_directories.iloc[indices]["Directories"].tolist()
-            print selected_directories
+            print(selected_directories)
             if value_soi:
-                NON_SOI = filter(lambda x: x not in value_soi, CONFIG_DATAS.keys())
+                NON_SOI = [x for x in list(CONFIG_DATAS.keys()) if x not in value_soi]
             else:
                 pass
             if value_interval:
@@ -1433,7 +1433,7 @@ def callbacks(_app):
             directory_threads = []
             ftp_objs = [FTP(FTP_HOST, user=FTP_USERNAME, passwd=FTP_PASSWORD) for i in range(len(selected_directories))]
             for index, each_dir in enumerate(selected_directories):
-                print each_dir
+                print(each_dir)
                 if index == 0:
                     try:
                         t = threading.Thread(target=directory_procedure_threading,
@@ -1516,13 +1516,13 @@ def callbacks(_app):
                 for column_name in dataframe.select_dtypes(include=[np.float]).columns:
                     dataframe[column_name] = dataframe[column_name].apply(lambda x: "{0:.2f}%".format(x))
 
-                dataframe["No."] = range(1, dataframe.shape[0]+1)
+                dataframe["No."] = list(range(1, dataframe.shape[0]+1))
                 devids = []
                 for each_ in dataframe["Directory"]:
                     devids.append(get_devid_from_dir(each_))
                 del dataframe["Directory"]
                 dataframe["DeviceID"] = devids
-                dataframe = dataframe[["No.", "DeviceID", "Filename"] + CONFIG_DATAS.keys()]
+                dataframe = dataframe[["No.", "DeviceID", "Filename"] + list(CONFIG_DATAS.keys())]
 
                 if soi_list:
                     color_coding = get_colored_for_soi_columns(soi_list)
@@ -1620,15 +1620,15 @@ def callbacks(_app):
             for i in dum_df["File Name"].tolist():
                 path = "FTP_downloaded/"+i
                 if os.path.exists(path):
-                    print "path Exists"
+                    print("path Exists")
                 else:
-                    print "Downloading and generating embeddings ", i
+                    print("Downloading and generating embeddings ", i)
                     with open(path, 'wb') as file_obj:
                         ftp.retrbinary('RETR '+ i, file_obj.write)
                 try:
                     emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
                 except ValueError:
-                    print "malformed index", dum_df.loc[dum_df["File Name"] == i].index
+                    print("malformed index", dum_df.loc[dum_df["File Name"] == i].index)
                     dum_df = dum_df.drop(dum_df.loc[dum_df["File Name"] == i].index)
                     malformed.append(i)
                     os.remove(path)

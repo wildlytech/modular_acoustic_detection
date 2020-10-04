@@ -61,7 +61,7 @@ def predictions_wavfile(data, model_type):
     elif model_type == "Nature":
         model.load_weights(dir_path + "/Binary_Relevance_Models/Nature_BR_Model/binary_relevance_nature_realised_multilabel_weights_mixedsounds_NM_NE_NH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
     else:
-        print "Invalid Model Selected"
+        print("Invalid Model Selected")
 
 
     test_data = data.reshape((-1, 1280, 1))
@@ -69,7 +69,7 @@ def predictions_wavfile(data, model_type):
         predictions_prob = model.predict(test_data)
         predictions = predictions_prob.round()
     else:
-        print "testing", len(test_data)
+        print("testing", len(test_data))
         # predict the data using the loaded model
         predictions_prob = model.predict(test_data).ravel()
         predictions = predictions_prob.round()
@@ -103,7 +103,7 @@ def predictions_batch_wavfiles(data, model_type):
     elif model_type == "Nature":
         model.load_weights(dir_path + "/Binary_Relevance_Models/Nature_BR_Model/binary_relevance_nature_realised_multilabel_weights_mixedsounds_NM_NE_NH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
     else:
-        print "Invalid Model Selected"
+        print("Invalid Model Selected")
 
 
     predictions_prob = model.predict(data)

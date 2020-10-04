@@ -39,7 +39,7 @@ MAX_POOL_2 = MaxPooling2D((10, 1))(DENSE_3)
 PREDICTIONS = Flatten()(MAX_POOL_2)
 # print conv_1.output
 MODEL = Model(inputs=[INPUTS], outputs=[PREDICTIONS])
-print MODEL.summary()
+print(MODEL.summary())
 
 #Load weights from saved weights file
 MODEL.load_weights('Goertzel_model_8k_weights_time.h5')
@@ -48,7 +48,7 @@ MODEL.load_weights('Goertzel_model_8k_weights_time.h5')
 WEIGHTS = []
 for layer in MODEL.layers:
     WEIGHTS.append(layer.get_weights())
-print 'Length of  the weights : ', len(WEIGHTS)
+print('Length of  the weights : ', len(WEIGHTS))
 
 #redict on audiomoth files using keras library
 TEST_VAULES, DATA_FRAME = audiomoth_function_for_goertzel_model.dataframe_with_frequency_components(RESULT.audio_files_path,RESULT.path_to_goertzel_components)
@@ -59,5 +59,5 @@ DATA_FRAME['predictions'] = PREDICTIONS_OUT.ravel().round()
 #predict on any of the audiomoth file without using any of the keras library
 #In this example code we are taking 100th example
 OUTPUT = predicting_without_libraries.layer1_predictions(TEST_VAULES[100], WEIGHTS)
-print OUTPUT
-print DATA_FRAME['predictions_prob'][100]
+print(OUTPUT)
+print(DATA_FRAME['predictions_prob'][100])

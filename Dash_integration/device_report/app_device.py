@@ -13,7 +13,7 @@ from ftplib import FTP
 import socket
 import struct
 from datetime import timedelta
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from time import strptime
 import glob
 import dash
@@ -156,7 +156,7 @@ def plot_function(dataframe):
         for each in val:
             values_list.append("Name: "+each[0]+", Dev: "+each[1]+", Net_Stat: "+str(each[2])+" Time: "+each[3]+", Net_type: "+each[4])
 
-        data = go.Scatter(x=pd.Series(range(0, 20000, 1)),
+        data = go.Scatter(x=pd.Series(list(range(0, 20000, 1))),
                           text=values_list,
                           mode="markers",
                           hoverinfo="text",
@@ -170,7 +170,7 @@ def plot_function(dataframe):
         for each in val:
             values_list.append("Name: "+each[0]+", Dev: "+each[1])
 
-        data = go.Scatter(x=pd.Series(range(0, 20000, 1)),
+        data = go.Scatter(x=pd.Series(list(range(0, 20000, 1))),
                           text=values_list,
                           mode="markers",
                           name="Network Quality",
@@ -511,7 +511,7 @@ def display_page(pathname):
         DATAFRAME_DEVICE_ACTIVE['Report'] = ["Download Report"] * DATAFRAME_DEVICE_ACTIVE.shape[0]
         DATAFRAME_DEVICE_ACTIVE["Status   (5 mins)"] = status
         DATAFRAME_DEVICE_ACTIVE = DATAFRAME_DEVICE_ACTIVE.sort_values(by=['Last Modified Time'], ascending=False)
-        DATAFRAME_DEVICE_ACTIVE["Device No."] = range(1, len(list_device)+1)
+        DATAFRAME_DEVICE_ACTIVE["Device No."] = list(range(1, len(list_device)+1))
         DATAFRAME_DEVICE_ACTIVE = DATAFRAME_DEVICE_ACTIVE[["Device No.", "Device ID", "Last Modified Time", "Report", "Status   (5 mins)"]]
 
 
@@ -594,7 +594,7 @@ def connect(primary_path):
     '''
     global ftp
     ftp = FTP(FTP_HOST, user=FTP_USERNAME, passwd=FTP_PASSWORD)
-    print "connected to FTP"
+    print("connected to FTP")
     ftp.cwd(primary_path)
 
 def connect_group(primary_path):
@@ -641,7 +641,7 @@ def sort_on_filenames(files_list):
         else:
             pass
     if wav_files_number:
-        wav_files_toint = map(int, wav_files_number)
+        wav_files_toint = list(map(int, wav_files_number))
         sorted_wavfiles = sorted(wav_files_toint)
 
         for sorted_file in sorted_wavfiles:
@@ -669,7 +669,7 @@ def get_list_files_sorted(ftp_path):
         if (name[-3:] == 'wav') or (name[-3:] == 'WAV'):
             time1 = ftp.voidcmd("MDTM " + name)
             dictionary[time1[4:]] = name
-    sorted_wav_files_list = sorted(dictionary.items(), key=operator.itemgetter(0))
+    sorted_wav_files_list = sorted(list(dictionary.items()), key=operator.itemgetter(0))
     return sorted_wav_files_list
 
 
@@ -908,7 +908,7 @@ def get_wavheader_extraheader(name,ftp_path):
 
             return wavheader_dict, extra_header_info
         except UnicodeDecodeError:
-            print "Got Unexpected File"
+            print("Got Unexpected File")
             return None, None
 
 
@@ -959,7 +959,7 @@ def group_by_device_id():
     """
     ftp_path = PRIMARY_PATH
     while 1:
-        print "Process in BG"
+        print("Process in BG")
         files_list = ftp_group.nlst()
         try:
             for wav_file in files_list:
@@ -1009,9 +1009,9 @@ def Table(dataframe, column_name):
             if os.path.exists("data_downloaded/"+dataframe.iloc[i][1]+".csv"):
                 csv_string = pd.read_csv("data_downloaded/"+dataframe.iloc[i][1]+".csv")
                 csv_string = csv_string.to_csv(index=False, encoding='utf-8')
-                csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" +  urllib.quote(csv_string)
+                csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" +  urllib.parse.quote(csv_string)
                 if col == column_name:
-                    print "Im executed", dataframe.iloc[i][1]+".csv"
+                    print("Im executed", dataframe.iloc[i][1]+".csv")
                     cell = html.Td(html.A(id="download-report",
                                           href=csv_string,
                                           download="data_downloaded/"+dataframe.iloc[i][1]+".csv",
@@ -1071,7 +1071,7 @@ DEVICE_LIST_ACTIVE = []
 
 
 def get_data_active(device_list,color):
-    print DEVICE_ACTIVE_COLOR
+    print(DEVICE_ACTIVE_COLOR)
     data = go.Scattermapbox(
         mode='markers',
         lat=LATITUDES_ACTIVE,
@@ -1093,7 +1093,7 @@ def get_figure_active(list_of_devices, status_list):
         if os.path.exists("data_downloaded/"+dev+".csv"):
             dataframe = read_csv_file("data_downloaded/"+dev+".csv")
             cord_ = dataframe[["Latitude", "Longitude"]]
-            print cord_.iloc[0][0]
+            print(cord_.iloc[0][0])
             if cord_.iloc[0][0] and cord_.iloc[0][1]:
                 LATITUDES_ACTIVE.append(cord_.iloc[0][0])
                 LONGITUDES_ACTIVE.append(cord_.iloc[0][1])
@@ -1179,7 +1179,7 @@ def directory_details(ftp_path):
         if line[0] == 'd':
             directory = line.split(' ')[-1]
             if len(line.split(" ")[-2].split(":")) == 2:
-                print line.split(" ")
+                print(line.split(" "))
                 if line.split(' ')[-4]:
                     month = line.split(' ')[-4]
                 else:
@@ -1190,15 +1190,15 @@ def directory_details(ftp_path):
 
                 dir_n_time = directory, time2, 'active'
                 dir_n_timestamp.append(dir_n_time)
-                print "timestamp(time):", time2
+                print("timestamp(time):", time2)
             else:
                 timestamp1 = line.split(' ')[-2]+'/'+str(strptime(line.split(' ')[-5], '%b').tm_mon)\
                 +'/'+line.split(' ')[-4]
-                print "timestamp(year):", timestamp1
+                print("timestamp(year):", timestamp1)
                 dir_n_time = directory, timestamp1, 'inactive'
                 dir_n_timestamp.append(dir_n_time)
 
-    print "dir_n_timestamp:", dir_n_timestamp
+    print("dir_n_timestamp:", dir_n_timestamp)
     return dir_n_timestamp
 
 
@@ -1218,7 +1218,7 @@ def last_ftp_time(ftp_path):
             if len(dir_n_time[1].split(' ')) != 1:
                 time_diff = datetime.strptime(timestamp2, datetimeFormat2) - datetime.strptime(dir_n_time[1], datetimeFormat2)
                 directories_time_list.append(str(time_diff))
-                print "last_ftp_time_list:", time_diff
+                print("last_ftp_time_list:", time_diff)
         else:
             directories_time_list.append('inactive')
     return dir_n_timestamp, directories_time_list
@@ -1293,7 +1293,7 @@ def get_time_difference(timestamp1, timestamp2):
     """
     datetimeFormat = '%Y/%m/%d-%H:%M:%S'
     time_diff = datetime.strptime(timestamp2, datetimeFormat) - datetime.strptime(timestamp1, datetimeFormat)
-    print "\ntime_diff :", str(time_diff)
+    print("\ntime_diff :", str(time_diff))
     return time_diff
 
 
@@ -1325,7 +1325,7 @@ def get_layout(latitudes, longitudes):
     """
     return the layout for latitudes and longitues given
     """
-    print latitudes, longitudes
+    print(latitudes, longitudes)
     layout = go.Layout(height=400,
                        width=690,
                        hovermode='closest',
@@ -1445,7 +1445,7 @@ def update_figure_location(rows,columns,indices):
     pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
     if indices is not None and indices != []:
         pred_df = pred_df.iloc[indices]["Select Device"]
-        print "location selected"
+        print("location selected")
         selected = pred_df.values.tolist()
         if selected:
             fig = get_figure(selected)

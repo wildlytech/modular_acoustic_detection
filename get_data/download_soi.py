@@ -251,9 +251,9 @@ def get_csv_data(target_sounds):
 
     # Remove rows for uninteresting sounds
     train = train.loc[train_label_binarized.sum(axis=1) > 0]
-    train.index = range(train.shape[0])
+    train.index = list(range(train.shape[0]))
     train_label_binarized = train_label_binarized.loc[train_label_binarized.sum(axis=1) > 0]
-    train_label_binarized.index = range(train_label_binarized.shape[0])
+    train_label_binarized.index = list(range(train_label_binarized.shape[0]))
 
     # Translate mid to display name
     new_column_names = []
@@ -289,7 +289,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
     except CalledProcessError:
 
         # do nothing
-        print "Exception CalledProcessError!"
+        print("Exception CalledProcessError!")
         return
 
     try:
@@ -297,7 +297,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
 
         aud_seg.export(target_file, format="wav")
     except:
-        print "Error while reading file!"
+        print("Error while reading file!")
 
     os.remove(tmp_filename_w_extension)
 
@@ -325,7 +325,7 @@ def download_data(target_sounds_list, target_path):
     with open(RESULT.target_sounds+'_downloaded_base_dataframe.pkl', 'w') as file_obj:
         pickle.dump(df, file_obj)
 
-    print 'Base dataframe is saved as " downloaded_base_dataframe.pkl "..!!'
+    print('Base dataframe is saved as " downloaded_base_dataframe.pkl "..!!')
 
     # create a path if it doesn't exists
     if not os.path.exists(target_path):
@@ -335,7 +335,7 @@ def download_data(target_sounds_list, target_path):
 
     for index in range(df.shape[0]):
         row = df.iloc[index]
-        print "Downloading", str(index), "of", df.shape[0], ":", row.YTID
+        print("Downloading", str(index), "of", df.shape[0], ":", row.YTID)
         # download_clip(row.YTID, row.start_seconds, row.end_seconds)
         t = threading.Thread(target=download_clip,
                              args=(row.YTID, row.start_seconds, row.end_seconds, target_path))

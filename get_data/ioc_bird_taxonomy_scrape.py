@@ -135,13 +135,13 @@ if __name__ == "__main__":
 
     ONTOLOGY_EXT_FILE_PATH = PARSED_ARGS.OUTPUT_FILE
 
-    print "Downloading IOC taxonomy data ..."
+    print("Downloading IOC taxonomy data ...")
     RESPONSE = requests.get(URL, headers={'user-agent': 'my-app/0.0.1'})
 
-    print "Encoding text from utf-8..."
+    print("Encoding text from utf-8...")
     DATA = RESPONSE.text.encode("utf-8")
 
-    print "Converting taxonomy data to ontology extension format..."
+    print("Converting taxonomy data to ontology extension format...")
     TAXONOMY_DICT = xmltodict.parse(DATA)
 
     parse_taxonomy(TAXONOMY_DICT['ioclist']['list'], 'bird_ioc', 'bird')
@@ -153,4 +153,4 @@ if __name__ == "__main__":
 
         file_obj.write(json_data)
 
-        print "Wrote JSON Data to", ONTOLOGY_EXT_FILE_PATH
+        print("Wrote JSON Data to", ONTOLOGY_EXT_FILE_PATH)

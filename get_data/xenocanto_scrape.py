@@ -1,6 +1,6 @@
 # bird sounds scrapping - audio data
 
-from __future__ import unicode_literals
+
 from bs4 import BeautifulSoup as bs
 import requests
 import youtube_dl
@@ -45,7 +45,7 @@ def get_info_from_raw_html(bird_species, page_number):
 
     # Make a GET request to fetch the raw HTML content
     r = requests.get(BASE_LINK+bird_species+'&pg='+str(page_number))
-    print "\nPage link:", BASE_LINK+bird_species+'&pg='+str(page_number)
+    print("\nPage link:", BASE_LINK+bird_species+'&pg='+str(page_number))
     page = r.text
     soup = bs(page, 'html.parser')
 
@@ -56,7 +56,7 @@ def get_info_from_raw_html(bird_species, page_number):
     for v in sub_url_list:
         url = 'https://www.xeno-canto.org/' + v['title'].split(":")[0][2:]+ '/download'
         url_list.append(url)
-    print "No of audio links in this page:", len(url_list), "\n"
+    print("No of audio links in this page:", len(url_list), "\n")
 
     # get each row data
     row_data = soup.find_all('tr')
@@ -93,7 +93,7 @@ def download_xc_audio(audio_files_path, xc_audio_ID):
     # download xc audio file in the given path
     # Link to audio does not contain first two letters of ID (Typically 'XC')
     audio_link = 'https://www.xeno-canto.org/' + xc_audio_ID[0][2:]+ '/download'
-    print audio_link
+    print(audio_link)
     ydl_opts = {'outtmpl': audio_files_path+xc_audio_ID[0]+'.%(ext)s'}
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([audio_link])
@@ -107,8 +107,8 @@ def scrape(audio_files_path, bird_species):
     if not audio_files_path.endswith("/"):
         audio_files_path += '/'
 
-    print "\nBird species keyword:", bird_species
-    print "Audio files path:", audio_files_path, '\n'
+    print("\nBird species keyword:", bird_species)
+    print("Audio files path:", audio_files_path, '\n')
 
     bird_species = bird_species.lower()
     # replace whitespace with underscore for bird_species name
@@ -122,14 +122,14 @@ def scrape(audio_files_path, bird_species):
     # csv file name appended with bird species
     csv_filename = dir_path+"xenocanto_bird_"+bird_species_name_ws+".csv"
 
-    print "csv file path:", csv_filename
+    print("csv file path:", csv_filename)
 
     column_tags = ['XenoCanto_ID', 'Common name/Scientific', 'Length', 'Recordist', 'Date', \
     'Time', 'Country', 'Location', 'Elev(m)', 'Type', 'Remarks']
 
     # get number of pages for given bird species
     web_pages = number_of_pages(bird_species)
-    print "Web Page(s):", web_pages
+    print("Web Page(s):", web_pages)
 
     csv_file_exists = os.path.exists(csv_filename)
     file_permission = 'a' if csv_file_exists else 'w'
@@ -157,7 +157,7 @@ def scrape(audio_files_path, bird_species):
                     # download the audio file
                     download_xc_audio(dir_path, audio_ID)
 
-    print "\nDone..!\n"
+    print("\nDone..!\n")
 
     return dir_path, csv_filename
 

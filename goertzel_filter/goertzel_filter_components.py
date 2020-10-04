@@ -167,8 +167,8 @@ def generate_frequency_components():
                             #Print out the details of the audio file
                 #############################################################################
                 number_audio = number_audio+1
-                print 'Audio FileName :', audio_path.split("/")[-1]
-                print 'Number of audio :', number_audio
+                print('Audio FileName :', audio_path.split("/")[-1])
+                print('Number of audio :', number_audio)
 
                 mag = []
 
@@ -186,10 +186,10 @@ def generate_frequency_components():
                     with open(PATH_TO_GOERTZEL_COMPONENTS + audio_path.split("/")[-1][:-4]+'.pkl', 'w') as file_obj:
                         pickle.dump(np.array(mag, dtype=np.float32), file_obj)
             else:
-                print ' Wave file is not at good sampling rate ie ' + str(ACCEPTABLE_SAMPLINGRATE) + "Hz"
+                print(' Wave file is not at good sampling rate ie ' + str(ACCEPTABLE_SAMPLINGRATE) + "Hz")
 
         except OSError:
-            print 'Wave file not found in directory '+ audio_path.split("/")[-1]
+            print('Wave file not found in directory '+ audio_path.split("/")[-1])
 
 
 

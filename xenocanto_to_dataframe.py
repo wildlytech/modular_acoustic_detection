@@ -62,9 +62,9 @@ def add_labels_to_dataframe(path_to_feature_dataframe, path_to_label_csv_file):
                 print_warning = True
 
         if print_warning:
-            print Fore.RED, \
+            print(Fore.RED, \
                   "Warning: Example {0} has scientific name in unexpected format: \"{1}\"".format(split_wav_filename, sci_name), \
-                  Style.RESET_ALL
+                  Style.RESET_ALL)
 
         # Add array of labels as entry for this example in labels name column
         labels_name_column.append(labels_name)
@@ -102,52 +102,52 @@ def xenocanto_to_dataframe(bird_species,
     path_to_embeddings = output_path + bird_species_name_ws + "/embeddings/"
     path_to_write_dataframe = output_path + bird_species_name_ws + "/dataframe.pkl"
 
-    print "Downloading audio files..."
+    print("Downloading audio files...")
     path_to_src_files, csv_filename = xenocanto_scrape.scrape(audio_files_path=output_path,
                                                               bird_species=bird_species)
 
-    print "Converting mp3 to wav..."
+    print("Converting mp3 to wav...")
     mp3_stereo_to_wav_mono.convert_files_directory(path_for_mp3_files=path_to_src_files,
                                                    path_to_save_wavfiles=path_to_src_files)
 
-    print "Splitting wav files into 10 second clips..."
+    print("Splitting wav files into 10 second clips...")
     split_wav_file.audio_split_directory(path_for_wavfiles = path_to_src_files,
                                          path_to_write_chunks = path_to_split_files,
                                          chunk_length_ms = 10000)
 
-    print "Generating embeddings for each 10 second clip..."
+    print("Generating embeddings for each 10 second clip...")
     generating_embeddings.generate(path_to_write_embeddings = path_to_embeddings,
                                    path_to_wav_files = path_to_split_files)
 
-    print "Building dataframe with features..."
+    print("Building dataframe with features...")
     create_base_dataframe.create_new_dataframe(path_for_saved_embeddings=path_to_embeddings,
                                                path_to_write_dataframe=path_to_write_dataframe)
 
-    print "Adding labels to dataframe..."
+    print("Adding labels to dataframe...")
     add_labels_to_dataframe(path_to_feature_dataframe=path_to_write_dataframe,
                             path_to_label_csv_file=csv_filename)
 
     if delete_mp3_files:
-        print "Cleaning up intermediate mp3 files..."
+        print("Cleaning up intermediate mp3 files...")
         for f in glob.glob(path_to_src_files + "*.mp3"):
             os.remove(f)
 
     if delete_wav_files:
-        print "Cleaning up intermediate wav files converted from mp3..."
+        print("Cleaning up intermediate wav files converted from mp3...")
         for f in glob.glob(path_to_src_files + "*.wav"):
             os.remove(f)
 
     if delete_split_wav_files:
-        print "Cleaning up intermediate split wav files..."
+        print("Cleaning up intermediate split wav files...")
         for f in glob.glob(path_to_split_files + "*.wav"):
             os.remove(f)
 
     if delete_embeddings:
-        print "Cleaning up embeddings..."
+        print("Cleaning up embeddings...")
         for f in glob.glob(path_to_embeddings + "*.pkl"):
             os.remove(f)
 
-    print "Finished!"
+    print("Finished!")
 
 ########################################################################
             # Main Function

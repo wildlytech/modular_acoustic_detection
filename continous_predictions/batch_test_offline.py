@@ -48,7 +48,7 @@ def start_batch_run_ftp_live(path_for_folder):
     """
     all_wav_files_path = glob.glob(path_for_folder+"*.WAV") + glob.glob(path_for_folder+"*.wav")
     all_wav_files = [each_file.split("/")[-1] for each_file in all_wav_files_path]
-    print 'Total No. of Files: ', len(all_wav_files)
+    print('Total No. of Files: ', len(all_wav_files))
     dum_df = pd.DataFrame()
     dum_df["FileNames"] = all_wav_files
     malformed_specific = []
@@ -73,14 +73,14 @@ def start_batch_run_ftp_live(path_for_folder):
                         emb = generate_before_predict_BR.main(path_for_folder+each_file, 0, 0, 0)
                         dbfs = AudioSegment.from_wav(path_for_folder+each_file).dBFS
                     except ValueError:
-                        print "malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index
+                        print("malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index)
                         dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
                         malformed_specific.append(each_file)
                         continue
 
                     # Predict the result and save the result to the csv file
                     predictions_each_model = []
-                    print "predicting for :", each_file
+                    print("predicting for :", each_file)
                     for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
                         pred_prob, pred = generate_before_predict_BR.main(path_for_folder+each_file, 1, emb, each_model)
                         if pred_prob:
@@ -107,12 +107,12 @@ def start_batch_run_ftp_live(path_for_folder):
                     emb = generate_before_predict_BR.main(path_for_folder+each_file, 0, 0, 0)
                     dbfs = AudioSegment.from_wav(path_for_folder+each_file).dBFS
                 except ValueError:
-                    print "malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index
+                    print("malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index)
                     dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
                     malformed_specific.append(each_file)
                     continue
                 predictions_each_model = []
-                print "predicting for :", each_file
+                print("predicting for :", each_file)
                 for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
                     pred_prob, pred = generate_before_predict_BR.main(path_for_folder+each_file, 1, emb, each_model)
                     if pred_prob:

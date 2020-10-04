@@ -68,8 +68,8 @@ def check_for_null(data_frame):
 with open(RESULT.dataframe_path, 'rb') as f:
     UN = pickle.load(f)
 LABELS_CSV = pd.read_csv('../data/audioset/class_labels_indices.csv')
-print 'Files Loaded'
-print UN.shape
+print('Files Loaded')
+print(UN.shape)
 
 #Reading the coarse labels pickle file.
 #It consists of seperate classes for sounds related to
@@ -275,15 +275,15 @@ with open(RESULT.path_to_write_different_sounds+'dom_tools_'+
 ######################################################################################
                 #Sounds with more than 2 classes labelled are witten
 ######################################################################################
-print 'three labelled sounds shape: ', UN_3.shape
+print('three labelled sounds shape: ', UN_3.shape)
 with open(RESULT.path_to_write_different_sounds+'3_labelled_priority1_'+
           str(UN_3.shape[0])+'.pkl', 'w') as f:
     pickle.dump(UN_3, f)
-print 'four labelled sounds shape: ', UN_4.shape
+print('four labelled sounds shape: ', UN_4.shape)
 with open(RESULT.path_to_write_different_sounds+'4_labelled_priority1_'+
           str(UN_4.shape[0])+'.pkl', 'w') as f:
     pickle.dump(UN_4, f)
-print 'five labelled sounds shape: ', UN_5.shape
+print('five labelled sounds shape: ', UN_5.shape)
 with open(RESULT.path_to_write_different_sounds+'5_labelled_prioirty1_'+
           str(UN_5.shape[0])+'.pkl', 'w') as f:
     pickle.dump(UN_5, f)

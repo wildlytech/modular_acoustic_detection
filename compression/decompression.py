@@ -59,15 +59,15 @@ if not os.path.exists(DECOMPRESSED_FILES_PATH):
 if COMPRESSED_FILES_LIST:
     for COMPRESSED_FILE in COMPRESSED_FILES_LIST:
         if os.path.exists(DECOMPRESSED_FILES_PATH+(COMPRESSED_FILE.split('/')[-1])[:-4]+'.wav'):
-            print COMPRESSED_FILE.split('/')[-1] + 'has already been decompressed'
+            print(COMPRESSED_FILE.split('/')[-1] + 'has already been decompressed')
         else:
             try:
                 subprocess.call('ffmpeg -i ' + COMPRESSED_FILE + ' '+
                                 DECOMPRESSED_FILES_PATH+ (COMPRESSED_FILE.split('/')[-1])[:-4]+'.wav',
                                 shell=True)
-                print 'De-compression : ' + COMPRESSED_FILE.split('/')[-1] + ' is done..'
+                print('De-compression : ' + COMPRESSED_FILE.split('/')[-1] + ' is done..')
             except ValueError:
-                print 'Warning : Skipped ' + COMPRESSED_FILE + " as file format is wrong "
+                print('Warning : Skipped ' + COMPRESSED_FILE + " as file format is wrong ")
 else:
-    print "No files found in given directory"
+    print("No files found in given directory")
 

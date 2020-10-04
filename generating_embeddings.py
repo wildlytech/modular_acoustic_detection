@@ -32,7 +32,7 @@ Usage:
   $ python vggish_inference_demo.py
 """
 
-from __future__ import print_function
+
 import argparse
 import sys
 import pickle

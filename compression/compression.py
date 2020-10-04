@@ -62,15 +62,15 @@ if not os.path.exists(COMPRESSED_FILES_PATH):
 if ORIGINAL_WAV_FILES_LIST:
     for ORIGINAL_WAV in ORIGINAL_WAV_FILES_LIST:
         if os.path.exists(COMPRESSED_FILES_PATH + ORIGINAL_WAV[:-3]+TYPE_OF_COMPRESSION):
-            print ORIGINAL_WAV + 'has already been compressed'
+            print(ORIGINAL_WAV + 'has already been compressed')
         else:
             try:
                 subprocess.call('ffmpeg -i '+ RESULT.path_to_original_audio_files + ORIGINAL_WAV +
                                 ' -c:a ' + TYPE_OF_COMPRESSION + ' -b:a 64k ' + COMPRESSED_FILES_PATH +
                                 ORIGINAL_WAV[:-4]+'.'+TYPE_OF_COMPRESSION, shell=True)
-                print 'Compression : ' + ORIGINAL_WAV + ' is done..'
+                print('Compression : ' + ORIGINAL_WAV + ' is done..')
             except IOError:
-                print 'Warning : Skipped ' + ORIGINAL_WAV + " as file doesn't exists in folder"
+                print('Warning : Skipped ' + ORIGINAL_WAV + " as file doesn't exists in folder")
 else:
-    print "No Files found in directory"
+    print("No Files found in directory")
 

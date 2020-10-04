@@ -36,7 +36,7 @@ def start_splitting(chunk_length_ms, wav_file, path_to_write_chunks):
         os.makedirs(path_to_write_chunks)
 
     file_name = wav_file.split('/')[-1].split(".")[0]
-    print "splitting audio files into chunks of", chunk_length_ms / 1000.0, "seconds :", file_name
+    print("splitting audio files into chunks of", chunk_length_ms / 1000.0, "seconds :", file_name)
     myaudio = AudioSegment.from_wav(wav_file)
     chunks = make_chunks(myaudio, chunk_length_ms)
     #Export all of the individual chunks as wav files
@@ -45,7 +45,7 @@ def start_splitting(chunk_length_ms, wav_file, path_to_write_chunks):
 
         # if the last chunk is not of length, then pad it with silence
         if len(chunk) < chunk_length_ms:
-            print "Padding last file with", (chunk_length_ms - len(chunk)) / 1000.0, "seconds of silence"
+            print("Padding last file with", (chunk_length_ms - len(chunk)) / 1000.0, "seconds of silence")
             chunk = chunk + AudioSegment.silent(duration = chunk_length_ms - len(chunk),
                                                 frame_rate=chunk.frame_rate)
 
@@ -65,8 +65,8 @@ def audio_split_single_file(wav_file, path_to_write_chunks, chunk_length_ms):
     total_duration_seconds = get_duration_wav_file(wav_file)
 
     if total_duration_seconds <= chunk_length_sec:
-        print Fore.RED + "\nWARNING :Audio File must be at least greater than", chunk_length_sec, "seconds to split"
-        print Style.RESET_ALL
+        print(Fore.RED + "\nWARNING :Audio File must be at least greater than", chunk_length_sec, "seconds to split")
+        print(Style.RESET_ALL)
 
     num_wav_files = (total_duration_seconds // chunk_length_sec) + ((total_duration_seconds % chunk_length_sec) == 0)
 
@@ -74,11 +74,11 @@ def audio_split_single_file(wav_file, path_to_write_chunks, chunk_length_ms):
                                                  wav_file=wav_file,
                                                  path_to_write_chunks=path_to_write_chunks)
     if num_wav_files == number_of_chunks_generated:
-        print Fore.GREEN + "\nTotal number of wav files splitted from", wav_file.split('/')[-1].split(".")[0], ":", number_of_chunks_generated
-        print Style.RESET_ALL
+        print(Fore.GREEN + "\nTotal number of wav files splitted from", wav_file.split('/')[-1].split(".")[0], ":", number_of_chunks_generated)
+        print(Style.RESET_ALL)
     else:
-        print  Fore.GREEN + "\nTotal number of wav files splitted from", wav_file.split('/')[-1].split(".")[0], ":", number_of_chunks_generated
-        print Style.RESET_ALL
+        print(Fore.GREEN + "\nTotal number of wav files splitted from", wav_file.split('/')[-1].split(".")[0], ":", number_of_chunks_generated)
+        print(Style.RESET_ALL)
 
 
 def audio_split_directory(path_for_wavfiles, path_to_write_chunks, chunk_length_ms):

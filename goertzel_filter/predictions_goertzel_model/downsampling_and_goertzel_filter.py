@@ -80,7 +80,7 @@ class DownsamplingImplementation(object):
         n_orig = x.shape[0]
         n_out = y.shape[0]
         n_channels = y.shape[1]
-        print "number of n_channels: ", n_channels
+        print("number of n_channels: ", n_channels)
 
         for t in range(n_out):
             # Grab the top bits as an index to the input buffer
@@ -162,7 +162,7 @@ class DownsamplingImplementation(object):
         # Construct 2d views of the data with the resampling axis on the first dimension
         x_2d = self.samples.reshape((self.samples.shape[axis], -1))
         y_2d = y.reshape((y.shape[axis], -1))
-        print "Process Initiated"
+        print("Process Initiated")
         self.resample_f(x_2d,y_2d, sample_ratio, interp_win, interp_delta, precision)
 
         return y

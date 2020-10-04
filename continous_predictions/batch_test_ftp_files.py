@@ -46,7 +46,7 @@ RESULT = PARSER.parse_args()
 if RESULT.ftp_folder_path:
     PRIMARY_PATH = RESULT.ftp_folder_path
 else:
-    print "Using default FTP folder Path"
+    print("Using default FTP folder Path")
     TARGET_PATH_FOLDER_FTP = "BNP/DEV5101890_2019:11:21-15:45:20/"
     PRIMARY_PATH = "/home/user-u0xzU/" + TARGET_PATH_FOLDER_FTP
 
@@ -76,7 +76,7 @@ def check_for_wav_only(list_values):
     for each_value in list_values:
         if each_value[-3:] == "WAV"  or each_value[-3:] == "wav":
             wav_files.append(each_value)
-    print "Total file: ", len(wav_files)
+    print("Total file: ", len(wav_files))
     return wav_files
 
 
@@ -91,7 +91,7 @@ def sorting_files_same_as_upload_order(wav_files_list):
     """
     DICT = {}
     count = 0
-    print "Files are being sorted.."
+    print("Files are being sorted..")
     for name in wav_files_list:
         if (name[-3:] == 'wav') or (name[-3:] == 'WAV'):
             # returns last uploaded file's time with utc
@@ -99,7 +99,7 @@ def sorting_files_same_as_upload_order(wav_files_list):
             count += 1
             #print time1[4:], name
             DICT[name] = time1[4:]
-    sorted_list = sorted((value, key) for (key, value) in DICT.items())
+    sorted_list = sorted((value, key) for (key, value) in list(DICT.items()))
     sorted_filenames = [element[0] for element in sorted_list]
 
     return sorted_filenames
@@ -116,7 +116,7 @@ def call_for_ftp():
     """
     global ftp
     ftp = FTP('34.211.117.196', user='user-u0xzU', passwd=FTP_PASSWORD)
-    print "Connection Status : connected to FTP"
+    print("Connection Status : connected to FTP")
     ftp.cwd(PRIMARY_PATH)
     ex = ftp.nlst()
     wav_files_only = check_for_wav_only(ex)
@@ -159,14 +159,14 @@ def start_batch_run_ftp_live():
                 path = "FTP_downloaded/"+each_file
                 check_directory_to_write_wavfiles()
                 if os.path.exists(path):
-                    print "path Exists"
+                    print("path Exists")
                 else:
                     with open(path, 'wb') as file_obj:
                         ftp.retrbinary('RETR '+each_file, file_obj.write)
                     try:
                         emb = generate_before_predict_BR.main(path, 0, 0, 0)
                     except ValueError:
-                        print "malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index
+                        print("malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index)
                         dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
                         malformed.append(each_file)
                         os.remove(path)
@@ -174,7 +174,7 @@ def start_batch_run_ftp_live():
 
                     # Predict the result and save the result to the csv file
                     predictions_each_model = []
-                    print "Predicting for :", each_file
+                    print("Predicting for :", each_file)
                     for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
                         pred_prob, pred = generate_before_predict_BR.main(path+each_file, 1, emb, each_model)
                         if pred_prob:
@@ -196,20 +196,20 @@ def start_batch_run_ftp_live():
                 path = "FTP_downloaded/"+each_file
                 check_directory_to_write_wavfiles()
                 if os.path.exists(path):
-                    print "path Exists"
+                    print("path Exists")
                 else:
                     with open(path, 'wb') as file_obj:
                         ftp.retrbinary('RETR '+ each_file, file_obj.write)
                 try:
                     emb = generate_before_predict_BR.main(path, 0, 0,0)
                 except ValueError:
-                    print "malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index
+                    print("malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index)
                     dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
                     malformed.append(each_file)
                     os.remove(path)
                     continue
                 predictions_each_model = []
-                print "Predicting for :", each_file
+                print("Predicting for :", each_file)
                 for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
                     pred_prob, pred = generate_before_predict_BR.main(path+each_file, 1, emb, each_model)
                     if pred_prob:
@@ -228,5 +228,5 @@ if __name__=="__main__":
     while(True):
         start_batch_run_ftp_live()
         time.sleep(120)
-        print "Waiting to FTP files to get accumulate: 2 Minutes"
+        print("Waiting to FTP files to get accumulate: 2 Minutes")
 

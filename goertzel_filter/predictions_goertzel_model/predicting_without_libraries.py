@@ -91,7 +91,7 @@ class ConvolutionalNeuralNetwork(object):
         """
         try:
             add_bias = [sum(zip_values) for zip_values in zip(data, self.bias)]
-            print "not except"
+            print("not except")
         except TypeError:
             add_bias = [sum(zip_values) for zip_values in zip(data[0], self.bias)]
         return np.array(add_bias, dtype='float64').tolist()
@@ -113,7 +113,7 @@ class ConvolutionalNeuralNetwork(object):
         """
         returns the index values as per the strides
         """
-        return range(0, len(self.input_data), stride_length)
+        return list(range(0, len(self.input_data), stride_length))
 
 
     def start_window_moment(self, stride_length, filter_size, type_padding):
@@ -222,7 +222,7 @@ class FullyConnectedLayer(object):
             elif self.activation == 'sigmoid':
                 result_after_mat_mull = self.sigmoid(result_after_mat_mull[0])
             else:
-                print Fore.RED + "Warning: No activation function given"
+                print(Fore.RED + "Warning: No activation function given")
             result_final[inter_index] = np.array(result_after_mat_mull, dtype='float64').tolist()
         return np.array(result_final, dtype='float64').tolist()
 
@@ -287,7 +287,7 @@ class InitialCheckForShape(object):
             output_shape = [len(self.input_data)/ list_uks[2], list_uks[1]]
             return output_shape
         else:
-            print "Give all the paramters for convolution layer"
+            print("Give all the paramters for convolution layer")
 
     def calculate_shape_dense_output(self, units):
         """
@@ -347,10 +347,10 @@ def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
                                                                 dtype="float64").tolist())
             return fully_connected.dense_layer()
         else:
-            print Fore.RED + "ERROR: Invalid Layer used \n"
+            print(Fore.RED + "ERROR: Invalid Layer used \n")
             sys.exit("try valid layer"+ Style.RESET_ALL)
     except OSError:
-        print Fore.RED + "MismatchError: Layer and Weights mismatch\n"
+        print(Fore.RED + "MismatchError: Layer and Weights mismatch\n")
         sys.exit("Input the correct order"+Style.RESET_ALL)
 
 
@@ -398,7 +398,7 @@ def flag_for_downsampling(audiofilepath):
             each_second = each_second.T
             start_time = time.time()
             for layer_index, layer_name in enumerate(ARCHITECTURE_CSV['layer_name'].values.tolist()):
-                print Fore.GREEN + str(layer_index)+ " "+layer_name + " " +str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2]+ Style.RESET_ALL
+                print(Fore.GREEN + str(layer_index)+ " "+layer_name + " " +str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2]+ Style.RESET_ALL)
                 if layer_index == 0 and layer_name != "EOF":
                     intermediate_result_values = unroll_the_architecture(ARCHITECTURE_CSV.iloc[layer_index].to_dict(),
                                                                          layer_name=layer_name,
@@ -407,7 +407,7 @@ def flag_for_downsampling(audiofilepath):
                                                                         )
 
                 elif layer_name == "EOF":
-                    print intermediate_result_values
+                    print(intermediate_result_values)
                 else:
                     intermediate_result_values = unroll_the_architecture(ARCHITECTURE_CSV.iloc[layer_index].to_dict(),
                                                                          layer_name=layer_name,
@@ -415,7 +415,7 @@ def flag_for_downsampling(audiofilepath):
                                                                          layer_index=layer_index
                                                                         )
             end_time = time.time() - start_time
-            print Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL
+            print(Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL)
 
 
 
@@ -433,7 +433,7 @@ def predict_on_goertzelcomponents(ten_sec_data):
     for each_second in ten_sec_data:
         start_time = time.time()
         for layer_index, layer_name in enumerate(ARCHITECTURE_CSV['layer_name'].values.tolist()):
-            print Fore.GREEN + str(layer_index)+ " "+layer_name + " " +str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2]+ Style.RESET_ALL
+            print(Fore.GREEN + str(layer_index)+ " "+layer_name + " " +str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2]+ Style.RESET_ALL)
             if layer_index == 0 and layer_name != "EOF":
                 intermediate_result_values = unroll_the_architecture(ARCHITECTURE_CSV.iloc[layer_index].to_dict(),
                                                                      layer_name=layer_name,
@@ -443,7 +443,7 @@ def predict_on_goertzelcomponents(ten_sec_data):
                 # print np.array(intermediate_result_values)
 
             elif layer_name == "EOF":
-                print intermediate_result_values
+                print(intermediate_result_values)
             else:
                 intermediate_result_values = unroll_the_architecture(ARCHITECTURE_CSV.iloc[layer_index].to_dict(),
                                                                      layer_name=layer_name,
@@ -452,7 +452,7 @@ def predict_on_goertzelcomponents(ten_sec_data):
                                                                     )
                 # print np.array(intermediate_result_values)
         end_time = time.time() - start_time
-        print Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL
+        print(Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL)
 
 
 

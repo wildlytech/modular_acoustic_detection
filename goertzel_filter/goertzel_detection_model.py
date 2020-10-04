@@ -91,9 +91,9 @@ DATA_FRAME, LABELS_BINARIZED = shuffle(DATA_FRAME, LABELS_BINARIZED, random_stat
 #################################################################################
               # print out the shape and percentage of sounds
 #################################################################################
-print 'Binarized labels shape :', LABELS_BINARIZED.shape
-print "Percentage Impact Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1) > 0).mean()
-print "Percentage Ambient Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1) > 0).mean()
+print('Binarized labels shape :', LABELS_BINARIZED.shape)
+print("Percentage Impact Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1) > 0).mean())
+print("Percentage Ambient Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1) > 0).mean())
 
 
 
@@ -133,7 +133,7 @@ def create_keras_model():
     model.add(TimeDistributed(Dense(1, activation='sigmoid')))
     model.add(MaxPooling2D((10, 1)))
     model.add(Flatten())
-    print model.summary()
+    print(model.summary())
     # Compile model
     model.compile(loss='binary_crossentropy', optimizer=RMSprop(1e-3), metrics=['accuracy'])
     return model
@@ -156,7 +156,7 @@ CLF1_TRAIN_TARGET_MINI = np.array(LABELS_BINARIZED_TRAIN.loc[:, IMPACT_SOUNDS].a
 MODEL = create_keras_model()
 CLF1_TRAIN_MINI = []
 CLF1_TEST = []
-print 'Reading Test files ..!'
+print('Reading Test files ..!')
 
 
 
@@ -173,7 +173,7 @@ for each_emb, each_wav in zip(DF_TEST['features'].tolist(), DF_TEST["wav_file"].
 
     #except any error then remove that file manually and then run the process again
     except :
-        print 'Test Pickling Error: ', each_wav
+        print('Test Pickling Error: ', each_wav)
 
 
 
@@ -181,7 +181,7 @@ for each_emb, each_wav in zip(DF_TEST['features'].tolist(), DF_TEST["wav_file"].
 #################################################################################
           # reshaping test data and applying normalization
 #################################################################################
-print np.array(CLF1_TEST).shape
+print(np.array(CLF1_TEST).shape)
 CLF1_TEST = np.array(CLF1_TEST).reshape((-1, 10, 8000, 4))
 CLF1_TEST = CLF1_TEST / np.linalg.norm(CLF1_TEST)
 
@@ -191,7 +191,7 @@ CLF1_TEST = CLF1_TEST / np.linalg.norm(CLF1_TEST)
 #################################################################################
               # Reading Trainging Files
 #################################################################################
-print "Reading Training files..!!"
+print("Reading Training files..!!")
 for each_emb, each_wav in zip(DF_TRAIN['features'].tolist(), DF_TRAIN["wav_file"].tolist()):
     # Read all the files that are splitted as train in the path directory specified
     try:
@@ -200,7 +200,7 @@ for each_emb, each_wav in zip(DF_TRAIN['features'].tolist(), DF_TRAIN["wav_file"
                                           each_emb[2].reshape((10, 8000)),
                                           each_emb[3].reshape((10, 8000)))))
     except:
-        print 'Train pickling Error ', each_wav
+        print('Train pickling Error ', each_wav)
 
 
 
@@ -244,8 +244,8 @@ CLF1_TEST_PREDICTION = MODEL.predict(CLF1_TEST).ravel().round()
 #################################################################################
             # print train and test acuuracy
 #################################################################################
-print "Train Accuracy:", (CLF1_TRAIN_PREDICTION == CLF1_TRAIN_TARGET_MINI).mean()
-print "Test Accuracy:", (CLF1_TEST_PREDICTION == CLF1_TEST_TARGET).mean()
+print("Train Accuracy:", (CLF1_TRAIN_PREDICTION == CLF1_TRAIN_TARGET_MINI).mean())
+print("Test Accuracy:", (CLF1_TEST_PREDICTION == CLF1_TEST_TARGET).mean())
 
 
 
@@ -254,12 +254,12 @@ print "Test Accuracy:", (CLF1_TEST_PREDICTION == CLF1_TEST_TARGET).mean()
             # print out the confusion matrix for train data
 #################################################################################
 CLF1_CONF_TRAIN_MAT = pd.crosstab(CLF1_TRAIN_TARGET_MINI, CLF1_TRAIN_PREDICTION, margins=True)
-print "Training Precision and recall for Keras model"
-print '============================================='
-print "Train Precision:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT[True]['All'])
-print "Train Recall:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT['All'][True])
-print "Train Accuracy:", (CLF1_TRAIN_PREDICTION == CLF1_TRAIN_TARGET_MINI).mean()
-print CLF1_CONF_TRAIN_MAT
+print("Training Precision and recall for Keras model")
+print('=============================================')
+print("Train Precision:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT[True]['All']))
+print("Train Recall:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT['All'][True]))
+print("Train Accuracy:", (CLF1_TRAIN_PREDICTION == CLF1_TRAIN_TARGET_MINI).mean())
+print(CLF1_CONF_TRAIN_MAT)
 
 
 
@@ -268,12 +268,12 @@ print CLF1_CONF_TRAIN_MAT
           # print out the confusion matrix for test data
 #################################################################################
 CLF1_CONF_TEST_MAT = pd.crosstab(CLF1_TEST_TARGET, CLF1_TEST_PREDICTION, margins=True)
-print "Testing Precision and recall for Keras model"
-print '============================================='
-print "Test Precision:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT[True]['All'])
-print "Test Recall:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT['All'][True])
-print "Test Accuracy:", (CLF1_TEST_PREDICTION == CLF1_TEST_TARGET).mean()
-print CLF1_CONF_TEST_MAT
+print("Testing Precision and recall for Keras model")
+print('=============================================')
+print("Test Precision:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT[True]['All']))
+print("Test Recall:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT['All'][True]))
+print("Test Accuracy:", (CLF1_TEST_PREDICTION == CLF1_TEST_TARGET).mean())
+print(CLF1_CONF_TEST_MAT)
 
 
 
@@ -282,7 +282,7 @@ print CLF1_CONF_TEST_MAT
           # calculate the f1 score and print it out
 #################################################################################
 F1_SCORE = metrics.f1_score(CLF1_TEST_TARGET, CLF1_TEST_PREDICTION)
-print 'F1 score is  : ', F1_SCORE
+print('F1 score is  : ', F1_SCORE)
 
 
 

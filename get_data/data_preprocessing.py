@@ -113,19 +113,19 @@ def preprocess_data(data_frame, label_columns_list, data_file_name):
     """
     start preprocessing the data
     """
-    print '\npreprocessing..'
-    print Style.RESET_ALL
+    print('\npreprocessing..')
+    print(Style.RESET_ALL)
     for col in label_columns_list:
         data_frame[col] = data_frame[col].apply(lambda arr: arr.strip(""))
         data_frame[col] = data_frame[col].replace(SET_DICTIONARY)
     data_frame['labels_name'] = data_frame[label_columns_list].values.tolist()
     data_frame['labels_name'] = data_frame['labels_name'].apply(lambda arr: check_for_null(arr))
-    print Fore.GREEN + "pre-processing Done:" + data_file_name.split("/")[-1]
-    print Style.RESET_ALL
+    print(Fore.GREEN + "pre-processing Done:" + data_file_name.split("/")[-1])
+    print(Style.RESET_ALL)
     # removing the null labelling rows
     index_null = data_frame['labels_name'].loc[data_frame['labels_name'].apply(lambda arr: len(arr) == 0)].index
     data_frame = data_frame.drop(index_null)
-    data_frame.index = range(data_frame.shape[0])
+    data_frame.index = list(range(data_frame.shape[0]))
     return data_frame
 
 
@@ -135,12 +135,12 @@ def check_for_unknown_label(data_frame, label_columns_list):
     labels_not_found = []
     for col in label_columns_list:
         for each_label in data_frame[col].values.tolist():
-            if each_label in SET_DICTIONARY.keys() or each_label in SET_DICTIONARY.values():
+            if each_label in list(SET_DICTIONARY.keys()) or each_label in list(SET_DICTIONARY.values()):
                 pass
             else:
                 labels_not_found.append(each_label)
 
-    print "Labels not found in Dictionary: \n", list(set(labels_not_found))
+    print("Labels not found in Dictionary: \n", list(set(labels_not_found)))
 
 
 
@@ -157,7 +157,7 @@ def read_embeddings(data_frame, path_to_embeddings):
         except:
             test_index.append(data_frame['wav_file'].values.tolist().index(each_file))
     data_frame = data_frame.drop(test_index)
-    data_frame.index = range(data_frame.shape[0])
+    data_frame.index = list(range(data_frame.shape[0]))
     data_frame['features'] = embeddings_list
     return data_frame
 
@@ -188,7 +188,7 @@ def write_dataframe(path_to_write, dataframe):
         with open(path_to_write, "w") as file_obj:
             pickle.dump(dataframe, file_obj)
     else:
-        print "Input path to write dataframe"
+        print("Input path to write dataframe")
 
 ###########################################################################
                 # Main Function

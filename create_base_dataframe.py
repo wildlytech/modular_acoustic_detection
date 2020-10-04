@@ -27,7 +27,7 @@ def get_embeddings_path(path_for_saved_embeddings, audio_files_list):
             found_embeddings_paths.append(path_for_saved_embeddings+each_value[:-3]+"pkl")
         else:
             pass
-    print "No. Embeddings found as per given audio Filenames in dataframe: ", len(found_embeddings_paths)
+    print("No. Embeddings found as per given audio Filenames in dataframe: ", len(found_embeddings_paths))
     return found_embeddings_paths
 
 

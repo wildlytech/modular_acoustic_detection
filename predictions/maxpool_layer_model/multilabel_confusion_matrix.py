@@ -65,4 +65,4 @@ PREDICTED_VALUES = np.array(DATAFRAME['predicted_labels'].values.tolist())
 ##############################################################################
 		# Prints confusion matrix for each label separately
 ##############################################################################
-print(multilabel_confusion_matrix(GROUND_TRUTH_VALUES, PREDICTED_VALUES))
+print((multilabel_confusion_matrix(GROUND_TRUTH_VALUES, PREDICTED_VALUES)))

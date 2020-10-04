@@ -83,7 +83,7 @@ elif type(ontologyExtFiles) != list:
 
 # All paths to ontology extension files are relative to the location of the
 # model configuration file.
-ontologyExtFiles = map(lambda x: PATH_TO_DIRECTORY_OF_CONFIG + x, ontologyExtFiles)
+ontologyExtFiles = [PATH_TO_DIRECTORY_OF_CONFIG + x for x in ontologyExtFiles]
 
 # Grab all the positive labels
 POSITIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["positiveLabels"], "../", ontologyExtFiles)
@@ -132,13 +132,13 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
   train_subsample = subsample - test_subsample
 
   if (train_df.shape[0] == 0) and (train_subsample > 0):
-    print Fore.RED, "No examples to subsample from!", Style.RESET_ALL
+    print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
     assert(False)
   else:
     train_df = subsample_dataframe(train_df, train_subsample)
 
   if (test_df.shape[0] == 0) and (test_subsample > 0):
-    print Fore.RED, "No examples to subsample from!", Style.RESET_ALL
+    print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
     assert(False)
   else:
     test_df = subsample_dataframe(test_df, test_subsample)
@@ -163,18 +163,18 @@ def import_dataframes(dataframe_file_list,
   # All entries that have a pattern path need special handling
   # Specifically, all the files that match the pattern path
   # need to be determined
-  pattern_file_dicts =  filter(lambda x: "patternPath" in x.keys(), dataframe_file_list)
+  pattern_file_dicts =  [x for x in dataframe_file_list if "patternPath" in list(x.keys())]
 
   # Keep just the entries that don't have a pattern path
   # We'll add entries for each pattern path separately
-  dataframe_file_list = filter(lambda x: "patternPath" not in x.keys(), dataframe_file_list)
+  dataframe_file_list = [x for x in dataframe_file_list if "patternPath" not in list(x.keys())]
 
   # Expand out each pattern path entry into individual ones with fixed paths
   for input_file_dict in pattern_file_dicts:
     pattern_path = input_file_dict["patternPath"]
 
     # Get list of any exclusions that should be made
-    if "excludePaths" in input_file_dict.keys():
+    if "excludePaths" in list(input_file_dict.keys()):
       exclude_paths = input_file_dict["excludePaths"]
 
       if exclude_paths is None:
@@ -192,13 +192,13 @@ def import_dataframes(dataframe_file_list,
 
     # Remove path to directory of json as prefix to the path
     # It will be added back later
-    search_results = map(lambda x: x[len(path_to_directory_of_json):], search_results)
+    search_results = [x[len(path_to_directory_of_json):] for x in search_results]
 
     # If path is in the excluded paths, then ignore it
-    search_results = filter(lambda x: x not in exclude_paths, search_results)
+    search_results = [x for x in search_results if x not in exclude_paths]
 
     if len(search_results) == 0:
-      print Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths, Style.RESET_ALL
+      print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths, Style.RESET_ALL)
       assert(False)
 
     for path in search_results:
@@ -208,7 +208,7 @@ def import_dataframes(dataframe_file_list,
       # Remove keys that are used for pattern path entry
       # Most other keys should be the same as the pattern path entry
       del fixed_path_dict["patternPath"]
-      if "excludePaths" in fixed_path_dict.keys():
+      if "excludePaths" in list(fixed_path_dict.keys()):
         del fixed_path_dict["excludePaths"]
 
       # Make it look like a fixed path entry
@@ -220,10 +220,10 @@ def import_dataframes(dataframe_file_list,
   list_of_test_dataframes = []
   for input_file_dict in dataframe_file_list:
 
-    assert("patternPath" not in input_file_dict.keys())
-    assert("path" in input_file_dict.keys())
+    assert("patternPath" not in list(input_file_dict.keys()))
+    assert("path" in list(input_file_dict.keys()))
 
-    print "Importing", input_file_dict["path"], "..."
+    print("Importing", input_file_dict["path"], "...")
 
     with open(path_to_directory_of_json + input_file_dict["path"], 'rb') as file_obj:
 
@@ -268,7 +268,7 @@ def import_dataframes(dataframe_file_list,
   train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
   test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
 
-  print "Import done."
+  print("Import done.")
 
   return train_df, test_df
 
@@ -299,12 +299,12 @@ TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES = (LABELS_BINARIZED_TRAIN[FULL_NAME] == 1).su
 TOTAL_TRAIN_TEST_NEGATIVE_EXAMPLES = (LABELS_BINARIZED_TRAIN[FULL_NAME] == 0).sum() + \
                                      (LABELS_BINARIZED_TEST[FULL_NAME] == 0).sum()
 
-print "NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
+print("NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
       TOTAL_TRAIN_TEST_EXAMPLES, "/", \
       TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES, "/", \
-      TOTAL_TRAIN_TEST_NEGATIVE_EXAMPLES
+      TOTAL_TRAIN_TEST_NEGATIVE_EXAMPLES)
 
-print "PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100.0*TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES/TOTAL_TRAIN_TEST_EXAMPLES)
+print("PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100.0*TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES/TOTAL_TRAIN_TEST_EXAMPLES))
 
 #############################################################################
         # preprecess the data into required structure
@@ -332,7 +332,7 @@ def create_keras_model():
     model.add(Dense(1, activation='sigmoid'))
     model.add(MaxPooling1D(10))
     model.add(Flatten())
-    print model.summary()
+    print(model.summary())
     # Compile model
     model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
                   metrics=['accuracy'])
@@ -353,11 +353,11 @@ CLF2_TEST_TARGET = LABELS_BINARIZED_TEST.values
 
 TRAIN_TARGET_POSITIVE_PERCENTAGE = CLF2_TRAIN_TARGET.mean()
 
-print "TRAIN NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
+print("TRAIN NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
       CLF2_TRAIN_TARGET.shape[0], "/", \
       (CLF2_TRAIN_TARGET == 1).sum(), "/", \
-      (CLF2_TRAIN_TARGET == 0).sum()
-print "TRAIN PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100*TRAIN_TARGET_POSITIVE_PERCENTAGE)
+      (CLF2_TRAIN_TARGET == 0).sum())
+print("TRAIN PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100*TRAIN_TARGET_POSITIVE_PERCENTAGE))
 
 if TRAIN_TARGET_POSITIVE_PERCENTAGE > 0.5:
   CLASS_WEIGHT_0 = TRAIN_TARGET_POSITIVE_PERCENTAGE / (1-TRAIN_TARGET_POSITIVE_PERCENTAGE)
@@ -410,30 +410,30 @@ MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 #############################################################################
         # print misclassified number of examples
 #############################################################################
-print 'Misclassified number of examples :', MISCLASSIFED_ARRAY.sum()
+print('Misclassified number of examples :', MISCLASSIFED_ARRAY.sum())
 
 
 
 #############################################################################
         # Print confusion matrix and classification_report
 #############################################################################
-print CLF2_TEST_TARGET.shape
-print '        Confusion Matrix          '
-print '============================================'
+print(CLF2_TEST_TARGET.shape)
+print('        Confusion Matrix          ')
+print('============================================')
 RESULT = confusion_matrix(CLF2_TEST_TARGET,
                           CLF2_TEST_PREDICTION)
-print RESULT
+print(RESULT)
 
 
 
 #############################################################################
         # print classification report
 #############################################################################
-print '                 Classification Report      '
-print '============================================'
+print('                 Classification Report      ')
+print('============================================')
 CL_REPORT = classification_report(CLF2_TEST_TARGET,
                                   CLF2_TEST_PREDICTION)
-print CL_REPORT
+print(CL_REPORT)
 
 
 #############################################################################
@@ -442,8 +442,8 @@ print CL_REPORT
 ACCURACY = accuracy_score(CLF2_TEST_TARGET,
                           CLF2_TEST_PREDICTION)
 HL = hamming_loss(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION)
-print 'Hamming Loss :', HL
-print 'Accuracy :', ACCURACY
+print('Hamming Loss :', HL)
+print('Accuracy :', ACCURACY)
 
 
 

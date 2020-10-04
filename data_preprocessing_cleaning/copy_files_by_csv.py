@@ -36,7 +36,7 @@ def copy_files_by_csv(csv_path, wavfiles_src, wavfiles_dest):
             count += 1
             # copy wav file to the destination path
             shutil.copy(wav_file, wavfiles_dest+csv_file_name)
-    print "\nNumber of files copied:", count
+    print("\nNumber of files copied:", count)
 
 ###################################################################################################
 
@@ -54,8 +54,8 @@ if __name__ == "__main__":
         help='Input path to copy wav files to the destination', required=True)
     RESULT = PARSER.parse_args()
 
-    print "\nGiven CSV file path:", RESULT.csv_path
-    print "\nGiven wav files path:", RESULT.src_wav_files_dir
-    print "\nGiven path to copy wav files:", RESULT.dest_wav_files_dir
+    print("\nGiven CSV file path:", RESULT.csv_path)
+    print("\nGiven wav files path:", RESULT.src_wav_files_dir)
+    print("\nGiven path to copy wav files:", RESULT.dest_wav_files_dir)
 
     copy_files_by_csv(RESULT.csv_path, RESULT.src_wav_files_dir, RESULT.dest_wav_files_dir)
