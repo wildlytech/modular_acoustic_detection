@@ -1,7 +1,7 @@
 
 
 #This code is modified from :
-#https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
+#https://github.com/tensorflow/models/blob/master/research/audioset/vggish/vggish_inference_demo.py
 
 r"""A simple demonstration of running VGGish in inference mode.
 This is intended as a toy example that demonstrates how the various building
@@ -42,7 +42,10 @@ import numpy as np
 from scipy.io import wavfile
 import six
 import tensorflow as tf
-sys.path.insert(0, 'externals/tensorflow_models/research/audioset/')
+
+VGGISH_PATH = 'externals/tensorflow_models/research/audioset/vggish/'
+sys.path.insert(0, VGGISH_PATH)
+
 import vggish_input
 import vggish_params
 import vggish_postprocess
@@ -54,8 +57,8 @@ import vggish_slim
                     # Constants
 #######################################################################################
 
-VGGISH_MODEL_CHECKPOINT_FILE = 'externals/tensorflow_models/research/audioset/vggish_model.ckpt'
-PCA_PARAMS_FILE = 'externals/tensorflow_models/research/audioset/vggish_pca_params.npz'
+VGGISH_MODEL_CHECKPOINT_FILE = VGGISH_PATH + 'vggish_model.ckpt'
+PCA_PARAMS_FILE = VGGISH_PATH + 'vggish_pca_params.npz'
 
 ########################################################################################
                     # Functions

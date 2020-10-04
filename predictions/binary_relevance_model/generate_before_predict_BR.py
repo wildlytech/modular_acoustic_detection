@@ -37,8 +37,10 @@ import tensorflow as tf
 from keras import backend as K
 import model_function_binary_relevance
 import os
-sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + \
-                   '/../../externals/tensorflow_models/research/audioset/')
+
+VGGISH_PATH = '../../externals/tensorflow_models/research/audioset/vggish/'
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + '/' + VGGISH_PATH)
+
 import vggish_input
 import vggish_params
 import vggish_postprocess
@@ -49,8 +51,8 @@ import vggish_slim
       # Defining the flags before hand
 ##############################################################################
 FLAGS = {
-    'pca_params' : '../../externals/tensorflow_models/research/audioset/vggish_pca_params.npz',
-    'checkpoint' : '../../externals/tensorflow_models/research/audioset/vggish_model.ckpt'
+    'pca_params' : VGGISH_PATH + 'vggish_pca_params.npz',
+    'checkpoint' : VGGISH_PATH + 'vggish_model.ckpt'
 }
 
 ##############################################################################
