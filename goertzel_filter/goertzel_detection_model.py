@@ -12,12 +12,11 @@ from sklearn.utils import shuffle
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-from keras.models import Sequential
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, TimeDistributed, MaxPooling2D
-from keras.layers.core import Lambda
-from keras.optimizers import RMSprop
-from keras_tqdm import TQDMNotebookCallback
-from keras.layers.core import Dropout
+from tensorflow.compat.v1.keras.models import Sequential
+from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, TimeDistributed, MaxPooling2D
+from tensorflow.compat.v1.keras.layers.core import Lambda
+from tensorflow.compat.v1.keras.optimizers import RMSprop
+from tensorflow.compat.v1.keras.layers.core import Dropout
 import balancing_dataset_goertzel
 sys.path.insert(0, "../")
 from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS, WILD_ANIMALS,DOMESTIC_SOUNDS, TOOLS_SOUNDS

@@ -257,7 +257,7 @@ MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 
 
 
-# with open("misclassified_weights_Birds_added_maxpool_at_end_4times_500units.pkl","w") as f:
+# with open("misclassified_weights_Birds_added_maxpool_at_end_4times_500units.pkl","wb") as f:
 #   pickle.dump(DF_TRAIN[MISCLASSIFIED_EXAMPLES][["wav_file","actual_labels","predicted_labels","predicted_prob"]],f)
 
 
@@ -300,7 +300,7 @@ print('Accuracy :', ACCURACY)
           # path to save the predictions in pkl format
 ##################################################################################
 if RESULT.path_to_save_prediciton_dataframe:
-    with open(RESULT.path_to_save_prediciton_dataframe, "w") as file_obj:
+    with open(RESULT.path_to_save_prediciton_dataframe, "wb") as file_obj:
         pickle.dump(DF_TRAIN, file_obj)
 else:
     print("Predictions not saved in DataFrame format (.pkl). \

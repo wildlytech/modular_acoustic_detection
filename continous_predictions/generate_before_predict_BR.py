@@ -33,7 +33,7 @@ Usage:
 
 
 import sys
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from keras import backend as K
 import model_function_binary_relevance
 

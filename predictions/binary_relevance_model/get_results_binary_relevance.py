@@ -190,7 +190,7 @@ def main(predictions_cfg_json,
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \
                               "misclassified_examples_br_model_"+label_name+".pkl"
-                with open(misclassified_pickle_file, "w") as f:
+                with open(misclassified_pickle_file, "wb") as f:
                     pickle.dump(DF_TEST[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 
 

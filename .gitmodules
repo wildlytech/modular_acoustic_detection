@@ -2,3 +2,6 @@
 	path = externals/tensorflow_models
 	url = https://github.com/tensorflow/models
 	branch = master
+[submodule "externals/audioset_ontology"]
+	path = externals/audioset_ontology
+	url = git@github.com:audioset/ontology.git

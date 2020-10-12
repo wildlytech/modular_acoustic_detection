@@ -123,10 +123,21 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
   Perform validation split and sub/over sampling of dataframe
   Returns train and test dataframe
   """
+
   # split before sub/oversampling to ensure there is no leakage between train and test sets
-  train_df, test_df = train_test_split(dataframe,
-                                       test_size=validation_split,
-                                       random_state=42)
+  test_size = int(validation_split*dataframe.shape[0])
+  train_size = dataframe.shape[0] - test_size
+
+  if test_size == 0:
+    train_df = dataframe
+    test_df = pd.DataFrame({}, columns=dataframe.columns)
+  elif train_size == 0:
+    train_df = pd.DataFrame({}, columns=dataframe.columns)
+    test_df = dataframe
+  else:
+    train_df, test_df = train_test_split(dataframe,
+                                         test_size=test_size,
+                                         random_state=42)
 
   test_subsample = int(subsample*validation_split)
   train_subsample = subsample - test_subsample

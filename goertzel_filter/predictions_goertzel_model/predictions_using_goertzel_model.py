@@ -5,10 +5,9 @@ import sys
 import pickle
 import argparse
 import numpy as np
-import keras
-from keras.models import Model
-from keras.layers import Input
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, TimeDistributed, MaxPooling2D
+from tensorflow.compat.v1.keras.models import Model
+from tensorflow.compat.v1.keras.layers import Input
+from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, TimeDistributed, MaxPooling2D
 
 
 

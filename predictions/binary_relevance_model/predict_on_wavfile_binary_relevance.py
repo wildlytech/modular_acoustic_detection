@@ -6,9 +6,6 @@ import pickle
 import pandas as pd
 import numpy as np
 from keras import backend as K
-from keras.models import Sequential
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, AtrousConvolution1D
-from keras.optimizers import Adam
 import generate_before_predict_BR
 import get_results_binary_relevance
 

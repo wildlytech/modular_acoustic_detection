@@ -183,7 +183,7 @@ def generate_frequency_components():
                     for i in TARGET_FREQUENCIES:
                         mag_arb, _, _, _ = Goertzel_filter(wave_file, DOWNSAMPLING_FREQUENCY, i, wave_file.shape[0])
                         mag.append(mag_arb)
-                    with open(PATH_TO_GOERTZEL_COMPONENTS + audio_path.split("/")[-1][:-4]+'.pkl', 'w') as file_obj:
+                    with open(PATH_TO_GOERTZEL_COMPONENTS + audio_path.split("/")[-1][:-4]+'.pkl', 'wb') as file_obj:
                         pickle.dump(np.array(mag, dtype=np.float32), file_obj)
             else:
                 print(' Wave file is not at good sampling rate ie ' + str(ACCEPTABLE_SAMPLINGRATE) + "Hz")

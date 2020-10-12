@@ -7,9 +7,9 @@
 *Note*: Recommended to install Anaconda to manage the different environment and to avoid package/library version conflicts
 Download: [Download Anaconda](https://www.anaconda.com/distribution/)
 
-- ##### Create a separate environment with python 2.7 Version
+- ##### Create a separate environment with python 3.8 Version
 ```shell
-$ conda create -n env_name python=2.7
+$ conda create -n env_name python=3.8
 ```
 **Note**: Change ```env_name``` to your convenient name
 
@@ -20,7 +20,7 @@ $ conda activate env_name
 **Note**: After successful activation of the environment terminal should display something similar to above
 ```shell
 (env_name)$
-``` 
+```
 
 #### 1.2 Local Repository setup
 
@@ -80,7 +80,7 @@ $ cd get_data/
 
 <br>
 
-## 4. Generate Embeddings 
+## 4. Generate Embeddings
 This will download the embeddings as ```.pkl``` files at the directory where you specify. This script requires additional functional scripts found at [Tensorflow-models-repo](https://github.com/tensorflow/models/tree/9b57f41ce21cd7264c52140c9ab31cdfc5169fcd/research/audioset).
 
 ```shell
@@ -96,7 +96,7 @@ $ python generating_embeddings.py   --wav_file
 - This will add the generated embedding values of each audio file to base dataframe columns if it already exists ```(TYPE 1)```, otherwise it creates base dataframe with ```["wav_file", "features"]``` columns i.e ```(TYPE 2)```. Final dataframe will now have one extra column when compared with ```downloaded_base_dataframe.pkl``` i.e with ```["features"]```
 - About Arguments:
 	-  ```-dataframe_without_feature``` : If ```TYPE 1``` dataframe exists already, path of it should be given otherwise it can be ignored
-	-  ```-path_for_saved_embeddings``` : Directory path where all the ```.pkl``` files are saved 
+	-  ```-path_for_saved_embeddings``` : Directory path where all the ```.pkl``` files are saved
 	-  ```-path_to_write_dataframe``` : Path along with name of the file with ```.pkl``` extension to write the final dataframe
 ```shell
 $ python create_base_dataframe.py [-h] -dataframe_without_feature
@@ -109,7 +109,7 @@ $ python create_base_dataframe.py [-h] -dataframe_without_feature
 <br>
 
 ## 6.  Separating Sounds Based on Labels
-- This script will read the dataframe ```(TYPE 1)``` i.e it should have ```["labels_name"]``` column in it ,  separates out the sounds based on labeling, creates a different dataframe as per labels and writes at target path given. 
+- This script will read the dataframe ```(TYPE 1)``` i.e it should have ```["labels_name"]``` column in it ,  separates out the sounds based on labeling, creates a different dataframe as per labels and writes at target path given.
 - You can check [coarse_labels.csv](https://github.com/wildlytech/modular_acoustic_detection/blob/master/coarse_labels.csv) file to know the mapping of the labels and the separation of each sounds takes place
 - To separate sounds based on labels navigate to [data_preprocessing_cleaning/separating_different_sounds.py](https://github.com/wildlytech/modular_acoustic_detection/blob/master/data_preprocessing_cleaning/seperating_different_sounds.py)
 - Follow the command below to navigate to the directory and execute the script to separate sounds
@@ -117,7 +117,7 @@ $ python create_base_dataframe.py [-h] -dataframe_without_feature
 
 <br>
 
-## 7.  Training ML/DL Models 
+## 7.  Training ML/DL Models
 - Once we have required audioset consisting of different labelled audio clips ```labels_name``` each of 10 seconds and their appropriate embeddings ```features```  in a dataframe format (preferably) we can use these dataframe files for training ML / DL models
 - Any Dataframe file with these columns in it can be included into training data i.e ```["wav_file", "labels_name", "features]```
 - We have to add the path of that required dataframe (Includes above mentioned columns) in [balanced_data.py](https://github.com/wildlytech/modular_acoustic_detection/blob/master/balancing_dataset.py)
@@ -145,7 +145,7 @@ $ cd predictions/
 ## 9. Compressing & Decompressing of Audio Files
 - Definition of Audio Compression: [Wikipedia Source](https://en.wikipedia.org/wiki/Audio_compression_(data))
 - Two different types of Audio compression
-     -  Lossy Audio Compression    
+     -  Lossy Audio Compression
      - Lossless Audio Compression
 
 To perform various types of audio compression techniques & decompressing back the compressed audio files navigate to ```compression/``` directory. To navigate follow the command below
@@ -160,7 +160,7 @@ $ cd compression/
 
 -   Definition of Goertzel Filter: [Wikipedia Source](https://en.wikipedia.org/wiki/Goertzel_algorithm)
 - Navigate to goertzel_filter/ directory if you want to :
-	- Visualize the audio file in spectrogram after applying goertzel filter 
+	- Visualize the audio file in spectrogram after applying goertzel filter
 	- Extract  particular frequency components of an audio file
 - To navigate to ```goertzel_filter/``` directory follow the below command
 ```shell
@@ -177,9 +177,9 @@ $ cd goertzel_filter/
 		- To annotate audio files navigate to [Dash_integration/annotation/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/annotation)
 		- Follow the command to navigate to that folder in terminal
 		- ``` $ cd Dash_integraion/annotation/```
-	- **Device Report** : Enables to see generate a concise report for each device that is uploading files in FTP server. Device parameters such as Battery performance, Location Details etc can be visualized using this app 
+	- **Device Report** : Enables to see generate a concise report for each device that is uploading files in FTP server. Device parameters such as Battery performance, Location Details etc can be visualized using this app
 		- To generate report navigate to  [Dash_integration/device_report/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/device_report)
-		- Follow the command to navigate to this folder in terminal 
+		- Follow the command to navigate to this folder in terminal
 		- ``` $ cd Dash_integraion/device_report/```
 	- **Monitoring and Alert** : Enables user to monitor FTP server directories, Device(s), get alert based on detection of any sounds of interest, upload multiple audio wavfiles to see the predictions etc
 		- To monitor and get alerts via SMS navigate to [Dash_integration/monitoring_alert/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/monitoring_alert)

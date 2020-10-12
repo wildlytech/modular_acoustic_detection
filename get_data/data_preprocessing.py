@@ -185,7 +185,7 @@ def write_dataframe(path_to_write, dataframe):
     write out the dataframe in pickle format
     """
     if path_to_write:
-        with open(path_to_write, "w") as file_obj:
+        with open(path_to_write, "wb") as file_obj:
             pickle.dump(dataframe, file_obj)
     else:
         print("Input path to write dataframe")

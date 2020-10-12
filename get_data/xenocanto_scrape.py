@@ -34,7 +34,7 @@ def number_of_pages(birdspecies):
         for result_page in result_pages:
             pages = result_page.find_all('li')
             for page1 in pages:
-                number_of_webpages.append(page1.text.replace('\n', ' ').strip().encode('ascii'))
+                number_of_webpages.append(page1.text.replace('\n', ' ').strip())
         last_page = number_of_webpages[-2]
     return last_page
 
@@ -76,9 +76,9 @@ def get_rows_info(row_data):
     for each_row in td:
         # get audio id
         audio_info = row_data.find('a', attrs={'class':'fancybox'})
-        audio_id = [audio_info['title'].split(":")[0].encode('ascii', 'ignore')]
+        audio_id = [audio_info['title'].split(":")[0]]
         # remove any newlines and extra spaces from left and right
-        td_rows.append(each_row.text.replace('\n', ' ').encode('ascii', 'ignore').strip())
+        td_rows.append(each_row.text.replace('\n', ' ').strip())
     return td_rows, audio_id
 
 def download_xc_audio(audio_files_path, xc_audio_ID):

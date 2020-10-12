@@ -74,7 +74,7 @@ def add_labels_to_dataframe(path_to_feature_dataframe, path_to_label_csv_file):
     assert(path_to_feature_dataframe.endswith(".pkl"))
     path_to_full_dataframe = path_to_feature_dataframe[:-4] + "_with_labels.pkl"
 
-    with open(path_to_full_dataframe, 'w') as file_obj:
+    with open(path_to_full_dataframe, 'wb') as file_obj:
         pickle.dump(feature_dataframe, file_obj)
 
     return feature_dataframe

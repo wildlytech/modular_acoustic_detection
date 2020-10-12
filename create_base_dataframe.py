@@ -55,8 +55,8 @@ def start_from_initial(embedding_filespath):
     """
     embeddings_value = []
     embeddings_name = []
-    embeddins_names_with_path = glob.glob(embedding_filespath+"*.pkl")
-    for each_value in embeddins_names_with_path:
+    embeddings_names_with_path = glob.glob(embedding_filespath+"*.pkl")
+    for each_value in embeddings_names_with_path:
         embeddings_value.append(read_pickle_file(each_value))
         embeddings_name.append(each_value.split("/")[-1][:-3]+"wav")
     dataframe_inside_scope = create_dataframe(["wav_file", "features"])
@@ -69,7 +69,7 @@ def write_dataframe(path_to_write, dataframe):
     """
     Write the dataframe in pickle format
     """
-    with open(path_to_write, "w") as file_obj:
+    with open(path_to_write, "wb") as file_obj:
         pickle.dump(dataframe, file_obj)
 
 

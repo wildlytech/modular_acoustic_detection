@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from pydub import AudioSegment
 from sklearn.preprocessing import LabelBinarizer
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 
@@ -287,7 +287,7 @@ def download_data(target_sounds_list, target_path):
 
     #save the data frame which can be used for further balancing the data
     #and generating the embeddings for audio files.
-    with open('downloaded_base_dataframe.pkl', 'w') as file_obj:
+    with open('downloaded_base_dataframe.pkl', 'wb') as file_obj:
         pickle.dump(df, file_obj)
 
     print('Base dataframe is saved as " downloaded_base_dataframe.pkl "..!!')
@@ -330,6 +330,9 @@ def read_audio_record(audio_record, output_to_file=None):
     feat_audio = []
     count = 0
 
+    # Workaround for tensorflow v1
+    tf.disable_eager_execution()
+
     with tf.device("/cpu:0"):
         config = tf.ConfigProto()
         config.gpu_options.per_process_gpu_memory_fraction = 0.0001
@@ -355,6 +358,7 @@ def read_audio_record(audio_record, output_to_file=None):
             feat_audio[count].append(audio_frame)
             count += 1
         sess.close()
+
     df = pd.DataFrame(list(zip(vid_ids, labels, start_time_seconds, end_time_seconds, feat_audio)),
                       columns=['video_id',
                                'labels',
@@ -377,9 +381,9 @@ def get_recursive_sound_names(designated_sound_names, path_to_ontology, ontology
     Read the recursive names from JSON file
     """
     if path_to_ontology is None:
-        path_to_ontology = "data/audioset/ontology.json"
+        path_to_ontology = "externals/audioset_ontology/ontology.json"
     else:
-        path_to_ontology = path_to_ontology+"data/audioset/ontology.json"
+        path_to_ontology = path_to_ontology+"externals/audioset_ontology/ontology.json"
 
     ontology_entries = json.load(open(path_to_ontology, 'r'))
 

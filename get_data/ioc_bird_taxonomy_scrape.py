@@ -72,10 +72,8 @@ def parse_taxonomy(xml_dict, id_prefix, key):
 
         english_name = xml_dict.get('english_name')
         if english_name:
-            english_name = english_name.encode("utf-8").lower()
+            english_name = english_name.lower()
         note = xml_dict.get('note')
-        if note:
-            note = note.encode("utf-8")
 
         ontology_id = id_prefix+"_{0}_{1}".format(key, latin_name.replace(' ', '-'))
 
@@ -138,16 +136,14 @@ if __name__ == "__main__":
     print("Downloading IOC taxonomy data ...")
     RESPONSE = requests.get(URL, headers={'user-agent': 'my-app/0.0.1'})
 
-    print("Encoding text from utf-8...")
-    DATA = RESPONSE.text.encode("utf-8")
-
     print("Converting taxonomy data to ontology extension format...")
-    TAXONOMY_DICT = xmltodict.parse(DATA)
+    TAXONOMY_DICT = xmltodict.parse(RESPONSE.text)
 
     parse_taxonomy(TAXONOMY_DICT['ioclist']['list'], 'bird_ioc', 'bird')
 
     # Write out the ontology to json
     with open(ONTOLOGY_EXT_FILE_PATH, 'w') as file_obj:
+
         json_data = json.dumps(ONTOLOGY_EXTENSION_NODES,
                                indent=4, sort_keys=True)
 

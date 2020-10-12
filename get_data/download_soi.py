@@ -322,7 +322,7 @@ def download_data(target_sounds_list, target_path):
 
     #save the data frame which can be used for further balancing the data
     #and generating the embeddings for audio files.
-    with open(RESULT.target_sounds+'_downloaded_base_dataframe.pkl', 'w') as file_obj:
+    with open(RESULT.target_sounds+'_downloaded_base_dataframe.pkl', 'wb') as file_obj:
         pickle.dump(df, file_obj)
 
     print('Base dataframe is saved as " downloaded_base_dataframe.pkl "..!!')

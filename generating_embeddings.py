@@ -41,7 +41,7 @@ import os
 import numpy as np
 from scipy.io import wavfile
 import six
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 VGGISH_PATH = 'externals/tensorflow_models/research/audioset/vggish/'
 sys.path.insert(0, VGGISH_PATH)
@@ -94,7 +94,7 @@ def generate(path_to_write_embeddings, path_to_wav_files):
         print (wav_file)
         #No need to generate the embeddings that are already generated.
         if path_to_pickle_file in pickle_files:
-            print ('Embeddings are already Generated for', path_to_pickle_file)
+            print ('Embeddings are already generated for', path_to_pickle_file)
 
         # In this simple example, we run the examples from a single audio file through
         # the model. If none is provided, we generate a synthetic input.
@@ -123,7 +123,7 @@ def generate(path_to_write_embeddings, path_to_wav_files):
                 # print(postprocessed_batch)
 
             #write the embeddings as pickle files
-            with open(path_to_pickle_file, 'w') as file_obj:
+            with open(path_to_pickle_file, 'wb') as file_obj:
                 pickle.dump(postprocessed_batch, file_obj)
 
 if __name__ == '__main__':
