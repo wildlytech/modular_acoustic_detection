@@ -3,12 +3,12 @@ import os
 import argparse
 import pickle
 import pydub
-import pandas as pd 
-import numpy as np 
+import pandas as pd
+import numpy as np
 from scipy.io import wavfile
 from pydub import AudioSegment
 import glob
-PATH_FOR_DATA = '../diff_class_datasets/Datasets/'
+PATH_FOR_DATA = 'diff_class_datasets/Datasets/'
 
 
 #########################################################################################

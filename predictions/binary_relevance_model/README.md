@@ -14,10 +14,10 @@
 	- ```-path_to_save_prediction_csv``` : Path for ```.csv``` file to save all the prediction results ```(.csv)``` file
 
 ```shell
-$ python get_results_binary_relevance.py  [-h]   -predictions_cfg_json
-                                                 -path_for_dataframe_with_features
-                                                 -save_misclassified_examples
-                                                 -path_to_save_prediction_csv
+$ python -m predictions.binary_relevance_model.get_results_binary_relevance [-h] -predictions_cfg_json
+                                                                                 -path_for_dataframe_with_features
+                                                                                 -save_misclassified_examples
+                                                                                 -path_to_save_prediction_csv
 ```
 
 <br>
@@ -33,9 +33,9 @@ $ python get_results_binary_relevance.py  [-h]   -predictions_cfg_json
 	- ```-results_in_csv``` : Path for csv file to save all the prediction results ```(.csv)``` file
 
 ```shell
-$ python get_predictions_on_dataframe.py  [-h]  -predictions_cfg_json
-                                                -path_for_dataframe_with_features
-                                                -results_in_csv
+$ python -m predictions.binary_relevance_model.get_predictions_on_dataframe [-h] -predictions_cfg_json
+                                                                                 -path_for_dataframe_with_features
+                                                                                 -results_in_csv
 ```
 
 

@@ -14,11 +14,10 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from tensorflow.compat.v1.keras.models import Sequential
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, TimeDistributed, MaxPooling2D
-from tensorflow.compat.v1.keras.layers.core import Lambda
+from tensorflow.compat.v1.keras.layers import Lambda
 from tensorflow.compat.v1.keras.optimizers import RMSprop
-from tensorflow.compat.v1.keras.layers.core import Dropout
-import balancing_dataset_goertzel
-sys.path.insert(0, "../")
+from tensorflow.compat.v1.keras.layers import Dropout
+from . import balancing_dataset_goertzel
 from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS, WILD_ANIMALS,DOMESTIC_SOUNDS, TOOLS_SOUNDS
 from youtube_audioset import get_data, get_recursive_sound_names, get_all_sound_names
 
@@ -54,14 +53,14 @@ DATA_FRAME = balancing_dataset_goertzel.balanced_data(audiomoth_flag=0, mixed_so
 #################################################################################
               # getting recursive label names
 #################################################################################
-AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names("../")
-EXPLOSION = get_recursive_sound_names(EXPLOSION_SOUNDS, "../")
-MOTOR = get_recursive_sound_names(MOTOR_SOUNDS, "../")
-WOOD = get_recursive_sound_names(WOOD_SOUNDS, "../")
-HUMAN = get_recursive_sound_names(HUMAN_SOUNDS, "../")
-NATURE = get_recursive_sound_names(NATURE_SOUNDS, "../")
-DOMESTIC = get_recursive_sound_names(DOMESTIC_SOUNDS, "../")
-DOMESTIC = get_recursive_sound_names(TOOLS_SOUNDS, "../")
+AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names("./")
+EXPLOSION = get_recursive_sound_names(EXPLOSION_SOUNDS, "./")
+MOTOR = get_recursive_sound_names(MOTOR_SOUNDS, "./")
+WOOD = get_recursive_sound_names(WOOD_SOUNDS, "./")
+HUMAN = get_recursive_sound_names(HUMAN_SOUNDS, "./")
+NATURE = get_recursive_sound_names(NATURE_SOUNDS, "./")
+DOMESTIC = get_recursive_sound_names(DOMESTIC_SOUNDS, "./")
+DOMESTIC = get_recursive_sound_names(TOOLS_SOUNDS, "./")
 
 
 

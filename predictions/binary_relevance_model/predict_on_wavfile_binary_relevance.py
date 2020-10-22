@@ -5,9 +5,8 @@ import argparse
 import pickle
 import pandas as pd
 import numpy as np
-from keras import backend as K
-import generate_before_predict_BR
-import get_results_binary_relevance
+from tensorflow.compat.v1.keras import backend as K
+from . import generate_before_predict_BR, get_results_binary_relevance
 
 def predict_on_embedding(embedding, label_names, config_datas):
     '''

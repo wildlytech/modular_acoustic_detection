@@ -6,7 +6,7 @@ import random
 import pandas as pd
 
 # Pure Sounds datapath
-YOUTUBE_PURE_DATAPATH = '../diff_class_datasets/Datasets/pure/'
+YOUTUBE_PURE_DATAPATH = 'diff_class_datasets/Datasets/pure/'
 AUDIOMOTH_PURE_DATAPATH = "audiomoth_different_split/pure/"
 
 # Mixed sounds data path

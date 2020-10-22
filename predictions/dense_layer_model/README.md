@@ -13,13 +13,13 @@
 	- ```-path_for_dataframe_with_FL``` : Path for ```TYPE 1``` dataframe file with ```(.pkl)```  extension
 	- ```-path_for_dense_saved_weights_file``` : Path where model weights are saved ```.h5``` file
 	- ```-csvfilename_to_save_predictions``` : Path for csv file to save all the prediction results ```(.csv)``` file
-	- ```-path_to_save_prediciton_dataframe``` : Path for ```.pkl``` file to save all the prediction results in dataframe format 
+	- ```-path_to_save_prediciton_dataframe``` : Path for ```.pkl``` file to save all the prediction results in dataframe format
 
 ```shell
-$ python get_results_multilabel.py  [-h]   -path_for_dataframe_with_FL
-                                           -path_for_dense_saved_weights_file
-                                           -csvfilename_to_save_predictions
-                                           -path_to_save_prediciton_dataframe
+$ python -m predictions.dense_layer_model.get_results_multilabel  [-h]  -path_for_dataframe_with_FL
+                                                                        -path_for_dense_saved_weights_file
+                                                                        -csvfilename_to_save_predictions
+                                                                        -path_to_save_prediciton_dataframe
 ```
 
 <br>
@@ -37,9 +37,9 @@ $ python get_results_multilabel.py  [-h]   -path_for_dataframe_with_FL
 	- ```-csvfilename_to_save_predictions``` : Path for csv file to save all the prediction results ```(.csv)``` file
 
 ```shell
-python predict_on_dataframe_file.py  [-h]   -path_for_dataframe_with_features
-                                            -path_for_dense_model_weights
-                                            -csvfilename_to_save_predictions
+python -m predictions.dense_layer_model.predict_on_dataframe_file  [-h]  -path_for_dataframe_with_features
+                                                                         -path_for_dense_model_weights
+                                                                         -csvfilename_to_save_predictions
 ```
 
 

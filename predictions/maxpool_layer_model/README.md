@@ -10,16 +10,16 @@
 - Follow the command below to get the ```precision```, ```recall```, ```confusion matrix```, ```classification report``` for the data
 -   When data in the pickle dataframe format (Type 1) then testing involves logging some of the metrics and evaluating the model performance.
 - About Arguments : [get_results_multilabel_maxpool.py](https://github.com/wildlytech/modular_acoustic_detection/blob/b9ecc45b698a7be8a266fc463f4489cdff3d688e/predictions/maxpool_layer_model/get_results_multilabel_maxpool.py#L37)
-	- ```-path_for_dataframe_with_FL``` : Path for ```TYPE 1``` dataframe file with ```(.pkl)```  extension
-	- ```-path_for_maxpool_saved_weights_file``` : Path where model weights are saved ```.h5``` file
-	- ```-csvfilename_to_save_predictions``` : Path for csv file to save all the prediction results ```(.csv)``` file
-	- ```-path_to_save_prediciton_dataframe``` : Path for ```.pkl``` file to save all the prediction results in dataframe format 
+    - ```-path_for_dataframe_with_FL``` : Path for ```TYPE 1``` dataframe file with ```(.pkl)```  extension
+    - ```-path_for_maxpool_saved_weights_file``` : Path where model weights are saved ```.h5``` file
+    - ```-csvfilename_to_save_predictions``` : Path for csv file to save all the prediction results ```(.csv)``` file
+    - ```-path_to_save_prediciton_dataframe``` : Path for ```.pkl``` file to save all the prediction results in dataframe format
 
 ```shell
-$ python get_results_multilabel_maxpool.py  [-h]   -path_for_dataframe_with_FL
-                                                   -path_for_dense_saved_weights_file
-                                                   -csvfilename_to_save_predictions
-                                                   -path_to_save_prediciton_dataframe
+$ python -m predictions.maxpool_layer_model.get_results_multilabel_maxpool [-h] -path_for_dataframe_with_FL
+                                                                                -path_for_dense_saved_weights_file
+                                                                                -csvfilename_to_save_predictions
+                                                                                -path_to_save_prediciton_dataframe
 ```
 
 <br>
@@ -32,14 +32,14 @@ $ python get_results_multilabel_maxpool.py  [-h]   -path_for_dataframe_with_FL
 - Follow the command below to get the predictions for files.
 - **Note** : We won't be able to get ```precision```, ```recall```, ```confusion matrix```, ```classification report``` for the data as they are not annotated i.e no ground truth values are present for it
  - About Arguments : [predict_on_dataframe_file_maxpool.py](https://github.com/wildlytech/modular_acoustic_detection/blob/3a05ea41746ba72212f8878b519696b6d520258f/predictions/dense_layer_model/predict_on_dataframe_file.py#L25)
-	- ```-path_for_dataframe_with_features``` : Path for ```TYPE 2``` dataframe file with ```(.pkl)```  extension
-	- ```-path_for_maxpool_model_weights``` : Path where model weights are saved ```.h5``` file
-	- ```-csvfilename_to_save_predictions``` : Path for csv file to save all the prediction results ```(.csv)``` file
+    - ```-path_for_dataframe_with_features``` : Path for ```TYPE 2``` dataframe file with ```(.pkl)```  extension
+    - ```-path_for_maxpool_model_weights``` : Path where model weights are saved ```.h5``` file
+    - ```-csvfilename_to_save_predictions``` : Path for csv file to save all the prediction results ```(.csv)``` file
 
 ```shell
-python predict_on_dataframe_file.py  [-h]   -path_for_dataframe_with_features
-                                            -path_for_maxpool_model_weights
-                                            -csvfilename_to_save_predictions
+python -m predictions.maxpool_layer_model.predict_on_dataframe_file [-h]    -path_for_dataframe_with_features
+                                                                            -path_for_maxpool_model_weights
+                                                                            -csvfilename_to_save_predictions
 ```
 
 

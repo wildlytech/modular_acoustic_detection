@@ -1,9 +1,9 @@
 [
-    "../../model_configs/binary_relevance_model/binary_relevance_model_Domestic_cfg.json",
-    "../../model_configs/binary_relevance_model/binary_relevance_model_Explosion_cfg.json",
-    "../../model_configs/binary_relevance_model/binary_relevance_model_Human_cfg.json",
-    "../../model_configs/binary_relevance_model/binary_relevance_model_Motor_cfg.json",
-    "../../model_configs/binary_relevance_model/binary_relevance_model_Nature_cfg.json",
-    "../../model_configs/binary_relevance_model/binary_relevance_model_Tools_cfg.json",
-    "../../model_configs/binary_relevance_model/binary_relevance_model_Wild_cfg.json"
+    "model_configs/binary_relevance_model/binary_relevance_model_Domestic_cfg.json",
+    "model_configs/binary_relevance_model/binary_relevance_model_Explosion_cfg.json",
+    "model_configs/binary_relevance_model/binary_relevance_model_Human_cfg.json",
+    "model_configs/binary_relevance_model/binary_relevance_model_Motor_cfg.json",
+    "model_configs/binary_relevance_model/binary_relevance_model_Nature_cfg.json",
+    "model_configs/binary_relevance_model/binary_relevance_model_Tools_cfg.json",
+    "model_configs/binary_relevance_model/binary_relevance_model_Wild_cfg.json"
 ]

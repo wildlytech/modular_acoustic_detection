@@ -24,7 +24,6 @@ from pymongo import MongoClient
 import re
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + "/../../")
 from predictions.binary_relevance_model import generate_before_predict_BR,\
                                                get_results_binary_relevance,\
                                                predict_on_wavfile_binary_relevance
@@ -69,7 +68,7 @@ OPTIONAL_NAMED.add_argument('-ftp_host', '--ftp_host', action='store',
 OPTIONAL_NAMED.add_argument('-predictions_cfg_json',
                             '--predictions_cfg_json', action='store',
                             help='Input json configuration file for predictions output',
-                            default='../../predictions/binary_relevance_model/binary_relevance_prediction_config.json')
+                            default='predictions/binary_relevance_model/binary_relevance_prediction_config.json')
 OPTIONAL_NAMED.add_argument('-csv_filename', '--csv_filename', action='store',
                             help='Input the name of csv file to save results', default='wav_file_results.csv')
 

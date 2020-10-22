@@ -2,7 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import glob
-from utils import Header, make_dash_table
+from ..utils import Header, make_dash_table
 from plotly import tools
 import pandas as pd
 import pathlib
@@ -60,7 +60,7 @@ def plot_function(dataframe):
                 name = "Network Quality:- GOOD"
             elif color_main == "yellow":
                 name = "Network Quality:- AVERAGE"
-        data = go.Scatter(x=pd.Series(list(range(0,20000,1))),text=values_list,mode="markers",hoverinfo="text", 
+        data = go.Scatter(x=pd.Series(list(range(0,20000,1))),text=values_list,mode="markers",hoverinfo="text",
                             name=name,marker = dict(color=list(map(SetColor, dataframe['Network_Status']))),
                             y=dataframe['Battery_Percentage'])
         return data
@@ -108,7 +108,7 @@ def plot_function_bar(dataframe,device_value):
         x=[dataframe["DeviceID"].iloc[0]],
         y=[dataframe.shape[0]],
         name="Device-"+str(device_value),
-        textposition="outside",        
+        textposition="outside",
         marker=dict(
         line=dict(
             color='red',
@@ -166,7 +166,7 @@ def get_dataframe_for_plotting_recording(file_index):
 
 def get_dictionary(csv_files):
     req_dict = dict()
-    for index, each_file in enumerate(csv_files):        
+    for index, each_file in enumerate(csv_files):
         req_dict["Device_"+str(index)] = each_file
     return req_dict
 
@@ -224,7 +224,7 @@ def get_layout():
 
 def get_figure(list_of_devices):
 
-    global latitudes, longitudes, color_location, device_name_location   
+    global latitudes, longitudes, color_location, device_name_location
     trace = []
     for index,each in enumerate(list_of_devices):
         df = read_csv_file(csv_files[int(str(each).split("_")[-1])])
@@ -234,7 +234,7 @@ def get_figure(list_of_devices):
         device_name_location.append(each)
         data = get_data(each)
         trace.append(data)
-        layout = get_layout()                      
+        layout = get_layout()
     fig = go.FigureWidget(data=trace, layout=layout)
     return fig
 
@@ -349,7 +349,7 @@ def create_layout(app):
                                                       'color':'black'}
                                                 })
                                             },
-                                            
+
                                         config={"displayModeBar": False},
                                     ),
                                 ],

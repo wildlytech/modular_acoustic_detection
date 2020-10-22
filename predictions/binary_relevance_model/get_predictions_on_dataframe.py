@@ -2,7 +2,7 @@
 Predictions with a Binary Relevance Model
 """
 import argparse
-import get_results_binary_relevance
+from . import get_results_binary_relevance
 
 if __name__ == "__main__":
 

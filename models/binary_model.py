@@ -9,10 +9,9 @@ import pandas as pd
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from keras.models import Sequential
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
-from keras.optimizers import RMSprop
-sys.path.insert(0, "../")
+from tensorflow.compat.v1.keras.models import Sequential
+from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
+from tensorflow.compat.v1.keras.optimizers import RMSprop
 from youtube_audioset import get_recursive_sound_names, get_all_sound_names
 from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, \
                              WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS, AMBIENT_SOUNDS, IMPACT_SOUNDS
@@ -26,12 +25,12 @@ import balancing_dataset
 ########################################################################
             # get all the sounds
 ########################################################################
-AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names("../")
-explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS, "../")
-motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS, "../")
-wood_sounds = get_recursive_sound_names(WOOD_SOUNDS, "../")
-human_sounds = get_recursive_sound_names(HUMAN_SOUNDS, "../")
-nature_sounds = get_recursive_sound_names(NATURE_SOUNDS, "../")
+AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names("./")
+explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS, "./")
+motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS, "./")
+wood_sounds = get_recursive_sound_names(WOOD_SOUNDS, "./")
+human_sounds = get_recursive_sound_names(HUMAN_SOUNDS, "./")
+nature_sounds = get_recursive_sound_names(NATURE_SOUNDS, "./")
 
 
 

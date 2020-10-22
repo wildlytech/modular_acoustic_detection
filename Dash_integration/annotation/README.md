@@ -15,7 +15,7 @@ CHECKLIST_DISPLAY = ["Nature", "Bird", "Wind", "Vehicle", "Honking", "Conversati
 ```
 - To start running the local server and annotate files use the following command
 ```shell
-$ python audio_annotation.py [-h]  -predictions_cfg_json
+$ python -m Dash_integration.annotation.audio_annotation [-h] -predictions_cfg_json
 ```
  - About Arguments : [audio_annotation.py]
 	- ```-predictions_cfg_json``` : Path to json configuration file, which indicates all the BR models to predict with

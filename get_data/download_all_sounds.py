@@ -1,8 +1,8 @@
 """
 Downloads all the Impact and Ambient sounds
 """
-import download_soi
-from download_soi import download_data, AMBIENT_SOUNDS, IMPACT_SOUNDS
+from . import download_soi
+from .download_soi import download_data, AMBIENT_SOUNDS, IMPACT_SOUNDS
 
 ########################################################################
 			# Main Function

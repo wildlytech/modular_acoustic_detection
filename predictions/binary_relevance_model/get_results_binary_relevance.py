@@ -4,13 +4,12 @@ Testing a Binary Relevance Model
 #Import the necessary functions and libraries
 import argparse
 import json
-from keras.models import model_from_json
+from tensorflow.compat.v1.keras.models import model_from_json
 import numpy as np
 import pandas as pd
 import pickle
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
 import sys
-sys.path.insert(0, "../../")
 from youtube_audioset import get_recursive_sound_names
 
 def import_predict_configuration_json(predictions_cfg_json):
@@ -117,7 +116,7 @@ def main(predictions_cfg_json,
             config_data = CONFIG_DATAS[label_name]
 
             positiveLabels = get_recursive_sound_names(designated_sound_names = config_data["positiveLabels"],
-                                                       path_to_ontology = "../../",
+                                                       path_to_ontology = "./",
                                                        ontology_extension_paths = config_data["ontology"]["extension"])
 
             LABELS_BINARIZED[label_name] = 1.0 * DATA_FRAME['labels_name'].apply( \

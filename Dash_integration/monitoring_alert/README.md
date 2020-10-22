@@ -24,7 +24,7 @@ ftp_path = "BNP/"
 ```
 - Follow the command below to start the application to monitor an alert via SMS
 ```shell
-$ python app_Wildly_Acoustic_Monitoring.py -ftp_username FTP_USERNAME
+$ python -m Dash_integration.monitoring_report.app_Wildly_Acoustic_Monitoring -ftp_username FTP_USERNAME
                                            -ftp_password FTP_PASSWORD
                                            [-predictions_cfg_json PREDICTIONS_CFG_JSON]
 ```

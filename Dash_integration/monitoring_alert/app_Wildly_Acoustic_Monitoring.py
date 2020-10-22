@@ -28,7 +28,6 @@ import re
 import requests
 from scipy.io import wavfile
 
-sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + "/../../")
 from predictions.binary_relevance_model import generate_before_predict_BR,\
                                                get_results_binary_relevance,\
                                                predict_on_wavfile_binary_relevance
@@ -39,7 +38,7 @@ from predictions.binary_relevance_model import generate_before_predict_BR,\
                     # running directly with Python
 ####################################################################################
 if __name__ == '__main__':
-    from utils.app_standalone import run_standalone_app
+    from .utils.app_standalone import run_standalone_app
 
 
 ####################################################################################
@@ -1735,7 +1734,7 @@ if __name__ == '__main__':
     OPTIONAL_NAMED.add_argument('-predictions_cfg_json',
                             '--predictions_cfg_json', action='store',
                             help='Input json configuration file for predictions output',
-                            default='../../predictions/binary_relevance_model/binary_relevance_prediction_config.json')
+                            default='predictions/binary_relevance_model/binary_relevance_prediction_config.json')
 
     ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()

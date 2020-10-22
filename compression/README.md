@@ -1,4 +1,4 @@
-# Audio compression 
+# Audio compression
 
 <br>
 
@@ -14,7 +14,7 @@
 
 ***
 #### 2.  Compressing the audio files using different audio encoders :
-- This script will take the audio files and try compress the audio using specified audio encoders. 
+- This script will take the audio files and try compress the audio using specified audio encoders.
 - Different types of Audio encoders that are supported by scripts below are : [aac, ac3, mp2, flac, libopus](https://github.com/wildlytech/modular_acoustic_detection/blob/b9e76653ae2cf59550767e4acabb63bfca8e0748/compression/compression.py#L21)
 - About Arguments:
 	- ```-path_to_original_audio_files``` : Directory path to the location where all the ```.wav``` files are present, which are to be compressed
@@ -23,9 +23,9 @@
 - Follow the command below to start compressing audio files using required audio codec
 
 ```
-$ python compression.py [-h]   -path_to_original_audio_files
-                               -codec_type                              
-                               -path_to_write_compressed_files
+$ python -m compression.compression [-h]   -path_to_original_audio_files
+                                           -codec_type
+                                           -path_to_write_compressed_files
 ```
 
 ###### Reference :
@@ -35,20 +35,20 @@ $ python compression.py [-h]   -path_to_original_audio_files
 <br>
 
 ***
-####  2. Decompressing the compressed audio files 
-- Decompressing the audio files back to ```.wav``` format will result in some loss if the compression used is Lossy. 
+####  2. Decompressing the compressed audio files
+- Decompressing the audio files back to ```.wav``` format will result in some loss if the compression used is Lossy.
 - We are decompressing back, audio files to ```wav``` files to check the performance of the detection models ( ```Binary Relevance Models``` and ```Multilabel Models``` ) on the decompressed ```.wav``` files.
 - About arguments :
 	- ```-path_to_compressed_audio_files``` : Directory Path where all the compressed audio files are present
 	- ```-path_to_decompressed_audio_files``` : Directory path to the location where decompressed ```.wav``` files are to be stored
-	- ```-codec_type``` : Type of compressed files present at ```-path_to_compressed_audio_files``` path 
+	- ```-codec_type``` : Type of compressed files present at ```-path_to_compressed_audio_files``` path
 ```
-$ python decmpression.py [-h]  -path_to_compressed_audio_files
-                               -path_to_decompressed_audio_files
-                               -codec_type
+$ python -m compression.decmpression [-h]  -path_to_compressed_audio_files
+                                           -path_to_decompressed_audio_files
+                                           -codec_type
 ```
 ###### output returns :
-- Decompressed ```.wav``` files in specified directory. 
+- Decompressed ```.wav``` files in specified directory.
 
 <br>
 
@@ -57,7 +57,7 @@ $ python decmpression.py [-h]  -path_to_compressed_audio_files
 - This gives the time taken for compressing the ```speech.wav``` file into different compressed file formats.
 - ```speech.wav``` is test audio file that is uploaded to the repository : [Speech.wav](https://github.com/wildlytech/modular_acoustic_detection/blob/master/compression/speech.wav)
 ```
-$ python different_compression_latency.py 
+$ python -m compression.different_compressions_latency
 ```
 ###### output  :
 - Prints out the time taken by each audio enocder to compress test wav file ```speech.wav```

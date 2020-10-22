@@ -7,10 +7,9 @@ import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-from keras.models import Sequential
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
-from keras.optimizers import Adam
-sys.path.insert(0, "../")
+from tensorflow.compat.v1.keras.models import Sequential
+from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
+from tensorflow.compat.v1.keras.optimizers import Adam
 from youtube_audioset import get_recursive_sound_names, get_all_sound_names
 from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, \
                              HUMAN_SOUNDS, NATURE_SOUNDS, DOMESTIC_SOUNDS, TOOLS_SOUNDS
@@ -22,13 +21,13 @@ import balancing_dataset
 ########################################################################
           # Get all sound names
 ########################################################################
-explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS, "../")
-motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS, "../")
-wood_sounds = get_recursive_sound_names(WOOD_SOUNDS, "../")
-human_sounds = get_recursive_sound_names(HUMAN_SOUNDS, "../")
-nature_sounds = get_recursive_sound_names(NATURE_SOUNDS, "../")
-domestic_sounds = get_recursive_sound_names(DOMESTIC_SOUNDS, "../")
-tools = get_recursive_sound_names(TOOLS_SOUNDS, "../")
+explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS, "./")
+motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS, "./")
+wood_sounds = get_recursive_sound_names(WOOD_SOUNDS, "./")
+human_sounds = get_recursive_sound_names(HUMAN_SOUNDS, "./")
+nature_sounds = get_recursive_sound_names(NATURE_SOUNDS, "./")
+domestic_sounds = get_recursive_sound_names(DOMESTIC_SOUNDS, "./")
+tools = get_recursive_sound_names(TOOLS_SOUNDS, "./")
 #wild_animals=get_recursive_sound_names(Wild_animals)
 
 

@@ -14,7 +14,7 @@ DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag
 ```
 - To train a simple binary model follow the command shown below
 ```shell
-$ python binary_model.py
+$ python -m models.binary_model
 ```
 
 
@@ -32,7 +32,7 @@ DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag
 ```
 - To train a Dense Layer mutli-label model follow the command shown below
 ```shell
-$ python multilabel_dense_model.py
+$ python -m models.multilabel_dense_model
 ```
 - Change the weight file name as per your trials [Line 228: multilabel_dense_model.py](https://github.com/wildlytech/modular_acoustic_detection/blob/28a38658a659ddabbd4d73cfad3c91132ab3736e/models/multilabel_dense_model.py#L228)
 ```python
@@ -53,7 +53,7 @@ DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag
 ```
 - To train a Dense Layer mutli-label model follow the command shown below
 ```shell
-$ python multilabel_maxpool_model.py
+$ python -m models.multilabel_maxpool_model
 ```
 - Change the weight file name as per your trials [Line 223: multilabel_maxpool_model.py](https://github.com/wildlytech/modular_acoustic_detection/blob/28a38658a659ddabbd4d73cfad3c91132ab3736e/models/multilabel_maxpool_model.py#L228)
 ```python
@@ -72,7 +72,7 @@ MODEL.save_weights('multilabel_model_maxpool_version.h5')
 ```
 - To train a Binary Relevance model follow the command shown below
 ```shell
-$ python binary_relevance_model.py 	[-h]	-model_cfg_json MODEL_CONFIG_JSON_FILE
-                                            [-output_weight_file OUTPUT_WEIGHT_FILE]
+$ python -m models.binary_relevance_model [-h]  -model_cfg_json MODEL_CONFIG_JSON_FILE
+                                                [-output_weight_file OUTPUT_WEIGHT_FILE]
 ```
 

@@ -6,9 +6,9 @@ import argparse
 from colorama import Fore, Style
 from glob import glob
 import json
-from keras.models import model_from_json, Sequential
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
-from keras.optimizers import Adam
+from tensorflow.compat.v1.keras.models import model_from_json, Sequential
+from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
+from tensorflow.compat.v1.keras.optimizers import Adam
 import numpy as np
 import os
 import pandas as pd
@@ -17,7 +17,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
 import sys
 
-sys.path.insert(0, "../")
 from youtube_audioset import get_recursive_sound_names
 
 #############################################################################
@@ -48,8 +47,6 @@ PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
   CONFIG_DATA = json.load(json_file_obj)
 
-PATH_TO_DIRECTORY_OF_CONFIG = '/'.join(PARSED_ARGS.model_cfg_json.split('/')[:-1]) + '/'
-
 FULL_NAME = CONFIG_DATA["aggregatePositiveLabelName"] + 'vs' + CONFIG_DATA["aggregateNegativeLabelName"]
 
 if PARSED_ARGS.output_weight_file is None:
@@ -60,7 +57,7 @@ else:
   OUTPUT_WEIGHT_FILE = PARSED_ARGS.output_weight_file
 
 # create directory to the folder
-pathToFileDirectory = PATH_TO_DIRECTORY_OF_CONFIG + '/'.join(OUTPUT_WEIGHT_FILE.split('/')[:-1]) + '/'
+pathToFileDirectory = "/".join(OUTPUT_WEIGHT_FILE.split('/')[:-1]) + '/'
 if not os.path.exists(pathToFileDirectory):
   os.makedirs(pathToFileDirectory)
 
@@ -81,12 +78,8 @@ if ontologyExtFiles is None:
 elif type(ontologyExtFiles) != list:
   ontologyExtFiles = [ontologyExtFiles]
 
-# All paths to ontology extension files are relative to the location of the
-# model configuration file.
-ontologyExtFiles = [PATH_TO_DIRECTORY_OF_CONFIG + x for x in ontologyExtFiles]
-
 # Grab all the positive labels
-POSITIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["positiveLabels"], "../", ontologyExtFiles)
+POSITIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["positiveLabels"], "./", ontologyExtFiles)
 
 # If negative labels were provided, then collect them
 # Otherwise, assume all examples that are not positive are negative
@@ -94,7 +87,7 @@ if CONFIG_DATA["negativeLabels"] is None:
   NEGATIVE_LABELS = None
 else:
   # Grab all the negative labels
-  NEGATIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["negativeLabels"], "../", ontologyExtFiles)
+  NEGATIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["negativeLabels"], "./", ontologyExtFiles)
   # Make sure there is no overlap between negative and positive labels
   NEGATIVE_LABELS = NEGATIVE_LABELS.difference(POSITIVE_LABELS)
 
@@ -165,7 +158,6 @@ def get_select_vector(dataframe, label_filter_arr):
 def import_dataframes(dataframe_file_list,
                       positive_label_filter_arr,
                       negative_label_filter_arr,
-                      path_to_directory_of_json,
                       validation_split):
   """
   Iterate through each pickle file and import a subset of the dataframe
@@ -199,11 +191,7 @@ def import_dataframes(dataframe_file_list,
     exclude_paths = set(exclude_paths)
 
     # Search for all paths that match this pattern
-    search_results = glob(path_to_directory_of_json + pattern_path)
-
-    # Remove path to directory of json as prefix to the path
-    # It will be added back later
-    search_results = [x[len(path_to_directory_of_json):] for x in search_results]
+    search_results = glob(pattern_path)
 
     # If path is in the excluded paths, then ignore it
     search_results = [x for x in search_results if x not in exclude_paths]
@@ -236,7 +224,7 @@ def import_dataframes(dataframe_file_list,
 
     print("Importing", input_file_dict["path"], "...")
 
-    with open(path_to_directory_of_json + input_file_dict["path"], 'rb') as file_obj:
+    with open(input_file_dict["path"], 'rb') as file_obj:
 
       # Load the file
       df = pickle.load(file_obj)
@@ -287,7 +275,6 @@ DF_TRAIN, DF_TEST = \
     import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
                       positive_label_filter_arr=POSITIVE_LABELS,
                       negative_label_filter_arr=NEGATIVE_LABELS,
-                      path_to_directory_of_json=PATH_TO_DIRECTORY_OF_CONFIG,
                       validation_split=CONFIG_DATA["train"]["validationSplit"])
 
 
@@ -384,7 +371,7 @@ if CONFIG_DATA["networkCfgJson"] is None:
   MODEL = create_keras_model()
 else:
   # load json and create model
-  json_file = open(PATH_TO_DIRECTORY_OF_CONFIG + CONFIG_DATA["networkCfgJson"], 'r')
+  json_file = open(CONFIG_DATA["networkCfgJson"], 'r')
   loaded_model_json = json_file.read()
   json_file.close()
   MODEL = model_from_json(loaded_model_json)
@@ -461,5 +448,5 @@ print('Accuracy :', ACCURACY)
 #############################################################################
         # save model weights. Change as per the model type
 #############################################################################
-MODEL.save_weights(PATH_TO_DIRECTORY_OF_CONFIG + OUTPUT_WEIGHT_FILE)
+MODEL.save_weights(OUTPUT_WEIGHT_FILE)
 

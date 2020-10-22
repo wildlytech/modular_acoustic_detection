@@ -46,17 +46,17 @@ def predictions_wavfile(data, model_type):
     model = create_keras_model()
 
     if model_type == "Motor":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Motor_BR_Model/4_Layer_variants/binary_relevance_motor_realised_multilabel_weights_mixedsounds_MH_MN_ME_added_maxpool_at_end_4times_500units_sigmoid.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Motor_BR_Model/4_Layer_variants/binary_relevance_motor_realised_multilabel_weights_mixedsounds_MH_MN_ME_added_maxpool_at_end_4times_500units_sigmoid.h5")
     elif model_type == "Human":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Human_BR_Model/4_Layer_Variant/binary_relevance_human_multilabel_weights_mixedsounds_HM_HN_HT_added_maxpool_at_end_4times_500units_sigmoid.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Human_BR_Model/4_Layer_Variant/binary_relevance_human_multilabel_weights_mixedsounds_HM_HN_HT_added_maxpool_at_end_4times_500units_sigmoid.h5")
     elif model_type == "Explosion":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Explosion_BR_Model/4_Layer_Variant/binary_relevance_explosion_realised_multilabel_weights_mixedsounds_EM_EN_EH_added_maxpool_at_end_4times_500units_sigmoid.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Explosion_BR_Model/4_Layer_Variant/binary_relevance_explosion_realised_multilabel_weights_mixedsounds_EM_EN_EH_added_maxpool_at_end_4times_500units_sigmoid.h5")
     elif model_type == "Tools":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Tools_BR_Model/4_Layer_Variants/binary_relevance_tools_realised_multilabel_weights_mixedsounds_TM_TD_TH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Tools_BR_Model/4_Layer_Variants/binary_relevance_tools_realised_multilabel_weights_mixedsounds_TM_TD_TH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
     elif model_type == "Domestic":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Domestic_BR_Model/binary_relevance_domestic_realised_multilabel_weights_mixedsounds_DM_DT_DH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Domestic_BR_Model/binary_relevance_domestic_realised_multilabel_weights_mixedsounds_DM_DT_DH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
     elif model_type == "Nature":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Nature_BR_Model/binary_relevance_nature_realised_multilabel_weights_mixedsounds_NM_NE_NH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Nature_BR_Model/binary_relevance_nature_realised_multilabel_weights_mixedsounds_NM_NE_NH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
     else:
         print("Invalid Model Selected")
 
@@ -88,17 +88,17 @@ def predictions_batch_wavfiles(data, model_type):
     model = create_keras_model()
 
     if model_type == "Motor":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Motor_BR_Model/4_Layer_variants/binary_relevance_motor_realised_multilabel_weights_mixedsounds_MH_MN_ME_added_maxpool_at_end_4times_500units_sigmoid.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Motor_BR_Model/4_Layer_variants/binary_relevance_motor_realised_multilabel_weights_mixedsounds_MH_MN_ME_added_maxpool_at_end_4times_500units_sigmoid.h5")
     elif model_type == "Human":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Human_BR_Model/4_Layer_Variant/binary_relevance_human_multilabel_weights_mixedsounds_HM_HN_HT_added_maxpool_at_end_4times_500units_sigmoid.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Human_BR_Model/4_Layer_Variant/binary_relevance_human_multilabel_weights_mixedsounds_HM_HN_HT_added_maxpool_at_end_4times_500units_sigmoid.h5")
     elif model_type == "Explosion":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Explosion_BR_Model/4_Layer_Variant/binary_relevance_explosion_realised_multilabel_weights_mixedsounds_EM_EN_EH_added_maxpool_at_end_4times_500units_sigmoid.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Explosion_BR_Model/4_Layer_Variant/binary_relevance_explosion_realised_multilabel_weights_mixedsounds_EM_EN_EH_added_maxpool_at_end_4times_500units_sigmoid.h5")
     elif model_type == "Tools":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Tools_BR_Model/4_Layer_Variants/binary_relevance_tools_realised_multilabel_weights_mixedsounds_TM_TD_TH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Tools_BR_Model/4_Layer_Variants/binary_relevance_tools_realised_multilabel_weights_mixedsounds_TM_TD_TH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
     elif model_type == "Domestic":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Domestic_BR_Model/binary_relevance_domestic_realised_multilabel_weights_mixedsounds_DM_DT_DH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Domestic_BR_Model/binary_relevance_domestic_realised_multilabel_weights_mixedsounds_DM_DT_DH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
     elif model_type == "Nature":
-        model.load_weights("../predictions/binary_relevance_model/Binary_Relevance_Models/Nature_BR_Model/binary_relevance_nature_realised_multilabel_weights_mixedsounds_NM_NE_NH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
+        model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Nature_BR_Model/binary_relevance_nature_realised_multilabel_weights_mixedsounds_NM_NE_NH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
     else:
         print("Invalid Model Selected")
 

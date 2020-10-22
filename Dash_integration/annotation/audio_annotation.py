@@ -19,7 +19,6 @@ import pandas as pd
 from scipy.io import wavfile
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + "/../../")
 from predictions.binary_relevance_model import generate_before_predict_BR,\
                                                get_results_binary_relevance,\
                                                predict_on_wavfile_binary_relevance

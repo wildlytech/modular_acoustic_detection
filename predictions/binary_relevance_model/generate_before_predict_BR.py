@@ -34,12 +34,12 @@ Usage:
 
 import sys
 import tensorflow.compat.v1 as tf
-from keras import backend as K
-import model_function_binary_relevance
+from tensorflow.compat.v1.keras import backend as K
+from . import model_function_binary_relevance
 import os
 
-VGGISH_PATH = '../../externals/tensorflow_models/research/audioset/vggish/'
-sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + '/' + VGGISH_PATH)
+VGGISH_PATH = 'externals/tensorflow_models/research/audioset/vggish/'
+sys.path.insert(0, VGGISH_PATH)
 
 import vggish_input
 import vggish_params

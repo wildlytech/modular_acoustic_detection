@@ -67,7 +67,7 @@ def check_for_null(data_frame):
 ######################################################################################
 with open(RESULT.dataframe_path, 'rb') as f:
     UN = pickle.load(f)
-LABELS_CSV = pd.read_csv('../data/audioset/class_labels_indices.csv')
+LABELS_CSV = pd.read_csv('data/audioset/class_labels_indices.csv')
 print('Files Loaded')
 print(UN.shape)
 

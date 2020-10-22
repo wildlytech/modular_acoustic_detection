@@ -207,16 +207,16 @@ def get_csv_data(target_sounds):
     """
     Read all the csv file data into pandas dataframe
     """
-    label_names = pd.read_csv("../data/audioset/class_labels_indices.csv")
+    label_names = pd.read_csv("data/audioset/class_labels_indices.csv")
 
-    balanced_train = pd.read_csv("../data/audioset/balanced_train_segments.csv",
+    balanced_train = pd.read_csv("data/audioset/balanced_train_segments.csv",
                                  quotechar='"',
                                  skipinitialspace=True,
                                  skiprows=2)
     balanced_train.columns = [balanced_train.columns[0][2:]] + \
                               balanced_train.columns[1:].values.tolist()
 
-    unbalanced_train = pd.read_csv("../data/audioset/unbalanced_train_segments.csv",
+    unbalanced_train = pd.read_csv("data/audioset/unbalanced_train_segments.csv",
                                    quotechar='"',
                                    skipinitialspace=True,
                                    skiprows=2)
@@ -312,7 +312,7 @@ def download_data(target_sounds_list, target_path):
     Get the data necessary for downloading audio files
     """
     df, labels_binarized = get_csv_data(target_sounds_list)
-    labels_csv = pd.read_csv("../data/audioset/class_labels_indices.csv")
+    labels_csv = pd.read_csv("data/audioset/class_labels_indices.csv")
 
     # create a column with name of the labels given to sounds and also column with wav file names
     df['positive_labels'] = df['positive_labels'].apply(lambda arr: arr.split(','))

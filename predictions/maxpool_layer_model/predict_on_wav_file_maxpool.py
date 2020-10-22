@@ -35,7 +35,7 @@ Usage:
 import sys
 import tensorflow.compat.v1 as tf
 
-VGGISH_PATH = '../../externals/tensorflow_models/research/audioset/vggish/'
+VGGISH_PATH = 'externals/tensorflow_models/research/audioset/vggish/'
 sys.path.insert(0, VGGISH_PATH)
 
 import vggish_input

@@ -1,9 +1,9 @@
 """
 Predictions are returned for a single wav file
 """
-from keras.models import Sequential
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
-from keras.optimizers import Adam
+from tensorflow.compat.v1.keras.models import Sequential
+from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
+from tensorflow.compat.v1.keras.optimizers import Adam
 
 
 
@@ -43,7 +43,7 @@ def predictions_wavfile(data):
     Takes the embeddings of wav file and runs the predictions on it
     """
     model = create_keras_model()
-    model.load_weights('../../predictions/dense_layer_model/multi_class_weights_waynad_nandi_2_nandi_1(4k-m_6k-h_4K-n).h5')
+    model.load_weights('predictions/dense_layer_model/multi_class_weights_waynad_nandi_2_nandi_1(4k-m_6k-h_4K-n).h5')
     test_data = data.reshape((-1, 1280, 1))
     if len(test_data) == 1:
         predictions_prob = model.predict(test_data)
@@ -61,7 +61,7 @@ def predictions_batch_wavfiles(data):
     Takes the embeddings of wav file and runs the predictions on it
     """
     model = create_keras_model()
-    model.load_weights('../../predictions/dense_layer_model/multi_class_weights_waynad_nandi_2_nandi_1(4k-m_6k-h_4K-n).h5')
+    model.load_weights('predictions/dense_layer_model/multi_class_weights_waynad_nandi_2_nandi_1(4k-m_6k-h_4K-n).h5')
     predictions_prob = model.predict(data).ravel()
     predictions = predictions_prob.round()
     return predictions_prob, predictions

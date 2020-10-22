@@ -4,7 +4,7 @@ import csv
 import argparse
 from ftplib import FTP
 import pandas as pd
-import generate_before_predict_BR
+from . import generate_before_predict_BR
 
 
 

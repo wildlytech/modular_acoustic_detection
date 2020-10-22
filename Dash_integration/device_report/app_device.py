@@ -21,11 +21,11 @@ import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-import pandas as pd 
+import pandas as pd
 import dash.dependencies
 import plotly.graph_objs as go
-from pages import overview
-from utils import Header, make_dash_table
+from .pages import overview
+from .utils import Header, make_dash_table
 import pathlib
 
 
@@ -495,7 +495,7 @@ def display_page(pathname):
             else:
                 threads = threading.Thread(target=write_csv, args=("data_downloaded/"+each_dir+".csv", DIR_REQ+each_dir))
                 directory_threads.append(threads)
-                threads.start()     
+                threads.start()
         DATAFRAME_DEVICE_ACTIVE = pd.DataFrame()
         DATAFRAME_DEVICE_ACTIVE["Device ID"] = list_device
         display_device_list = []
@@ -860,7 +860,7 @@ class FtpFile:
 
 
 ##########################################################################################
-                # Get wavheader information 
+                # Get wavheader information
 ##########################################################################################
 def get_wavheader_extraheader(name,ftp_path):
     '''
@@ -869,7 +869,7 @@ def get_wavheader_extraheader(name,ftp_path):
     wavheader_dict = {}
     ftp = FTP(FTP_HOST, user=FTP_USERNAME, passwd=FTP_PASSWORD)
     ftp.cwd(ftp_path)
-        
+
     if (name[-3:] == 'wav') or (name[-3:] == 'WAV'):
         try:
             file_header_info = BytesIO(FtpFile(ftp,name).read(ftp_path,264))
@@ -897,7 +897,7 @@ def get_wavheader_extraheader(name,ftp_path):
 
             wav_header = [riff, size, fformat, subchunkid, subchunksize, aformat, \
             channels, samplerate, byterate, blockalign, bps, subchunk2id, subchunk2size]
-            
+
             for each_value in zip(wav_header,["ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size",
                                               "AudioFormat", "NumChannels", "SampleRate", "ByteRate", "BlockAlign",
                                               "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]):
@@ -938,7 +938,7 @@ def get_directory_timestamp_listed():
 ##########################################################################################
 def check_wav_file_size(each_wav_file, blockalign, samplerate):
     """
-    Checks for wavfile size and return if it is completely 
+    Checks for wavfile size and return if it is completely
     uploaded to ftp server or not
     """
     ftp_group.sendcmd("TYPE I")

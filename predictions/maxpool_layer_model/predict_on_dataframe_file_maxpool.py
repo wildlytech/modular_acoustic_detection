@@ -5,9 +5,9 @@ for the audiomoth recorded files 'audiomoth_id'
 import argparse
 import pickle
 import numpy as np
-from keras.models import Sequential
-from keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
-from keras.optimizers import Adam
+from tensorflow.compat.v1.keras.models import Sequential
+from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
+from tensorflow.compat.v1.keras.optimizers import Adam
 
 
 ##############################################################################

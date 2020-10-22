@@ -7,7 +7,7 @@ import argparse
 import csv
 import pandas as pd
 from pydub import AudioSegment
-import generate_before_predict_BR
+from . import generate_before_predict_BR
 
 
 ############################################################################
