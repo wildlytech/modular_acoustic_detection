@@ -1047,6 +1047,7 @@ def layout():
                                  children=[
                                      dcc.Upload(id='upload-data', multiple=True, children=[
                                          html.A(html.Button(className='control-download',
+                                                            n_clicks=0,
                                                             children=html.Div(["Drag and Drop or click \
                                                                                to select files."],
                                                                               style={"font-size":10})))],
@@ -1057,6 +1058,7 @@ def layout():
                                 html.Button(
                                     'Download sample data',
                                     id='clustergram-download-sample-data',
+                                    n_clicks=0,
                                     className='control-download'))]),
                         html.Div(id='clustergram-info')])),
 

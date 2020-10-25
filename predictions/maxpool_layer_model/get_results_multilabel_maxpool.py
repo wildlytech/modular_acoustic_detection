@@ -116,8 +116,8 @@ def get_remaining_columns(present_columns):
 ##################################################################################
 
 ##################################################################################
-ALL_SOUND_LIST = explosion_sounds + motor_sounds + human_sounds + \
-                 nature_sounds + domestic_sounds + tools
+ALL_SOUND_LIST = explosion_sounds | motor_sounds | human_sounds | \
+                 nature_sounds | domestic_sounds | tools
 
 
 

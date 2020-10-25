@@ -25,7 +25,8 @@ def get_header(app):
             [html.Img(src=app.get_asset_url("dash-logo.png"),
                       className="logo"),
              html.A(html.Button("Learn More",
-                                id="learn-more-button"),
+                                id="learn-more-button",
+                                n_clicks=0),
                     href="/acoustic-device-report/summary")],
             className="row"),
          html.Div(

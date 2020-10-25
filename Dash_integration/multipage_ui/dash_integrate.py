@@ -400,6 +400,7 @@ PAGE_1_LAYOUT = html.Div(id='out-upload-data',
                                    html.Br(),
                                    html.Div(children=[html.Button('Folder Run',
                                                                   id='button1',
+                                                                  n_clicks=0,
                                                                   style={'text-decoration': 'none',
                                                                          'textAlign': 'center',
                                                                          'border':'3px solid green',
@@ -792,7 +793,7 @@ PAGE_3_LAYOUT = html.Div([
                                       'fontSize': 20,
                                       'text-decoration':'underline'})]),
     html.Div(id='page-new-content'),
-    html.Button("FTP Status", id='button'),
+    html.Button("FTP Status", id='button', n_clicks=0),
     html.Div(id="ftp_content_button"),
     html.Div(id="prediction-audio"),
     html.Div(id="datatable-interactivity-container")])
@@ -834,7 +835,7 @@ def display_output(rows, columns, indices):
     if indices is not None and indices != []:
         df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
         df = df.iloc[indices]
-        return html.Div([html.Button('Input Batch to Model', id='button_batch')])
+        return html.Div([html.Button('Input Batch to Model', id='button_batch', n_clicks=0)])
 
 
 
@@ -1185,7 +1186,7 @@ def display_output_from_data(rows, columns, indices):
                        src='data:audio/WAV;base64,{}'.format(encoded_image_from_path),
                        controls=True),
             html.Br(),
-            html.Button('Input audio to model', id='button')])
+            html.Button('Input audio to model', id='button', n_clicks=0)])
 
 
 

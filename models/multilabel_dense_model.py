@@ -47,8 +47,8 @@ DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag
 ########################################################################
 ALL_SOUND_NAMES = ['Motor_sound', 'Explosion_sound', 'Human_sound',
                    'Nature_sound', 'Domestic_animals', 'Tools']
-ALL_SOUND_LIST = explosion_sounds + motor_sounds + human_sounds + \
-                 nature_sounds + domestic_sounds + tools
+ALL_SOUND_LIST = list(explosion_sounds | motor_sounds | human_sounds | \
+                      nature_sounds | domestic_sounds | tools)
 
 
 
@@ -78,7 +78,7 @@ LABELS_BINARIZED = LABELS_BINARIZED_ALL[ALL_SOUND_NAMES]
 
 
 ########################################################################
-      # print out the number and percenatge of each class examples
+      # print out the number and percentage of each class examples
 ########################################################################
 print(LABELS_BINARIZED.mean())
 

@@ -46,7 +46,7 @@ DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag
 ########################################################################
             # Binarize the labels
 ########################################################################
-NAME_BIN = LabelBinarizer().fit(AMBIENT_SOUNDS + IMPACT_SOUNDS)
+NAME_BIN = LabelBinarizer().fit(list(AMBIENT_SOUNDS | IMPACT_SOUNDS))
 LABELS_SPLIT = DATA_FRAME['labels_name'].apply(pd.Series).fillna('None')
 LABELS_BINARIZED = NAME_BIN.transform(LABELS_SPLIT[LABELS_SPLIT.columns[0]])
 for column in LABELS_SPLIT.columns:
@@ -57,7 +57,7 @@ LABELS_BINARIZED = pd.DataFrame(LABELS_BINARIZED, columns=NAME_BIN.classes_)
 
 
 ########################################################################
-            # print the percentage of Impact and Ambinet sounds
+            # print the percentage of Impact and Ambient sounds
 ########################################################################
 print("Percentage Impact Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1) > 0).mean())
 print("Percentage Ambient Sounds:", (LABELS_BINARIZED[AMBIENT_SOUNDS].sum(axis=1) > 0).mean())
@@ -129,7 +129,7 @@ CLF1_TEST_TARGET = LABELS_BINARIZED_TEST.loc[:, IMPACT_SOUNDS].any(axis=1)
 ########################################################################
         # fit the train data to LR model
 ########################################################################
-print("Trainging Logistic Regression Model..")
+print("Training Logistic Regression Model..")
 CLF1_.fit(CLF1_TRAIN, CLF1_TRAIN_TARGET)
 
 
@@ -145,7 +145,7 @@ CLF1_TEST_PREDICTION_PROB = CLF1_.predict_proba(CLF1_TEST)[:, 1]
         # Print out the confusion matrix for Train data
 ########################################################################
 CLF1_CONF_TRAIN_MAT = pd.crosstab(CLF1_TRAIN_TARGET, CLF1_TRAIN_PREDICTION, margins=True)
-print('Train precsion and recall for Logistic regression')
+print('Train precision and recall for Logistic regression')
 print('=============================================')
 print("Train Precision:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT[True]['All']))
 print("Train Recall:", CLF1_CONF_TRAIN_MAT[True][True] / float(CLF1_CONF_TRAIN_MAT['All'][True]))
@@ -158,7 +158,7 @@ print(CLF1_CONF_TRAIN_MAT)
         # Print out the confusion matrix for test data
 ########################################################################
 CLF1_CONF_TEST_MAT = pd.crosstab(CLF1_TEST_TARGET, CLF1_TEST_PREDICTION, margins=True)
-print('Test precsion and recall for Logistic regression')
+print('Test precision and recall for Logistic regression')
 print('=============================================')
 print("Test Precision:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT[True]['All']))
 print("Test Recall:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT['All'][True]))

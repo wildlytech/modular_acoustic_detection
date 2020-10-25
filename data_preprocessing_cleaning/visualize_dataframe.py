@@ -31,7 +31,7 @@ filepath = PARSED_ARGS.filepath
 with open(filepath, 'rb') as file_obj:
     df = pickle.load(file_obj)
 
-if not df.columns.contains("dBFS"):
+if "dBFS" not in df.columns:
     print("DataFrame does not contain dBFS column")
 else:
     fig = plt.figure()
@@ -45,9 +45,9 @@ else:
     plt.clf()
     print("Created", outputFile)
 
-if df.columns.contains("start_seconds") and df.columns.contains("end_seconds"):
+if ("start_seconds" in df.columns) and ("end_seconds" in df.columns):
     duration = df.end_seconds - df.start_seconds
-elif df.columns.contains("features"):
+elif "features" in df.columns:
     duration = df.features.apply(lambda x: len(x))
 else:
     duration = None
@@ -65,7 +65,7 @@ if duration is not None:
     plt.clf()
     print("Created", outputFile)
 
-if not df.columns.contains("labels_name"):
+if "labels_name" not in df.columns:
     print("DataFrame does not contain labels")
 else:
     fig = plt.figure()

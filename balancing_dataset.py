@@ -311,6 +311,11 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
     print('Final dataframe shape :', data_frame.shape)
 
     ###########################################################################################
+                #All labels should be lowercase for comparison and identification
+    ###########################################################################################
+    data_frame['labels_name'] = data_frame.labels_name.apply(lambda arr: [x.lower() for x in arr])
+
+    ###########################################################################################
                 #Free up the space
     ###########################################################################################
     del pure_nat, pure_dom, pure_exp, pure_mot, pure_wod, pure_tools

@@ -90,8 +90,8 @@ ALL_SOUND_NAMES = ['Motor_sound',
 ##################################################################################
             # Concatenating all the list of sounds
 ##################################################################################
-ALL_SOUND_LIST = explosion_sounds + motor_sounds + human_sounds + \
-                 nature_sounds + domestic_sounds + tools
+ALL_SOUND_LIST = explosion_sounds | motor_sounds | human_sounds | \
+                 nature_sounds | domestic_sounds | tools
 
 
 ##################################################################################
