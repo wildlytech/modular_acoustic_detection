@@ -23,7 +23,7 @@ colorama==0.4.1
 colour==0.1.5
 configparser==3.5.0
 crayons==0.2.0
-cryptography==2.3.1
+cryptography==3.2
 cycler==0.10.0
 Cython==0.29.1
 dash==1.12.0
