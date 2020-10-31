@@ -43,7 +43,7 @@ $ python -m compression.compression [-h]   -path_to_original_audio_files
 	- ```-path_to_decompressed_audio_files``` : Directory path to the location where decompressed ```.wav``` files are to be stored
 	- ```-codec_type``` : Type of compressed files present at ```-path_to_compressed_audio_files``` path
 ```
-$ python -m compression.decmpression [-h]  -path_to_compressed_audio_files
+$ python -m compression.decompression [-h]  -path_to_compressed_audio_files
                                            -path_to_decompressed_audio_files
                                            -codec_type
 ```

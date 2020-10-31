@@ -12,7 +12,7 @@
     - ```-path_to_write_different_sounds``` : Directory path to write the separated dataframes based on labels
 
 ```shell
-$ python -m data_preprocessing_cleaning.separating_different_sounds [-h]    -dataframe_path
+$ python -m data_preprocessing_cleaning.seperating_different_sounds [-h]    -dataframe_path
                                                                             -path_to_write_different_sounds
 ```
 
