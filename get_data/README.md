@@ -48,6 +48,21 @@ NUMBER_AUDIOCLIPS_LIMIT = 10
 ```shell
 $ python youtube_script.py
 ```
+#### 4. From Xenocanto website
 
+- We can scrape required sounds from the xenocanto website and generate a dataframe for training
+- In order to do this we run the xenocanto_to_dataframe.py file in the shell
+- About arguments:
+    - Required arguments:
+        - ```-bird_species``` : Input bird species by separating name with space and enclosed within quotes
+        - ```-output_path```: Path to save generated data
+  - Optional arguments:
+    - ```-delete```: Delete downloaded audio files after script execution
+    - ```-dont_delete```: Don't delete downloaded audio files after script execution
 
-
+```shell
+$ python xenocanto_to_dataframe.py  -bird_species
+			        -output_path
+			        -delete
+                    -dont_delete
+```
