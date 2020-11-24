@@ -26,7 +26,8 @@ def create_spec(sig,fs):
         fs,float: Signal's frame rate
 
     Returns:
-        pdb,librosa spectrogram: Spectrogram converted form power to decibel scale
+        pdb,np array: Spectrogram converted form power to decibel scale
+        t,np array: Time frame co-ordinates
     """
     f, t, sxx = scipy.signal.spectrogram(sig, fs)
     pdb = librosa.power_to_db(sxx, ref=np.max)
