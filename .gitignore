@@ -21,3 +21,8 @@ data/audioset/rerated_video_ids.txt
 data/
 sounds/
 .DS_Store
+.idea/
+diff_class_datasets/
+testing.py
+externals/tensorflow_models
+externals/audioset_ontology
