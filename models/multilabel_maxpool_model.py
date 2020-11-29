@@ -226,8 +226,8 @@ for key in pos_sounds.keys():
     final_dfs_train.append(DF_TRAIN)
     final_dfs_test.append(DF_TEST)
 
-DF_TRAIN = pd.concat(final_dfs_train,ignore_index=True)
-DF_TEST= pd.concat(final_dfs_test,ignore_index=True)
+df_train = pd.concat(final_dfs_train,ignore_index=True)
+df_test = pd.concat(final_dfs_test,ignore_index=True)
 
 
 
@@ -246,10 +246,10 @@ LABELS_BINARIZED_TRAIN = pd.DataFrame()
 for key in pos_sounds.keys():
     FULL_NAME = key
     POSITIVE_LABELS = pos_sounds[key]
-    LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(DF_TRAIN, POSITIVE_LABELS)
+    LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(df_train, POSITIVE_LABELS)
 
     LABELS_BINARIZED_TEST = pd.DataFrame()
-    LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
+    LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(df_train, POSITIVE_LABELS)
 
 print(LABELS_BINARIZED_TRAIN)
 
@@ -300,7 +300,7 @@ LABELS_FILTERED = LABELS_BINARIZED.loc[DF_FILTERED.index, :]
 DF_TRAIN, DF_TEST, LABELS_BINARIZED_TRAIN, LABELS_BINARIZED_TEST = train_test_split(DF_FILTERED, LABELS_FILTERED,
                                                                                     test_size=0.33, random_state=42)
 
-'''
+
 
 ########################################################################
       # preprecess the data into required structure
@@ -310,7 +310,7 @@ X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 X_TEST_STANDARDIZED = X_TEST / 255
 
-print(X_TRAIN_STANDARDIZED)
+
 
 ########################################################################
       # create the keras model.
@@ -426,3 +426,4 @@ print('Accuracy :', ACCURACY)
         # Change the name if you are tweaking hyper parameters
 ########################################################################
 MODEL.save_weights('multilabel_model_maxpool_version.h5')
+'''
