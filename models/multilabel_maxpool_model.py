@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-from tensorflow.compat.v1.keras.models import Sequential
+from tensorflow.compat.v1.keras.models import Sequential,model_from_json
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from tensorflow.compat.v1.keras.optimizers import Adam
 from youtube_audioset import get_recursive_sound_names, get_all_sound_names
@@ -37,21 +37,6 @@ if not os.path.exists(pathToFileDirectory):
 assert(config["ontology"]["useYoutubeAudioSet"])
 
 
-
-
-'''
-########################################################################
-          # Get all sound names
-########################################################################
-explosion_sounds = get_recursive_sound_names(EXPLOSION_SOUNDS, "./")
-motor_sounds = get_recursive_sound_names(MOTOR_SOUNDS, "./")
-wood_sounds = get_recursive_sound_names(WOOD_SOUNDS, "./")
-human_sounds = get_recursive_sound_names(HUMAN_SOUNDS, "./")
-nature_sounds = get_recursive_sound_names(NATURE_SOUNDS, "./")
-domestic_sounds = get_recursive_sound_names(DOMESTIC_SOUNDS, "./")
-tools = get_recursive_sound_names(TOOLS_SOUNDS, "./")
-#wild_animals=get_recursive_sound_names(Wild_animals)
-'''
 pos_sounds = {}
 neg_sounds = {}
 for label_dicts in config["labels"]:
@@ -231,76 +216,18 @@ DF_TEST= pd.concat(final_dfs_test,ignore_index=True)
 
 
 
-
-########################################################################
-      # Different classes of sounds.
-      # You can increase the class by adding the necesssary sounds of that class
-########################################################################
-#ALL_SOUND_NAMES = ['Motor_sound', 'Explosion_sound', 'Human_sound',
-#                   'Nature_sound', 'Domestic_animals', 'Tools']
-#ALL_SOUND_LIST = list(explosion_sounds | motor_sounds | human_sounds | \
-#                      nature_sounds | domestic_sounds | tools)
-
-
 LABELS_BINARIZED_TRAIN = pd.DataFrame()
+LABELS_BINARIZED_TEST = pd.DataFrame()
 for key in pos_sounds.keys():
     FULL_NAME = key
     POSITIVE_LABELS = pos_sounds[key]
     LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(DF_TRAIN, POSITIVE_LABELS)
 
-    LABELS_BINARIZED_TEST = pd.DataFrame()
+
     LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
 
-print(LABELS_BINARIZED_TRAIN)
-
-'''
-########################################################################
-      # Map all the sounds into their respective classes
-      # Include the similar column if a new class label is to be added
-########################################################################
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_name'].apply(lambda arr: ['Motor_sound' if x  in motor_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Explosion_sound' if x  in explosion_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Nature_sound' if x  in nature_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Human_sound' if x  in human_sounds else x for x in arr])
-# DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Wood_sound' if x  in wood_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Domestic_animals' if x  in domestic_sounds else x for x in arr])
-DATA_FRAME['labels_new'] = DATA_FRAME['labels_new'].apply(lambda arr: ['Tools' if x  in tools else x for x in arr])
-# DATA_FRAME['labels_new']=DATA_FRAME['labels_new'].apply(lambda arr: ['Wild_animals' if x  in Wild_animals else x for x in arr])
 
 
-
-########################################################################
-      # Binarize the labels. Its a Multi-label binarizer
-########################################################################
-NAME_BIN = MultiLabelBinarizer().fit(DATA_FRAME['labels_new'])
-LABELS_BINARIZED = NAME_BIN.transform(DATA_FRAME['labels_new'])
-LABELS_BINARIZED_ALL = pd.DataFrame(LABELS_BINARIZED, columns=NAME_BIN.classes_)
-LABELS_BINARIZED = LABELS_BINARIZED_ALL[ALL_SOUND_NAMES]
-
-
-########################################################################
-      # print out the number and percenatge of each class examples
-########################################################################
-print(LABELS_BINARIZED.mean())
-
-
-
-########################################################################
-      # Filtering the sounds that are exactly 10 seconds
-########################################################################
-DF_FILTERED = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
-LABELS_FILTERED = LABELS_BINARIZED.loc[DF_FILTERED.index, :]
-#print(LABELS_FILTERED)
-
-
-
-########################################################################
-      # split the data into train and test data
-########################################################################
-DF_TRAIN, DF_TEST, LABELS_BINARIZED_TRAIN, LABELS_BINARIZED_TEST = train_test_split(DF_FILTERED, LABELS_FILTERED,
-                                                                                    test_size=0.33, random_state=42)
-
-'''
 
 ########################################################################
       # preprecess the data into required structure
@@ -310,7 +237,7 @@ X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 X_TEST_STANDARDIZED = X_TEST / 255
 
-print(X_TRAIN_STANDARDIZED)
+
 
 ########################################################################
       # create the keras model.
@@ -327,7 +254,7 @@ def create_keras_model():
     model.add(Dense(500, activation='relu'))
     model.add(Dense(500, activation='relu'))
     model.add(Dense(500, activation='relu'))
-    model.add(Dense(6, activation='sigmoid'))
+    model.add(Dense(7, activation='sigmoid'))
     model.add(MaxPooling1D(10))
     model.add(Flatten())
     print(model.summary())
@@ -352,9 +279,20 @@ CLF2_TEST_TARGET = LABELS_BINARIZED_TEST
 ########################################################################
       # Implementing & Training the keras model
 ########################################################################
-MODEL = create_keras_model()
+
+if config["networkCfgJson"] is None:
+  MODEL = create_keras_model()
+else:
+    json_file = open(config["networkCfgJson"], 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+
+    MODEL = model_from_json(loaded_model_json)
+    MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+                  metrics=['accuracy'])
+
 MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
-                           epochs=100, batch_size=500, verbose=1,
+                           epochs=5, batch_size=500, verbose=1,
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
 
 
@@ -378,6 +316,7 @@ CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 DF_TEST['actual_labels'] = np.split(LABELS_BINARIZED_TEST.values, DF_TEST.shape[0])
 DF_TEST['predicted_labels'] = np.split(CLF2_TEST_PREDICTION, DF_TEST.shape[0])
 DF_TEST['predicted_prob'] = np.split(CLF2_TEST_PREDICTION_PROB, DF_TEST.shape[0])
+
 MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 
