@@ -27,7 +27,6 @@ import argparse
 #########################################################
 DESCRIPTION = "Reads config file from user and trains multilabel model accordingly."
 HELP = "Input config filepath for the required model to be trained."
-cfg_path = "/home/madlad/Code_Projects/modular_acoustic_detection/model_configs/multilabel_model/multilabel_maxpool.json"
 #########################################################
     #Parse the arguments
 #########################################################
@@ -56,11 +55,11 @@ pos_sounds = {}
 neg_sounds = {}
 for label_dicts in config["labels"]:
     lab_name = label_dicts["aggregatePositiveLabelName"]
-    pos_temp = get_recursive_sound_names(label_dicts["positiveLabels"],"/home/madlad/Code_Projects/modular_acoustic_detection/")
+    pos_temp = get_recursive_sound_names(label_dicts["positiveLabels"],"./")
     pos_sounds[lab_name] = pos_temp
     if label_dicts["negativeLabels"]!=None:
         neg_lab_name = label_dicts["aggregateNegativeLabelName"]
-        neg_temp = get_recursive_sound_names(label_dicts["negativeLabels"],"/home/madlad/Code_Projects/modular_acoustic_detection/")
+        neg_temp = get_recursive_sound_names(label_dicts["negativeLabels"],"./")
         neg_temp = neg_temp.difference(pos_temp)
         neg_sounds[neg_lab_name] = neg_temp
 
@@ -305,7 +304,7 @@ else:
                   metrics=['accuracy'])
 
 epochs = config["train"]["epochs"]
-batch_size = config["train"]["batch_size"]
+batch_size = config["train"]["batchSize"]
 
 
 MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
