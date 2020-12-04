@@ -115,13 +115,13 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
 
   if (train_df.shape[0] == 0) and (train_subsample > 0):
     print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
-    #assert(False)
+
   else:
     train_df = subsample_dataframe(train_df, train_subsample)
 
   if (test_df.shape[0] == 0) and (test_subsample > 0):
     print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
-    #assert(False)
+
   else:
     test_df = subsample_dataframe(test_df, test_subsample)
 
@@ -174,14 +174,14 @@ def import_dataframes(dataframe_file_list,
 
       # No longer need df after this point
       del df
-      #if len(positive_examples_df)>0:
+
       train_positive_examples_df, test_positive_examples_df = \
                 split_and_subsample_dataframe(dataframe=positive_examples_df,
                                               validation_split=validation_split,
                                               subsample=input_file_dict["subsample"])
 
       del positive_examples_df
-      #if len(negative_examples_df)>0:
+
       train_negative_examples_df, test_negative_examples_df = \
                 split_and_subsample_dataframe(dataframe=negative_examples_df,
                                               validation_split=validation_split,
@@ -190,11 +190,11 @@ def import_dataframes(dataframe_file_list,
       del negative_examples_df
 
       # append to overall list of examples
-      #if len(train_negative_examples_df)>0:
+
       list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
 
 
-      #if len(test_negative_examples_df)>0:
+
       list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
       
   train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
