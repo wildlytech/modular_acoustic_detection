@@ -160,7 +160,7 @@
     "useYoutubeAudioSet": true,
     "extension": null
     },
-    "networkCfgJson": "/home/madlad/Code_Projects/modular_acoustic_detection/model_configs/multilabel_model/Conv1D500-128x128_Dense500_Dense500_Dense500_Dense7_MaxPool.json",
+    "networkCfgJson": "model_configs/multilabel_model/Conv1D500-128x128_Dense500_Dense500_Dense500_Dense7_MaxPool.json",
     "train": {
         "epochs": 100,
         "batchSize": 500,
