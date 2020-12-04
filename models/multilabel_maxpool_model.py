@@ -304,8 +304,12 @@ else:
     MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
                   metrics=['accuracy'])
 
+epochs = config["train"]["epochs"]
+batch_size = config["train"]["batch_size"]
+
+
 MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
-                           epochs=5, batch_size=500, verbose=1,
+                           epochs=epochs, batch_size=batch_size, verbose=1,
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
 
 
