@@ -2,6 +2,7 @@
 Traning a Mulit-label Model
 """
 import sys
+sys.path.append("/home/madlad/Code_Projects/modular_acoustic_detection/")
 import pandas as pd
 import pickle
 import numpy as np
@@ -19,8 +20,22 @@ from pprint import pprint
 import os
 import json
 from colorama import Fore,Style
+import argparse
 
+#########################################################
+    #Description and Help
+#########################################################
+DESCRIPTION = "Reads config file from user and trains multilabel model accordingly."
+HELP = "Input config filepath for the required model to be trained."
 cfg_path = "/home/madlad/Code_Projects/modular_acoustic_detection/model_configs/multilabel_model/multilabel_maxpool.json"
+#########################################################
+    #Parse the arguments
+#########################################################
+parser = argparse.ArgumentParser(description=DESCRIPTION)
+parser.add_argument("-cfg_json",action="store",help=HELP,required=True)
+result = parser.parse_args()
+cfg_path = result.cfg_json
+
 def read_config(filepath):
     with open(filepath) as f:
         config = json.load(f)
@@ -50,8 +65,6 @@ for label_dicts in config["labels"]:
         neg_sounds[neg_lab_name] = neg_temp
 
 
-pprint(pos_sounds)
-pprint(neg_sounds)
 
 
 ########################################################################
