@@ -298,8 +298,8 @@ def call_for_data(dataframe,
 
 app = dash.Dash()
 app.config.suppress_callback_exceptions = True
-IMAGE_FILENAME = 'pic.png' # replace with your own image
-ENCODED_IMAGE_MAIN = base64.b64encode(open(IMAGE_FILENAME, 'rb').read())
+IMAGE_FILENAME = os.path.dirname(__file__)+'/pic.png' # replace with your own image
+ENCODED_IMAGE_MAIN = base64.b64encode(open(IMAGE_FILENAME, 'rb').read()).decode()
 
 app.layout = html.Div([dcc.Location(id='url',
                                     refresh=False),
@@ -458,7 +458,7 @@ def parse_contents(contents, filename, date):
         os.makedirs(directory_path)
     save_file(filename, contents)
     filepath = directory_path + filename
-    encoded_image_uploaded_file = base64.b64encode(open(filepath, 'rb').read())
+    encoded_image_uploaded_file = base64.b64encode(open(filepath, 'rb').read()).decode()
 
     bar_graph_info = get_prediction_bar_graph(filepath)
 
@@ -883,7 +883,7 @@ def play_button_for_prediction(rows, columns, indices):
     pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
     if indices is not None and indices != []:
         path = "FTP_downloaded/"+str(pred_df.iloc[indices[0]]["FileNames"])
-        encoded_image_to_play = base64.b64encode(open(path, 'rb').read())
+        encoded_image_to_play = base64.b64encode(open(path, 'rb').read()).decode()
         return html.Div([
             html.Br(),
             html.Audio(id='myaudio',
@@ -1176,7 +1176,7 @@ def display_output_from_data(rows, columns, indices):
 
         path = path.stdout.read().split("\n")[0]
         print("path ", path.split("\n"))
-        encoded_image_from_path = base64.b64encode(open(path, 'rb').read())
+        encoded_image_from_path = base64.b64encode(open(path, 'rb').read()).decode()
         print("len of indices ", len(indices))
         INPUT_NAME = path
         return html.Div(style={"padding-bottom":"10%"}, children=[

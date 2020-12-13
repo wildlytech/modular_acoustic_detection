@@ -1,6 +1,7 @@
 import base64
 import dash_core_components as dcc
 import dash_html_components as html
+import os
 
 
 def app_page_layout(page_layout,
@@ -47,7 +48,7 @@ def app_page_layout(page_layout,
                         src='data:image/png;base64,{}'.format(
                             base64.b64encode(
                                 open(
-                                    'assets/GitHub-Mark-{}64px.png'.format(
+                                    os.path.dirname(__file__) + '/../assets/GitHub-Mark-{}64px.png'.format(
                                         'Light-' if light_logo else ''
                                     ),
                                     'rb'

@@ -27,16 +27,9 @@ def import_predict_configuration_json(predictions_cfg_json):
         # Each entry in json file is a path to model cfg file for one label
         for filepath in list_of_config_files:
 
-            directory_of_filepath = '/'.join(filepath.split('/')[:-1]) + '/'
-
             with open(filepath) as json_data_obj:
 
                 config_data = json.load(json_data_obj)
-
-                config_data["networkCfgJson"] = directory_of_filepath + \
-                                                config_data["networkCfgJson"]
-                config_data["train"]["outputWeightFile"] = directory_of_filepath + \
-                                                           config_data["train"]["outputWeightFile"]
 
                 # Model only supports using audio set as main ontology
                 assert(config_data["ontology"]["useYoutubeAudioSet"])
@@ -50,10 +43,6 @@ def import_predict_configuration_json(predictions_cfg_json):
                   ontologyExtFiles = []
                 elif type(ontologyExtFiles) != list:
                   ontologyExtFiles = [ontologyExtFiles]
-
-                # All paths to ontology extension files are relative to the location of the
-                # model configuration file.
-                ontologyExtFiles = [directory_of_filepath + x for x in ontologyExtFiles]
 
                 # Update extension paths in dictionary
                 config_data["ontology"]["extension"] = ontologyExtFiles
