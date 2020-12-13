@@ -45,7 +45,7 @@ if __name__=="__main__":
     RESULT = PARSER.parse_args()
 
     S = get_spectrogram(RESULT.input_file_path)
-    if result.output_file_path:
+    if RESULT.output_file_path:
         plot_spec(S,RESULT.output_file_path)
     else:
         plot_spec(S)
