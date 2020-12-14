@@ -54,8 +54,7 @@ def import_predict_configuration_json(predictions_cfg_json):
                 # Update extension paths in dictionary
                 config_data["ontology"]["extension"] = ontologyExtFiles
 
-                #label_name = '['+config_data["aggregatePositiveLabelName"] + ']Vs[' + \
-                #             config_data["aggregateNegativeLabelName"] + ']'
+
 
                 label_name = config_data["name"]
                 config_data_dict[label_name] = config_data
