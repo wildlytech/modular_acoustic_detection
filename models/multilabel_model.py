@@ -1,22 +1,16 @@
 """
-Traning a Mulit-label Model
+Training a Mulit-label Model
 """
-import sys
-sys.path.append("/home/madlad/Code_Projects/modular_acoustic_detection/")
 import pandas as pd
 import pickle
 import numpy as np
-from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
 from tensorflow.compat.v1.keras.models import Sequential,model_from_json
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from tensorflow.compat.v1.keras.optimizers import Adam
-from youtube_audioset import get_recursive_sound_names, get_all_sound_names
-from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, \
-                             HUMAN_SOUNDS, NATURE_SOUNDS, DOMESTIC_SOUNDS, TOOLS_SOUNDS
+from youtube_audioset import get_recursive_sound_names
 import balancing_dataset
-from pprint import pprint
 import os
 import json
 from colorama import Fore,Style
@@ -49,19 +43,26 @@ if not os.path.exists(pathToFileDirectory):
   os.makedirs(pathToFileDirectory)
 
 assert(config["ontology"]["useYoutubeAudioSet"])
+# If single file or null, then convert to list
+ontologyExtFiles = config["ontology"]["extension"]
+
+if ontologyExtFiles is None:
+  ontologyExtFiles = []
+elif type(ontologyExtFiles) != list:
+  ontologyExtFiles = [ontologyExtFiles]
 
 
 pos_sounds = {}
 neg_sounds = {}
 for label_dicts in config["labels"]:
     lab_name = label_dicts["aggregatePositiveLabelName"]
-    pos_temp = get_recursive_sound_names(label_dicts["positiveLabels"],"./")
-    pos_sounds[lab_name] = pos_temp
+    comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"],"./")
+    pos_sounds[lab_name] = comprising_pos_labels
     if label_dicts["negativeLabels"]!=None:
         neg_lab_name = label_dicts["aggregateNegativeLabelName"]
-        neg_temp = get_recursive_sound_names(label_dicts["negativeLabels"],"./")
-        neg_temp = neg_temp.difference(pos_temp)
-        neg_sounds[neg_lab_name] = neg_temp
+        comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"],"./")
+        comprising_neg_labels = comprising_neg_labels.difference(comprising_pos_labels)
+        neg_sounds[neg_lab_name] = comprising_neg_labels
 
 
 
@@ -73,10 +74,10 @@ for label_dicts in config["labels"]:
 DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag=0)
 
 def subsample_dataframe(dataframe, subsample):
-  """
-  Subsample examples from the dataframe
-  """
-  if subsample is not None:
+    """
+    Subsample examples from the dataframe
+    """
+    if subsample is not None:
     if subsample > 0:
       # If subsample is less than size of dataframe, then
       # don't allow replacement when sampling
@@ -85,7 +86,7 @@ def subsample_dataframe(dataframe, subsample):
     else:
       dataframe = pd.DataFrame([], columns=dataframe.columns)
 
-  return dataframe
+    return dataframe
 
 def split_and_subsample_dataframe(dataframe, validation_split, subsample):
   """
@@ -139,6 +140,57 @@ def import_dataframes(dataframe_file_list,
   """
   Iterate through each pickle file and import a subset of the dataframe
   """
+  # All entries that have a pattern path need special handling
+  # Specifically, all the files that match the pattern path
+  # need to be determined
+  pattern_file_dicts = [x for x in dataframe_file_list if "patternPath" in list(x.keys())]
+
+  # Keep just the entries that don't have a pattern path
+  # We'll add entries for each pattern path separately
+  dataframe_file_list = [x for x in dataframe_file_list if "patternPath" not in list(x.keys())]
+
+  # Expand out each pattern path entry into individual ones with fixed paths
+  for input_file_dict in pattern_file_dicts:
+      pattern_path = input_file_dict["patternPath"]
+
+      # Get list of any exclusions that should be made
+      if "excludePaths" in list(input_file_dict.keys()):
+          exclude_paths = input_file_dict["excludePaths"]
+
+          if exclude_paths is None:
+              exclude_paths = []
+          elif type(exclude_paths) != list:
+              exclude_paths = [exclude_paths]
+      else:
+          exclude_paths = []
+
+      # Make excluded paths a set for fast lookup
+      exclude_paths = set(exclude_paths)
+
+      # Search for all paths that match this pattern
+      search_results = glob(pattern_path)
+
+      # If path is in the excluded paths, then ignore it
+      search_results = [x for x in search_results if x not in exclude_paths]
+
+      if len(search_results) == 0:
+          print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths,
+                Style.RESET_ALL)
+          assert (False)
+
+      for path in search_results:
+          # Add an entry with fixed path
+          fixed_path_dict = input_file_dict.copy()
+
+          # Remove keys that are used for pattern path entry
+          # Most other keys should be the same as the pattern path entry
+          del fixed_path_dict["patternPath"]
+          if "excludePaths" in list(fixed_path_dict.keys()):
+              del fixed_path_dict["excludePaths"]
+
+          # Make it look like a fixed path entry
+          fixed_path_dict["path"] = path
+          dataframe_file_list += [fixed_path_dict]
 
   # Proceed with importing all dataframe files
   list_of_train_dataframes = []
@@ -240,7 +292,8 @@ for key in pos_sounds.keys():
 
 
 
-
+print("TR: ",LABELS_BINARIZED_TRAIN.columns)
+print("TS: ",LABELS_BINARIZED_TEST.columns)
 ########################################################################
       # preprecess the data into required structure
 ########################################################################
@@ -352,9 +405,12 @@ print('Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shap
 print(CLF2_TEST_TARGET.values.argmax(axis=1).shape)
 print('        Confusion Matrix          ')
 print('============================================')
-RESULT = confusion_matrix(CLF2_TEST_TARGET.values.argmax(axis=1),
-                          CLF2_TEST_PREDICTION.argmax(axis=1))
-print(RESULT)
+for i in range(CLF2_TEST_TARGET.shape[1]):
+    print("Confusion matrix for ", CLF2_TEST_TARGET[i])
+    a = CLF2_TEST_TARGET.iloc[:, i].values
+    b = CLF2_TEST_PREDICTION[:, i]
+    RESULT_ = confusion_matrix(a, b)
+    print(RESULT_)
 print('        Classification Report      ')
 print('============================================')
 CL_REPORT = classification_report(CLF2_TEST_TARGET.values.argmax(axis=1),
@@ -380,4 +436,4 @@ print('Accuracy :', ACCURACY)
         # Save the model weights
         # Change the name if you are tweaking hyper parameters
 ########################################################################
-MODEL.save_weights('multilabel_model_maxpool_version.h5')
+MODEL.save_weights(config["train"]["outputWeightFile"])
