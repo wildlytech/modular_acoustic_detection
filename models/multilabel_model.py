@@ -204,27 +204,39 @@ def import_dataframes(dataframe_file_list,
 
     with open(input_file_dict["path"], 'rb') as file_obj:
 
-      # Load the file
-      df = pickle.load(file_obj)
+        # Load the file
 
-      # Filtering the sounds that are exactly 10 seconds
-      # Examples should be exactly 10 seconds. Anything else
-      # is not a valid input to the model
-      df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+        df = pickle.load(file_obj)
 
+    # Filtering the sounds that are exactly 10 seconds
+    # Examples should be exactly 10 seconds. Anything else
+    # is not a valid input to the model
+    df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+
+    final_dfs_train = []
+    final_dfs_test = []
+    k=0
+    for key in positive_label_filter_arr.keys():
+
+      positive_filter = positive_label_filter_arr[key]
+      if key in negative_label_filter_arr.keys():
+          negative_filter = negative_label_filter_arr[key]
+      else:
+          negative_filter = None
       # Only use examples that have a label in label filter array
-      positive_example_select_vector = get_select_vector(df, positive_label_filter_arr)
+
+      positive_example_select_vector = get_select_vector(df, positive_filter)
       positive_examples_df = df.loc[positive_example_select_vector]
 
       # This ensures there no overlap between positive and negative examples
       negative_example_select_vector = ~positive_example_select_vector
-      if negative_label_filter_arr is not None:
+      if negative_filter is not None:
         # Exclude even further examples that don't fall into the negative label filter
-        negative_example_select_vector &= get_select_vector(df, negative_label_filter_arr)
+        negative_example_select_vector &= get_select_vector(df, negative_filter)
       negative_examples_df = df.loc[negative_example_select_vector]
 
       # No longer need df after this point
-      del df
+      #del df
 
       train_positive_examples_df, test_positive_examples_df = \
                 split_and_subsample_dataframe(dataframe=positive_examples_df,
@@ -247,36 +259,25 @@ def import_dataframes(dataframe_file_list,
 
 
       list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
-      
-  train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
-  test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
+      k+=1
 
-  print("Import done.")
+    train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
+    final_dfs_train.append(train_df)
+    test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
+    final_dfs_test.append(test_df)
 
-  return train_df, test_df
+    DF_TRAIN = pd.concat(final_dfs_train, ignore_index=True)
+    DF_TEST = pd.concat(final_dfs_test, ignore_index=True)
+    print("Import done.")
 
-final_dfs_train = []
-final_dfs_test = []
-for key in pos_sounds.keys():
+  return DF_TRAIN, DF_TEST
 
-    if key in neg_sounds.keys():
-        DF_TRAIN, DF_TEST = \
-            import_dataframes(dataframe_file_list=config["train"]["inputDataFrames"],
-                              positive_label_filter_arr=pos_sounds[key],
-                              negative_label_filter_arr=neg_sounds[key],
-                              validation_split=config["train"]["validationSplit"])
-    else:
-        DF_TRAIN, DF_TEST = \
-            import_dataframes(dataframe_file_list=config["train"]["inputDataFrames"],
-                              positive_label_filter_arr=pos_sounds[key],
-                              negative_label_filter_arr=None,
+
+DF_TRAIN, DF_TEST = import_dataframes(dataframe_file_list=config["train"]["inputDataFrames"],
+                              positive_label_filter_arr=pos_sounds,
+                              negative_label_filter_arr=neg_sounds,
                               validation_split=config["train"]["validationSplit"])
 
-    final_dfs_train.append(DF_TRAIN)
-    final_dfs_test.append(DF_TEST)
-
-DF_TRAIN = pd.concat(final_dfs_train,ignore_index=True)
-DF_TEST= pd.concat(final_dfs_test,ignore_index=True)
 
 
 
@@ -402,12 +403,11 @@ print('Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shap
 ########################################################################
       # Print confusion matrix and classification_report
 ########################################################################
-print(CLF2_TEST_TARGET.values.argmax(axis=1).shape)
 print('        Confusion Matrix          ')
 print('============================================')
 for i in range(CLF2_TEST_TARGET.shape[1]):
-    print("Confusion matrix for ", CLF2_TEST_TARGET[i])
-    a = CLF2_TEST_TARGET.iloc[:, i].values
+    print("Confusion matrix for ", CLF2_TEST_TARGET.columns[i])
+    a = CLF2_TEST_TARGET[CLF2_TEST_TARGET.columns[i]].values
     b = CLF2_TEST_PREDICTION[:, i]
     RESULT_ = confusion_matrix(a, b)
     print(RESULT_)
