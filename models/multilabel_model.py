@@ -78,13 +78,13 @@ def subsample_dataframe(dataframe, subsample):
     Subsample examples from the dataframe
     """
     if subsample is not None:
-    if subsample > 0:
-      # If subsample is less than size of dataframe, then
-      # don't allow replacement when sampling
-      # Otherwise, the intention is to oversample
-      dataframe = dataframe.sample(subsample, replace=(subsample > dataframe.shape[0]))
-    else:
-      dataframe = pd.DataFrame([], columns=dataframe.columns)
+        if subsample > 0:
+          # If subsample is less than size of dataframe, then
+          # don't allow replacement when sampling
+          # Otherwise, the intention is to oversample
+          dataframe = dataframe.sample(subsample, replace=(subsample > dataframe.shape[0]))
+        else:
+          dataframe = pd.DataFrame([], columns=dataframe.columns)
 
     return dataframe
 
