@@ -1,5 +1,5 @@
 """
-Training a Mulit-label Model
+Training a Multilabel Model
 """
 import pandas as pd
 import pickle
@@ -56,11 +56,11 @@ pos_sounds = {}
 neg_sounds = {}
 for label_dicts in config["labels"]:
     lab_name = label_dicts["aggregatePositiveLabelName"]
-    comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"],"./")
+    comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"],"./",ontologyExtFiles)
     pos_sounds[lab_name] = comprising_pos_labels
     if label_dicts["negativeLabels"]!=None:
         neg_lab_name = label_dicts["aggregateNegativeLabelName"]
-        comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"],"./")
+        comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"],"./",ontologyExtFiles)
         comprising_neg_labels = comprising_neg_labels.difference(comprising_pos_labels)
         neg_sounds[neg_lab_name] = comprising_neg_labels
 
@@ -71,7 +71,6 @@ for label_dicts in config["labels"]:
       # Importing balanced data from the function.
       # Including audiomoth annotated files for training
 ########################################################################
-DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag=0)
 
 def subsample_dataframe(dataframe, subsample):
     """
@@ -197,69 +196,69 @@ def import_dataframes(dataframe_file_list,
     list_of_test_dataframes = []
     for input_file_dict in dataframe_file_list:
 
-    assert("patternPath" not in list(input_file_dict.keys()))
-    assert("path" in list(input_file_dict.keys()))
+        assert("patternPath" not in list(input_file_dict.keys()))
+        assert("path" in list(input_file_dict.keys()))
 
-    print("Importing", input_file_dict["path"], "...")
+        print("Importing", input_file_dict["path"], "...")
 
-    with open(input_file_dict["path"], 'rb') as file_obj:
+        with open(input_file_dict["path"], 'rb') as file_obj:
 
-        # Load the file
+            # Load the file
 
-        df = pickle.load(file_obj)
+            df = pickle.load(file_obj)
 
-    # Filtering the sounds that are exactly 10 seconds
-    # Examples should be exactly 10 seconds. Anything else
-    # is not a valid input to the model
-    df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+        # Filtering the sounds that are exactly 10 seconds
+        # Examples should be exactly 10 seconds. Anything else
+        # is not a valid input to the model
+        df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
-    final_dfs_train = []
-    final_dfs_test = []
-    k=0
-    for key in positive_label_filter_arr.keys():
+        final_dfs_train = []
+        final_dfs_test = []
+        k=0
+        for key in positive_label_filter_arr.keys():
 
-      positive_filter = positive_label_filter_arr[key]
-      if key in negative_label_filter_arr.keys():
-          negative_filter = negative_label_filter_arr[key]
-      else:
-          negative_filter = None
-      # Only use examples that have a label in label filter array
+          positive_filter = positive_label_filter_arr[key]
+          if key in negative_label_filter_arr.keys():
+              negative_filter = negative_label_filter_arr[key]
+          else:
+              negative_filter = None
+          # Only use examples that have a label in label filter array
 
-      positive_example_select_vector = get_select_vector(df, positive_filter)
-      positive_examples_df = df.loc[positive_example_select_vector]
+          positive_example_select_vector = get_select_vector(df, positive_filter)
+          positive_examples_df = df.loc[positive_example_select_vector]
 
-      # This ensures there no overlap between positive and negative examples
-      negative_example_select_vector = ~positive_example_select_vector
-      if negative_filter is not None:
-        # Exclude even further examples that don't fall into the negative label filter
-        negative_example_select_vector &= get_select_vector(df, negative_filter)
-      negative_examples_df = df.loc[negative_example_select_vector]
+          # This ensures there no overlap between positive and negative examples
+          negative_example_select_vector = ~positive_example_select_vector
+          if negative_filter is not None:
+            # Exclude even further examples that don't fall into the negative label filter
+            negative_example_select_vector &= get_select_vector(df, negative_filter)
+          negative_examples_df = df.loc[negative_example_select_vector]
 
-      # No longer need df after this point
-      #del df
+          # No longer need df after this point
+          #del df
 
-      train_positive_examples_df, test_positive_examples_df = \
-                split_and_subsample_dataframe(dataframe=positive_examples_df,
-                                              validation_split=validation_split,
-                                              subsample=input_file_dict["subsample"])
+          train_positive_examples_df, test_positive_examples_df = \
+                    split_and_subsample_dataframe(dataframe=positive_examples_df,
+                                                  validation_split=validation_split,
+                                                  subsample=input_file_dict["subsample"])
 
-      del positive_examples_df
+          del positive_examples_df
 
-      train_negative_examples_df, test_negative_examples_df = \
-                split_and_subsample_dataframe(dataframe=negative_examples_df,
-                                              validation_split=validation_split,
-                                              subsample=input_file_dict["subsample"])
+          train_negative_examples_df, test_negative_examples_df = \
+                    split_and_subsample_dataframe(dataframe=negative_examples_df,
+                                                  validation_split=validation_split,
+                                                  subsample=input_file_dict["subsample"])
 
-      del negative_examples_df
+          del negative_examples_df
 
-      # append to overall list of examples
+          # append to overall list of examples
 
-      list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
+          list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
 
 
 
-      list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
-      k+=1
+          list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
+          k+=1
 
     train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
     final_dfs_train.append(train_df)
