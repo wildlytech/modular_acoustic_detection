@@ -47,8 +47,6 @@ def import_predict_configuration_json(predictions_cfg_json):
                 elif type(ontologyExtFiles) != list:
                   ontologyExtFiles = [ontologyExtFiles]
 
-                # All paths to ontology extension files are relative to the location of the
-                # model configuration file.
 
 
                 # Update extension paths in dictionary
