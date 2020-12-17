@@ -89,68 +89,68 @@ def subsample_dataframe(dataframe, subsample):
     return dataframe
 
 def split_and_subsample_dataframe(dataframe, validation_split, subsample):
-  """
-  Perform validation split and sub/over sampling of dataframe
-  Returns train and test dataframe
-  """
+    """
+    Perform validation split and sub/over sampling of dataframe
+    Returns train and test dataframe
+    """
 
-  # split before sub/oversampling to ensure there is no leakage between train and test sets
-  test_size = int(validation_split*dataframe.shape[0])
+    # split before sub/oversampling to ensure there is no leakage between train and test sets
+    test_size = int(validation_split*dataframe.shape[0])
 
-  train_size = dataframe.shape[0] - test_size
+    train_size = dataframe.shape[0] - test_size
 
-  if test_size == 0:
-    train_df = dataframe
-    test_df = pd.DataFrame({}, columns=dataframe.columns)
-  elif train_size == 0:
-    train_df = pd.DataFrame({}, columns=dataframe.columns)
-    test_df = dataframe
-  else:
-    train_df, test_df = train_test_split(dataframe,
-                                         test_size=test_size,
-                                         random_state=42)
+    if test_size == 0:
+        train_df = dataframe
+        test_df = pd.DataFrame({}, columns=dataframe.columns)
+    elif train_size == 0:
+        train_df = pd.DataFrame({}, columns=dataframe.columns)
+        test_df = dataframe
+    else:
+        train_df, test_df = train_test_split(dataframe,
+                                             test_size=test_size,
+                                             random_state=42)
 
-  test_subsample = int(subsample*validation_split)
-  train_subsample = subsample - test_subsample
+    test_subsample = int(subsample*validation_split)
+    train_subsample = subsample - test_subsample
 
-  if (train_df.shape[0] == 0) and (train_subsample > 0):
-    print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
+    if (train_df.shape[0] == 0) and (train_subsample > 0):
+        print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
 
-  else:
-    train_df = subsample_dataframe(train_df, train_subsample)
+    else:
+        train_df = subsample_dataframe(train_df, train_subsample)
 
-  if (test_df.shape[0] == 0) and (test_subsample > 0):
-    print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
+    if (test_df.shape[0] == 0) and (test_subsample > 0):
+        print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
 
-  else:
-    test_df = subsample_dataframe(test_df, test_subsample)
+    else:
+        test_df = subsample_dataframe(test_df, test_subsample)
 
-  return train_df, test_df
+    return train_df, test_df
 
 def get_select_vector(dataframe, label_filter_arr):
-  """
-  Get the boolean select vector on the dataframe from the label filter
-  """
-  return dataframe['labels_name'].apply(lambda arr: np.any([x.lower() in label_filter_arr for x in arr]))
+      """
+      Get the boolean select vector on the dataframe from the label filter
+      """
+      return dataframe['labels_name'].apply(lambda arr: np.any([x.lower() in label_filter_arr for x in arr]))
 
 def import_dataframes(dataframe_file_list,
                       positive_label_filter_arr,
                       negative_label_filter_arr,
                       validation_split):
-  """
-  Iterate through each pickle file and import a subset of the dataframe
-  """
-  # All entries that have a pattern path need special handling
-  # Specifically, all the files that match the pattern path
-  # need to be determined
-  pattern_file_dicts = [x for x in dataframe_file_list if "patternPath" in list(x.keys())]
+    """
+    Iterate through each pickle file and import a subset of the dataframe
+    """
+    # All entries that have a pattern path need special handling
+    # Specifically, all the files that match the pattern path
+    # need to be determined
+    pattern_file_dicts = [x for x in dataframe_file_list if "patternPath" in list(x.keys())]
 
-  # Keep just the entries that don't have a pattern path
-  # We'll add entries for each pattern path separately
-  dataframe_file_list = [x for x in dataframe_file_list if "patternPath" not in list(x.keys())]
+    # Keep just the entries that don't have a pattern path
+    # We'll add entries for each pattern path separately
+    dataframe_file_list = [x for x in dataframe_file_list if "patternPath" not in list(x.keys())]
 
-  # Expand out each pattern path entry into individual ones with fixed paths
-  for input_file_dict in pattern_file_dicts:
+    # Expand out each pattern path entry into individual ones with fixed paths
+    for input_file_dict in pattern_file_dicts:
       pattern_path = input_file_dict["patternPath"]
 
       # Get list of any exclusions that should be made
@@ -192,10 +192,10 @@ def import_dataframes(dataframe_file_list,
           fixed_path_dict["path"] = path
           dataframe_file_list += [fixed_path_dict]
 
-  # Proceed with importing all dataframe files
-  list_of_train_dataframes = []
-  list_of_test_dataframes = []
-  for input_file_dict in dataframe_file_list:
+    # Proceed with importing all dataframe files
+    list_of_train_dataframes = []
+    list_of_test_dataframes = []
+    for input_file_dict in dataframe_file_list:
 
     assert("patternPath" not in list(input_file_dict.keys()))
     assert("path" in list(input_file_dict.keys()))
@@ -270,7 +270,7 @@ def import_dataframes(dataframe_file_list,
     DF_TEST = pd.concat(final_dfs_test, ignore_index=True)
     print("Import done.")
 
-  return DF_TRAIN, DF_TEST
+    return DF_TRAIN, DF_TEST
 
 
 DF_TRAIN, DF_TEST = import_dataframes(dataframe_file_list=config["train"]["inputDataFrames"],
