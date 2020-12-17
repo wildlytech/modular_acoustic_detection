@@ -1,5 +1,5 @@
 """
-Testing a Multi label model Model
+Testing a Multi label Model
 """
 #Import the necessary functions and libraries
 import argparse
@@ -170,9 +170,6 @@ def main(predictions_cfg_json,
 
         pred_args = CLF2_TEST_PREDICTION_PROB.argmax(axis=1)
 
-        # Add results to data frame
-        #DF_TEST.insert(len(DF_TEST.columns), label_name+"_Probability", CLF2_TEST_PREDICTION_PROB)
-        #DF_TEST.insert(len(DF_TEST.columns), label_name+"_Prediction", CLF2_TEST_PREDICTION)
 
         test = pd.concat([pd.DataFrame(CLF2_TEST_PREDICTION_PROB),pd.DataFrame(CLF2_TEST_PREDICTION)],axis=1,ignore_index=True)
         test = test.reset_index(drop=True)
@@ -189,7 +186,7 @@ def main(predictions_cfg_json,
             ##############################################################################
                     # To get the Misclassified examples
             ##############################################################################
-            #DF_TEST.insert(len(DF_TEST.columns), label_name+'_Actual', CLF2_TEST_TARGET)
+
             CLF2_TEST_TARGET = pd.DataFrame(CLF2_TEST_TARGET).reset_index(drop=True)
             DF_TEST = pd.concat([DF_TEST,CLF2_TEST_TARGET],axis=1,ignore_index=True)
 
