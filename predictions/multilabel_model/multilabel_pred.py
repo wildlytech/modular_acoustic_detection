@@ -43,9 +43,9 @@ def import_predict_configuration_json(predictions_cfg_json):
 
                 # If single file or null, then convert to list
                 if ontologyExtFiles is None:
-                  ontologyExtFiles = []
+                    ontologyExtFiles = []
                 elif type(ontologyExtFiles) != list:
-                  ontologyExtFiles = [ontologyExtFiles]
+                    ontologyExtFiles = [ontologyExtFiles]
 
 
 
