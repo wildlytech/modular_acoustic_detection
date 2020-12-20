@@ -294,6 +294,20 @@ for key in pos_sounds.keys():
 
 print("TR: ",LABELS_BINARIZED_TRAIN.columns)
 print("TS: ",LABELS_BINARIZED_TEST.columns)
+
+TOTAL_TRAIN_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TRAIN.sum(axis=0)
+TOTAL_TEST_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TEST.sum(axis=0)
+TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS = TOTAL_TRAIN_EXAMPLES_BY_CLASS + TOTAL_TEST_EXAMPLES_BY_CLASS
+TOTAL_TRAIN_TEST_EXAMPLES = LABELS_BINARIZED_TRAIN.shape[0] + LABELS_BINARIZED_TEST.shape[0]
+
+print("TRAIN NUMBER EXAMPLES (BY CLASS):")
+print(TOTAL_TRAIN_EXAMPLES_BY_CLASS)
+print("TEST NUMBER EXAMPLES (BY CLASS):")
+print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS)
+print("TOTAL NUMBER EXAMPLES (BY CLASS):")
+print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS)
+print("PERCENT EXAMPLES (BY CLASS):")
+print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS / TOTAL_TRAIN_TEST_EXAMPLES)
 ########################################################################
       # preprecess the data into required structure
 ########################################################################
