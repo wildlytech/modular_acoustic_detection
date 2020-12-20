@@ -160,45 +160,45 @@
     "useYoutubeAudioSet": true,
     "extension": null
     },
-    "networkCfgJson": "model_configs/multilabel_model/Conv1D500-128x128_Dense500_Dense500_Dense500_Dense7_MaxPool.json",
+    "networkCfgJson": "model_configs/multilabel_model/topology/Conv1D500-128x128_Dense500_Dense500_Dense500_Dense7_MaxPool.json",
     "train": {
-        "epochs": 100,
+        "epochs": 1,
         "batchSize": 500,
         "validationSplit": 0.3,
         "inputDataFrames": [
             {
                 "path": "diff_class_datasets/Datasets/pure/Explosion/pure_exp_7957.pkl",
-                "subsample": 100
+                "subsample": 2000
             },
             {
                 "path": "diff_class_datasets/Datasets/pure/Motor/pure_mot_76045.pkl",
-                "subsample": 100
+                "subsample": 2000
             },
             {
                 "path": "diff_class_datasets/Datasets/pure/Human_sounds/pure_hum_46525.pkl",
-                "subsample": 100
+                "subsample": 2000
             },
             {
                 "path": "diff_class_datasets/Datasets/pure/Wood/pure_wod_1115.pkl",
-                "subsample": 100
+                "subsample": 2000
             },
             {
                 "path": "diff_class_datasets/Datasets/pure/Nature_sounds/pure_nat_13527.pkl",
-                "subsample": 100
+                "subsample": 2000
             },
             {
                 "path": "diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl",
-                "subsample": 1000
+                "subsample": 2000
             },
             {
                 "path": "diff_class_datasets/Datasets/pure/Tools/pure_tools_8113.pkl",
-                "subsample": 100
+                "subsample": 2000
             },
             {
                 "path": "diff_class_datasets/Datasets/pure/Wild/pure_wild_7061.pkl",
-                "subsample": 100
+                "subsample": 2000
             }
         ],
-        "outputWeightFile": "predictions/multilabel_model/weights/multilabel_Conv1D500-128x128_Dense500_Dense500_Dense500_Dense7_MaxPool.h5"
+        "outputWeightFile": "predictions/multilabel_model/weights/multilabel_model_maxpool_version.h5"
     }
 }
