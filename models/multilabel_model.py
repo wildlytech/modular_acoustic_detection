@@ -40,16 +40,16 @@ config = read_config(cfg_path)
 output_wt_file = config["train"]["outputWeightFile"]
 pathToFileDirectory = "/".join(output_wt_file.split('/')[:-1]) + '/'
 if not os.path.exists(pathToFileDirectory):
-  os.makedirs(pathToFileDirectory)
+    os.makedirs(pathToFileDirectory)
 
 assert(config["ontology"]["useYoutubeAudioSet"])
 # If single file or null, then convert to list
 ontologyExtFiles = config["ontology"]["extension"]
 
 if ontologyExtFiles is None:
-  ontologyExtFiles = []
+    ontologyExtFiles = []
 elif type(ontologyExtFiles) != list:
-  ontologyExtFiles = [ontologyExtFiles]
+    ontologyExtFiles = [ontologyExtFiles]
 
 
 pos_sounds = {}
@@ -78,12 +78,12 @@ def subsample_dataframe(dataframe, subsample):
     """
     if subsample is not None:
         if subsample > 0:
-          # If subsample is less than size of dataframe, then
-          # don't allow replacement when sampling
-          # Otherwise, the intention is to oversample
-          dataframe = dataframe.sample(subsample, replace=(subsample > dataframe.shape[0]))
+            # If subsample is less than size of dataframe, then
+            # don't allow replacement when sampling
+            # Otherwise, the intention is to oversample
+            dataframe = dataframe.sample(subsample, replace=(subsample > dataframe.shape[0]))
         else:
-          dataframe = pd.DataFrame([], columns=dataframe.columns)
+            dataframe = pd.DataFrame([], columns=dataframe.columns)
 
     return dataframe
 
@@ -150,46 +150,45 @@ def import_dataframes(dataframe_file_list,
 
     # Expand out each pattern path entry into individual ones with fixed paths
     for input_file_dict in pattern_file_dicts:
-      pattern_path = input_file_dict["patternPath"]
+        pattern_path = input_file_dict["patternPath"]
 
-      # Get list of any exclusions that should be made
-      if "excludePaths" in list(input_file_dict.keys()):
-          exclude_paths = input_file_dict["excludePaths"]
+        # Get list of any exclusions that should be made
+        if "excludePaths" in list(input_file_dict.keys()):
+            exclude_paths = input_file_dict["excludePaths"]
 
-          if exclude_paths is None:
-              exclude_paths = []
-          elif type(exclude_paths) != list:
-              exclude_paths = [exclude_paths]
-      else:
-          exclude_paths = []
+            if exclude_paths is None:
+                exclude_paths = []
+            elif type(exclude_paths) != list:
+                exclude_paths = [exclude_paths]
+        else:
+            exclude_paths = []
 
-      # Make excluded paths a set for fast lookup
-      exclude_paths = set(exclude_paths)
+        # Make excluded paths a set for fast lookup
+        exclude_paths = set(exclude_paths)
 
-      # Search for all paths that match this pattern
-      search_results = glob(pattern_path)
+        # Search for all paths that match this pattern
+        search_results = glob(pattern_path)
 
-      # If path is in the excluded paths, then ignore it
-      search_results = [x for x in search_results if x not in exclude_paths]
+        # If path is in the excluded paths, then ignore it
+        search_results = [x for x in search_results if x not in exclude_paths]
 
-      if len(search_results) == 0:
-          print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths,
-                Style.RESET_ALL)
-          assert (False)
+        if len(search_results) == 0:
+            print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths,Style.RESET_ALL)
+            assert (False)
 
-      for path in search_results:
-          # Add an entry with fixed path
-          fixed_path_dict = input_file_dict.copy()
+        for path in search_results:
+            # Add an entry with fixed path
+            fixed_path_dict = input_file_dict.copy()
 
-          # Remove keys that are used for pattern path entry
-          # Most other keys should be the same as the pattern path entry
-          del fixed_path_dict["patternPath"]
-          if "excludePaths" in list(fixed_path_dict.keys()):
-              del fixed_path_dict["excludePaths"]
+            # Remove keys that are used for pattern path entry
+            # Most other keys should be the same as the pattern path entry
+            del fixed_path_dict["patternPath"]
+            if "excludePaths" in list(fixed_path_dict.keys()):
+                del fixed_path_dict["excludePaths"]
 
-          # Make it look like a fixed path entry
-          fixed_path_dict["path"] = path
-          dataframe_file_list += [fixed_path_dict]
+            # Make it look like a fixed path entry
+            fixed_path_dict["path"] = path
+            dataframe_file_list += [fixed_path_dict]
 
     # Proceed with importing all dataframe files
     list_of_train_dataframes = []
@@ -214,56 +213,55 @@ def import_dataframes(dataframe_file_list,
 
         final_dfs_train = []
         final_dfs_test = []
-        k=0
+
         for key in positive_label_filter_arr.keys():
 
-          positive_filter = positive_label_filter_arr[key]
-          if key in negative_label_filter_arr.keys():
-              negative_filter = negative_label_filter_arr[key]
-          else:
-              negative_filter = None
-          # Only use examples that have a label in label filter array
+            positive_filter = positive_label_filter_arr[key]
+            if key in negative_label_filter_arr.keys():
+                negative_filter = negative_label_filter_arr[key]
+            else:
+                negative_filter = None
+            # Only use examples that have a label in label filter array
 
-          positive_example_select_vector = get_select_vector(df, positive_filter)
-          positive_examples_df = df.loc[positive_example_select_vector]
+            positive_example_select_vector = get_select_vector(df, positive_filter)
+            positive_examples_df = df.loc[positive_example_select_vector]
 
-          # This ensures there no overlap between positive and negative examples
-          negative_example_select_vector = ~positive_example_select_vector
-          if negative_filter is not None:
-            # Exclude even further examples that don't fall into the negative label filter
-            negative_example_select_vector &= get_select_vector(df, negative_filter)
-          negative_examples_df = df.loc[negative_example_select_vector]
+            # This ensures there no overlap between positive and negative examples
+            negative_example_select_vector = ~positive_example_select_vector
+            if negative_filter is not None:
+                # Exclude even further examples that don't fall into the negative label filter
+                negative_example_select_vector &= get_select_vector(df, negative_filter)
+            negative_examples_df = df.loc[negative_example_select_vector]
 
-          # No longer need df after this point
-          #del df
+            # No longer need df after this point
 
-          train_positive_examples_df, test_positive_examples_df = \
+            train_positive_examples_df, test_positive_examples_df = \
                     split_and_subsample_dataframe(dataframe=positive_examples_df,
                                                   validation_split=validation_split,
                                                   subsample=input_file_dict["subsample"])
 
-          del positive_examples_df
+            del positive_examples_df
 
-          train_negative_examples_df, test_negative_examples_df = \
+            train_negative_examples_df, test_negative_examples_df = \
                     split_and_subsample_dataframe(dataframe=negative_examples_df,
                                                   validation_split=validation_split,
                                                   subsample=input_file_dict["subsample"])
 
-          del negative_examples_df
+            del negative_examples_df
 
-          # append to overall list of examples
+            # append to overall list of examples
 
-          list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
+            list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
 
 
 
-          list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
-          k+=1
+            list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
 
-    train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
-    final_dfs_train.append(train_df)
-    test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
-    final_dfs_test.append(test_df)
+
+        train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
+        final_dfs_train.append(train_df)
+        test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
+        final_dfs_test.append(test_df)
 
     DF_TRAIN = pd.concat(final_dfs_train, ignore_index=True)
     DF_TEST = pd.concat(final_dfs_test, ignore_index=True)
@@ -346,7 +344,7 @@ CLF2_TEST_TARGET = LABELS_BINARIZED_TEST
 ########################################################################
 
 if config["networkCfgJson"] is None:
-  MODEL = create_keras_model()
+    MODEL = create_keras_model()
 else:
     json_file = open(config["networkCfgJson"], 'r')
     loaded_model_json = json_file.read()
