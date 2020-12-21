@@ -2,11 +2,13 @@
 Testing a BR - Model
 """
 import argparse
+import json
 import pickle
 import pandas as pd
 import numpy as np
 from tensorflow.compat.v1.keras import backend as K
-from . import generate_before_predict_BR, multilabel_pred
+from predictions.binary_relevance_model import generate_before_predict_BR
+from predictions.multilabel_model import multilabel_pred
 
 def predict_on_embedding(embedding, config_datas):
     '''
@@ -51,6 +53,11 @@ def predict_on_embedding(embedding, config_datas):
 
     return prediction_probs, prediction_rounded
 
+def read_config(filepath):
+    with open(filepath,"r") as f:
+        config = json.load(f)
+    return config
+
 def main(predictions_cfg_json, path_for_wavfile):
 
     ##############################################################################
@@ -62,7 +69,7 @@ def main(predictions_cfg_json, path_for_wavfile):
             # Import json data
     ##############################################################################
     #CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(predictions_cfg_json)
-    CONFIG_DATAS = predictions_cfg_json
+    CONFIG_DATAS = [read_config(file) for file in read_config(predictions_cfg_json)]
     #LABEL_NAMES = list(CONFIG_DATAS.keys())
 
     ##############################################################################
@@ -71,20 +78,19 @@ def main(predictions_cfg_json, path_for_wavfile):
 
     CLF2_TRAIN_PREDICTION = []
     CLF2_TRAIN_PREDICTION_PROB = []
+    for data in CONFIG_DATAS:
+        for each_embedding in [EMBEDDINGS]:
 
-    for each_embedding in [EMBEDDINGS]:
+            prediction_probs, prediction_rounded = predict_on_embedding(embedding = each_embedding,
+                                                                        config_datas = data)
 
-        prediction_probs, prediction_rounded = predict_on_embedding(embedding = each_embedding,
-                                                                    label_names = LABEL_NAMES,
-                                                                    config_datas = CONFIG_DATAS)
-
-        CLF2_TRAIN_PREDICTION_PROB.append(prediction_probs)
-        CLF2_TRAIN_PREDICTION.append(prediction_rounded)
+            CLF2_TRAIN_PREDICTION_PROB.append(prediction_probs)
+            CLF2_TRAIN_PREDICTION.append(prediction_rounded)
 
     ##############################################################################
           # Print results
     ##############################################################################
-    results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB), columns=LABEL_NAMES)
+    results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB))
     print(results)
 
 if __name__ == "__main__":
@@ -110,7 +116,7 @@ if __name__ == "__main__":
     REQUIRED_NAMED.add_argument('-path_for_wavfile',
                                 '--path_for_wavfile',
                                 action='store',
-                                help='Input the path for 10second wavfile',
+                                help='Input the path for 10 second wavfile',
                                 required=True)
 
     ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
