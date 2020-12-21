@@ -211,10 +211,9 @@ def import_dataframes(dataframe_file_list,
         # is not a valid input to the model
         df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
-        final_dfs_train = []
-        final_dfs_test = []
+        final_dfs = []
 
-        for key in positive_label_filter_arr.keys():
+        '''for key in positive_label_filter_arr.keys():
 
             positive_filter = positive_label_filter_arr[key]
             if key in negative_label_filter_arr.keys():
@@ -261,10 +260,15 @@ def import_dataframes(dataframe_file_list,
         train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
         final_dfs_train.append(train_df)
         test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
-        final_dfs_test.append(test_df)
+        final_dfs_test.append(test_df)'''
+        final_dfs.append(df)
 
-    DF_TRAIN = pd.concat(final_dfs_train, ignore_index=True)
-    DF_TEST = pd.concat(final_dfs_test, ignore_index=True)
+    DF = pd.concat(final_dfs,ignore_index=True)
+    DF_TRAIN,DF_TEST = split_and_subsample_dataframe(dataframe=DF,
+                                                     validation_split=validation_split,
+                                                     subsample=input_file_dict["subsample"])
+    #DF_TRAIN = pd.concat(final_dfs_train, ignore_index=True)
+    #DF_TEST = pd.concat(final_dfs_test, ignore_index=True)
     print("Import done.")
 
     return DF_TRAIN, DF_TEST
