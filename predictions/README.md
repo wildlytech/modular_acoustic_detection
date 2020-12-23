@@ -2,13 +2,13 @@
 
 <br>
 
-#### 1. Multilabel Dense Layer Model
-- Navigate to ```dense_layer_model/``` folder to start predictng on single/multiple audio files using Multilabel Dense layer model
+#### 1. Multilabel Model
+- Navigate to ```multilabel_model/``` folder to start predicting on single/multiple audio files using Multilabel Model
 - To navigate follow the command below
 ```shell
 $ cd dense_layer_model/
 ```
-**Note**: [Navigate to dense_layer_model/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/predictions/dense_layer_model)
+**Note**: [Navigate to multilabel_model/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/predictions/multilabel_model)
 
 <br>
 
