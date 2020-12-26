@@ -17,6 +17,7 @@ from colorama import Fore,Style
 import argparse
 from keras.wrappers.scikit_learn import KerasClassifier
 from modAL.models import ActiveLearner
+import matplotlib.pyplot as plt
 #########################################################
     #Description and Help
 #########################################################
@@ -210,6 +211,7 @@ def import_dataframes(dataframe_file_list,
         # Filtering the sounds that are exactly 10 seconds
         # Examples should be exactly 10 seconds. Anything else
         # is not a valid input to the model
+
         df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
         final_dfs = []
@@ -324,13 +326,45 @@ X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 X_TEST_STANDARDIZED = X_TEST / 255
 
+########## Make a function to read pool #######
+def read_pool(pool_path):
+    with open(pool_path, "rb") as f:
+        df = pickle.load(f)
 
+    split_wavfiles = []
+    split_feats = []
+    for ii, feat in enumerate(df.features):
 
+        for i in range(0, (len(feat) // 10) * 10, 10):
+            if i==0:
+                res = feat[i:i+10]
+            else:
+                res = np.concatenate([res,feat[i:i+10]])
+
+            #split_feats.append(feat[i:i + 10])
+            split_wavfiles.append(df.wav_file[ii] + "_start_" + str(i))
+
+        if ii==0:
+            super_res = res
+        else:
+            super_res = np.concatenate([super_res,res])
+    #df = pd.DataFrame({"features": split_feats, "wav_files": split_wavfiles})
+    #df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+    return super_res.reshape(-1,1280),split_wavfiles
 ########################################################################
       # create the keras model.
       # Change and play around with model architecture
       # Hyper parameters can be tweaked here
 ########################################################################
+
+df_pool,wavfiles_pool = read_pool("/home/madlad/Code_Projects/modular_acoustic_detection/diff_class_datasets/field_dataset.pkl")
+
+#features = df_pool.features.values
+#labels = df_pool.wav_files.values
+print("POOL: ",df_pool.shape)
+#print("F SHAPE ",features.shape)
+#print("L SHAPE ",labels.shape)
+
 def create_keras_model():
     """
     Creating a Model
@@ -386,11 +420,19 @@ n_initial = 1000
 initial_idx = np.random.choice(range(len(CLF2_TRAIN_TARGET)), size=n_initial, replace=False)
 X_initial = CLF2_TRAIN[initial_idx]
 y_initial = CLF2_TRAIN_TARGET.iloc[initial_idx].values
+X_test = CLF2_TEST
+y_test = CLF2_TEST_TARGET.values
 print("SHAPE: ",CLF2_TRAIN.shape)
-X_pool = np.delete(CLF2_TRAIN, initial_idx, axis=0)[:500]
-y_pool = np.delete(CLF2_TRAIN_TARGET.values, initial_idx, axis=0)[:500]
-print("X: ",X_initial)
-print("Y: ",y_initial)
+
+########################## Read Pool #####################################
+X_pool = df_pool
+X_pool = X_pool.reshape(-1,1280,1)
+#X_pool = np.delete(CLF2_TRAIN, initial_idx, axis=0)[:500]
+#y_pool = np.delete(CLF2_TRAIN_TARGET.values, initial_idx, axis=0)[:500]
+
+
+
+
 
 learner = ActiveLearner(
     estimator=classifier,
@@ -399,8 +441,9 @@ learner = ActiveLearner(
 )
 
 
-n_queries = 4
-
+n_queries = 2
+query_list = []
+model_accuracy = []
 for idx in range(n_queries):
     print('Query no. %d' % (idx + 1))
     query_idx, query_instance = learner.query(X_pool, n_instances=3, verbose=0)
@@ -409,17 +452,18 @@ for idx in range(n_queries):
     features = pd.DataFrame()
     labels = [["label"] for i in range(len(query_idx))]
 
-    features["wavefiles"] = wavefiles.values[query_idx]
+    features["wavefiles"] = np.array(wavfiles_pool)[query_idx]
     features["labels_name"] = labels
     features.to_csv("active_learner.csv")
     inp = input("Enter any character after you finish labelling the csv")
     labelled_csv = pd.read_csv("active_learner.csv",index_col=0)
     labs = pd.DataFrame()
+
     for key in pos_sounds.keys():
         FULL_NAME = key
         POSITIVE_LABELS = pos_sounds[key]
         labs[FULL_NAME] = 1.0 * get_select_vector(labelled_csv, POSITIVE_LABELS)
-    print(labs)
+
     y_pool = labs.values
 
 
@@ -427,9 +471,12 @@ for idx in range(n_queries):
         X=X_pool[query_idx], y=y_pool, only_new=True,
         verbose=1
     )
+    model_accuracy.append(learner.score(X_test,y_test))
+    query_list.append(idx)
     # remove queried instance from pool
     X_pool = np.delete(X_pool, query_idx, axis=0)
 
-
-
-
+print("Acc: ",model_accuracy)
+print("Query: ",query_list)
+plt.plot(query_list,model_accuracy)
+plt.show()
