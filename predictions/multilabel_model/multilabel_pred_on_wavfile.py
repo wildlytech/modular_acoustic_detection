@@ -69,6 +69,9 @@ def main(predictions_cfg_json, path_for_wavfile):
     ##############################################################################
           # Implementing using the keras usual training techinque
     ##############################################################################
+    colnames = []
+    for label in CONFIG_DATAS["labels"]:
+        colnames.append(label["aggregatePositiveLabelName"])
 
     CLF2_TRAIN_PREDICTION = []
     CLF2_TRAIN_PREDICTION_PROB = []
@@ -84,7 +87,8 @@ def main(predictions_cfg_json, path_for_wavfile):
     ##############################################################################
           # Print results
     ##############################################################################
-    results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB))
+    results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB),columns = colnames)
+
     print(results)
 
 if __name__ == "__main__":
