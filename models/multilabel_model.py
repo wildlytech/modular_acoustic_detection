@@ -205,72 +205,26 @@ def import_dataframes(dataframe_file_list,
 
             df = pickle.load(file_obj)
 
-        # Filtering the sounds that are exactly 10 seconds
-        # Examples should be exactly 10 seconds. Anything else
-        # is not a valid input to the model
-        df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+            # Filtering the sounds that are exactly 10 seconds
+            # Examples should be exactly 10 seconds. Anything else
+            # is not a valid input to the model
+            df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
-        final_dfs = []
-
-        '''for key in positive_label_filter_arr.keys():
-
-            positive_filter = positive_label_filter_arr[key]
-            if key in negative_label_filter_arr.keys():
-                negative_filter = negative_label_filter_arr[key]
-            else:
-                negative_filter = None
-            # Only use examples that have a label in label filter array
-
-            positive_example_select_vector = get_select_vector(df, positive_filter)
-            positive_examples_df = df.loc[positive_example_select_vector]
-
-            # This ensures there no overlap between positive and negative examples
-            negative_example_select_vector = ~positive_example_select_vector
-            if negative_filter is not None:
-                # Exclude even further examples that don't fall into the negative label filter
-                negative_example_select_vector &= get_select_vector(df, negative_filter)
-            negative_examples_df = df.loc[negative_example_select_vector]
-
-            # No longer need df after this point
-
-            train_positive_examples_df, test_positive_examples_df = \
-                    split_and_subsample_dataframe(dataframe=positive_examples_df,
-                                                  validation_split=validation_split,
-                                                  subsample=input_file_dict["subsample"])
-
-            del positive_examples_df
-
-            train_negative_examples_df, test_negative_examples_df = \
-                    split_and_subsample_dataframe(dataframe=negative_examples_df,
-                                                  validation_split=validation_split,
-                                                  subsample=input_file_dict["subsample"])
-
-            del negative_examples_df
+            train_file_examples_df, test_file_examples_df = \
+                        split_and_subsample_dataframe(dataframe=df,
+                              validation_split=validation_split,
+                              subsample=input_file_dict["subsample"])
 
             # append to overall list of examples
+            list_of_train_dataframes.append(train_file_examples_df)
+            list_of_test_dataframes.append(test_file_examples_df)
 
-            list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
+    train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
+    test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
 
-
-
-            list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
-
-
-        train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
-        final_dfs_train.append(train_df)
-        test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
-        final_dfs_test.append(test_df)'''
-        final_dfs.append(df)
-
-    DF = pd.concat(final_dfs,ignore_index=True)
-    DF_TRAIN,DF_TEST = split_and_subsample_dataframe(dataframe=DF,
-                                                     validation_split=validation_split,
-                                                     subsample=input_file_dict["subsample"])
-    #DF_TRAIN = pd.concat(final_dfs_train, ignore_index=True)
-    #DF_TEST = pd.concat(final_dfs_test, ignore_index=True)
     print("Import done.")
 
-    return DF_TRAIN, DF_TEST
+    return train_df, test_df
 
 
 DF_TRAIN, DF_TEST = import_dataframes(dataframe_file_list=config["train"]["inputDataFrames"],
