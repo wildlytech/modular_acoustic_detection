@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from tensorflow.compat.v1.keras import backend as K
 from predictions.binary_relevance_model import generate_before_predict_BR
-from predictions.multilabel_model import multilabel_pred
+from . import multilabel_pred
 
 def predict_on_embedding(embedding, config_datas):
     '''
