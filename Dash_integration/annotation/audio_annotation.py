@@ -5,6 +5,7 @@ import argparse
 import ast
 import base64
 import csv
+import cv2
 import dash
 import dash.dependencies
 from dash.dependencies import Input, Output
@@ -12,11 +13,12 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
 import glob
-import matplotlib.pyplot as plt
+import librosa
 import numpy as np
 import os
 import pandas as pd
-from scipy.io import wavfile
+import plotly.express
+import plotly.graph_objs as go
 import sys
 
 from predictions.binary_relevance_model import generate_before_predict_BR,\
@@ -33,7 +35,6 @@ FILE_COUNT = 0
 CONFIG_DATAS = {}
 CSV_FILENAME = "New_annotation.csv"
 CHECKLIST_DISPLAY = ["Bird", "Wind", "Vehicle", "Honking", "Conversation"]
-
 
 # WHEN SUBMITTED FROM NEXT CONTENT
 LABELS_LIST_CHECKLIST_NEXT = []
@@ -140,7 +141,7 @@ def model_prediction_tab():
     global NUMBER_OF_WAVFILES, FILE_COUNT, CONFIG_DATAS
 
     encoded_image_uploaded_file = NUMBER_OF_WAVFILES[FILE_COUNT]
-    encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read())
+    encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read()).decode()
     embeddings = generate_before_predict_BR.main(NUMBER_OF_WAVFILES[FILE_COUNT], 0, 0, 0)
 
     ##############################################################################
@@ -216,26 +217,29 @@ def spectrogram_tab():
 
     global NUMBER_OF_WAVFILES, FILE_COUNT
 
-    sample_rate, samples = wavfile.read(NUMBER_OF_WAVFILES[FILE_COUNT])
-    try:
-        if samples.shape[1] == 2:
-            samples = np.array([i[0] for i in samples])
-    except:
-        samples = samples
-    plt.specgram(samples[:],
-                 Fs=sample_rate,
-                 xextent=(0, int(len(samples)/sample_rate)),
-                 mode="psd",
-                 cmap=plt.get_cmap('hsv'),
-                 noverlap=5,
-                 scale_by_freq=True)
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [sec]')
-    plt.savefig(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
-    encoded_image = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png", 'rb').read())
-    os.remove(NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1][:-4]+".png")
+    clip, sr = librosa.load(NUMBER_OF_WAVFILES[FILE_COUNT])
 
-    return html.Div([html.Img(src='data:image/png;base64,{}'.format(encoded_image))],
+    hop_length = int(0.01*sr)
+    window_length = int(0.025*sr)
+    n_fft = int(np.exp2(np.ceil(np.log2(window_length))))
+
+    spec = librosa.feature.melspectrogram(clip, sr,
+                                        n_mels=64,
+                                        n_fft=n_fft,
+                                        hop_length=hop_length,
+                                        win_length=window_length)
+    spec_db = librosa.power_to_db(spec, ref=np.max)
+
+    spec_db = cv2.resize(spec_db, (0, 0), fx=1, fy=4)
+
+    fig = plotly.express.imshow(spec_db, origin='lower',
+            title = 'Spectrogram: ' + \
+                    NUMBER_OF_WAVFILES[FILE_COUNT].split('/')[-1],
+            labels = {'x': 'Time (ms)',
+                      'y': 'Frequency (Hz / {:.2f})'.format(sr/2/spec_db.shape[0]),
+                      'color': 'Decibel'})
+
+    return html.Div([dcc.Graph(figure=fig)],
                     style={"margin-top":"10%",
                            "text-align":"center"})
 
@@ -262,7 +266,8 @@ def annotation_tab(initial):
                 NUMBER_OF_WAVFILES = TOTAL_FOLDER_WAV_FILES
             print("total wavfiles :", len(NUMBER_OF_WAVFILES))
 
-        encoded_image_to_play = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT], 'rb').read())
+        encoded_image_to_play = base64.b64encode(open(NUMBER_OF_WAVFILES[FILE_COUNT], 'rb').read()).decode()
+
         dataframe = pd.DataFrame()
         dataframe["Labels Name"] = CHECKLIST_DISPLAY
         return html.Div([html.Div([html.Br(),

@@ -7,9 +7,9 @@
 *Note*: Recommended to install Anaconda to manage the different environment and to avoid package/library version conflicts
 Download: [Download Anaconda](https://www.anaconda.com/distribution/)
 
-- ##### Create a separate environment with python 3.8 Version
+- ##### Create a separate environment with python 3.7 Version
 ```shell
-$ conda create -n env_name python=3.8
+$ conda create -n env_name python=3.7
 ```
 **Note**: Change ```env_name``` to your convenient name
 

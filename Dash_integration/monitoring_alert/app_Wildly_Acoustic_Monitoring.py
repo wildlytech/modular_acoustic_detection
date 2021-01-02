@@ -798,7 +798,7 @@ def parse_contents(contents, filename, date):
         os.makedirs(directory_path)
     save_file(filename, contents)
     filepath = directory_path + filename
-    encoded_image_uploaded_file = base64.b64encode(open(filepath, 'rb').read())
+    encoded_image_uploaded_file = base64.b64encode(open(filepath, 'rb').read()).decode()
 
     bar_graph_info = get_prediction_bar_graph(filepath)
 
@@ -1199,7 +1199,7 @@ def callbacks(_app):
         pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
         if indices is not None and indices != []:
             path = "FTP_downloaded/"+str(pred_df.iloc[indices[0]]["File Name"])
-            encoded_image_to_play = base64.b64encode(open(path, 'rb').read())
+            encoded_image_to_play = base64.b64encode(open(path, 'rb').read()).decode()
             return html.Div([
                 html.Br(),
                 html.Audio(id='myaudio',
@@ -1236,7 +1236,7 @@ def callbacks(_app):
         pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
         if indices is not None and indices != []:
             path = "FTP_downloaded/"+str(pred_df.iloc[indices[0]]["File Name"])
-            encoded_image_to_play = base64.b64encode(open(path, 'rb').read())
+            encoded_image_to_play = base64.b64encode(open(path, 'rb').read()).decode()
             return html.Div([html.Br(),
                              html.Audio(id='myaudio',
                                         src='data:audio/WAV;base64,{}'.format(encoded_image_to_play),
@@ -1310,6 +1310,7 @@ def callbacks(_app):
                                          n_clicks=0,
                                          n_clicks_timestamp=0,
                                          style={'border':'1px solid #FFBF01', "color":"white"})])],
+                             n_clicks = 0,
                              style={"marginTop":"10px"}),
 
 
@@ -1618,8 +1619,14 @@ def callbacks(_app):
             emb = []
             malformed = []
             dum_df = batch_ftp_file_df.copy()
+
+            # If it doesn't exist, create directory for output file
+            path_prefix = "FTP_downloaded/"
+            if not os.path.exists(path_prefix):
+                os.makedirs(path_prefix)
+
             for i in dum_df["File Name"].tolist():
-                path = "FTP_downloaded/"+i
+                path = path_prefix+i
                 if os.path.exists(path):
                     print("path Exists")
                 else:
@@ -1650,7 +1657,7 @@ def callbacks(_app):
                                               list_of_malformed = malformed,
                                               addLineBreak = True)
 
-            elif len(dum_df["File Name"] > 1):
+            elif len(dum_df["File Name"]) > 1:
 
                 whole_pred_prob = []
                 whole_pred = []
