@@ -68,7 +68,6 @@ def main(predictions_cfg_json, path_for_wavfile):
     ##############################################################################
             # Import json data
     ##############################################################################
-    #CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(predictions_cfg_json)
     CONFIG_DATAS = [read_config(file) for file in read_config(predictions_cfg_json)]
     #LABEL_NAMES = list(CONFIG_DATAS.keys())
 
