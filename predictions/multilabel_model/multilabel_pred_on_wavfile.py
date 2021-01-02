@@ -69,7 +69,6 @@ def main(predictions_cfg_json, path_for_wavfile):
             # Import json data
     ##############################################################################
     CONFIG_DATAS = [read_config(file) for file in read_config(predictions_cfg_json)]
-    #LABEL_NAMES = list(CONFIG_DATAS.keys())
 
     ##############################################################################
           # Implementing using the keras usual training techinque
