@@ -72,8 +72,8 @@ def main(predictions_cfg_json, path_for_wavfile):
 
     CLF2_TRAIN_PREDICTION = []
     CLF2_TRAIN_PREDICTION_PROB = []
-    for data in CONFIG_DATAS:
-        for each_embedding in [EMBEDDINGS]:
+    for each_embedding in [EMBEDDINGS]:
+        for data in CONFIG_DATAS:
 
             prediction_probs, prediction_rounded = predict_on_embedding(embedding = each_embedding,
                                                                         config_datas = data)
