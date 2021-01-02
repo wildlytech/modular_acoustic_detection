@@ -268,7 +268,6 @@ print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS / TOTAL_TRAIN_TEST_EXAMPLES)
 ########################################################################
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
-X_TEST_STANDARDIZED = X_TEST / 255
 
 
 
