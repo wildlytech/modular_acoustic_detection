@@ -14,8 +14,6 @@ def predict_on_embedding(embedding, config_datas):
     '''
     Predict on single embedding for audio clip
     '''
-    prediction_probs = []
-    prediction_rounded = []
 
 
     config_data = config_datas
