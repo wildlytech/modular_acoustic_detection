@@ -243,7 +243,7 @@ def main(predictions_cfg_json,
     ##############################################################################
 
     if path_to_save_prediction_csv:
-        DF_TEST.to_csv(path_to_save_prediction_csv)
+        DF_TEST.drop(["features"], axis=1).to_csv(path_to_save_prediction_csv)
 
 if __name__ == "__main__":
 
