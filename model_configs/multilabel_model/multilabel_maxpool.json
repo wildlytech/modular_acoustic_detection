@@ -162,7 +162,7 @@
     },
     "networkCfgJson": "model_configs/multilabel_model/topology/Conv1D500-128x128_Dense500_Dense500_Dense500_Dense7_MaxPool.json",
     "train": {
-        "epochs": 1,
+        "epochs": 100,
         "batchSize": 500,
         "validationSplit": 0.3,
         "inputDataFrames": [
