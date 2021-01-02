@@ -37,19 +37,17 @@ def predict_on_embedding(embedding, config_datas):
 
     # If the clip is longer then 10 seconds, then predict on multiple 10-second
     # windows within the clip. Take the max probability across all windows.
-    pred_prob = 0
+    prediction_probs = np.zeros(len(config_data["labels"]))
     for index in np.arange(10,embedding.shape[0]+1):
         windowed_embedding = embedding[(index-10):index,:].reshape((1,10*128,1))
-        pred_prob = max(pred_prob, model.predict(windowed_embedding).ravel()[0])
+        window_pred_prob = model.predict(windowed_embedding)
+        prediction_probs = np.array([prediction_probs, window_pred_prob.ravel()]).max(axis=0)
 
     # Clear keras session after all predictions with model
     K.clear_session()
 
-    pred_round = np.round(pred_prob)
-    pred_prob = pred_prob * 100
-
-    prediction_probs.append(pred_prob)
-    prediction_rounded.append(pred_round)
+    prediction_rounded = np.round(prediction_probs)
+    prediction_probs = prediction_probs * 100
 
     return prediction_probs, prediction_rounded
 
