@@ -8,8 +8,8 @@ import pandas as pd
 import numpy as np
 from tensorflow.compat.v1.keras import backend as K
 from predictions.binary_relevance_model import generate_before_predict_BR
-#from . import multilabel_pred
-import multilabel_pred
+from . import multilabel_pred
+
 def predict_on_embedding(embedding, config_datas):
     '''
     Predict on single embedding for audio clip
@@ -70,13 +70,14 @@ def main(predictions_cfg_json, path_for_wavfile):
           # Implementing using the keras usual training techinque
     ##############################################################################
     colnames = []
-    for label in CONFIG_DATAS[0]["labels"]:
-        colnames.append(label["aggregatePositiveLabelName"])
 
     CLF2_TRAIN_PREDICTION = []
     CLF2_TRAIN_PREDICTION_PROB = []
     for each_embedding in [EMBEDDINGS]:
         for data in CONFIG_DATAS:
+
+            for label in data["labels"]:
+                colnames.append(label["aggregatePositiveLabelName"])
 
             prediction_probs, prediction_rounded = predict_on_embedding(embedding = each_embedding,
                                                                         config_datas = data)

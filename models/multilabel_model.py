@@ -126,10 +126,10 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
     return train_df, test_df
 
 def get_select_vector(dataframe, label_filter_arr):
-      """
-      Get the boolean select vector on the dataframe from the label filter
-      """
-      return dataframe['labels_name'].apply(lambda arr: np.any([x.lower() in label_filter_arr for x in arr]))
+    """
+    Get the boolean select vector on the dataframe from the label filter
+    """
+    return dataframe['labels_name'].apply(lambda arr: np.any([x.lower() in label_filter_arr for x in arr]))
 
 def import_dataframes(dataframe_file_list,
                       positive_label_filter_arr,

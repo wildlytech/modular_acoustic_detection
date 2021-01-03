@@ -199,6 +199,6 @@
                 "subsample": 2000
             }
         ],
-        "outputWeightFile": "predictions/multilabel_model/weights/multilabel_model_maxpool_version.h5"
+        "outputWeightFile": "predictions/multilabel_model/weights/multilabel_Conv1D500-128x128_Dense500_Dense500_Dense500_Dense7_MaxPool.h5"
     }
 }
