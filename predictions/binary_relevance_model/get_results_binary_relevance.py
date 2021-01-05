@@ -75,15 +75,15 @@ def main(predictions_cfg_json,
          save_misclassified_examples = None,
          path_to_save_prediction_csv = None):
 
-    ##############################################################################
+    ###########################################################################
               # Import json data
-    ##############################################################################
+    ###########################################################################
 
     CONFIG_DATAS = import_predict_configuration_json(predictions_cfg_json)
 
-    ##############################################################################
+    ###########################################################################
           # read the dataframe with feature and labels_name column
-    ##############################################################################
+    ###########################################################################
 
     print("Importing Data...")
     with open(path_for_dataframe_with_features, "rb") as file_obj:
@@ -94,9 +94,9 @@ def main(predictions_cfg_json,
 
     if IS_DATAFRAME_LABELED:
         print("Categorizing labels in dataframe...")
-        ##############################################################################
+        #######################################################################
                 # Check if labels fall into positive label designation
-        ##############################################################################
+        #######################################################################
         LABELS_BINARIZED = pd.DataFrame()
 
         for label_name in list(CONFIG_DATAS.keys()):
@@ -110,30 +110,30 @@ def main(predictions_cfg_json,
             LABELS_BINARIZED[label_name] = 1.0 * DATA_FRAME['labels_name'].apply( \
                                            lambda arr: np.any([x.lower() in positiveLabels for x in arr]))
 
-    ##############################################################################
+    ###########################################################################
           # Filtering the sounds that are exactly 10 seconds
-    ##############################################################################
+    ###########################################################################
     DF_TEST = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
 
     if IS_DATAFRAME_LABELED:
         LABELS_FILTERED = LABELS_BINARIZED.loc[DF_TEST.index, :]
 
 
-    ##############################################################################
+    ###########################################################################
           # preprecess the data into required structure
-    ##############################################################################
+    ###########################################################################
     X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 
 
-    ##############################################################################
+    ###########################################################################
       # reshaping the test data so as to align with input for model
-    ##############################################################################
+    ###########################################################################
     CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
 
 
-    ##############################################################################
+    ###########################################################################
         # Implementing using the keras usual prediction technique
-    ##############################################################################
+    ###########################################################################
 
     for label_name in list(CONFIG_DATAS.keys()):
 
@@ -143,9 +143,9 @@ def main(predictions_cfg_json,
 
         print(("\nLoaded " + label_name + " model from disk"))
 
-        ##############################################################################
+        #######################################################################
               # Predict on test data
-        ##############################################################################
+        #######################################################################
         CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST).ravel()
         CLF2_TEST_PREDICTION = CLF2_TEST_PREDICTION_PROB.round()
 
@@ -155,24 +155,24 @@ def main(predictions_cfg_json,
 
 
         if IS_DATAFRAME_LABELED:
-            ##############################################################################
+            ###################################################################
                     # Target for the test labels
-            ##############################################################################
+            ###################################################################
             CLF2_TEST_TARGET = LABELS_FILTERED[label_name].values
             print('Target shape:', CLF2_TEST_TARGET.shape)
 
-            ##############################################################################
+            ###################################################################
                     # To get the Misclassified examples
-            ##############################################################################
+            ###################################################################
             DF_TEST.insert(len(DF_TEST.columns), label_name+'_Actual', CLF2_TEST_TARGET)
             MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
             print('\nMisclassified number of examples for '+ label_name + " :", \
                   DF_TEST.loc[MISCLASSIFED_ARRAY].shape[0])
 
 
-            ##############################################################################
+            ###################################################################
                     #  misclassified examples are to be saved
-            ##############################################################################
+            ###################################################################
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \
                               "misclassified_examples_br_model_"+label_name+".pkl"
@@ -180,9 +180,9 @@ def main(predictions_cfg_json,
                     pickle.dump(DF_TEST[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 
 
-            ##############################################################################
+            ###################################################################
                     # Print confusion matrix and classification_report
-            ##############################################################################
+            ###################################################################
             print('Confusion Matrix for '+ label_name)
             print('============================================')
             RESULT_ = confusion_matrix(CLF2_TEST_TARGET,
@@ -190,9 +190,9 @@ def main(predictions_cfg_json,
             print(RESULT_)
 
 
-            ##############################################################################
+            ###################################################################
                   # print classification report
-            ##############################################################################
+            ###################################################################
             print('Classification Report for '+ label_name)
             print('============================================')
             CL_REPORT = classification_report(CLF2_TEST_TARGET,
@@ -200,34 +200,34 @@ def main(predictions_cfg_json,
             print(CL_REPORT)
 
 
-            ##############################################################################
+            ###################################################################
                   # calculate accuracy and hamming loss
-            ##############################################################################
+            ###################################################################
             ACCURACY = accuracy_score(CLF2_TEST_TARGET,
                                       CLF2_TEST_PREDICTION)
             HL = hamming_loss(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION)
             print('Hamming Loss :', HL)
             print('Accuracy :', ACCURACY)
 
-    ##############################################################################
+    ###########################################################################
           # save the prediction in pickle format
-    ##############################################################################
+    ###########################################################################
 
     if path_to_save_prediction_csv:
         DF_TEST.drop(["features"], axis=1).to_csv(path_to_save_prediction_csv)
 
 if __name__ == "__main__":
 
-    ##############################################################################
+    ###########################################################################
             # Description and Help
-    ##############################################################################
+    ###########################################################################
     DESCRIPTION = 'Gets the predictions of sounds. \n \
                    Input base dataframe file path \
                    with feature (Embeddings) and labels_name column in it.'
 
-    ##############################################################################
+    ###########################################################################
             # Parsing the inputs given
-    ##############################################################################
+    ###########################################################################
 
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()

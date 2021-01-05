@@ -261,9 +261,9 @@ def get_csv_data(target_sounds):
 
     return train, train_label_binarized
 
-############################################################################################
+###############################################################################
             # Downloads the youtube audio files
-############################################################################################
+###############################################################################
 def download_clip(YTID, start_seconds, end_seconds, target_path):
     """
     Downloads the youtube audio files
@@ -302,9 +302,9 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
 
 
 
-############################################################################################
+###############################################################################
                 # To download the audio files from youtube
-############################################################################################
+###############################################################################
 def download_data(target_sounds_list, target_path):
     """
     Get the data necessary for downloading audio files

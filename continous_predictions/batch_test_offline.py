@@ -57,10 +57,10 @@ def start_batch_run_ftp_live(path_for_folder):
                  "Tools_probability", "dBFS"]
 
 
-    #############################################################################
+    ###########################################################################
                 # Check if the csv file is already existing or not.
                 # If it is existing then append the result to same csv file
-    #############################################################################
+    ###########################################################################
     if os.path.exists(CSV_FILENAME):
         data_read = pd.read_csv(CSV_FILENAME)
         list_of_files_predicted = data_read['FileNames'].tolist()
@@ -92,9 +92,9 @@ def start_batch_run_ftp_live(path_for_folder):
                 else:
                     pass
 
-    #############################################################################
+    ###########################################################################
             # Is there is no csv file then create one and write
-    #############################################################################
+    ###########################################################################
     else:
         with open(CSV_FILENAME, "w") as file_object:
             wav_information_object = csv.writer(file_object)

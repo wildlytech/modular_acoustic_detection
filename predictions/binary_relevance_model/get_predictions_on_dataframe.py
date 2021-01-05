@@ -6,16 +6,16 @@ from . import get_results_binary_relevance
 
 if __name__ == "__main__":
 
-    ##############################################################################
+    ###########################################################################
             # Description and Help
-    ##############################################################################
+    ###########################################################################
     DESCRIPTION = 'Gets the predictions of sounds. \n \
                    Input base dataframe file path \
                    with feature (Embeddings) and labels_name column in it.'
 
-    ##############################################################################
+    ###########################################################################
             # Parsing the inputs given
-    ##############################################################################
+    ###########################################################################
 
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
