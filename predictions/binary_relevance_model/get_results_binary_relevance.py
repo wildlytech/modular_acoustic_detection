@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import pickle
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-import sys
 from youtube_audioset import get_recursive_sound_names
 
 def import_predict_configuration_json(predictions_cfg_json):
@@ -124,7 +123,6 @@ def main(predictions_cfg_json,
           # preprecess the data into required structure
     ##############################################################################
     X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
-    X_TEST_STANDARDIZED = X_TEST / 255
 
 
     ##############################################################################

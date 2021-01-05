@@ -2,7 +2,6 @@
 import argparse
 from pydub import AudioSegment
 import glob
-from colorama import Fore
 import os
 
 def convert_files_directory(path_for_mp3_files, path_to_save_wavfiles):

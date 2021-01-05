@@ -18,8 +18,6 @@ import numpy as np
 import os
 import pandas as pd
 import plotly.express
-import plotly.graph_objs as go
-import sys
 
 from predictions.binary_relevance_model import generate_before_predict_BR,\
                                                get_results_binary_relevance,\
@@ -482,7 +480,7 @@ def next_audio_content_annotation(rows, columns, indices, value_drop):
     """
     Displaying Selected Annotations on the text area : Next Content
     """
-    global LABELS_LIST_CHECKLIST_NEXT, LABELS_LIST_DROPDOWN_NEXT
+    global LABELS_LIST_CHECKLIST_INITIAL, LABELS_LIST_CHECKLIST_NEXT, LABELS_LIST_DROPDOWN_NEXT
     pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
     LABELS_LIST_CHECKLIST_INITIAL = []
     if indices is not None and indices != []:

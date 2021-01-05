@@ -2,7 +2,6 @@
 Testing a BR - Model
 """
 import argparse
-import pickle
 import pandas as pd
 import numpy as np
 from tensorflow.compat.v1.keras import backend as K

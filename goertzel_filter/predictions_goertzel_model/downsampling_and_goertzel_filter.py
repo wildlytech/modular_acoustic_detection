@@ -14,7 +14,6 @@
 # To calculate Pi value
 import math
 # To log the time elapsed
-import time
 # To read the wavfile
 from scipy.io import wavfile
 # To initialize the lists

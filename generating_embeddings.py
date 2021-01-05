@@ -38,9 +38,6 @@ import sys
 import pickle
 import glob
 import os
-import numpy as np
-from scipy.io import wavfile
-import six
 import tensorflow.compat.v1 as tf
 
 VGGISH_PATH = 'externals/tensorflow_models/research/audioset/vggish/'

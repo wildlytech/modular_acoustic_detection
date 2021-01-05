@@ -3,7 +3,6 @@ Training a Binary Output model.
 Impact Sounds = 1
 Ambient SOunds = 0
 """
-import sys
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelBinarizer
@@ -14,7 +13,7 @@ from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatt
 from tensorflow.compat.v1.keras.optimizers import RMSprop
 from youtube_audioset import get_recursive_sound_names, get_all_sound_names
 from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, \
-                             WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS, AMBIENT_SOUNDS, IMPACT_SOUNDS
+                             WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS
 import balancing_dataset
 
 

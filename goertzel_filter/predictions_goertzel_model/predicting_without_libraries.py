@@ -103,7 +103,7 @@ class ConvolutionalNeuralNetwork(object):
         """
         try:
             apply_relu = [0 if arb < 0 else arb for arb in data]
-        except (TypeError, ValueError) as error:
+        except (TypeError, ValueError):
             apply_relu = [0 if arb < 0 else arb for arb in data[0]]
         return np.array(apply_relu, dtype='float64').tolist()
 
@@ -194,7 +194,7 @@ class FullyConnectedLayer(object):
         """
         try:
             apply_relu = [0 if arb < 0 else arb for arb in data]
-        except (TypeError, ValueError) as error:
+        except (TypeError, ValueError):
             apply_relu = [0 if arb < 0 else arb for arb in data[0]]
         return np.array(apply_relu, dtype='float64').tolist()
 
@@ -230,7 +230,7 @@ class FullyConnectedLayer(object):
 
 
 
-#############################################################################   
+#############################################################################
                 # Implementation of Maxpool Layer
 #############################################################################
 class MaxPoolingLayer(object):
@@ -392,7 +392,7 @@ def flag_for_downsampling(audiofilepath):
 
         # Normalizing the data
         goertzel_components = goertzel_components/np.linalg.norm(goertzel_components)
-        
+
         # Predicting using the goertzel model for each second
         for each_second in [goertzel_components]:
             each_second = each_second.T

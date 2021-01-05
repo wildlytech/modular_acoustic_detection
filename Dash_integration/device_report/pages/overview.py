@@ -3,9 +3,7 @@ import dash_html_components as html
 import plotly.graph_objs as go
 import glob
 from ..utils import Header, make_dash_table
-from plotly import tools
 import pandas as pd
-import pathlib
 import numpy as np
 from datetime import datetime
 
@@ -153,16 +151,6 @@ def get_dataframe_for_plotting_transmission(file_index):
     df_date = filter_on_date(df,date_values)
     df_date = get_data_specific_time(df_date)
     return df_date
-
-
-def get_dataframe_for_plotting_recording(file_index):
-    dataframe = read_csv_file(csv_files1[file_index])
-    df, date_values = get_data_specific_date(dataframe)
-    df_date = filter_on_date(df,date_values)
-    df_date = get_data_specific_time(df_date)
-    return df_date
-
-
 
 def get_dictionary(csv_files):
     req_dict = dict()

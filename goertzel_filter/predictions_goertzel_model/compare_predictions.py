@@ -2,11 +2,10 @@
 Compares the predictions made using model libaries and without libraries
 """
 import argparse
-import tensorflow.compat.v1.keras as keras
-from tensorflow.compat.v1.keras.models import Sequential, Model
+from tensorflow.compat.v1.keras.models import Model
 from tensorflow.compat.v1.keras.layers import Input
 from . import predicting_without_libraries
-from tensorflow.compat.v1.keras.layers import Dense, Conv1D, Conv2D, MaxPooling1D, Flatten, AveragePooling1D, TimeDistributed, MaxPooling2D
+from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, TimeDistributed, MaxPooling2D
 from . import audiomoth_function_for_goertzel_model
 
 

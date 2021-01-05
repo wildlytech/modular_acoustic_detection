@@ -1,9 +1,7 @@
 from bs4 import BeautifulSoup as bs
-from pytube import YouTube
 import requests
 import os
 from subprocess import check_call, CalledProcessError
-import pandas as pd 
 
 
 

@@ -7,7 +7,6 @@ in later stage
 import subprocess
 import os
 import glob
-import sys
 import argparse
 
 

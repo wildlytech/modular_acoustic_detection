@@ -19,10 +19,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import dash_table
-import pymongo
 from pymongo import MongoClient
 import re
-import sys
 
 from predictions.binary_relevance_model import generate_before_predict_BR,\
                                                get_results_binary_relevance,\
@@ -590,7 +588,6 @@ def start_batch_run_ftp_live(path_for_folder):
     print('len:', len(all_wav_files))
     dum_df = pd.DataFrame()
     dum_df["FileNames"] = all_wav_files
-    malformed_specific = []
     tag_names = ["FileNames"] + list(CONFIG_DATAS.keys())
 
 

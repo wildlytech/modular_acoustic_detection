@@ -15,7 +15,6 @@ import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-import sys
 
 from youtube_audioset import get_recursive_sound_names
 

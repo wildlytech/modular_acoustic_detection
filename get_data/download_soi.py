@@ -2,12 +2,10 @@
 Downloads Sounds of Interest audio files amoung the list
 """
 import argparse
-import sys
 from subprocess import check_call, CalledProcessError
 import threading
 import pickle
 import os
-import sys
 import numpy as np
 import pandas as pd
 from pydub import AudioSegment

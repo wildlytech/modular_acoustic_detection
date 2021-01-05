@@ -1,4 +1,3 @@
-import numpy
 import glob
 import pandas as pd
 import pickle

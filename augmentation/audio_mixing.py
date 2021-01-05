@@ -2,9 +2,7 @@ import sys
 import os
 import argparse
 import pickle
-import pydub
 import pandas as pd
-import numpy as np
 from scipy.io import wavfile
 from pydub import AudioSegment
 import glob
@@ -70,8 +68,8 @@ def balanced_data():
         pure_mot = pickle.load(file_obj)
     with open(PATH_FOR_DATA+'pure/Human_sounds/pure_hum_46525.pkl', 'rb') as file_obj:
         pure_hum = pickle.load(file_obj)
-    with open(PATH_FOR_DATA+'pure/Wood/pure_wod_1115.pkl', 'rb') as file_obj:
-        pure_wod = pickle.load(file_obj)
+    # with open(PATH_FOR_DATA+'pure/Wood/pure_wod_1115.pkl', 'rb') as file_obj:
+    #     pure_wod = pickle.load(file_obj)
     with open(PATH_FOR_DATA+'pure/Nature_sounds/pure_nat_13527.pkl', 'rb') as file_obj:
         pure_nat = pickle.load(file_obj)
     with open(PATH_FOR_DATA+'pure/Domestic/pure_dom_9497.pkl', 'rb') as file_obj:

@@ -36,7 +36,6 @@ import sys
 import tensorflow.compat.v1 as tf
 from tensorflow.compat.v1.keras import backend as K
 from . import model_function_binary_relevance
-import os
 
 VGGISH_PATH = 'externals/tensorflow_models/research/audioset/vggish/'
 sys.path.insert(0, VGGISH_PATH)
@@ -64,9 +63,6 @@ def main(wav_file, flag_for_data, data,model_type):
     also path for writing the embeddings or pickle files
     """
     if flag_for_data == 0:
-        if wav_file:
-            pkl = wav_file[:-4]+'.pkl'
-            # print (pkl)
         examples_batch = vggish_input.wavfile_to_examples(wav_file)
 
 

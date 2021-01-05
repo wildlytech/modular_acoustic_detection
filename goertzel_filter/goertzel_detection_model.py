@@ -3,7 +3,6 @@ Detection of Ambient Vs Impact sounds
 using the Goertzel frequency components
 ie [800, 1600, 2000, 2300]
 """
-import sys
 import pickle
 import argparse
 import pandas as pd
@@ -14,12 +13,10 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from tensorflow.compat.v1.keras.models import Sequential
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, TimeDistributed, MaxPooling2D
-from tensorflow.compat.v1.keras.layers import Lambda
 from tensorflow.compat.v1.keras.optimizers import RMSprop
-from tensorflow.compat.v1.keras.layers import Dropout
 from . import balancing_dataset_goertzel
-from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS, WILD_ANIMALS,DOMESTIC_SOUNDS, TOOLS_SOUNDS
-from youtube_audioset import get_data, get_recursive_sound_names, get_all_sound_names
+from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS, DOMESTIC_SOUNDS, TOOLS_SOUNDS
+from youtube_audioset import get_recursive_sound_names, get_all_sound_names
 
 
 

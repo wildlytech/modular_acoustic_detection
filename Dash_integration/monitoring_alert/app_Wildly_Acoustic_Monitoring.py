@@ -2,7 +2,6 @@
 """
 import argparse
 from time import strptime
-import itertools
 import threading
 from io import BytesIO
 from ssl import SSLSocket
@@ -13,11 +12,9 @@ import base64
 import os
 from ftplib import FTP
 import pandas as pd
-import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_daq as daq
 from datetime import datetime
 from datetime import timedelta
 import urllib.request, urllib.parse, urllib.error
@@ -26,7 +23,6 @@ import numpy as np
 import csv
 import re
 import requests
-from scipy.io import wavfile
 
 from predictions.binary_relevance_model import generate_before_predict_BR,\
                                                get_results_binary_relevance,\
@@ -47,7 +43,7 @@ if __name__ == '__main__':
 CONFIG_DATAS = {}
 FTP_PATH = "BNP/"
 NON_SOI = ["[Nature]Vs[EverythingElse]"]
-
+VALUE_INTERVAL = 0
 
 
 ####################################################################################
@@ -757,15 +753,12 @@ def get_wavheader_subchunk1(name,ftp_obj):
         file_header_info = BytesIO(FtpFile(ftp_obj, name).read(264))
 
         riff, size, fformat = struct.unpack('<4sI4s', file_header_info.read(12))
-        chunkoffset = file_header_info.tell()
 
         chunk_header = file_header_info.read(8)
         subchunkid, subchunksize = struct.unpack('<4sI', chunk_header)
-        chunkoffset = file_header_info.tell()
 
         aformat, channels, samplerate, byterate, blockalign, bps = struct.unpack('HHIIHH', \
             file_header_info.read(16))
-        chunkoffset = file_header_info.tell()
 
         wav_header = [riff, size, fformat, subchunkid, \
                       subchunksize, aformat, channels, \
@@ -1413,6 +1406,7 @@ def callbacks(_app):
         global CONFIG_DATAS
         global NON_SOI
         global GLOBAL_STOP_THREAD, directory_threads, t
+        global VALUE_INTERVAL
         if indices is not None and indices != [] and select_dev_clicks >= 1 and not GLOBAL_STOP_THREAD:
             all_directories = pd.DataFrame(rows, columns=[c['name'] for c in columns])
             selected_directories = all_directories.iloc[indices]["Directories"].tolist()

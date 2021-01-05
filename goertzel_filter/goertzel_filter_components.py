@@ -2,7 +2,6 @@
 Generates the multiple target frequency components
 for a single .wav file
 """
-import sys
 import math
 import os
 import argparse
@@ -11,7 +10,6 @@ import glob
 import numpy as np
 import pandas as pd
 import scipy.signal
-from matplotlib import pyplot as plt
 import scipy.io.wavfile
 import resampy
 
