@@ -14,7 +14,7 @@ if __name__ == "__main__":
                    with feature (Embeddings) and labels_name column in it.'
 
     ###########################################################################
-            # Parsing the inputs given
+    # Parsing the inputs given
     ###########################################################################
 
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)

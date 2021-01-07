@@ -15,14 +15,14 @@ import resampy
 
 
 ###############################################################################
-            # Description
+# Description
 ###############################################################################
 DESCRIPTION = 'Generates the target Goertzel filter components of audio files'
 
 
 
 ###############################################################################
-            # parse the input arguments given from command line
+# parse the input arguments given from command line
 ###############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-audio_files_path', '--audio_files_path', action='store',
@@ -34,7 +34,7 @@ RESULT = PARSER.parse_args()
 
 
 ###############################################################################
-                # set the input arguments
+# set the input arguments
 ###############################################################################
 AUDIO_FILES_PATH = RESULT.audio_files_path
 PATH_TO_GOERTZEL_COMPONENTS = RESULT.path_to_freq_comp
@@ -42,7 +42,7 @@ PATH_TO_GOERTZEL_COMPONENTS = RESULT.path_to_freq_comp
 
 
 ###############################################################################
-    # set the target frequencies are interested to filter out from audio file
+# set the target frequencies are interested to filter out from audio file
 ###############################################################################
 TARGET_FREQUENCIES = [800, 1600, 2000, 2300]
 ACCEPTABLE_SAMPLINGRATE = 48000
@@ -50,7 +50,7 @@ DOWNSAMPLING_FREQUENCY = 8000
 
 
 ###############################################################################
-            # Goertzel Algorithm implementation
+# Goertzel Algorithm implementation
 ###############################################################################
 def Goertzel_filter(sample, sample_rate, freq, number_samples):
     """
@@ -91,7 +91,7 @@ def Goertzel_filter(sample, sample_rate, freq, number_samples):
 
 
 ###############################################################################
-            # Getting the candle stick type of data
+# Getting the candle stick type of data
 ###############################################################################
 def get_candlesticks_data(magnitude_data, sample_rate, time_stamp, length_of_audio_ms):
 
@@ -111,7 +111,7 @@ def get_candlesticks_data(magnitude_data, sample_rate, time_stamp, length_of_aud
     # Create  a dataframe with evry row as time stamp values for a single audio file
     arb_df = pd.DataFrame([[row]], columns=['Time_stamp'])
 
-    #This is optional. If you want all the values into CSV file .
+    # This is optional. If you want all the values into CSV file .
     # arb_df.to_csv('candlesticks_data_new.csv')
     return row, arb_df
 
@@ -119,7 +119,7 @@ def get_candlesticks_data(magnitude_data, sample_rate, time_stamp, length_of_aud
 
 
 ###############################################################################
-            # Batch processing for generating goertzel components
+# Batch processing for generating goertzel components
 ###############################################################################
 def generate_frequency_components():
     """
@@ -134,8 +134,8 @@ def generate_frequency_components():
     wavfiles_path = glob.glob(RESULT.audio_files_path + "*.wav") + glob.glob(RESULT.audio_files_path + "*.WAV")
 
     ###########################################################################
-                    # Iterate through all the wav files.
-                    # Generate goertzel filter components
+    # Iterate through all the wav files.
+    # Generate goertzel filter components
     ###########################################################################
     for audio_path in wavfiles_path:
         try:
@@ -143,7 +143,7 @@ def generate_frequency_components():
 
 
             ###################################################################
-                    # Check for the sampling rate of the audio file
+            # Check for the sampling rate of the audio file
             ###################################################################
             if read_file[1].shape[0] == ACCEPTABLE_SAMPLINGRATE * 10:
                 try:
@@ -156,13 +156,13 @@ def generate_frequency_components():
 
 
                     ###########################################################
-                                # If mono take as it is
+                    # If mono take as it is
                     ###########################################################
                 except:
                     wave_file = np.array(read_file[1])
 
                 ###############################################################
-                            #Print out the details of the audio file
+                # Print out the details of the audio file
                 ###############################################################
                 number_audio = number_audio+1
                 print('Audio FileName :', audio_path.split("/")[-1])
@@ -171,7 +171,7 @@ def generate_frequency_components():
                 mag = []
 
                 ###############################################################
-                    # check if the audio file is already filtered else do it
+                # check if the audio file is already filtered else do it
                 ###############################################################
                 if os.path.exists(PATH_TO_GOERTZEL_COMPONENTS + audio_path.split("/")[-1][:-4]+'.pkl'):
                     pass
@@ -192,7 +192,7 @@ def generate_frequency_components():
 
 
 ###############################################################################
-                # Main function
+# Main function
 ###############################################################################
 if __name__ == "__main__":
     generate_frequency_components()

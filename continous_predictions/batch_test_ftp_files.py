@@ -10,7 +10,7 @@ from . import generate_before_predict_BR
 
 
 ############################################################################
-                # Target Path or Folder in FTP
+# Target Path or Folder in FTP
 ############################################################################
 
 
@@ -20,14 +20,14 @@ HELP = "Give the Required Arguments"
 
 
 ############################################################################
-                # Target Path or Folder in FTP
+# Target Path or Folder in FTP
 ############################################################################
 DEFAULT_CSV_FILENAME = "predictions_FTP_folder.csv"
 FTP_PASSWORD = "********"
 
 
 ############################################################################
-        # Parsing argument
+# Parsing argument
 ############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-ftp_folder_path', '--ftp_folder_path', action='store',
@@ -40,7 +40,7 @@ RESULT = PARSER.parse_args()
 
 
 ############################################################################
-        # Parsing argument
+# Parsing argument
 ############################################################################
 
 if RESULT.ftp_folder_path:
@@ -52,7 +52,7 @@ else:
 
 
 ############################################################################
-        # Check for directory locally to download
+# Check for directory locally to download
 ############################################################################
 def check_directory_to_write_wavfiles():
     """
@@ -66,7 +66,7 @@ def check_directory_to_write_wavfiles():
 
 
 ############################################################################
-            # List only wav files into
+# List only wav files into
 ############################################################################
 def check_for_wav_only(list_values):
     """
@@ -83,7 +83,7 @@ def check_for_wav_only(list_values):
 
 
 ############################################################################
-            # Sort files based on time
+# Sort files based on time
 ############################################################################
 def sorting_files_same_as_upload_order(wav_files_list):
     """
@@ -97,7 +97,6 @@ def sorting_files_same_as_upload_order(wav_files_list):
             # returns last uploaded file's time with utc
             time1 = ftp.voidcmd("MDTM " + name)
             count += 1
-            #print time1[4:], name
             DICT[name] = time1[4:]
     sorted_list = sorted((value, key) for (key, value) in list(DICT.items()))
     sorted_filenames = [element[0] for element in sorted_list]
@@ -108,7 +107,7 @@ def sorting_files_same_as_upload_order(wav_files_list):
 
 
 ############################################################################
-            # Connect ftp server
+# Connect ftp server
 ############################################################################
 def call_for_ftp():
     """

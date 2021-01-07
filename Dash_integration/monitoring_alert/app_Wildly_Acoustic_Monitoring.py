@@ -31,14 +31,14 @@ from predictions.binary_relevance_model import generate_before_predict_BR,\
 
 
 ###############################################################################
-                    # running directly with Python
+# running directly with Python
 ###############################################################################
 if __name__ == '__main__':
     from .utils.app_standalone import run_standalone_app
 
 
 ###############################################################################
-                # FTP path and defining soi
+# FTP path and defining soi
 ###############################################################################
 CONFIG_DATAS = {}
 FTP_PATH = "BNP/"
@@ -47,7 +47,7 @@ VALUE_INTERVAL = 0
 
 
 ###############################################################################
-                # Predefining variables
+# Predefining variables
 ###############################################################################
 GLOBAL_STOP_THREAD = False
 if os.path.exists("downloaded_audio_files/soi_csv_file.csv"):
@@ -58,14 +58,14 @@ else:
 
 
 ###############################################################################
-        # FTP credentials & Message Authorisation token from fast2sms.com
+# FTP credentials & Message Authorisation token from fast2sms.com
 ###############################################################################
 FTP_HOST = '34.211.117.196'
 AUTHORIZATION_TOKEN = "***********"
 
 
 ###############################################################################
-                # Creates dash table format from pandas dataframe format
+# Creates dash table format from pandas dataframe format
 ###############################################################################
 def Table(dataframe, column_name):
     """
@@ -130,7 +130,7 @@ def Table(dataframe, column_name):
 
 
 ###############################################################################
-                # Lists all the directories with timestamps
+# Lists all the directories with timestamps
 ###############################################################################
 def get_directories_listed(ftp_path):
     """
@@ -168,7 +168,7 @@ def get_directories_listed(ftp_path):
 
 
 ###############################################################################
-            # Returns ftp timestamps
+# Returns ftp timestamps
 ###############################################################################
 def last_ftp_time(ftp_path):
     """
@@ -189,7 +189,7 @@ def last_ftp_time(ftp_path):
 
 
 ###############################################################################
-            # Returns directories / device active or inactive
+# Returns directories / device active or inactive
 ###############################################################################
 def active_or_inactive(dir_n_timestamp, directories_time_list):
     """
@@ -208,7 +208,7 @@ def active_or_inactive(dir_n_timestamp, directories_time_list):
 
 
 ###############################################################################
-            # Connect to FTP server
+# Connect to FTP server
 ###############################################################################
 def connect(ftp_path):
     '''
@@ -221,7 +221,7 @@ def connect(ftp_path):
 
 
 ###############################################################################
-            # Returns the deviceid from directory name
+# Returns the deviceid from directory name
 ###############################################################################
 def get_devid_from_dir(dir_name):
     device_id = dir_name.split("_")[0][3:]
@@ -229,7 +229,7 @@ def get_devid_from_dir(dir_name):
 
 
 ###############################################################################
-            # Colors to headers
+# Colors to headers
 ###############################################################################
 def header_colors():
     """
@@ -242,7 +242,7 @@ def header_colors():
 
 
 ###############################################################################
-                # Loop through all the models and get predictions
+# Loop through all the models and get predictions
 ###############################################################################
 def predictions_from_models(wavfile_path, embeddings):
     """
@@ -259,7 +259,7 @@ def predictions_from_models(wavfile_path, embeddings):
     return prediction_probs, prediction_rounded
 
 ###############################################################################
-        # Generates embeddings for each file and calls for predictions
+# Generates embeddings for each file and calls for predictions
 ###############################################################################
 def get_predictions(wavfile_path):
     """
@@ -366,7 +366,7 @@ def get_prediction_bar_graph(filepath):
                                'marginTop': 10})
 
 ###############################################################################
-                    # Saves the audio file / Downloads audio file
+# Saves the audio file / Downloads audio file
 ###############################################################################
 def save_file(name, content):
     """
@@ -378,7 +378,7 @@ def save_file(name, content):
 
 
 ###############################################################################
-            # Removes the duplicate from looping
+# Removes the duplicate from looping
 ###############################################################################
 def get_without_duplicates(dir_name, csv_filename, ftp_obj):
     """
@@ -400,7 +400,7 @@ def get_without_duplicates(dir_name, csv_filename, ftp_obj):
 
 
 ###############################################################################
-            # Creates a directory if not already present
+# Creates a directory if not already present
 ###############################################################################
 def check_path_for_downloading(wavfile_path):
     """
@@ -413,7 +413,7 @@ def check_path_for_downloading(wavfile_path):
 
 
 ###############################################################################
-            # sorts ftp files based on names
+# sorts ftp files based on names
 ###############################################################################
 def sort_on_filenames(files_list):
     """
@@ -442,7 +442,7 @@ def sort_on_filenames(files_list):
 
 
 ###############################################################################
-        # Downloads audio files but checks for already existed one
+# Downloads audio files but checks for already existed one
 ###############################################################################
 def download_files(each_wav_file, path_to_download, blockalign, samplerate,ftp_obj):
     '''
@@ -462,7 +462,7 @@ def download_files(each_wav_file, path_to_download, blockalign, samplerate,ftp_o
 
 
 ###############################################################################
-            # Writes csv with all the information
+# Writes csv with all the information
 ###############################################################################
 def write_csv_prediction(direct_name, filename, device_id, prediction_list, csv_filename):
     """
@@ -487,7 +487,7 @@ def write_csv_prediction(direct_name, filename, device_id, prediction_list, csv_
 
 
 ###############################################################################
-        # Checks if the predicted sounds consist of sound iof interest
+# Checks if the predicted sounds consist of sound iof interest
 ###############################################################################
 def check_for_soi(prediction_list_rounded, labels_aligned):
     """
@@ -510,7 +510,7 @@ def check_for_soi(prediction_list_rounded, labels_aligned):
 
 
 ###############################################################################
-    # Loops over all the directories selected for going through process
+# Loops over all the directories selected for going through process
 ###############################################################################
 def directory_procedure(directory_listing, selected_device, ftp_obj):
     """
@@ -570,7 +570,7 @@ def directory_procedure(directory_listing, selected_device, ftp_obj):
 
 
 ###############################################################################
-                    # Loops over FTP directories for processing: Threads
+# Loops over FTP directories for processing: Threads
 ###############################################################################
 def directory_procedure_threading(directory_listing, selected_device, ftp_obj, phoneno):
     """
@@ -637,7 +637,7 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
 
 
 ###############################################################################
-                # Alert function
+# Alert function
 ###############################################################################
 def get_alerted(wavfile_path, soi_found, prediction_list, phoneNo):
     """
@@ -669,7 +669,7 @@ def get_alerted(wavfile_path, soi_found, prediction_list, phoneNo):
 
 
 ###############################################################################
-                # Checks for FTP size
+# Checks for FTP size
 ###############################################################################
 def check_ftp_wav_file_size(each_wav_file, blockalign, samplerate,ftp_obj):
     '''
@@ -741,7 +741,7 @@ class FtpFile:
 
 
 ###############################################################################
-            # returns wavheader information
+# returns wavheader information
 ###############################################################################
 def get_wavheader_subchunk1(name,ftp_obj):
     '''
@@ -776,7 +776,7 @@ def get_wavheader_subchunk1(name,ftp_obj):
 
 
 ###############################################################################
-                # Parse the single file input
+# Parse the single file input
 ###############################################################################
 
 def parse_contents(contents, filename, date):
@@ -817,7 +817,7 @@ def parse_contents(contents, filename, date):
 
 
 ###############################################################################
-            # Color coding for selected labels
+# Color coding for selected labels
 ###############################################################################
 def get_colored_for_soi_columns(value_list):
     """
@@ -882,7 +882,7 @@ def format_html_data_table(dataframe, list_of_malformed, addLineBreak=False):
 
 
 ###############################################################################
-                # Parsing batch of files uploaded
+# Parsing batch of files uploaded
 ###############################################################################
 def parse_contents_batch(contents, names, dates):
     """
@@ -935,7 +935,7 @@ def parse_contents_batch(contents, names, dates):
 
 
 ###############################################################################
-                # Defining the layout
+# Defining the layout
 ###############################################################################
 def layout():
 
@@ -949,7 +949,7 @@ def layout():
             dcc.Tabs(id='clustergram-tabs', value='graph',
                 children=[
                 ###############################################################
-                                # Monitoring Tab
+                # Monitoring Tab
                 ###############################################################
                 dcc.Tab(
                     label='Monitor Device',
@@ -1028,7 +1028,7 @@ def layout():
                             html.Div(id="graph-output-graph-tab-do-nothing")])]),
 
                 ###############################################################
-                        # Upload Tab
+                # Upload Tab
                 ###############################################################
                 dcc.Tab(
                     label='Upload Data',
@@ -1056,7 +1056,7 @@ def layout():
                         html.Div(id='clustergram-info')])),
 
                 ###############################################################
-                        # FTP server Tab
+                # FTP server Tab
                 ###############################################################
                 dcc.Tab(
                     label='FTP Server',
@@ -1099,7 +1099,7 @@ def layout():
                 ])]),
 
             ###################################################################
-                    # Right side DIV element
+            # Right side DIV element
             ###################################################################
             html.Div(id='clustergram-page-content-right',
                      className='control-tabs-right',
@@ -1125,7 +1125,7 @@ def layout():
                                                             n_intervals=0)])])])
 
 ###############################################################################
-        # Callback for each tab operation
+# Callback for each tab operation
 ###############################################################################
 def callbacks(_app):
     """
@@ -1133,7 +1133,7 @@ def callbacks(_app):
     """
 
     ###########################################################################
-                    # Display based on selection
+    # Display based on selection
     ###########################################################################
     @_app.callback(
         Output('display-all-directories-div', 'children'),
@@ -1178,7 +1178,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # Play selected audio
+    # Play selected audio
     ###########################################################################
     @_app.callback(
         Output('prediction-audio', 'children'),
@@ -1202,7 +1202,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # Disabling div element not required
+    # Disabling div element not required
     ###########################################################################
     @_app.callback(
         Output('prediction-audio', 'style'),
@@ -1215,7 +1215,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # Play option for predicted and selected file
+    # Play option for predicted and selected file
     ###########################################################################
     @_app.callback(
         Output('prediction-audio-upload', 'children'),
@@ -1238,7 +1238,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # disabling div element that is not required
+    # disabling div element that is not required
     ###########################################################################
     @_app.callback(
         Output('prediction-audio-upload', 'style'),
@@ -1251,7 +1251,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # disabling div element that is not required
+    # disabling div element that is not required
     ###########################################################################
     @_app.callback(Output('display-all-directory-on-status-selection-div', 'style'),
             [Input('clustergram-datasets1', 'value')])
@@ -1264,7 +1264,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # disabling div element that is not required
+    # disabling div element that is not required
     ###########################################################################
     @_app.callback(Output('display-directory-on-status-selection', 'style'),
             [Input('clustergram-datasets1', 'value')])
@@ -1277,7 +1277,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # Displays button to run predictions on selection of file
+    # Displays button to run predictions on selection of file
     ###########################################################################
     @_app.callback(
         Output('display-selection-buttons-single-monitor', 'children'),
@@ -1313,7 +1313,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # Displays all the directories of selected status
+    # Displays all the directories of selected status
     ###########################################################################
     @_app.callback(
         Output('display-directory-on-status-selection', 'children'),
@@ -1358,7 +1358,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # callback for upload of single file
+    # callback for upload of single file
     ###########################################################################
     @_app.callback(Output(component_id='graph-output-any', component_property='children'),
                    [Input(component_id='upload-data', component_property='contents')],
@@ -1381,7 +1381,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                    # callback for moniting the drectory with soi
+    # callback for monitoring the directory with soi
     ###########################################################################
     @_app.callback(Output(component_id='graph-output-graph-tab-do-nothing', component_property='style'),
                   [Input(component_id='display-all-directories-datatable-graph-tab', component_property='data'),
@@ -1456,7 +1456,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-            # Refreshs continuously the div element to display predictions
+    # Refreshs continuously the div element to display predictions
     ###########################################################################
     @_app.callback(Output(component_id='graph-output-graph-tab', component_property='children'),
                    [Input("selected-all-active-devices-graph-tab", "n_clicks"),
@@ -1556,7 +1556,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                    # callback to stop monitoring
+    # callback to stop monitoring
     ###########################################################################
     @_app.callback(Output(component_id='button-to-stop-threads', component_property='disable'),
                    [Input("button-to-stop-threads", "n_clicks")])
@@ -1582,7 +1582,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                    # Disabling div elements that are not required
+    # Disabling div elements that are not required
     ###########################################################################
     @_app.callback(
         Output('button-stop-threads', 'style'),
@@ -1597,7 +1597,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                    #  Batch processing of the ftp files
+    #  Batch processing of the ftp files
     ###########################################################################
     @_app.callback(
         Output('graph-output-ftp', 'children'),
@@ -1683,7 +1683,7 @@ def callbacks(_app):
 
 
     ###########################################################################
-                # Disabling div elements that are not required
+    # Disabling div elements that are not required
     ###########################################################################
     @_app.callback(
         Output('graph-output-ftp', 'style'),
@@ -1717,12 +1717,12 @@ def callbacks(_app):
 if __name__ == '__main__':
 
     ###########################################################################
-            # Description and Help
+    # Description and Help
     ###########################################################################
     DESCRIPTION = 'Runs the Audio Annotation Tool.'
 
     ###########################################################################
-            # Parsing the inputs given
+    # Parsing the inputs given
     ###########################################################################
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
@@ -1743,14 +1743,14 @@ if __name__ == '__main__':
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
     ###########################################################################
-            # Import json data and get ftp credentials
+    # Import json data and get ftp credentials
     ###########################################################################
     CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(PARSED_ARGS.predictions_cfg_json)
     FTP_USERNAME = PARSED_ARGS.ftp_username
     FTP_PASSWORD = PARSED_ARGS.ftp_password
 
     ###########################################################################
-        # Connecting ftp server and listing all directories
+    # Connecting ftp server and listing all directories
     ###########################################################################
     connect(FTP_PATH)
     DIR_AND_TIME, DIRECTORIES, TIMESTAMPS = get_directories_listed(FTP_PATH)
@@ -1760,7 +1760,7 @@ if __name__ == '__main__':
 
 
     ###########################################################################
-                # Creatin a dataframe to display
+    # Creating a dataframe to display
     ###########################################################################
     DEVIDS = []
     for each in DIRECTORIES:
@@ -1770,7 +1770,7 @@ if __name__ == '__main__':
     DATAFRAME_REQUIRED["Status"] = STATUS
 
 ###############################################################################
-        # only declare app/server if the file is being run directly
+# only declare app/server if the file is being run directly
 ###############################################################################
 if 'DASH_PATH_ROUTING' in os.environ or __name__ == '__main__':
     app = run_standalone_app(layout, callbacks, header_colors, __file__)

@@ -3,7 +3,7 @@ import dash_core_components as dcc
 
 
 ###############################################################################
-                # consolidation of the header
+# consolidation of the header
 ###############################################################################
 def Header(app):
     """
@@ -14,11 +14,11 @@ def Header(app):
 
 
 ###############################################################################
-                # Returns the heder of the app
+# Returns the header of the app
 ###############################################################################
 def get_header(app):
     """
-    Returns the heder of the app
+    Returns the header of the app
     """
     header = html.Div(
         [html.Div(
@@ -51,7 +51,7 @@ def get_header(app):
 
 
 ###############################################################################
-                # Menu options
+# Menu options
 ###############################################################################
 def get_menu():
     """
@@ -101,7 +101,7 @@ def get_menu():
 
 
 ###############################################################################
-        # Return a dash definition of an HTML table for a Pandas dataframe
+# Return a dash definition of an HTML table for a Pandas dataframe
 ###############################################################################
 def make_dash_table(dataframe):
     """

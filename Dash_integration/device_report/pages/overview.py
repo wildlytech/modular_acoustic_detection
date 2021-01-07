@@ -11,11 +11,10 @@ csv_files = glob.glob("transmission_details/*.csv")
 
 
 ###############################################################################
-                # BATTERY PERFORMANCE GRAPH HELPER FUNC TAB
+# BATTERY PERFORMANCE GRAPH HELPER FUNC TAB
 ###############################################################################
 
 def SetColor(x):
-#     print "called",x
     if(x > 20):
         return "green"
     elif(x > 15 and x <= 20):
@@ -81,7 +80,7 @@ def plot_function(dataframe):
 
 
 ###############################################################################
-                    # TIME STAMP DIFFERENCE HELPER FUNC
+# TIME STAMP DIFFERENCE HELPER FUNC
 ###############################################################################
 
 def get_time_difference(timestamp1, timestamp2):
@@ -92,7 +91,7 @@ def get_time_difference(timestamp1, timestamp2):
 
 
 ###############################################################################
-                    # Device Transmission HELPER FUNC
+# Device Transmission HELPER FUNC
 ###############################################################################
 
 def plot_function_bar(dataframe,device_value):
@@ -159,7 +158,7 @@ def get_dictionary(csv_files):
     return req_dict
 
 ###############################################################################
-                        # LOCATION HELPER FUNC
+# LOCATION HELPER FUNC
 ###############################################################################
 latitudes=[]
 longitudes=[]
@@ -228,7 +227,7 @@ def get_figure(list_of_devices):
 
 
 ###############################################################################
-                        # LAYOUT FUNC
+# LAYOUT FUNC
 ###############################################################################
 
 def create_layout(app):

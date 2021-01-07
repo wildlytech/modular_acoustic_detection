@@ -12,7 +12,7 @@ import argparse
 
 
 ###############################################################################
-            # Description and Help
+# Description and Help
 ###############################################################################
 
 DESCRIPTION = 'Input the path of the original audio files \
@@ -21,7 +21,7 @@ HELP = 'Supported audio codec formats aac, ac3, mp2, flac, libopus'
 
 
 ###############################################################################
-            # Parsing arguments
+# Parsing arguments
 ###############################################################################
 
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
@@ -37,7 +37,7 @@ RESULT = PARSER.parse_args()
 
 
 ###############################################################################
-            # set the path where compressed files to be written
+# set the path where compressed files to be written
 ###############################################################################
 COMPRESSED_FILES_PATH = RESULT.path_to_compressed_audio_files
 ORIGINAL_WAV_FILES_PATH = glob.glob(RESULT.path_to_original_audio_files+"*.wav") + \
@@ -48,7 +48,7 @@ TYPE_OF_COMPRESSION = RESULT.codec_type
 
 
 ###############################################################################
-                # create separate directories
+# create separate directories
 ###############################################################################
 if not os.path.exists(COMPRESSED_FILES_PATH):
     os.makedirs(COMPRESSED_FILES_PATH)
@@ -56,7 +56,7 @@ if not os.path.exists(COMPRESSED_FILES_PATH):
 
 
 ###############################################################################
-        # Compressing wav files into opus format (It can be changed)
+# Compressing wav files into opus format (It can be changed)
 ###############################################################################
 if ORIGINAL_WAV_FILES_LIST:
     for ORIGINAL_WAV in ORIGINAL_WAV_FILES_LIST:

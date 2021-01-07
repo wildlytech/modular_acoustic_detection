@@ -7,7 +7,7 @@ import glob
 import argparse
 
 ###############################################################################
-                    # Description and Help
+# Description and Help
 ###############################################################################
 DESCRIPTION = 'Input the path of the compressed audio files \
               and path to write the decompressed audio files'
@@ -16,7 +16,7 @@ HELP = 'Decompresses back to wav format'
 
 
 ###############################################################################
-                    # Parse the arguments
+# Parse the arguments
 ###############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-path_to_compressed_audio_files', '--path_to_compressed_audio_files',
@@ -30,7 +30,7 @@ RESULT = PARSER.parse_args()
 
 
 ###############################################################################
-                #give the path where the compressed files are stored
+# give the path where the compressed files are stored
 ###############################################################################
 COMPRESSED_FILES_PATH = RESULT.path_to_compressed_audio_files
 DECOMPRESSED_FILES_PATH = RESULT.path_to_decompressed_audio_files
@@ -39,14 +39,14 @@ TYPE_OF_COMPRESSION = RESULT.codec_type
 
 
 ###############################################################################
-            # Read the balanced data and the get the wav files list
+# Read the balanced data and the get the wav files list
 ###############################################################################
 COMPRESSED_FILES_LIST = glob.glob(COMPRESSED_FILES_PATH+'*.'+TYPE_OF_COMPRESSION)
 
 
 
 ###############################################################################
-                # create seperte directories
+# create seperte directories
 ###############################################################################
 if not os.path.exists(DECOMPRESSED_FILES_PATH):
     os.makedirs(DECOMPRESSED_FILES_PATH)
@@ -54,7 +54,7 @@ if not os.path.exists(DECOMPRESSED_FILES_PATH):
 
 
 ###############################################################################
-                # decompressing opus files back into wav format
+# decompressing opus files back into wav format
 ###############################################################################
 if COMPRESSED_FILES_LIST:
     for COMPRESSED_FILE in COMPRESSED_FILES_LIST:

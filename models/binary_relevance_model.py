@@ -1,7 +1,7 @@
 """
 Traning a Binary Relevance Model
 """
-#Import the necessary functions and libraries
+# Import the necessary functions and libraries
 import argparse
 from colorama import Fore, Style
 from glob import glob
@@ -19,14 +19,14 @@ from sklearn.metrics import confusion_matrix, accuracy_score, classification_rep
 from youtube_audioset import get_recursive_sound_names
 
 #############################################################################
-                # Description and help
+# Description and help
 #############################################################################
 
 DESCRIPTION = "Reads the configuration file to train a particular \
                label and outputs the model"
 
 #############################################################################
-        # Parse the input arguments given from command line
+# Parse the input arguments given from command line
 #############################################################################
 
 ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
@@ -40,7 +40,7 @@ ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
 PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
 #############################################################################
-        # Parse the arguments
+# Parse the arguments
 #############################################################################
 
 with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
@@ -61,7 +61,7 @@ if not os.path.exists(pathToFileDirectory):
     os.makedirs(pathToFileDirectory)
 
 #############################################################################
-        # Get all sound names
+# Get all sound names
 #############################################################################
 
 # Model training only supports using audio set as main ontology
@@ -91,7 +91,7 @@ else:
     NEGATIVE_LABELS = NEGATIVE_LABELS.difference(POSITIVE_LABELS)
 
 #############################################################################
-        # Importing dataframes from the function
+# Importing dataframes from the function
 #############################################################################
 
 
@@ -278,7 +278,7 @@ DF_TRAIN, DF_TEST = \
 
 
 #############################################################################
-        # Turn the target labels into one binarized vector
+# Turn the target labels into one binarized vector
 #############################################################################
 LABELS_BINARIZED_TRAIN = pd.DataFrame()
 LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(DF_TRAIN, POSITIVE_LABELS)
@@ -287,7 +287,7 @@ LABELS_BINARIZED_TEST = pd.DataFrame()
 LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
 
 #############################################################################
-        # print out the number and percentage of each class examples
+# print out the number and percentage of each class examples
 #############################################################################
 
 TOTAL_TRAIN_TEST_EXAMPLES = LABELS_BINARIZED_TRAIN.shape[0] + LABELS_BINARIZED_TEST.shape[0]
@@ -304,7 +304,7 @@ print("NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
 print("PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100.0*TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES/TOTAL_TRAIN_TEST_EXAMPLES))
 
 #############################################################################
-        # preprocess the data into required structure
+# preprocess the data into required structure
 #############################################################################
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TRAIN_STANDARDIZED = X_TRAIN / 255
@@ -314,7 +314,7 @@ X_TEST_STANDARDIZED = X_TEST / 255
 
 
 #############################################################################
-        # create the keras model. It is a maxpool version BR model
+# create the keras model. It is a maxpool version BR model
 #############################################################################
 def create_keras_model():
     """
@@ -385,7 +385,7 @@ MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
 
 #############################################################################
-    # Predict on train and test data
+# Predict on train and test data
 #############################################################################
 CLF2_TRAIN_PREDICTION = MODEL.predict(CLF2_TRAIN).round()
 CLF2_TRAIN_PREDICTION_PROB = MODEL.predict(CLF2_TRAIN)
@@ -395,7 +395,7 @@ CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 
 
 #############################################################################
-    # To get the Misclassified examples
+# To get the Misclassified examples
 #############################################################################
 # DF_TEST['actual_labels'] = np.split(LABELS_BINARIZED_TEST.values, DF_TEST.shape[0])
 # DF_TEST['predicted_labels'] = np.split(CLF2_TEST_PREDICTION, DF_TEST.shape[0])
@@ -405,14 +405,14 @@ MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 
 
 #############################################################################
-        # print misclassified number of examples
+# print misclassified number of examples
 #############################################################################
 print('Misclassified number of examples :', MISCLASSIFED_ARRAY.sum())
 
 
 
 #############################################################################
-        # Print confusion matrix and classification_report
+# Print confusion matrix and classification_report
 #############################################################################
 print(CLF2_TEST_TARGET.shape)
 print('        Confusion Matrix          ')
@@ -424,7 +424,7 @@ print(RESULT)
 
 
 #############################################################################
-        # print classification report
+# print classification report
 #############################################################################
 print('                 Classification Report      ')
 print('============================================')
@@ -434,7 +434,7 @@ print(CL_REPORT)
 
 
 #############################################################################
-        # calculate accuracy and hamming loss
+# calculate accuracy and hamming loss
 #############################################################################
 ACCURACY = accuracy_score(CLF2_TEST_TARGET,
                           CLF2_TEST_PREDICTION)
@@ -445,6 +445,6 @@ print('Accuracy :', ACCURACY)
 
 
 #############################################################################
-        # save model weights. Change as per the model type
+# save model weights. Change as per the model type
 #############################################################################
 MODEL.save_weights(OUTPUT_WEIGHT_FILE)

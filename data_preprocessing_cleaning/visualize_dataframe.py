@@ -6,13 +6,13 @@ import pandas as pd
 import pickle
 
 #############################################################################
-                # Description and help
+# Description and help
 #############################################################################
 
 DESCRIPTION = "Analyzes DataFrame pickle file and outputs relevant information"
 
 #############################################################################
-        # Parse the input arguments given from command line
+# Parse the input arguments given from command line
 #############################################################################
 
 ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)

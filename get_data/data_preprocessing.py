@@ -9,7 +9,7 @@ from colorama import Fore, Style
 
 
 ###########################################################################
-                # Description and help
+# Description and help
 ###########################################################################
 
 DESCRIPTION = "Reads the annotation file and Embeddings \
@@ -19,7 +19,7 @@ HELP = "Input the annotation file path [Label_1, Label_2, Label_3] \n \
 
 
 ###########################################################################
-        #parse the input arguments given from command line
+# parse the input arguments given from command line
 ###########################################################################
 
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
@@ -50,7 +50,7 @@ def read_data_files(filename):
 
 
 ###########################################################################
-                # create dictionary
+# create dictionary
 ###########################################################################
 SET_DICTIONARY = {"crow":"Crow",
                   "honking":"Vehicle",
@@ -98,7 +98,7 @@ SET_DICTIONARY = {"crow":"Crow",
 
 
 ###########################################################################
-            # Helper Function
+# Helper Function
 ###########################################################################
 def check_for_null(array):
     """
@@ -172,7 +172,7 @@ def initiate_preprocessing(data_file_name, path_to_embeddings):
     data = preprocess_data(data_file, LABELS_NAME_COLUMNS, data_file_name)
     data = data.drop(LABELS_NAME_COLUMNS, axis=1)
 
-    #read all the embeddings
+    # read all the embeddings
     if path_to_embeddings:
         data_with_embeddings = read_embeddings(data, path_to_embeddings)
         return data_with_embeddings
@@ -191,7 +191,7 @@ def write_dataframe(path_to_write, dataframe):
         print("Input path to write dataframe")
 
 ###########################################################################
-                # Main Function
+# Main Function
 ###########################################################################
 if __name__ == "__main__":
 

@@ -6,7 +6,7 @@ from subprocess import check_call, CalledProcessError
 
 
 ###########################################################################
-            #Change as per the need
+# Change as per the need
 ###########################################################################
 SEARCH_KEYWORD = "dog barking"
 PATH_TO_WRITE_AUDIO = "youtube_scraped_audio/"
@@ -14,7 +14,7 @@ NUMBER_AUDIOCLIPS_LIMIT = 10
 
 
 ###########################################################################
-    # create the directory path if not present
+# create the directory path if not present
 ###########################################################################
 if not os.path.exists(PATH_TO_WRITE_AUDIO):
     os.mkdir(PATH_TO_WRITE_AUDIO)
@@ -41,7 +41,7 @@ VIDEOS = SOUP.findAll('a', attrs={'class':'yt-uix-tile-link'})
 
 
 ###########################################################################
-    # Create a list of query's with videoID's
+# Create a list of query's with videoID's
 ###########################################################################
 VIDEO_LIST = []
 for v in VIDEOS:

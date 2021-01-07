@@ -115,7 +115,7 @@ def scrape(audio_files_path, bird_species):
     bird_species_name_ws = bird_species.replace(' ', '_')
 
     dir_path = audio_files_path+bird_species_name_ws + '/'
-    #if not exists create directory with bird species name to save audio files
+    # if not exists create directory with bird species name to save audio files
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
@@ -162,7 +162,7 @@ def scrape(audio_files_path, bird_species):
     return dir_path, csv_filename
 
 ########################################################################
-            # Main Function
+# Main Function
 ########################################################################
 if __name__ == "__main__":
 

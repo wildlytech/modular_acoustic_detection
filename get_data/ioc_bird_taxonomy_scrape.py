@@ -119,7 +119,7 @@ def parse_taxonomy(xml_dict, id_prefix, key):
     return ontology_id
 
 ########################################################################
-            # Main Function
+# Main Function
 ########################################################################
 if __name__ == "__main__":
 

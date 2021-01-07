@@ -15,7 +15,7 @@ import resampy
 
 
 ###############################################################################
-                    # Description and Help
+# Description and Help
 ###############################################################################
 DESCRIPTION = 'Input the path of audio file \
               and target frequency to filter '
@@ -24,7 +24,7 @@ HELP = 'Give relevant Inputs'
 
 
 ###############################################################################
-                    # Parse the arguments
+# Parse the arguments
 ###############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-target_frequency_to_filter', '--target_frequency_to_filter',
@@ -37,7 +37,7 @@ RESULT = PARSER.parse_args()
 
 
 ###############################################################################
-            # set the resampling rate, target frequency
+# set the resampling rate, target frequency
 ###############################################################################
 
 RESAMPLING_RATE = 8000
@@ -46,7 +46,7 @@ NUMBER_OF_SECONDS = 10
 
 
 ###############################################################################
-            # read the sample wav file
+# read the sample wav file
 ###############################################################################
 SAMPLE_RATE, READ_FILE = scipy.io.wavfile.read(RESULT.wavfile_path_to_filter)
 WAV_FILE = np.array([i[0] for i in READ_FILE])
@@ -54,7 +54,7 @@ print(WAV_FILE.shape)
 
 
 ###############################################################################
-            # resampling the wave file
+# resampling the wave file
 ###############################################################################
 WAV_FILE = resampy.resample(WAV_FILE, SAMPLE_RATE, RESAMPLING_RATE)
 print(WAV_FILE.shape)
@@ -62,7 +62,7 @@ print(WAV_FILE.shape)
 
 
 ###############################################################################
-            # Goertzel Implementation
+# Goertzel Implementation
 ###############################################################################
 def Goertzel_filter(sample, sample_rate, target_frequency, number_samples):
     """
@@ -100,7 +100,7 @@ def Goertzel_filter(sample, sample_rate, target_frequency, number_samples):
 
 
 ###############################################################################
-        # applying Goertzel on those signals
+# applying Goertzel on those signals
 ###############################################################################
 MAGNITUDE = Goertzel_filter(WAV_FILE, RESAMPLING_RATE,
                             TARGET_FREQUENCY, RESAMPLING_RATE*NUMBER_OF_SECONDS)
@@ -110,7 +110,7 @@ TIME_SPACE = np.linspace(0, NUMBER_OF_SECONDS, RESAMPLING_RATE*10)
 
 
 ###############################################################################
-        # plot the goertzel filter components
+# plot the goertzel filter components
 ###############################################################################
 plt.subplot(2, 1, 1)
 plt.title('(1) speech wave of 44.1KHz sampling rate')

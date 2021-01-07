@@ -10,7 +10,7 @@ PATH_FOR_DATA = 'diff_class_datasets/Datasets/'
 
 
 ###############################################################################
-            # description and Help
+# description and Help
 ###############################################################################
 
 DESCRIPTION = 'Input the type of youtube sounds to mix. It can be motor, explosion, human, nature \
@@ -20,7 +20,7 @@ HELP = 'Input type of audio sound'
 
 
 ###############################################################################
-            # Arguments and parsing
+# Arguments and parsing
 ###############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-use_youtube_sounds', '--use_youtube_sounds', action='store',
@@ -43,7 +43,7 @@ RESULT = PARSER.parse_args()
 
 
 ###############################################################################
-                # Define Constants
+# Define Constants
 ###############################################################################
 
 SAMPLING_RATE_ONE = 48000
@@ -54,14 +54,14 @@ MAXIMUM_LIMIT_EXAMPLES = 8000
 
 
 ###############################################################################
-            # Function to read all data frames from Youtube data
+# Function to read all data frames from Youtube data
 ###############################################################################
 def balanced_data():
     """
     Function to read all data frames and balancing
     """
 
-    #Files with single class
+    # Files with single class
     with open(PATH_FOR_DATA+'pure/Explosion/pure_exp_7957.pkl', 'rb') as file_obj:
         pure_exp = pickle.load(file_obj)
     with open(PATH_FOR_DATA+'pure/Motor/pure_mot_76045.pkl', 'rb') as file_obj:
@@ -95,10 +95,10 @@ def balanced_data():
 
 
 ###############################################################################
-            # Getting wavfiles from different paths.
-            # Change paths according (Add or delete
-            # if there are multiple paths where audio
-            # files are stored)
+# Getting wavfiles from different paths.
+# Change paths according (Add or delete
+# if there are multiple paths where audio
+# files are stored)
 ###############################################################################
 def get_file_path(filename):
     if  os.path.exists("/media/wildly/Seagate/Audio_files/unbal_audio_data_178k/"+filename):
@@ -112,7 +112,7 @@ def get_file_path(filename):
 
 
 ###############################################################################
-            # Get different sampling rates audio Files in separate lists (Youtube)
+# Get different sampling rates audio Files in separate lists (Youtube)
 ###############################################################################
 def get_samplerate_44_48(dataframe):
     samp_44k = []

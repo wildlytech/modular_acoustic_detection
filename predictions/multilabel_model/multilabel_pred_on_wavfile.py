@@ -24,7 +24,7 @@ def predict_on_embedding(embedding, config_datas):
                                                     config_data["train"]["outputWeightFile"])
 
     ###########################################################################
-        # Predict on test data
+    # Predict on test data
     ###########################################################################
 
     if embedding.shape[0] < 10:
@@ -61,12 +61,12 @@ def main(predictions_cfg_json, path_for_wavfile):
     EMBEDDINGS = generate_before_predict_BR.main(path_for_wavfile, 0, None, None)
 
     ###########################################################################
-            # Import json data
+    # Import json data
     ###########################################################################
     CONFIG_DATAS = [read_config(file) for file in read_config(predictions_cfg_json)]
 
     ###########################################################################
-        # Implementing using the keras usual training technique
+    # Implementing using the keras usual training technique
     ###########################################################################
     colnames = []
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
                    with feature (Embeddings) and labels_name column in it.'
 
     ###########################################################################
-            # Parsing the inputs given
+    # Parsing the inputs given
     ###########################################################################
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()

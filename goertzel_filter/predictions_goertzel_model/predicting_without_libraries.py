@@ -23,7 +23,7 @@ import downsampling_and_goertzel_filter
 
 
 #############################################################################
-            # Read all the global variables i.e weights and Inputs.
+# Read all the global variables i.e weights and Inputs.
 #############################################################################
 with open("weights_goertzel_model_layers.pkl", "rb") as file_obj:
     WEIGHTS_VALUE = pickle.load(file_obj)
@@ -35,7 +35,7 @@ TEN_SEC_INPUT_DATA = np.random.uniform(low=0.000002, high=0.001, size=(10, 8000,
 
 
 #############################################################################
-            # Implementation of convolutional layer
+# Implementation of convolutional layer
 #############################################################################
 class ConvolutionalNeuralNetwork(object):
 
@@ -144,7 +144,7 @@ class ConvolutionalNeuralNetwork(object):
 
 
 #############################################################################
-            # Implementation of Dense Layer (Fully connected layer)
+# Implementation of Dense Layer (Fully connected layer)
 #############################################################################
 class FullyConnectedLayer(object):
 
@@ -229,7 +229,7 @@ class FullyConnectedLayer(object):
 
 
 #############################################################################
-                # Implementation of Maxpool Layer
+# Implementation of Maxpool Layer
 #############################################################################
 class MaxPoolingLayer(object):
     """
@@ -265,7 +265,7 @@ class MaxPoolingLayer(object):
 
 
 #############################################################################
-                # Check for shape
+# Check for shape
 #############################################################################
 class InitialCheckForShape(object):
 
@@ -310,7 +310,7 @@ class InitialCheckForShape(object):
 
 
 #############################################################################
-            # Architecture unrolling as per test_architecture.csv
+# Architecture unrolling as per test_architecture.csv
 #############################################################################
 def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
     """
@@ -355,7 +355,7 @@ def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
 
 
 #############################################################################
-                # Downsampling implementation
+# Downsampling implementation
 #############################################################################
 def flag_for_downsampling(audiofilepath):
     """
@@ -419,7 +419,7 @@ def flag_for_downsampling(audiofilepath):
 
 
 #############################################################################
-                # Predictions on each second for 10second audio file
+# Predictions on each second for 10second audio file
 #############################################################################
 def predict_on_goertzelcomponents(ten_sec_data):
     """
@@ -457,7 +457,7 @@ def predict_on_goertzelcomponents(ten_sec_data):
 
 
 #############################################################################
-                # Main Function
+# Main Function
 #############################################################################
 if __name__ == "__main__":
     '''

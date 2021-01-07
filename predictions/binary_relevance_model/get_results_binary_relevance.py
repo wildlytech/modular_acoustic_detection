@@ -1,7 +1,7 @@
 """
 Testing a Binary Relevance Model
 """
-#Import the necessary functions and libraries
+# Import the necessary functions and libraries
 import argparse
 import json
 from tensorflow.compat.v1.keras.models import model_from_json
@@ -82,7 +82,7 @@ def main(predictions_cfg_json,
     CONFIG_DATAS = import_predict_configuration_json(predictions_cfg_json)
 
     ###########################################################################
-        # read the dataframe with feature and labels_name column
+    # read the dataframe with feature and labels_name column
     ###########################################################################
 
     print("Importing Data...")
@@ -95,7 +95,7 @@ def main(predictions_cfg_json,
     if IS_DATAFRAME_LABELED:
         print("Categorizing labels in dataframe...")
         #######################################################################
-                # Check if labels fall into positive label designation
+        # Check if labels fall into positive label designation
         #######################################################################
         LABELS_BINARIZED = pd.DataFrame()
 
@@ -132,7 +132,7 @@ def main(predictions_cfg_json,
 
 
     ###########################################################################
-        # Implementing using the keras usual prediction technique
+    # Implementing using the keras usual prediction technique
     ###########################################################################
 
     for label_name in list(CONFIG_DATAS.keys()):
@@ -144,7 +144,7 @@ def main(predictions_cfg_json,
         print(("\nLoaded " + label_name + " model from disk"))
 
         #######################################################################
-            # Predict on test data
+        # Predict on test data
         #######################################################################
         CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST).ravel()
         CLF2_TEST_PREDICTION = CLF2_TEST_PREDICTION_PROB.round()
@@ -162,7 +162,7 @@ def main(predictions_cfg_json,
             print('Target shape:', CLF2_TEST_TARGET.shape)
 
             ###################################################################
-                    # To get the Misclassified examples
+            # To get the Misclassified examples
             ###################################################################
             DF_TEST.insert(len(DF_TEST.columns), label_name+'_Actual', CLF2_TEST_TARGET)
             MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
@@ -171,7 +171,7 @@ def main(predictions_cfg_json,
 
 
             ###################################################################
-                    #  misclassified examples are to be saved
+            #  misclassified examples are to be saved
             ###################################################################
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \
@@ -191,7 +191,7 @@ def main(predictions_cfg_json,
 
 
             ###################################################################
-                # print classification report
+            # print classification report
             ###################################################################
             print('Classification Report for '+ label_name)
             print('============================================')
@@ -201,7 +201,7 @@ def main(predictions_cfg_json,
 
 
             ###################################################################
-                # calculate accuracy and hamming loss
+            # calculate accuracy and hamming loss
             ###################################################################
             ACCURACY = accuracy_score(CLF2_TEST_TARGET,
                                       CLF2_TEST_PREDICTION)
@@ -226,7 +226,7 @@ if __name__ == "__main__":
                    with feature (Embeddings) and labels_name column in it.'
 
     ###########################################################################
-            # Parsing the inputs given
+    # Parsing the inputs given
     ###########################################################################
 
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)

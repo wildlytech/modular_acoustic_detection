@@ -31,7 +31,7 @@ import pathlib
 
 
 ###############################################################################
-                # get relative data folder
+# get relative data folder
 ###############################################################################
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
@@ -43,7 +43,7 @@ else:
 
 
 ###############################################################################
-                # Inputs Required: Path FTP
+# Inputs Required: Path FTP
 ###############################################################################
 PRIMARY_PATH = "/home/user-u0xzU/BNP/"
 DIR_REQ = "BNP/"
@@ -52,7 +52,7 @@ MAPBOX_ACCESS_TOKEN = "*************"
 
 
 ###############################################################################
-            # Inputs Required: FTP credentials
+# Inputs Required: FTP credentials
 ###############################################################################
 FTP_USERNAME = "user-u0xzU"
 FTP_PASSWORD = "**********"
@@ -60,7 +60,7 @@ FTP_HOST = '34.211.117.196'
 
 
 ###############################################################################
-                        # READING ARGUMENTS
+# READING ARGUMENTS
 ###############################################################################
 DESCRIPTION = "Wildly Acoutsic Monitoring Device Report"
 HELP = "Give the Required Arguments"
@@ -70,7 +70,7 @@ HELP = "Give the Required Arguments"
 
 
 ###############################################################################
-                # parse the input arguments given from command line
+# parse the input arguments given from command line
 ###############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-transmission_mode_csv_path', '--transmission_mode_csv_path', action='store',
@@ -117,7 +117,7 @@ DATAFRAME_DEVICE = pd.DataFrame()
 
 
 ###############################################################################
-                        # Main APP LAYOUT
+# Main APP LAYOUT
 ###############################################################################
 
 app = dash.Dash()
@@ -130,7 +130,7 @@ app.layout = html.Div(
 
 
 ###############################################################################
-                        # BATTERY PERFORMANCE GRAPH HELPER FUNC TAB
+# BATTERY PERFORMANCE GRAPH HELPER FUNC TAB
 ###############################################################################
 
 def SetColor(x):
@@ -181,7 +181,7 @@ def plot_function(dataframe):
 
 
 ###############################################################################
-                # Reads csv file and returns pandas dataframe
+# Reads csv file and returns pandas dataframe
 ###############################################################################
 def read_csv_file(csv_file_name):
     """
@@ -192,11 +192,11 @@ def read_csv_file(csv_file_name):
 
 
 ###############################################################################
-                # Different dataframe with filter based on date and time
+# Different dataframe with filter based on date and time
 ###############################################################################
 def get_data_specific_date(dataframe):
     """
-    seperates data and time stamp
+    separates data and time stamp
     """
     list_of_date_time = dataframe['Time_Stamp'].values.tolist()
     only_date = []
@@ -210,7 +210,7 @@ def get_data_specific_date(dataframe):
 
 def get_data_specific_time(dataframe):
     """
-    seperates time from time stamp
+    separates time from time stamp
     """
     list_of_date_time = dataframe["Time_Stamp"].values.tolist()
     only_time = []
@@ -253,7 +253,7 @@ def get_dataframe_for_plotting_recording(file_index):
 
 
 ###############################################################################
-                    # CALLBACK FOR URL INPUT: DEVICE TRANSMISSION
+# CALLBACK FOR URL INPUT: DEVICE TRANSMISSION
 ###############################################################################
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
@@ -291,7 +291,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                        # CALLBACK FOR URL INPUT: LOCATION
+    # CALLBACK FOR URL INPUT: LOCATION
     ###########################################################################
     elif pathname == "/acoustic-device-report/location-details":
 
@@ -323,7 +323,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                    # CALLBACK FOR URL INPUT: BATTERY PERFORMANCE
+    # CALLBACK FOR URL INPUT: BATTERY PERFORMANCE
     ###########################################################################
     elif pathname == "/acoustic-device-report/battery-performance":
         return html.Div(
@@ -358,7 +358,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                    # CALLBACK FOR URL INPUT: DEVICE DETAILS
+    # CALLBACK FOR URL INPUT: DEVICE DETAILS
     ###########################################################################
     elif pathname == "/acoustic-device-report/device-details":
         return html.Div([Header(app),
@@ -390,7 +390,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                    # CALLBACK FOR URL INPUT: REVIEWS
+    # CALLBACK FOR URL INPUT: REVIEWS
     ###########################################################################
     elif pathname == "/acoustic-device-report/reviews":
         return html.Div(
@@ -461,7 +461,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                # CALLBACK FOR URL INPUT: FULL VIEW
+    # CALLBACK FOR URL INPUT: FULL VIEW
     ###########################################################################
     elif pathname == "/acoustic-device-report/full-view":
         return overview.create_layout(app)
@@ -469,7 +469,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-            # CALLBACK FOR URL INPUT: OVERVIEW
+    # CALLBACK FOR URL INPUT: OVERVIEW
     ###########################################################################
     elif pathname == "/acoustic-device-report/overview":
         return overview.create_layout(app)
@@ -477,7 +477,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-            # CALLBACK FOR URL INPUT: DEFAULT / HOME PAGE
+    # CALLBACK FOR URL INPUT: DEFAULT / HOME PAGE
     ###########################################################################
     else:
         connect_group(PRIMARY_PATH)
@@ -517,7 +517,7 @@ def display_page(pathname):
 
 
         #######################################################################
-                        # Return the page with Directory status and Graph
+        # Return the page with Directory status and Graph
         #######################################################################
         fig_active = get_figure_active(list_device, status)
         if list_wavfiles:
@@ -586,7 +586,7 @@ def display_page(pathname):
 
 
 ###############################################################################
-                    # connect to FTP server
+# connect to FTP server
 ###############################################################################
 def connect(primary_path):
     '''
@@ -609,7 +609,7 @@ def connect_group(primary_path):
 
 
 ###############################################################################
-                # check for wav files only in FTP server
+# check for wav files only in FTP server
 ###############################################################################
 def check_wav_files():
     """
@@ -623,7 +623,7 @@ def check_wav_files():
 
 
 ###############################################################################
-                # sort files based on names
+# sort files based on names
 ###############################################################################
 def sort_on_filenames(files_list):
     """
@@ -676,7 +676,7 @@ def get_list_files_sorted(ftp_path):
 
 
 ###############################################################################
-                # Removes duplicate files from iteration
+# Removes duplicate files from iteration
 ###############################################################################
 def get_without_duplicates(csv_filename, sorted_wavfiles):
     """
@@ -699,7 +699,7 @@ def get_without_duplicates(csv_filename, sorted_wavfiles):
 
 
 ###############################################################################
-                # Create and write csv file with all the details
+# Create and write csv file with all the details
 ###############################################################################
 def write_csv(csv_filename, ftp_path):
     """
@@ -712,7 +712,7 @@ def write_csv(csv_filename, ftp_path):
 
 
     ###########################################################################
-                # CSV file column details
+    # CSV file column details
     ###########################################################################
     non_repeated = get_without_duplicates(csv_filename, sorted_files)
     wav_info_tags = ["Filename", "Operator", "DeviceID", "Battery_Voltage", "Battery_Percentage",\
@@ -725,7 +725,7 @@ def write_csv(csv_filename, ftp_path):
     "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]
 
     ###########################################################################
-                # If CSV file already exists append rows to it
+    # If CSV file already exists append rows to it
     ###########################################################################
     if os.path.exists(csv_filename):
         with open(csv_filename, "a") as file_object:
@@ -860,7 +860,7 @@ class FtpFile:
 
 
 ###############################################################################
-                # Get wavheader information
+# Get wavheader information
 ###############################################################################
 def get_wavheader_extraheader(name,ftp_path):
     '''
@@ -914,7 +914,7 @@ def get_wavheader_extraheader(name,ftp_path):
 
 
 ###############################################################################
-                # Get directory and time stamp
+# Get directory and time stamp
 ###############################################################################
 def get_directory_timestamp_listed():
     """
@@ -952,7 +952,7 @@ def check_wav_file_size(each_wav_file, blockalign, samplerate):
 
 
 ###############################################################################
-                # Groups device based on device id
+# Groups device based on device id
 ###############################################################################
 def group_by_device_id():
     """
@@ -1062,7 +1062,7 @@ def Table(dataframe, column_name):
 
 
 ###############################################################################
-            # Map plot for active and inactive devices on home page
+# Map plot for active and inactive devices on home page
 ###############################################################################
 LATITUDES_ACTIVE = []
 LONGITUDES_ACTIVE = []
@@ -1161,7 +1161,7 @@ def get_layout_active():
 
 
 ###############################################################################
-                # Get all the directory in specified ftp server path
+# Get all the directory in specified ftp server path
 ###############################################################################
 def directory_details(ftp_path):
     """
@@ -1226,7 +1226,7 @@ def last_ftp_time(ftp_path):
 
 
 ###############################################################################
-            # Return active and inactive devices based on 5 Mins activity
+# Return active and inactive devices based on 5 Mins activity
 ###############################################################################
 def active_or_inactive(dir_n_timestamp, directories_time_list):
     """
@@ -1258,7 +1258,7 @@ def active_or_inactive(dir_n_timestamp, directories_time_list):
 
 
 ###############################################################################
-                            # TRANSMISSION HELPER FUNCTION
+# TRANSMISSION HELPER FUNCTION
 ###############################################################################
 
 def plot_function_bar(dataframe):
@@ -1284,7 +1284,7 @@ def plot_function_bar(dataframe):
 
 
 ###############################################################################
-                        # TIME STAMP DIFFERENCE HELPER FUNC
+# TIME STAMP DIFFERENCE HELPER FUNC
 ###############################################################################
 
 def get_time_difference(timestamp1, timestamp2):
@@ -1301,7 +1301,7 @@ def get_time_difference(timestamp1, timestamp2):
 
 
 ###############################################################################
-                        # LOCATION HELPER FUNC
+# LOCATION HELPER FUNC
 ###############################################################################
 
 
@@ -1365,7 +1365,7 @@ def get_figure(list_of_devices):
 
 
 ###############################################################################
-                        # CALLBACK FOR TRANSMISSION
+# CALLBACK FOR TRANSMISSION
 ###############################################################################
 
 
@@ -1431,7 +1431,7 @@ def update_figure_transmission(rows,columns,indices):
 
 
 ###############################################################################
-                        # CALLBACK FOR LOCATION
+# CALLBACK FOR LOCATION
 ###############################################################################
 @app.callback(
     dash.dependencies.Output("inside-location", "children"),
@@ -1461,7 +1461,7 @@ def update_figure_location(rows,columns,indices):
 
 
 ###############################################################################
-                        # CALLBACK FOR BATTERY PERFORMANCE GRAPH
+# CALLBACK FOR BATTERY PERFORMANCE GRAPH
 ###############################################################################
 
 @app.callback(
@@ -1521,7 +1521,7 @@ def update_figure_battery(rows,columns,indices):
 
 
 ###############################################################################
-                        # CALLBACK FOR DEVICE DETAILS
+# CALLBACK FOR DEVICE DETAILS
 ###############################################################################
 @app.callback(
     dash.dependencies.Output("device-details-id", "children"),
@@ -1547,7 +1547,7 @@ def update_figure_device_details(rows, columns, indices):
 
 
 ###############################################################################
-                        # CALLBACK FOR DOWNLOAD REPORT
+# CALLBACK FOR DOWNLOAD REPORT
 ###############################################################################
 
 

@@ -1,6 +1,6 @@
 
-#This code is copied from
-#https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
+# This code is copied from
+# https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
 
 r"""A simple demonstration of running VGGish in inference mode.
 This is intended as a toy example that demonstrates how the various building
@@ -51,7 +51,7 @@ flags = tf.app.flags
 
 
 ##############################################################################
-    # Flag for input argument
+# Flag for input argument
 ##############################################################################
 flags.DEFINE_string(
     'local_folder_path', None, help='Path to the VGGish checkpoint file.')
@@ -70,7 +70,7 @@ flags.DEFINE_string(
 
 
 ##############################################################################
-    # Defining the flags before hand
+# Defining the flags before hand
 ##############################################################################
 flags.DEFINE_string(
     'pca_params', VGGISH_PATH + 'vggish_pca_params.npz',
@@ -94,8 +94,8 @@ FLAGS = flags.FLAGS
 ##############################################################################
 def main(wav_file, flag_for_data, data,model_type):
     """
-    #Specify the path for the downloaded or recorded audio files and
-    #also path for writing the embeddings or pickle files
+    Specify the path for the downloaded or recorded audio files and
+    also path for writing the embeddings or pickle files
     """
     if flag_for_data == 0:
         examples_batch = vggish_input.wavfile_to_examples(wav_file)

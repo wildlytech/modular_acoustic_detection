@@ -11,7 +11,7 @@ from . import generate_before_predict_BR
 
 
 ############################################################################
-        # Description and Help
+# Description and Help
 ############################################################################
 DESCRIPTION = "Generates the csv file with prediction results"
 HELP = "Give the Required Arguments"
@@ -19,7 +19,7 @@ HELP = "Give the Required Arguments"
 
 
 ############################################################################
-        # Parsing argument
+# Parsing argument
 ############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-local_folder_path', '--local_folder_path', action='store',
@@ -31,7 +31,7 @@ RESULT = PARSER.parse_args()
 
 
 ############################################################################
-        # Setting the input arguments
+# Setting the input arguments
 ############################################################################
 FOLDER_FILES_PATH = RESULT.local_folder_path
 CSV_FILENAME = RESULT.csv_filename
@@ -40,7 +40,7 @@ CSV_FILENAME = RESULT.csv_filename
 
 
 ############################################################################
-    # Loops over the list of files in the directrory specified
+# Loops over the list of files in the directrory specified
 ############################################################################
 def start_batch_run_ftp_live(path_for_folder):
     """
@@ -58,8 +58,8 @@ def start_batch_run_ftp_live(path_for_folder):
 
 
     ###########################################################################
-                # Check if the csv file is already existing or not.
-                # If it is existing then append the result to same csv file
+    # Check if the csv file is already existing or not.
+    # If it is existing then append the result to same csv file
     ###########################################################################
     if os.path.exists(CSV_FILENAME):
         data_read = pd.read_csv(CSV_FILENAME)

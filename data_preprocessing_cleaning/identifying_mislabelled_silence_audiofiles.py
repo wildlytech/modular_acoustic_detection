@@ -8,7 +8,7 @@ from pydub import AudioSegment
 
 
 ###############################################################################
-            # description and Help
+# description and Help
 ###############################################################################
 DESCRIPTION = '1. Input the path for base dataframe [YTID / wav_file, labels_name] and \n \
                2. Input the path for audio files '
@@ -17,7 +17,7 @@ HELP = 'Input the path'
 
 
 ###############################################################################
-            # Arguments and parsing
+# Arguments and parsing
 ###############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-dataframe_path', '--dataframe_path', action='store',
@@ -29,11 +29,11 @@ RESULT = PARSER.parse_args()
 
 
 ###############################################################################
-                # Helper functions with Docstrings
+# Helper functions with Docstrings
 ###############################################################################
 def glob_all_files_from_path(wavfiles_path):
     """
-    #Define the path where the audiofiles(.wav format) are downloaded
+    Define the path where the audiofiles(.wav format) are downloaded
     """
     all_wav_files_path = glob.glob(wavfiles_path+"*.wav") + glob.glob(wavfiles_path+"*.WAV")
     wav_files = []
@@ -43,7 +43,7 @@ def glob_all_files_from_path(wavfiles_path):
 
 def get_dbfs(wavfile_path):
     """
-    #calculate the dBFS( decibels to Full scale) to know audio is silent or no.
+    calculate the dBFS( decibels to Full scale) to know audio is silent or no.
     """
     dbfs = []
     for i in wavfile_path:
@@ -77,14 +77,14 @@ def get_mislabelled_as_silence_files(dataframe):
     dataframe = dataframe.loc[dataframe['labels_name'].apply(lambda x: (len(x) == 1)) & dataframe.labels.apply(lambda x: 'Silence' in x)]
     mislabelled_as_otherthan_silent = dataframe.loc[dataframe['dBFS'] != float('-inf')]
     list_of_wavfiles = mislabelled_as_otherthan_silent.wav_file.tolist()
-    #save the balcklisted sounds in a text file
+    # save the balcklisted sounds in a text file
     with open('mislabelled_as_silent.txt', 'w')as file_obj:
         pickle.dump(list_of_wavfiles, file_obj)
 
 
 def get_mislablled_silence_files(dataframe):
     """
-    #Sounds that are labelled other than Silence but audio clip is pure silent
+    Sounds that are labelled other than Silence but audio clip is pure silent
     """
     dataframe = dataframe.loc[dataframe['dBFS'] == float('-inf')]
     mislabelled_as_silence = dataframe.loc[dataframe['labels_name'].apply(lambda x: 'Silence' not in x)]
@@ -96,7 +96,7 @@ def get_mislablled_silence_files(dataframe):
 
 
 ###############################################################################
-            # Main Function
+# Main Function
 ###############################################################################
 if __name__ == "__main__":
     DATAFRAME = read_pickle_file(RESULT.dataframe_path)

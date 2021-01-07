@@ -1,7 +1,7 @@
 
 
-#This code is modified from :
-#https://github.com/tensorflow/models/blob/master/research/audioset/vggish/vggish_inference_demo.py
+# This code is modified from :
+# https://github.com/tensorflow/models/blob/master/research/audioset/vggish/vggish_inference_demo.py
 
 r"""A simple demonstration of running VGGish in inference mode.
 This is intended as a toy example that demonstrates how the various building
@@ -51,14 +51,14 @@ import vggish_slim
 
 
 ###############################################################################
-                    # Constants
+# Constants
 ###############################################################################
 
 VGGISH_MODEL_CHECKPOINT_FILE = VGGISH_PATH + 'vggish_model.ckpt'
 PCA_PARAMS_FILE = VGGISH_PATH + 'vggish_pca_params.npz'
 
 ###############################################################################
-                    # Functions
+# Functions
 ###############################################################################
 
 def generate(path_to_write_embeddings, path_to_wav_files):
@@ -79,7 +79,7 @@ def generate(path_to_write_embeddings, path_to_wav_files):
     if not os.path.exists(path_to_write_embeddings):
         os.makedirs(path_to_write_embeddings)
 
-    #glob all the wave files and embeddings if any .
+    # glob all the wave files and embeddings if any .
     wav_files_path = glob.glob(path_to_wav_files + '*.wav')
     pickle_files = glob.glob(path_to_write_embeddings + '*.pkl')
     wav_file_list = []
@@ -89,7 +89,7 @@ def generate(path_to_write_embeddings, path_to_wav_files):
     for wav_file, wav_file_name in zip(wav_files_path, wav_file_list):
         path_to_pickle_file = path_to_write_embeddings + str(wav_file_name)[:-4] + '.pkl'
         print (wav_file)
-        #No need to generate the embeddings that are already generated.
+        # No need to generate the embeddings that are already generated.
         if path_to_pickle_file in pickle_files:
             print ('Embeddings are already generated for', path_to_pickle_file)
 
@@ -119,7 +119,7 @@ def generate(path_to_write_embeddings, path_to_wav_files):
                 postprocessed_batch = pproc.postprocess(embedding_batch)
                 # print(postprocessed_batch)
 
-            #write the embeddings as pickle files
+            # write the embeddings as pickle files
             with open(path_to_pickle_file, 'wb') as file_obj:
                 pickle.dump(postprocessed_batch, file_obj)
 

@@ -28,7 +28,7 @@ from predictions.binary_relevance_model import generate_before_predict_BR,\
 
 
 ########################################################################
-                # set the different colors
+# set the different colors
 ########################################################################
 COLORS = {
     'background': '#111111',
@@ -38,7 +38,7 @@ COLORS = {
 
 
 ########################################################################
-                # Description and Help
+# Description and Help
 ########################################################################
 DESCRIPTION = "Creates UI for uploading Files and checking FTP server status. Works Offline and Online"
 HELP = "Give the Required Arguments"
@@ -46,7 +46,7 @@ HELP = "Give the Required Arguments"
 
 
 ########################################################################
-                # parse the input arguments
+# parse the input arguments
 ########################################################################
 ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
@@ -76,7 +76,7 @@ PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
 
 ########################################################################
-                    # set the FTP Target folder
+# set the FTP Target folder
 ########################################################################
 TARGET_FTP_FOLDER = PARSED_ARGS.remote_ftp_path
 FOLDER_FILES_PATH = PARSED_ARGS.local_folder_path
@@ -87,13 +87,13 @@ FTP_PASSWORD = PARSED_ARGS.ftp_password
 PREDICTIONS_CFG_JSON = PARSED_ARGS.predictions_cfg_json
 
 ##############################################################################
-        # Import json data
+# Import json data
 ##############################################################################
 CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(PREDICTIONS_CFG_JSON)
 
 
 ###############################################################################
-                # Loop through all the models and get predictions
+# Loop through all the models and get predictions
 ###############################################################################
 def predictions_from_models(wavfile_path, embeddings):
     """
@@ -110,7 +110,7 @@ def predictions_from_models(wavfile_path, embeddings):
     return prediction_probs, prediction_rounded
 
 ###############################################################################
-        # Generates embeddings for each file and calls for predictions
+# Generates embeddings for each file and calls for predictions
 ###############################################################################
 def get_predictions(wavfile_path):
     """
@@ -263,8 +263,8 @@ def check_pre_requiste_files():
 
 
 #############################################################################
-                # Sound Library Helper:
-            # Returns the data table based on the applied filters
+# Sound Library Helper:
+# Returns the data table based on the applied filters
 #############################################################################
 def call_for_data(dataframe,
                   titleElementType,
@@ -290,7 +290,7 @@ def call_for_data(dataframe,
 
 
 ###############################################################################
-                    # INDEX PAGE / HOME PAGE
+# INDEX PAGE / HOME PAGE
 ###############################################################################
 
 
@@ -366,7 +366,7 @@ INDEX_PAGE = html.Div(children=[html.Div(children=[html.Div(children=[html.H1('W
 
 
 ###############################################################################
-                        # 1 UPLOAD PAGE
+# 1 UPLOAD PAGE
 ###############################################################################
 PAGE_1_LAYOUT = html.Div(id='out-upload-data',
                          children=[html.Div(style={"background-color":"green",
@@ -614,7 +614,7 @@ def start_batch_run_ftp_live(path_for_folder):
             file_object.flush()
 
 ###############################################################################
-                    # 1A UPLOAD PAGE : Reloading for Folder file results
+# 1A UPLOAD PAGE : Reloading for Folder file results
 ###############################################################################
 
 PAGE_5_LAYOUT = html.Div(html.Div([html.H4('Prediction Result'),
@@ -681,7 +681,7 @@ def disabling_button_1c(n_clicks):
 
 
 ###############################################################################
-                            # TEST PAGE / MISC#
+# TEST PAGE / MISC#
 ###############################################################################
 
 
@@ -749,7 +749,7 @@ def update_values(input_data):
 
 
 ###############################################################################
-                # FTP STATUS PAGE : Helper Functions
+# FTP STATUS PAGE : Helper Functions
 ###############################################################################
 
 def check_for_wav_only(list_values):
@@ -780,7 +780,7 @@ def call_for_ftp():
     return dataframe
 
 ###############################################################################
-                # FTP STATUS PAGE : Layout and callbacks
+# FTP STATUS PAGE : Layout and callbacks
 ###############################################################################
 PAGE_3_LAYOUT = html.Div([
     html.Div(style={"background-color":"green", "padding":"2px"},
@@ -798,8 +798,8 @@ PAGE_3_LAYOUT = html.Div([
 
 
 ###############################################################################
-                    # FTP STATUS PAGE: Callback:
-            # Wait for button click & display FTP files
+# FTP STATUS PAGE: Callback:
+# Wait for button click & display FTP files
 ###############################################################################
 @app.callback(Output('page-new-content', 'children'),
               [Input('button', 'n_clicks')])
@@ -816,7 +816,7 @@ def ftp_data_display(n_clicks):
 
 
 ###############################################################################
-                    # FTP STATUS PAGE: Callback:
+# FTP STATUS PAGE: Callback:
         # Takes all the data that has been selected and stores as dataframe
 ###############################################################################
 @app.callback(
@@ -837,8 +837,8 @@ def display_output(rows, columns, indices):
 
 
 ###############################################################################
-                # FTP STATUS PAGE : Callback:
-            # Disabling div elements if none are selected
+# FTP STATUS PAGE : Callback:
+# Disabling div elements if none are selected
 ###############################################################################
 @app.callback(
     Output('prediction-audio', 'style'),
@@ -865,8 +865,8 @@ def disabling_button(n_clicks):
 
 
 ###############################################################################
-                # FTP STATUS PAGE : Callback:
-            # Playing the audio when file is selected
+# FTP STATUS PAGE : Callback:
+# Playing the audio when file is selected
 ###############################################################################
 @app.callback(
     Output('prediction-audio', 'children'),
@@ -890,7 +890,7 @@ def play_button_for_prediction(rows, columns, indices):
 
 
 ###############################################################################
-                # FTP STATUS PAGE : Callback:
+# FTP STATUS PAGE : Callback:
     # Downloading the selected batch of files and processing them to model
 ###############################################################################
 @app.callback(
@@ -967,7 +967,7 @@ def batch_downloading_and_predict(n_clicks):
 
 
 ###############################################################################
-                    # SOUND LIBRARY - Requires MongoDB server
+# SOUND LIBRARY - Requires MongoDB server
 ###############################################################################
 
 CLIENT = MongoClient('localhost', 27017)
@@ -976,7 +976,7 @@ DATA_BASE = CLIENT.audio_library
 
 
 ###############################################################################
-                # Sound Library Page : Layout and callbacks
+# Sound Library Page : Layout and callbacks
 ###############################################################################
 PAGE_4_LAYOUT = html.Div([
     html.Div(style={"background-color":"green", "padding":"2px"},
@@ -1026,8 +1026,8 @@ def call_for_labels(data):
 
 
 #############################################################################
-                # Sound Library: Callback:
-        # Return the sub-labels based on the selected class label
+# Sound Library: Callback:
+# Return the sub-labels based on the selected class label
 #############################################################################
 @app.callback(Output('output_dropdown', 'children'),
               [Input('select-class', 'value')])
@@ -1056,8 +1056,8 @@ def select_class(value):
 
 
 #############################################################################
-                # Sound Library: Callback:
-            # Disables appropiate div element if none are selected
+# Sound Library: Callback:
+# Disables appropiate div element if none are selected
 #############################################################################
 @app.callback(Output('datatable-interactivity-container-2', 'style'),
               [Input('select-labels', 'value')])
@@ -1091,7 +1091,7 @@ def disabling_div_output_data(value):
 
 
 #############################################################################
-                # Sound Library: Callback:
+# Sound Library: Callback:
         # Querying MongoDB server based on selection
 #############################################################################
 @app.callback(Output('output_data', 'children'),
@@ -1145,7 +1145,7 @@ def generate_layout(value):
 
 
 #############################################################################
-                # Sound Library Callback:
+# Sound Library Callback:
         # Displays the play button option and other option
 #############################################################################
 @app.callback(
@@ -1188,7 +1188,7 @@ def display_output_from_data(rows, columns, indices):
 
 
 #############################################################################
-            # Sound Library: Callback:
+# Sound Library: Callback:
         # actual predictions and executing the model
 #############################################################################
 @app.callback(Output('page-4-content-2', 'children'),
@@ -1254,7 +1254,7 @@ def display_page(pathname):
 
 
 ###############################################################################
-                # Main Function
+# Main Function
 ###############################################################################
 
 if __name__ == '__main__':

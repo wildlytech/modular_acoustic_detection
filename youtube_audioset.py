@@ -16,7 +16,7 @@ import tensorflow.compat.v1 as tf
 
 
 ########################################################################
-            # Define the class and sublabels in it
+# Define the class and sublabels in it
 ########################################################################
 EXPLOSION_SOUNDS = [
     'Fireworks',
@@ -155,7 +155,7 @@ NATURE_SOUNDS = [
 ]
 
 ###############################################################################
-        #Defining Ambient and Impact sounds as to what sounds it must comprise of.
+# Defining Ambient and Impact sounds as to what sounds it must comprise of.
 ###############################################################################
 AMBIENT_SOUNDS = NATURE_SOUNDS
 IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
@@ -164,7 +164,7 @@ IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
 
 
 ###############################################################################
-            # function to get the dataframe from csv data
+# function to get the dataframe from csv data
 ###############################################################################
 def get_csv_data(target_sounds):
     """
@@ -229,7 +229,7 @@ def get_csv_data(target_sounds):
 
 
 ###############################################################################
-            # Downloads the youtube audio files
+# Downloads the youtube audio files
 ###############################################################################
 def download_clip(YTID, start_seconds, end_seconds, target_path):
     """
@@ -237,7 +237,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
     """
     url = "https://www.youtube.com/watch?v=" + YTID
 
-    #set the target path to download the audio files
+    # set the target path to download the audio files
     target_file = target_path + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)+".wav"
 
     # No need to download audio file that already has been downloaded
@@ -270,7 +270,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
 
 
 ###############################################################################
-                # To download the audio files from youtube
+# To download the audio files from youtube
 ###############################################################################
 def download_data(target_sounds_list, target_path):
     """
@@ -285,8 +285,8 @@ def download_data(target_sounds_list, target_path):
     df['wav_file'] = df['YTID'].astype(str) + '-' + df['start_seconds'].astype(str) +\
                      '-' + df['end_seconds'].astype(str)+'.wav'
 
-    #save the data frame which can be used for further balancing the data
-    #and generating the embeddings for audio files.
+    # save the data frame which can be used for further balancing the data
+    # and generating the embeddings for audio files.
     with open('downloaded_base_dataframe.pkl', 'wb') as file_obj:
         pickle.dump(df, file_obj)
 
@@ -316,12 +316,12 @@ def download_data(target_sounds_list, target_path):
 
 
 ###############################################################################
-                        # slightly modified from
-    #https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
+# slightly modified from
+# https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
 ###############################################################################
 def read_audio_record(audio_record, output_to_file=None):
     """
-    #https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
+    # https://stackoverflow.com/questions/42703849/audioset-and-tensorflow-understanding
     """
     vid_ids = []
     labels = []
@@ -374,7 +374,7 @@ def read_audio_record(audio_record, output_to_file=None):
 
 
 ###############################################################################
-                    # Read the recursive names from JSON file
+# Read the recursive names from JSON file
 ###############################################################################
 def get_recursive_sound_names(designated_sound_names, path_to_ontology, ontology_extension_paths=[]):
     """
@@ -442,7 +442,7 @@ def get_all_sound_names(path_to_ontology):
 
 
 ###############################################################################
-                    # Read the tf.record files data
+# Read the tf.record files data
 ###############################################################################
 def get_data():
     """

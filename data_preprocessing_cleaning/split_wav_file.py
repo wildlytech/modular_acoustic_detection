@@ -11,7 +11,7 @@ import glob
 import os
 
 ###############################################################################
-                    # Helper Function
+# Helper Function
 ###############################################################################
 
 def get_duration_wav_file(wav_file):
@@ -39,7 +39,7 @@ def start_splitting(chunk_length_ms, wav_file, path_to_write_chunks):
     print("splitting audio files into chunks of", chunk_length_ms / 1000.0, "seconds :", file_name)
     myaudio = AudioSegment.from_wav(wav_file)
     chunks = make_chunks(myaudio, chunk_length_ms)
-    #Export all of the individual chunks as wav files
+    # Export all of the individual chunks as wav files
     for i, chunk in enumerate(chunks):
         chunk_name = file_name+"_"+str(i)+'.wav'
 
@@ -102,7 +102,7 @@ def audio_split_directory(path_for_wavfiles, path_to_write_chunks, chunk_length_
 
 
 ###############################################################################
-            # Main Function
+# Main Function
 ###############################################################################
 if __name__ == "__main__":
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
 
     ###########################################################################
-                # Parse the arguments
+    # Parse the arguments
     ###########################################################################
     PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     REQUIRED_ARGUMENTS = PARSER.add_argument_group('required arguments')

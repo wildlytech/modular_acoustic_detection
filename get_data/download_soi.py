@@ -14,7 +14,7 @@ from sklearn.preprocessing import LabelBinarizer
 
 
 ###########################################################################
-                    #Define the Sounds
+# Define the Sounds
 ###########################################################################
 
 EXPLOSION_SOUNDS = [
@@ -158,7 +158,7 @@ NATURE_SOUNDS = [
 
 
 ###########################################################################
-            #Description and Help
+# Description and Help
 ###########################################################################
 
 DESCRIPTION = 'Input one of these sounds : explosion_sounds , wood_sounds , motor_sounds,\
@@ -169,7 +169,7 @@ HELP = 'Input the target sounds. It should be one of the listed sounds'
 
 
 ###########################################################################
-    #Defining Ambient and Impact sounds as to what sounds it must comprise of.
+# Defining Ambient and Impact sounds as to what sounds it must comprise of.
 ###########################################################################
 
 AMBIENT_SOUNDS = NATURE_SOUNDS
@@ -179,7 +179,7 @@ IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
 
 
 ###########################################################################
-        #create a dictionary of sounds
+# create a dictionary of sounds
 ###########################################################################
 
 SOUNDS_DICT = {'explosion_sounds': EXPLOSION_SOUNDS, 'wood_sounds': WOOD_SOUNDS,
@@ -191,7 +191,7 @@ SOUNDS_DICT = {'explosion_sounds': EXPLOSION_SOUNDS, 'wood_sounds': WOOD_SOUNDS,
 
 
 ###########################################################################
-        #parse the input arguments given from command line
+# parse the input arguments given from command line
 ###########################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-target_sounds', '--target_sounds', action='store',
@@ -262,7 +262,7 @@ def get_csv_data(target_sounds):
     return train, train_label_binarized
 
 ###############################################################################
-            # Downloads the youtube audio files
+# Downloads the youtube audio files
 ###############################################################################
 def download_clip(YTID, start_seconds, end_seconds, target_path):
     """
@@ -270,7 +270,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
     """
     url = "https://www.youtube.com/watch?v=" + YTID
 
-    #set the target path to download the audio files
+    # set the target path to download the audio files
     target_file = target_path + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)+".wav"
 
     # No need to download audio file that already has been downloaded
@@ -303,7 +303,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
 
 
 ###############################################################################
-                # To download the audio files from youtube
+# To download the audio files from youtube
 ###############################################################################
 def download_data(target_sounds_list, target_path):
     """
@@ -318,8 +318,8 @@ def download_data(target_sounds_list, target_path):
     df['wav_file'] = df['YTID'].astype(str) + '-' + df['start_seconds'].astype(str) +\
                      '-' + df['end_seconds'].astype(str)+'.wav'
 
-    #save the data frame which can be used for further balancing the data
-    #and generating the embeddings for audio files.
+    # save the data frame which can be used for further balancing the data
+    # and generating the embeddings for audio files.
     with open(RESULT.target_sounds+'_downloaded_base_dataframe.pkl', 'wb') as file_obj:
         pickle.dump(df, file_obj)
 
@@ -348,6 +348,6 @@ def download_data(target_sounds_list, target_path):
 
 
 
-#call the function to dowload the target or sounds of Interest. Set the target
+# call the function to dowload the target or sounds of Interest. Set the target
 if __name__ == '__main__':
     download_data(SOUNDS_DICT[RESULT.target_sounds], RESULT.target_path)

@@ -1,6 +1,6 @@
 
-#This code is copied and modified from
-#https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
+# This code is copied and modified from
+# https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
 
 r"""A simple demonstration of running VGGish in inference mode.
 This is intended as a toy example that demonstrates how the various building
@@ -47,7 +47,7 @@ import vggish_slim
 
 
 ##############################################################################
-    # Defining the flags before hand
+# Defining the flags before hand
 ##############################################################################
 FLAGS = {
     'pca_params' : VGGISH_PATH + 'vggish_pca_params.npz',
