@@ -7,7 +7,7 @@ from . import get_results_binary_relevance
 if __name__ == "__main__":
 
     ###########################################################################
-            # Description and Help
+    # Description and Help
     ###########################################################################
     DESCRIPTION = 'Gets the predictions of sounds. \n \
                    Input base dataframe file path \

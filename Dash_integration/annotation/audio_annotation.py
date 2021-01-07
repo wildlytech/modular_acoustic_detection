@@ -662,7 +662,7 @@ def submit_initial_button(n_clicks, value):
 
 
 ###############################################################################
-            # STATUS IN NEXT CONTENT
+# STATUS IN NEXT CONTENT
 ###############################################################################
 @app.callback(Output('next_submission', 'children'),
               [Input('submit_next', 'n_clicks'),
@@ -701,12 +701,12 @@ def submit_next_button(n_clicks, value):
 
 
 ###############################################################################
-        # Main Function
+# Main Function
 ###############################################################################
 if __name__ == '__main__':
 
     ###########################################################################
-            # Description and Help
+    # Description and Help
     ###########################################################################
     DESCRIPTION = 'Runs the Audio Annotation Tool.'
 

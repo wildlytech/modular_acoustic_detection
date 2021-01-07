@@ -54,7 +54,7 @@ def predict_on_embedding(embedding, label_names, config_datas):
 def main(predictions_cfg_json, path_for_wavfile):
 
     ###########################################################################
-            # read the dataframe with feature and labels_name column
+    # read the dataframe with feature and labels_name column
     ###########################################################################
     EMBEDDINGS = generate_before_predict_BR.main(path_for_wavfile, 0, None, None)
 
@@ -89,7 +89,7 @@ def main(predictions_cfg_json, path_for_wavfile):
 if __name__ == "__main__":
 
     ###########################################################################
-            # Description and Help
+    # Description and Help
     ###########################################################################
     DESCRIPTION = 'Gets the predictions of sounds. \n \
                    Input base dataframe file path \

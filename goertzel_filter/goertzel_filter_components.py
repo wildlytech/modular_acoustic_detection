@@ -149,7 +149,7 @@ def generate_frequency_components():
                 try:
 
                     ###########################################################
-                        # If its stereo taking only the first of the array
+                    # If its stereo taking only the first of the array
                     ###########################################################
                     if read_file[1].shape[1] == 2:
                         wave_file = np.array([i[0] for i in read_file[1]])

@@ -76,7 +76,7 @@ def main(predictions_cfg_json,
          path_to_save_prediction_csv = None):
 
     ###########################################################################
-            # Import json data
+    # Import json data
     ###########################################################################
 
     CONFIG_DATAS = import_predict_configuration_json(predictions_cfg_json)
@@ -156,7 +156,7 @@ def main(predictions_cfg_json,
 
         if IS_DATAFRAME_LABELED:
             ###################################################################
-                    # Target for the test labels
+            # Target for the test labels
             ###################################################################
             CLF2_TEST_TARGET = LABELS_FILTERED[label_name].values
             print('Target shape:', CLF2_TEST_TARGET.shape)
@@ -219,7 +219,7 @@ def main(predictions_cfg_json,
 if __name__ == "__main__":
 
     ###########################################################################
-            # Description and Help
+    # Description and Help
     ###########################################################################
     DESCRIPTION = 'Gets the predictions of sounds. \n \
                    Input base dataframe file path \

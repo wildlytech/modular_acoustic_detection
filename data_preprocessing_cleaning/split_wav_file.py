@@ -107,7 +107,7 @@ def audio_split_directory(path_for_wavfiles, path_to_write_chunks, chunk_length_
 if __name__ == "__main__":
 
     ###########################################################################
-            # Description and help
+    # Description and help
     ###########################################################################
 
     DESCRIPTION = " Splits the long duration audio files into chunks of 10 seconds"
