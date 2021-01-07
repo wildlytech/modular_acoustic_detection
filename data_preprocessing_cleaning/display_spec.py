@@ -49,4 +49,3 @@ if __name__=="__main__":
         plot_spec(S,RESULT.output_file_path)
     else:
         plot_spec(S)
-

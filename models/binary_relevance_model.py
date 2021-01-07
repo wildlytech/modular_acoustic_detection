@@ -448,4 +448,3 @@ print('Accuracy :', ACCURACY)
         # save model weights. Change as per the model type
 #############################################################################
 MODEL.save_weights(OUTPUT_WEIGHT_FILE)
-

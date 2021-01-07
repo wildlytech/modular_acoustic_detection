@@ -106,4 +106,3 @@ def predictions_batch_wavfiles(data, model_type):
     predictions_prob = model.predict(data)
     predictions = predictions_prob.round()
     return predictions_prob, predictions
-

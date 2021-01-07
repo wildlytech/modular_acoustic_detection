@@ -70,4 +70,3 @@ if COMPRESSED_FILES_LIST:
                 print('Warning : Skipped ' + COMPRESSED_FILE + " as file format is wrong ")
 else:
     print("No files found in given directory")
-

@@ -139,4 +139,3 @@ if __name__ == "__main__":
         assert(RESULT.path_to_write_dataframe.endswith(".pkl"))
         create_new_dataframe(path_for_saved_embeddings=RESULT.path_for_saved_embeddings,
                              path_to_write_dataframe=RESULT.path_to_write_dataframe)
-

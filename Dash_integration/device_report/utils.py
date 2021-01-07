@@ -114,4 +114,3 @@ def make_dash_table(dataframe):
             html_row.append(html.Td([row[index]]))
         table.append(html.Tr(html_row))
     return table
-

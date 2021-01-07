@@ -18,7 +18,7 @@ import math
 from scipy.io import wavfile
 # To initialize the lists
 import numpy as np
-# To resample. We will also be implementing without 
+# To resample. We will also be implementing without
 import resampy
 
 
@@ -149,7 +149,6 @@ class DownsamplingImplementation(object):
 
         if sample_ratio < 1:
             interp_win *= sample_ratio
-        
 
         # create a numpy array of zeros similar to shape of interpolation window i.e interp_win
         interp_delta = np.zeros_like(interp_win)
@@ -220,8 +219,7 @@ class GoertzelComponents(object):
 
             real = (q_1 - q_2 * cosine)
             imag = (q_2 * sine)
-            magnitude = np.square(real) + np.square(imag) 
+            magnitude = np.square(real) + np.square(imag)
             result_mag[index] = np.sqrt(magnitude)
             index += 1
         return  result_mag
-

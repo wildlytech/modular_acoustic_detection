@@ -186,5 +186,3 @@ if __name__ == "__main__":
 
     scrape(audio_files_path=AUDIO_FILES_PATH,
            bird_species=BIRD_SPECIES_KEYWORD)
-
-

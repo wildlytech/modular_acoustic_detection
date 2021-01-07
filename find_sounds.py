@@ -161,4 +161,3 @@ if __name__ == "__main__":
     if ARGS.extract_dir:
         extract_sound_clips(FILENAME_W_EXTENSION, DATA_FRAME, ARGS.extract_dir[0])
         print("Sound clips extracted!")
-        
