@@ -75,13 +75,13 @@ def main(predictions_cfg_json,
          path_to_save_prediction_csv = None):
 
     ###########################################################################
-              # Import json data
+            # Import json data
     ###########################################################################
 
     CONFIG_DATAS = import_predict_configuration_json(predictions_cfg_json)
 
     ###########################################################################
-          # read the dataframe with feature and labels_name column
+        # read the dataframe with feature and labels_name column
     ###########################################################################
 
     print("Importing Data...")
@@ -117,7 +117,7 @@ def main(predictions_cfg_json,
 
 
     ###########################################################################
-          # Filtering the sounds that are exactly 10 seconds
+        # Filtering the sounds that are exactly 10 seconds
     ###########################################################################
     DF_TEST = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
 
@@ -128,13 +128,13 @@ def main(predictions_cfg_json,
 
 
     ###########################################################################
-          # preprecess the data into required structure
+        # preprocess the data into required structure
     ###########################################################################
 
     X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 
     ###########################################################################
-      # reshaping the test data so as to align with input for model
+    # reshaping the test data so as to align with input for model
     ###########################################################################
     CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
 
@@ -152,7 +152,7 @@ def main(predictions_cfg_json,
         print(("\nLoaded " + model_name + " model from disk"))
 
         #######################################################################
-              # Predict on test data
+            # Predict on test data
         #######################################################################
 
         CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
@@ -214,7 +214,7 @@ def main(predictions_cfg_json,
 
 
             ###################################################################
-                  # print classification report
+                # print classification report
             ###################################################################
             print('Classification Report for '+ model_name)
             print('============================================')
@@ -224,7 +224,7 @@ def main(predictions_cfg_json,
 
 
             ###################################################################
-                  # calculate accuracy and hamming loss
+                # calculate accuracy and hamming loss
             ###################################################################
             ACCURACY = accuracy_score(gt_args,
                                       pred_args)
@@ -233,7 +233,7 @@ def main(predictions_cfg_json,
             print('Accuracy :', ACCURACY)
 
     ###########################################################################
-          # save the prediction in pickle format
+        # save the prediction in pickle format
     ###########################################################################
 
     if path_to_save_prediction_csv:

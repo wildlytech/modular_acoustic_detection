@@ -10,7 +10,7 @@ PATH_FOR_DATA = 'diff_class_datasets/Datasets/'
 
 
 ###############################################################################
-               # description and Help
+            # description and Help
 ###############################################################################
 
 DESCRIPTION = 'Input the type of youtube sounds to mix. It can be motor, explosion, human, nature \
@@ -80,7 +80,7 @@ def balanced_data():
     #     pure_wild=pickle.load(file_obj)
 
 
-     #Balancing and experimenting
+    # Balancing and experimenting
     exp = pd.concat([pure_exp], ignore_index=True)
     mot = pd.concat([pure_mot], ignore_index=True)
     hum = pd.concat([pure_hum], ignore_index=True)

@@ -40,7 +40,7 @@ RESULT = PARSER.parse_args()
 
 
 ###############################################################################
-           # get the data of each sounds seperately
+        # get the data of each sounds seperately
 ###############################################################################
 DATA_FRAME = balancing_dataset_goertzel.balanced_data(audiomoth_flag=0, mixed_sounds_flag=0)
 
@@ -48,7 +48,7 @@ DATA_FRAME = balancing_dataset_goertzel.balanced_data(audiomoth_flag=0, mixed_so
 
 
 ###############################################################################
-              # getting recursive label names
+            # getting recursive label names
 ###############################################################################
 AMBIENT_SOUNDS, IMPACT_SOUNDS = get_all_sound_names("./")
 EXPLOSION = get_recursive_sound_names(EXPLOSION_SOUNDS, "./")
@@ -62,7 +62,7 @@ DOMESTIC = get_recursive_sound_names(TOOLS_SOUNDS, "./")
 
 
 ###############################################################################
-              # Binarize the labels
+            # Binarize the labels
 ###############################################################################
 NAME_BIN = LabelBinarizer().fit(AMBIENT_SOUNDS + IMPACT_SOUNDS)
 LABELS_SPLIT = DATA_FRAME['labels_name'].apply(pd.Series).fillna('None')
@@ -75,7 +75,7 @@ LABELS_BINARIZED = pd.DataFrame(LABELS_BINARIZED, columns=NAME_BIN.classes_)
 
 
 ###############################################################################
-              # Shuffle the data
+            # Shuffle the data
 ###############################################################################
 DATA_FRAME, LABELS_BINARIZED = shuffle(DATA_FRAME, LABELS_BINARIZED, random_state=20)
 
@@ -84,7 +84,7 @@ DATA_FRAME, LABELS_BINARIZED = shuffle(DATA_FRAME, LABELS_BINARIZED, random_stat
 
 
 ###############################################################################
-              # print out the shape and percentage of sounds
+            # print out the shape and percentage of sounds
 ###############################################################################
 print('Binarized labels shape :', LABELS_BINARIZED.shape)
 print("Percentage Impact Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1) > 0).mean())
@@ -94,7 +94,7 @@ print("Percentage Ambient Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1)
 
 
 ###############################################################################
-              # split up the data into train and test
+            # split up the data into train and test
 ###############################################################################
 DF_TRAIN, DF_TEST, LABELS_BINARIZED_TRAIN, LABELS_BINARIZED_TEST = train_test_split(DATA_FRAME,
                                                                                     LABELS_BINARIZED,
@@ -106,7 +106,7 @@ DF_TRAIN, DF_TEST, LABELS_BINARIZED_TRAIN, LABELS_BINARIZED_TEST = train_test_sp
 
 
 ###############################################################################
-              # Create the time distributed model
+            # Create the time distributed model
 ###############################################################################
 def create_keras_model():
     """
@@ -174,7 +174,7 @@ for each_emb, each_wav in zip(DF_TEST['features'].tolist(), DF_TEST["wav_file"].
 
 
 ###############################################################################
-          # reshaping test data and applying normalization
+        # reshaping test data and applying normalization
 ###############################################################################
 print(np.array(CLF1_TEST).shape)
 CLF1_TEST = np.array(CLF1_TEST).reshape((-1, 10, 8000, 4))
@@ -184,7 +184,7 @@ CLF1_TEST = CLF1_TEST / np.linalg.norm(CLF1_TEST)
 
 
 ###############################################################################
-              # Reading Trainging Files
+            # Reading Training Files
 ###############################################################################
 print("Reading Training files..!!")
 for each_emb, each_wav in zip(DF_TRAIN['features'].tolist(), DF_TRAIN["wav_file"].tolist()):
@@ -202,7 +202,7 @@ for each_emb, each_wav in zip(DF_TRAIN['features'].tolist(), DF_TRAIN["wav_file"
 
 
 ###############################################################################
-          # Reshaping the traininig data and applying normalization
+        # Reshaping the traininig data and applying normalization
 ###############################################################################
 CLF1_TRAIN_MINI = np.array(CLF1_TRAIN_MINI).reshape((-1, 10, 8000, 4))
 CLF1_TRAIN_MINI = CLF1_TRAIN_MINI/np.linalg.norm(CLF1_TRAIN_MINI)
@@ -217,7 +217,7 @@ MODEL.fit(CLF1_TRAIN_MINI,
 
 
 ###############################################################################
-       # predict out of the model (Change Decision threshold by uncommenting)
+    # predict out of the model (Change Decision threshold by uncommenting)
 ###############################################################################
 CLF1_TRAIN_PREDICTION_PROB = MODEL.predict(CLF1_TRAIN_MINI).ravel()
 CLF1_TRAIN_PREDICTION = MODEL.predict(CLF1_TRAIN_MINI).ravel().round()
@@ -227,7 +227,7 @@ CLF1_TRAIN_PREDICTION = MODEL.predict(CLF1_TRAIN_MINI).ravel().round()
 
 
 ###############################################################################
-       # Predict out the test data. (Change Decision threshold by uncommenting)
+    # Predict out the test data. (Change Decision threshold by uncommenting)
 ###############################################################################
 CLF1_TEST_PREDICTION_PROB = MODEL.predict(CLF1_TEST).ravel()
 CLF1_TEST_PREDICTION = MODEL.predict(CLF1_TEST).ravel().round()
@@ -260,7 +260,7 @@ print(CLF1_CONF_TRAIN_MAT)
 
 
 ###############################################################################
-          # print out the confusion matrix for test data
+        # print out the confusion matrix for test data
 ###############################################################################
 CLF1_CONF_TEST_MAT = pd.crosstab(CLF1_TEST_TARGET, CLF1_TEST_PREDICTION, margins=True)
 print("Testing Precision and recall for Keras model")
@@ -274,7 +274,7 @@ print(CLF1_CONF_TEST_MAT)
 
 
 ###############################################################################
-          # calculate the f1 score and print it out
+        # calculate the f1 score and print it out
 ###############################################################################
 F1_SCORE = metrics.f1_score(CLF1_TEST_TARGET, CLF1_TEST_PREDICTION)
 print('F1 score is  : ', F1_SCORE)
@@ -283,14 +283,14 @@ print('F1 score is  : ', F1_SCORE)
 
 
 ###############################################################################
-          # save the model
+        # save the model
 ###############################################################################
 MODEL.save_weights('Goertzel_model_8k_weights_time.h5')
 
 
 
 ###############################################################################
-          # save the model weights for each layer separately
+        # save the model weights for each layer separately
 ###############################################################################
 WEIGHTS_LIST = []
 for layer in MODEL.layers:

@@ -42,7 +42,7 @@ PATH_TO_GOERTZEL_COMPONENTS = RESULT.path_to_freq_comp
 
 
 ###############################################################################
-    #set the target frequencies are interested to filter out from  audio file
+    # set the target frequencies are interested to filter out from audio file
 ###############################################################################
 TARGET_FREQUENCIES = [800, 1600, 2000, 2300]
 ACCEPTABLE_SAMPLINGRATE = 48000
@@ -119,7 +119,7 @@ def get_candlesticks_data(magnitude_data, sample_rate, time_stamp, length_of_aud
 
 
 ###############################################################################
-        # Batch processing for generating goertzel components
+            # Batch processing for generating goertzel components
 ###############################################################################
 def generate_frequency_components():
     """
@@ -134,8 +134,8 @@ def generate_frequency_components():
     wavfiles_path = glob.glob(RESULT.audio_files_path + "*.wav") + glob.glob(RESULT.audio_files_path + "*.WAV")
 
     ###########################################################################
-                # Iterate through all the wav files.
-                # Generate goertzel filter components
+                    # Iterate through all the wav files.
+                    # Generate goertzel filter components
     ###########################################################################
     for audio_path in wavfiles_path:
         try:
@@ -143,13 +143,13 @@ def generate_frequency_components():
 
 
             ###################################################################
-                        # Check for the sampling rate of the audio file
+                    # Check for the sampling rate of the audio file
             ###################################################################
             if read_file[1].shape[0] == ACCEPTABLE_SAMPLINGRATE * 10:
                 try:
 
                     ###########################################################
-                                # If its stereo taking only the first of the array
+                        # If its stereo taking only the first of the array
                     ###########################################################
                     if read_file[1].shape[1] == 2:
                         wave_file = np.array([i[0] for i in read_file[1]])
@@ -171,7 +171,7 @@ def generate_frequency_components():
                 mag = []
 
                 ###############################################################
-                         # check if the audio file is already filtered else do it
+                    # check if the audio file is already filtered else do it
                 ###############################################################
                 if os.path.exists(PATH_TO_GOERTZEL_COMPONENTS + audio_path.split("/")[-1][:-4]+'.pkl'):
                     pass

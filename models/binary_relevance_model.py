@@ -26,7 +26,7 @@ DESCRIPTION = "Reads the configuration file to train a particular \
                label and outputs the model"
 
 #############################################################################
-          # Parse the input arguments given from command line
+        # Parse the input arguments given from command line
 #############################################################################
 
 ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
@@ -40,7 +40,7 @@ ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
 PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
 #############################################################################
-          # Parse the arguments
+        # Parse the arguments
 #############################################################################
 
 with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
@@ -61,7 +61,7 @@ if not os.path.exists(pathToFileDirectory):
     os.makedirs(pathToFileDirectory)
 
 #############################################################################
-          # Get all sound names
+        # Get all sound names
 #############################################################################
 
 # Model training only supports using audio set as main ontology
@@ -91,7 +91,7 @@ else:
     NEGATIVE_LABELS = NEGATIVE_LABELS.difference(POSITIVE_LABELS)
 
 #############################################################################
-          # Importing dataframes from the function
+        # Importing dataframes from the function
 #############################################################################
 
 
@@ -304,7 +304,7 @@ print("NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
 print("PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100.0*TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES/TOTAL_TRAIN_TEST_EXAMPLES))
 
 #############################################################################
-        # preprecess the data into required structure
+        # preprocess the data into required structure
 #############################################################################
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TRAIN_STANDARDIZED = X_TRAIN / 255
@@ -337,7 +337,7 @@ def create_keras_model():
 
 
 #############################################################################
-   # reshaping the train and test data so as to align with input for model
+# reshaping the train and test data so as to align with input for model
 #############################################################################
 CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
 CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
@@ -345,7 +345,7 @@ CLF2_TRAIN_TARGET = LABELS_BINARIZED_TRAIN.values
 CLF2_TEST_TARGET = LABELS_BINARIZED_TEST.values
 
 #############################################################################
-   # assign class weights to ensure balanced datasets during training
+# assign class weights to ensure balanced datasets during training
 #############################################################################
 
 TRAIN_TARGET_POSITIVE_PERCENTAGE = CLF2_TRAIN_TARGET.mean()
@@ -364,7 +364,7 @@ else:
     CLASS_WEIGHT_1 = (1-TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
 
 #############################################################################
-      # Implementing using the keras usual training techinque
+    # Implementing using the keras usual training techinque
 #############################################################################
 if CONFIG_DATA["networkCfgJson"] is None:
     MODEL = create_keras_model()
@@ -385,7 +385,7 @@ MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
 
 #############################################################################
-      # Predict on train and test data
+    # Predict on train and test data
 #############################################################################
 CLF2_TRAIN_PREDICTION = MODEL.predict(CLF2_TRAIN).round()
 CLF2_TRAIN_PREDICTION_PROB = MODEL.predict(CLF2_TRAIN)
@@ -395,7 +395,7 @@ CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 
 
 #############################################################################
-      # To get the Misclassified examples
+    # To get the Misclassified examples
 #############################################################################
 # DF_TEST['actual_labels'] = np.split(LABELS_BINARIZED_TEST.values, DF_TEST.shape[0])
 # DF_TEST['predicted_labels'] = np.split(CLF2_TEST_PREDICTION, DF_TEST.shape[0])

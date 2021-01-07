@@ -52,7 +52,7 @@ else:
 
 
 ############################################################################
-         # Check for directory locally to download
+        # Check for directory locally to download
 ############################################################################
 def check_directory_to_write_wavfiles():
     """
@@ -135,7 +135,7 @@ def call_for_ftp():
 
 
 ############################################################################
-     # Loops over the list of files in ftp & saves predictions in csv
+    # Loops over the list of files in ftp & saves predictions in csv
 ############################################################################
 def start_batch_run_ftp_live():
     """

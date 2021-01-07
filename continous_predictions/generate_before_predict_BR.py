@@ -51,7 +51,7 @@ flags = tf.app.flags
 
 
 ##############################################################################
-       # Flag for input argument
+    # Flag for input argument
 ##############################################################################
 flags.DEFINE_string(
     'local_folder_path', None, help='Path to the VGGish checkpoint file.')
@@ -70,7 +70,7 @@ flags.DEFINE_string(
 
 
 ##############################################################################
-      # Defining the flags before hand
+    # Defining the flags before hand
 ##############################################################################
 flags.DEFINE_string(
     'pca_params', VGGISH_PATH + 'vggish_pca_params.npz',
@@ -100,7 +100,7 @@ def main(wav_file, flag_for_data, data,model_type):
     if flag_for_data == 0:
         examples_batch = vggish_input.wavfile_to_examples(wav_file)
 
-      # Prepare a postprocessor to munge the model embeddings.
+        # Prepare a postprocessor to munge the model embeddings.
         pproc = vggish_postprocess.Postprocessor(FLAGS.pca_params)
 
         with tf.Graph().as_default(), tf.Session() as sess:
@@ -114,12 +114,12 @@ def main(wav_file, flag_for_data, data,model_type):
             embedding_tensor = sess.graph.get_tensor_by_name(
                 vggish_params.OUTPUT_TENSOR_NAME)
 
-         # Run inference and postprocessing.
+            # Run inference and postprocessing.
             [embedding_batch] = sess.run([embedding_tensor],
                                          feed_dict={features_tensor: examples_batch})
             postprocessed_batch = pproc.postprocess(embedding_batch)
             return postprocessed_batch
-        # print(postprocessed_batch)
+
     elif flag_for_data == 1:
         predict_prob, predictions = model_function_binary_relevance.predictions_wavfile(data, model_type)
         K.clear_session()

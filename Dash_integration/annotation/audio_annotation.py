@@ -25,7 +25,7 @@ from predictions.binary_relevance_model import generate_before_predict_BR,\
 
 
 ###############################################################################
-                       # INITIAL SETUP VARIABLES #
+                    # INITIAL SETUP VARIABLES
 ###############################################################################
 app = dash.Dash()
 app.config.suppress_callback_exceptions = True
@@ -40,7 +40,7 @@ LABELS_LIST_DROPDOWN_NEXT = []
 
 
 ###############################################################################
-                                # INITIAL LAYOUT #
+                                # INITIAL LAYOUT
 ###############################################################################
 
 app.layout = html.Div([html.Div([html.H1("Audio Annotation",
@@ -84,7 +84,7 @@ app.layout = html.Div([html.Div([html.H1("Audio Annotation",
 
 
 ###############################################################################
-                          # PREVIOUS and NEXT BUTTONS #
+                        # PREVIOUS and NEXT BUTTONS
 ###############################################################################
 
 @app.callback(Output('previous_next_button_display', 'children'),
@@ -114,7 +114,7 @@ def previous_next_button_content(n_clicks):
 
 
 ###############################################################################
-                       # STYLING FOR TABS #
+                    # STYLING FOR TABS
 ###############################################################################
 
 TABS_STYLES = {
@@ -148,7 +148,7 @@ def model_prediction_tab():
     label_names = list(CONFIG_DATAS.keys())
 
     ###########################################################################
-          # Implementing using the keras usual training techinque
+        # Implementing using the keras usual training technique
     ###########################################################################
 
     prediction_probs, prediction_rounded = \
@@ -335,7 +335,7 @@ def annotation_tab(initial):
 
 
 ###############################################################################
-                       # NEXT CONTENT TABS DISPLAY #
+                    # NEXT CONTENT TABS DISPLAY
 ###############################################################################
 
 @app.callback(Output('next_button_content_display', 'children'),
@@ -368,7 +368,7 @@ def next_audio_content(n_clicks):
 
 
 ###############################################################################
-                       # Next: TABS CONTENT ON SELECTION #
+                    # Next: TABS CONTENT ON SELECTION
 ###############################################################################
 
 @app.callback(Output('next_tab_content', 'children'),
@@ -387,7 +387,7 @@ def next_content_tab(value):
 
 
 ###############################################################################
-                       # INITIAL CONTENT TABS DISPLAY #
+                    # INITIAL CONTENT TABS DISPLAY
 ###############################################################################
 
 @app.callback(Output('initial_content_display', 'children'),
@@ -421,7 +421,7 @@ def initial_content(value, n_clicks):
 
 
 ###############################################################################
-                      # INITIAL CONTENT TABS SELECTION  #
+                    # INITIAL CONTENT TABS SELECTION
 ###############################################################################
 
 @app.callback(Output('intial_tab_content', 'children'),
@@ -440,7 +440,7 @@ def initial_content_tab(value):
 
 
 ###############################################################################
-                     # SAVING ANNOTATIONS IN CSV FILE #
+                    # SAVING ANNOTATIONS IN CSV FILE
 ###############################################################################
 # WHEN SUBMITTED FROM INITIAL CONTENT
 LABELS_LIST_CHECKLIST_INITIAL = []
@@ -519,7 +519,7 @@ def previous_audio_content_annotation(value,value_drop):
 
 
 ###############################################################################
-                  # DISABLING CONTENTS THAT ARE NOT REQUIRED #
+                # DISABLING CONTENTS THAT ARE NOT REQUIRED
 ###############################################################################
 
 @app.callback(Output('text_area', 'style'),
@@ -616,7 +616,7 @@ def disable_next_audio_content_enable_previous_audio_content(value_next, value_p
 
 
 ###############################################################################
-                           # SUBMISSION STATUS DISPLAY #
+                        # SUBMISSION STATUS DISPLAY
 ###############################################################################
 
 @app.callback(Output('initial_submission', 'children'),
@@ -706,12 +706,12 @@ def submit_next_button(n_clicks, value):
 if __name__ == '__main__':
 
     ###########################################################################
-              # Description and Help
+            # Description and Help
     ###########################################################################
     DESCRIPTION = 'Runs the Audio Annotation Tool.'
 
     ###########################################################################
-              # Parsing the inputs given
+            # Parsing the inputs given
     ###########################################################################
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
@@ -726,7 +726,7 @@ if __name__ == '__main__':
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
     ###########################################################################
-              # Import json data
+            # Import json data
     ###########################################################################
     CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(PARSED_ARGS.predictions_cfg_json)
 

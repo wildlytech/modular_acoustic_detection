@@ -77,9 +77,9 @@ class ConvolutionalNeuralNetwork(object):
 
         # Iterate thorugh rows of X
         for i in range(len(data)):
-           # Iterate through columns of Y
+            # Iterate through columns of Y
             for j in range(len(self.weights[nested_index][0])):
-               # Iterate through rows of Y
+                # Iterate through rows of Y
                 for k in range(len(self.weights[nested_index])):
                     result[i][j] += data[i][k] * self.weights[nested_index][k][j]
 
@@ -144,7 +144,7 @@ class ConvolutionalNeuralNetwork(object):
 
 
 #############################################################################
-             # Implementation of Dense Layer (Fully connected layer)
+            # Implementation of Dense Layer (Fully connected layer)
 #############################################################################
 class FullyConnectedLayer(object):
 
@@ -164,14 +164,12 @@ class FullyConnectedLayer(object):
         """
 
         result = [[0 for col in range(len(self.weights[0]))] for row in range(len(data))]
-        # result = np.zeros((len(data), self.units)).tolist()
         # Iterate thorugh rows of X
         for i in range(len(data)):
-           # Iterate through columns of Y
+            # Iterate through columns of Y
             for j in range(len(self.weights[0])):
-               # Iterate through rows of Y
+                # Iterate through rows of Y
                 for k in range(len(self.weights)):
-                    # print len(self.weights[0])
                     result[i][j] += data[i][k] * self.weights[k][j]
 
         return  np.array(result, dtype='float64').tolist()
@@ -312,7 +310,7 @@ class InitialCheckForShape(object):
 
 
 #############################################################################
-             # Archictecture unrolling as per test_architecture.csv
+            # Architecture unrolling as per test_architecture.csv
 #############################################################################
 def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
     """

@@ -117,7 +117,7 @@ CLF1_TEST = X_TEST
 
 ########################################################################
         # Assign the Labels
-        # Impact sounds( target sounds) as  1's
+        # Impact sounds( target sounds) as 1's
         # and ambient sounds as 0's
 ########################################################################
 CLF1_TRAIN_TARGET = LABELS_BINARIZED_TRAIN.loc[:, IMPACT_SOUNDS].any(axis=1)

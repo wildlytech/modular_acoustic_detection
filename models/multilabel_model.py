@@ -68,8 +68,8 @@ for label_dicts in config["labels"]:
 
 
 ########################################################################
-      # Importing balanced data from the function.
-      # Including audiomoth annotated files for training
+    # Importing balanced data from the function.
+    # Including audiomoth annotated files for training
 ########################################################################
 
 def subsample_dataframe(dataframe, subsample):
@@ -265,7 +265,7 @@ print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS)
 print("PERCENT EXAMPLES (BY CLASS):")
 print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS / TOTAL_TRAIN_TEST_EXAMPLES)
 ########################################################################
-      # preprecess the data into required structure
+    # preprocess the data into required structure
 ########################################################################
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
@@ -273,9 +273,9 @@ X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 
 
 ########################################################################
-      # create the keras model.
-      # Change and play around with model architecture
-      # Hyper parameters can be tweaked here
+    # create the keras model.
+    # Change and play around with model architecture
+    # Hyper parameters can be tweaked here
 ########################################################################
 def create_keras_model():
     """
@@ -310,7 +310,7 @@ CLF2_TEST_TARGET = LABELS_BINARIZED_TEST
 
 
 ########################################################################
-      # Implementing & Training the keras model
+    # Implementing & Training the keras model
 ########################################################################
 
 if config["networkCfgJson"] is None:
@@ -336,8 +336,8 @@ MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
 
 
 ########################################################################
-      # Predict on train and test data
-      # Changing decision threshold can be done here
+    # Predict on train and test data
+    # Changing decision threshold can be done here
 ########################################################################
 CLF2_TRAIN_PREDICTION = MODEL.predict(CLF2_TRAIN).round()
 CLF2_TRAIN_PREDICTION_PROB = MODEL.predict(CLF2_TRAIN)
@@ -348,7 +348,7 @@ CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 
 
 ########################################################################
-      # To get the Misclassified examples
+    # To get the Misclassified examples
 ########################################################################
 DF_TEST['actual_labels'] = np.split(LABELS_BINARIZED_TEST.values, DF_TEST.shape[0])
 DF_TEST['predicted_labels'] = np.split(CLF2_TEST_PREDICTION, DF_TEST.shape[0])
@@ -361,14 +361,14 @@ MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 
 
 ########################################################################
-      # print misclassified number of examples
+    # print misclassified number of examples
 ########################################################################
 print('Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shape[0])
 
 
 
 ########################################################################
-      # Print confusion matrix and classification_report
+    # Print confusion matrix and classification_report
 ########################################################################
 print('        Confusion Matrix          ')
 print('============================================')

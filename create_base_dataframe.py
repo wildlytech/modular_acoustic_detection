@@ -96,7 +96,7 @@ def create_new_dataframe(path_for_saved_embeddings, path_to_write_dataframe):
 if __name__ == "__main__":
 
     ###########################################################################
-                   # description and Help
+                # description and Help
     ###########################################################################
 
     DESCRIPTION = '1. Input the path for base dataframe [wav_file, labels_name] or \n \

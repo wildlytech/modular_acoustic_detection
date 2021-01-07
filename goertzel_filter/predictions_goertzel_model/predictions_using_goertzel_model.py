@@ -12,7 +12,7 @@ from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatt
 
 
 ###############################################################################
-          # Description and Help
+        # Description and Help
 ###############################################################################
 DESCRIPTION = "Compares the prediction my goertzel model and annotated labels"
 HELP_AUDIO = "Path for Dataframe with features( .pkl )"
@@ -21,7 +21,7 @@ HELP_GOERTZEL = "Path to write predictions in csv( .csv )"
 
 
 ###############################################################################
-          # parse the input arguments given from command line
+        # parse the input arguments given from command line
 ###############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-path_dataframe_with_features',
@@ -61,7 +61,7 @@ print(MODEL.summary())
 
 
 ###############################################################################
-      # Load the saved weights and predict on the audiomoth  recordings
+        # Load the saved weights and predict on the audiomoth recordings
 ###############################################################################
 
 if RESULT.path_for_saved_weights:
@@ -71,7 +71,7 @@ else:
     sys.exit(1)
 
 ###############################################################################
-      # Read the dataframe with columns features and labels name
+        # Read the dataframe with columns features and labels name
 ###############################################################################
 if RESULT.path_dataframe_with_features:
     with open(RESULT.path_dataframe_with_features, "rb") as file_obj:
@@ -82,7 +82,7 @@ else:
 
 
 ###############################################################################
-            # Read all the test data first
+        # Read all the test data first
 ###############################################################################
 CLF1_TEST = []
 print('Reading Test files ..!')
@@ -116,7 +116,7 @@ DF_TEST['predictions'] = PREDICTIONS.ravel().round()
 
 
 ###############################################################################
-          # save it in a CSV file
+        # save it in a CSV file
 ###############################################################################
 if RESULT.path_to_write_prediction_csv:
     DF_TEST.drop(["features"], axis=1).to_csv(RESULT.path_to_write_prediction_csv)

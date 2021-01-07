@@ -23,7 +23,7 @@ def distinguished_audiomoth_sounds():
     """
 
     ###########################################################################
-                     # Pure motor sounds - AudioMoth (Different Locations)
+                    # Pure motor sounds - AudioMoth (Different Locations)
     ###########################################################################
     with open(AUDIOMOTH_PURE_DATAPATH + "pure_mot/pure_mot_1017_Nandi_hills_2_datafile_labels_emb.pkl", 'rb') as file_obj:
         ad_mot1 = pickle.load(file_obj)
@@ -122,7 +122,7 @@ def include_mixed_sounds(mixed_sounds_flag):
 
 
         #######################################################################
-            # Check for  Nature Mixed sounds : Youtube and AudioMoth
+            # Check for Nature Mixed sounds : Youtube and AudioMoth
         #######################################################################
         with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"hum_mix_nat_with_wavfiles_9532.pkl", 'rb') as file_obj:
             df_hn = pickle.load(file_obj)
@@ -254,7 +254,7 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
 
 
     ###########################################################################
-                 # Balancing and experimenting
+                # Balancing and experimenting
     ###########################################################################
     exp = pd.concat([pure_exp], ignore_index=True)
     mot = pd.concat([pure_mot], ignore_index=True)
@@ -324,7 +324,7 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
 
 
 ###############################################################################
-          # Main Function
+        # Main Function
 ###############################################################################
 if __name__ == "__main__":
     AUDIOMOTH_FLAG = 1

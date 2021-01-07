@@ -47,7 +47,7 @@ import vggish_slim
 
 
 ##############################################################################
-      # Defining the flags before hand
+    # Defining the flags before hand
 ##############################################################################
 FLAGS = {
     'pca_params' : VGGISH_PATH + 'vggish_pca_params.npz',

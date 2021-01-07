@@ -25,7 +25,7 @@ def predict_on_embedding(embedding, label_names, config_datas):
                                                         config_data["train"]["outputWeightFile"])
 
         #######################################################################
-              # Predict on test data
+            # Predict on test data
         #######################################################################
 
         if embedding.shape[0] < 10:
@@ -65,7 +65,7 @@ def main(predictions_cfg_json, path_for_wavfile):
     LABEL_NAMES = list(CONFIG_DATAS.keys())
 
     ###########################################################################
-          # Implementing using the keras usual training techinque
+        # Implementing using the keras usual training techinque
     ###########################################################################
 
     CLF2_TRAIN_PREDICTION = []
@@ -81,7 +81,7 @@ def main(predictions_cfg_json, path_for_wavfile):
         CLF2_TRAIN_PREDICTION.append(prediction_rounded)
 
     ###########################################################################
-          # Print results
+        # Print results
     ###########################################################################
     results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB), columns=LABEL_NAMES)
     print(results)
@@ -89,14 +89,14 @@ def main(predictions_cfg_json, path_for_wavfile):
 if __name__ == "__main__":
 
     ###########################################################################
-              # Description and Help
+            # Description and Help
     ###########################################################################
     DESCRIPTION = 'Gets the predictions of sounds. \n \
                    Input base dataframe file path \
                    with feature (Embeddings) and labels_name column in it.'
 
     ###########################################################################
-              # Parsing the inputs given
+            # Parsing the inputs given
     ###########################################################################
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()

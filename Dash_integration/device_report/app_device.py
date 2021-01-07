@@ -60,7 +60,7 @@ FTP_HOST = '34.211.117.196'
 
 
 ###############################################################################
-                         # READING ARGUMENTS #
+                        # READING ARGUMENTS
 ###############################################################################
 DESCRIPTION = "Wildly Acoutsic Monitoring Device Report"
 HELP = "Give the Required Arguments"
@@ -117,7 +117,7 @@ DATAFRAME_DEVICE = pd.DataFrame()
 
 
 ###############################################################################
-                         # Main APP LAYOUT #
+                        # Main APP LAYOUT
 ###############################################################################
 
 app = dash.Dash()
@@ -130,7 +130,7 @@ app.layout = html.Div(
 
 
 ###############################################################################
-                         # BATTERY PERFORMANCE GRAPH HELPER FUNC TAB #
+                        # BATTERY PERFORMANCE GRAPH HELPER FUNC TAB
 ###############################################################################
 
 def SetColor(x):
@@ -253,7 +253,7 @@ def get_dataframe_for_plotting_recording(file_index):
 
 
 ###############################################################################
-                    # CALLBACK FOR URL INPUT: DEVICE TRANSMISSION #
+                    # CALLBACK FOR URL INPUT: DEVICE TRANSMISSION
 ###############################################################################
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
@@ -291,7 +291,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                         # CALLBACK FOR URL INPUT: LOCATION #
+                        # CALLBACK FOR URL INPUT: LOCATION
     ###########################################################################
     elif pathname == "/acoustic-device-report/location-details":
 
@@ -323,7 +323,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                    # CALLBACK FOR URL INPUT: BATTERY PERFORMANCE #
+                    # CALLBACK FOR URL INPUT: BATTERY PERFORMANCE
     ###########################################################################
     elif pathname == "/acoustic-device-report/battery-performance":
         return html.Div(
@@ -358,7 +358,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                    # CALLBACK FOR URL INPUT: DEVICE DETAILS #
+                    # CALLBACK FOR URL INPUT: DEVICE DETAILS
     ###########################################################################
     elif pathname == "/acoustic-device-report/device-details":
         return html.Div([Header(app),
@@ -390,7 +390,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                    # CALLBACK FOR URL INPUT: REVIEWS #
+                    # CALLBACK FOR URL INPUT: REVIEWS
     ###########################################################################
     elif pathname == "/acoustic-device-report/reviews":
         return html.Div(
@@ -461,7 +461,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-                # CALLBACK FOR URL INPUT: FULL VIEW #
+                # CALLBACK FOR URL INPUT: FULL VIEW
     ###########################################################################
     elif pathname == "/acoustic-device-report/full-view":
         return overview.create_layout(app)
@@ -469,7 +469,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-             # CALLBACK FOR URL INPUT: OVERVIEW  #
+            # CALLBACK FOR URL INPUT: OVERVIEW
     ###########################################################################
     elif pathname == "/acoustic-device-report/overview":
         return overview.create_layout(app)
@@ -477,7 +477,7 @@ def display_page(pathname):
 
 
     ###########################################################################
-            # CALLBACK FOR URL INPUT: DEFAULT / HOME PAGE #
+            # CALLBACK FOR URL INPUT: DEFAULT / HOME PAGE
     ###########################################################################
     else:
         connect_group(PRIMARY_PATH)
@@ -807,7 +807,7 @@ def write_csv(csv_filename, ftp_path):
 
 
 ###############################################################################
-         # FTP class to read data without downloading file
+        # FTP class to read data without downloading file
 ###############################################################################
 class FtpFile:
     """
@@ -993,7 +993,7 @@ def group_by_device_id():
 
 
 ###############################################################################
-          # Creates a table in dash format from pandas dataframe format
+        # Creates a table in dash format from pandas dataframe format
 ###############################################################################
 def Table(dataframe, column_name):
     """
@@ -1062,7 +1062,7 @@ def Table(dataframe, column_name):
 
 
 ###############################################################################
-             # Map plot for active and inactive devices on home page
+            # Map plot for active and inactive devices on home page
 ###############################################################################
 LATITUDES_ACTIVE = []
 LONGITUDES_ACTIVE = []
@@ -1258,7 +1258,7 @@ def active_or_inactive(dir_n_timestamp, directories_time_list):
 
 
 ###############################################################################
-                             # TRANSMISSION HELPER FUNCTION #
+                            # TRANSMISSION HELPER FUNCTION
 ###############################################################################
 
 def plot_function_bar(dataframe):
@@ -1284,7 +1284,7 @@ def plot_function_bar(dataframe):
 
 
 ###############################################################################
-                         # TIME STAMP DIFFERENCE HELPER FUNC #
+                        # TIME STAMP DIFFERENCE HELPER FUNC
 ###############################################################################
 
 def get_time_difference(timestamp1, timestamp2):
@@ -1301,7 +1301,7 @@ def get_time_difference(timestamp1, timestamp2):
 
 
 ###############################################################################
-                         # LOCATION HELPER FUNC  #
+                        # LOCATION HELPER FUNC
 ###############################################################################
 
 
@@ -1365,7 +1365,7 @@ def get_figure(list_of_devices):
 
 
 ###############################################################################
-                         # CALLBACK FOR TRANSMISSION #
+                        # CALLBACK FOR TRANSMISSION
 ###############################################################################
 
 
@@ -1431,7 +1431,7 @@ def update_figure_transmission(rows,columns,indices):
 
 
 ###############################################################################
-                         # CALLBACK FOR LOCATION #
+                        # CALLBACK FOR LOCATION
 ###############################################################################
 @app.callback(
     dash.dependencies.Output("inside-location", "children"),
@@ -1461,7 +1461,7 @@ def update_figure_location(rows,columns,indices):
 
 
 ###############################################################################
-                          # CALLBACK FOR BATTERY PERFORMANCE GRAPH #
+                        # CALLBACK FOR BATTERY PERFORMANCE GRAPH
 ###############################################################################
 
 @app.callback(
@@ -1521,7 +1521,7 @@ def update_figure_battery(rows,columns,indices):
 
 
 ###############################################################################
-                         # CALLBACK FOR DEVICE DETAILS #
+                        # CALLBACK FOR DEVICE DETAILS
 ###############################################################################
 @app.callback(
     dash.dependencies.Output("device-details-id", "children"),
@@ -1547,7 +1547,7 @@ def update_figure_device_details(rows, columns, indices):
 
 
 ###############################################################################
-                         # CALLBACK FOR DOWNLOAD REPORT #
+                        # CALLBACK FOR DOWNLOAD REPORT
 ###############################################################################
 
 

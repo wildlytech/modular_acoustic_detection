@@ -8,7 +8,7 @@ from pydub import AudioSegment
 
 
 ###############################################################################
-               # description and Help
+            # description and Help
 ###############################################################################
 DESCRIPTION = '1. Input the path for base dataframe [YTID / wav_file, labels_name] and \n \
                2. Input the path for audio files '

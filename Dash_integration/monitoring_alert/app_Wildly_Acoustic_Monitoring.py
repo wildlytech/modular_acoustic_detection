@@ -58,7 +58,7 @@ else:
 
 
 ###############################################################################
-         # FTP credentials & Message Authorisation token from fast2sms.com
+        # FTP credentials & Message Authorisation token from fast2sms.com
 ###############################################################################
 FTP_HOST = '34.211.117.196'
 AUTHORIZATION_TOKEN = "***********"
@@ -378,7 +378,7 @@ def save_file(name, content):
 
 
 ###############################################################################
-             # Removes the duplicate from looping
+            # Removes the duplicate from looping
 ###############################################################################
 def get_without_duplicates(dir_name, csv_filename, ftp_obj):
     """
@@ -1717,12 +1717,12 @@ def callbacks(_app):
 if __name__ == '__main__':
 
     ###########################################################################
-              # Description and Help
+            # Description and Help
     ###########################################################################
     DESCRIPTION = 'Runs the Audio Annotation Tool.'
 
     ###########################################################################
-              # Parsing the inputs given
+            # Parsing the inputs given
     ###########################################################################
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
@@ -1743,7 +1743,7 @@ if __name__ == '__main__':
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
     ###########################################################################
-              # Import json data and get ftp credentials
+            # Import json data and get ftp credentials
     ###########################################################################
     CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(PARSED_ARGS.predictions_cfg_json)
     FTP_USERNAME = PARSED_ARGS.ftp_username

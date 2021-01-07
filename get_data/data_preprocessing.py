@@ -19,7 +19,7 @@ HELP = "Input the annotation file path [Label_1, Label_2, Label_3] \n \
 
 
 ###########################################################################
-          #parse the input arguments given from command line
+        #parse the input arguments given from command line
 ###########################################################################
 
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
@@ -98,7 +98,7 @@ SET_DICTIONARY = {"crow":"Crow",
 
 
 ###########################################################################
-              # Helper Function
+            # Helper Function
 ###########################################################################
 def check_for_null(array):
     """
