@@ -465,17 +465,17 @@ def parse_contents(contents, filename, date):
         _, prediction_rounded, output_sound, bar_graph = bar_graph_info
 
         return  html.Div(style={'color': 'green', 'fontSize':14},
-                         children=[ html.Audio(id='myaudio',
-                                               src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
-                                               controls=True),
-                                    html.H4('Predictions rounded will be: '+ str(prediction_rounded)),
-                                    html.H4('Prediction seems to be '+ output_sound,
-                                               style={'color':'green',
-                                                      'fontSize': 30,
-                                                      'textAlign':'center',
-                                                      'text-decoration':'underline'}),
-                                    bar_graph,
-                                    html.P('Uploaded File : '+ filename)] + [html.Br() for x in range(3)])
+                         children=[html.Audio(id='myaudio',
+                                              src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
+                                              controls=True),
+                                   html.H4('Predictions rounded will be: '+ str(prediction_rounded)),
+                                   html.H4('Prediction seems to be '+ output_sound,
+                                           style={'color':'green',
+                                                  'fontSize': 30,
+                                                  'textAlign':'center',
+                                                  'text-decoration':'underline'}),
+                                   bar_graph,
+                                   html.P('Uploaded File : '+ filename)] + [html.Br() for x in range(3)])
     else:
 
         # Since the file is not a wav file or has problems, delete the file

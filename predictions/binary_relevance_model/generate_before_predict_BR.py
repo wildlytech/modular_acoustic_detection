@@ -50,8 +50,8 @@ import vggish_slim
 # Defining the flags before hand
 ##############################################################################
 FLAGS = {
-    'pca_params' : VGGISH_PATH + 'vggish_pca_params.npz',
-    'checkpoint' : VGGISH_PATH + 'vggish_model.ckpt'
+    'pca_params': VGGISH_PATH + 'vggish_pca_params.npz',
+    'checkpoint': VGGISH_PATH + 'vggish_model.ckpt'
 }
 
 ##############################################################################

@@ -186,7 +186,7 @@ class GoertzelComponents(object):
     """
     executes goertzel filtering on audio
     """
-    def __init__(self, samples, sample_rate, target_frequency, number_samples ):
+    def __init__(self, samples, sample_rate, target_frequency, number_samples):
         self.samples = samples
         self.sample_rate = sample_rate
         self.target_frequency = target_frequency

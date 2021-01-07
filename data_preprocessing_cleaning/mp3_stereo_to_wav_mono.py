@@ -52,8 +52,9 @@ def convert_single_file(path_for_mp3_file, path_to_save_wavfiles):
 
     mysound = AudioSegment.from_mp3(path_for_mp3_file)
     mono = mysound.set_channels(1)
-    mono.export(path_to_save_wavfiles+path_for_mp3_file.split(".")\
-        [-2].split("/")[-1]+".wav", format="wav")
+    mono.export(path_to_save_wavfiles + \
+                path_for_mp3_file.split(".")[-2].split("/")[-1]+".wav",
+                format="wav")
     print("Conversion is done !")
 
 

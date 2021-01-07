@@ -99,7 +99,7 @@ def previous_next_button_content(n_clicks):
                                                                  value="previous",
                                                                  id='previous_button',
                                                                  n_clicks=0,
-                                                                 style={"width" : "200px"})],
+                                                                 style={"width": "200px"})],
                                            style={"margin-left":'8%',
                                                   "width":"65%",
                                                   'display': 'inline-block'}),
@@ -107,7 +107,7 @@ def previous_next_button_content(n_clicks):
                                                                  value="next",
                                                                  id='next_button',
                                                                  n_clicks=0,
-                                                                 style={"width" : "200px"})],
+                                                                 style={"width": "200px"})],
                                            style={"width":"10%", 'display': 'inline-block'})])
 
 
@@ -182,7 +182,7 @@ def model_prediction_tab():
                                    'color':'rgb(158,202,225)'},
                                'type':'bar',
                                "text":["{0:.2f}%".format(i) for i in prediction_probs],
-                               "textposition" : 'auto',}],
+                               "textposition": 'auto',}],
                       'layout': {
                           'title':'probabilistic prediction graph ',
                           'titlefont':{
@@ -286,7 +286,7 @@ def annotation_tab(initial):
                                               data=dataframe.to_dict("rows"),
                                               row_selectable="multi",
                                               style_table={"maxHeight":"300px",
-                                                           "maxWidth" :"300px",
+                                                           "maxWidth":"300px",
                                                            "overflowY":"scroll"},
                                               selected_rows=[]),
                          dcc.Dropdown(id="dropdown_data_" + ("initial" if initial else "next"),

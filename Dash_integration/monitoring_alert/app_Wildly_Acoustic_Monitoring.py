@@ -800,12 +800,12 @@ def parse_contents(contents, filename, date):
         _, _, _, bar_graph = bar_graph_info
 
         return  html.Div(style={'color': '#e4e4e4', 'fontSize':14},
-                         children=[ html.Div(children=[html.Audio(id='myaudio',
-                                                                  src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
-                                                                  controls=True)],
-                                             style={"margin-left":"27%"}),
-                                    bar_graph,
-                                    html.P('Uploaded File : '+ filename)])
+                         children=[html.Div(children=[html.Audio(id='myaudio',
+                                                                 src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
+                                                                 controls=True)],
+                                            style={"margin-left":"27%"}),
+                                   bar_graph,
+                                   html.P('Uploaded File : '+ filename)])
     else:
 
         # Since the file is not a wav file or has problems, delete the file
@@ -969,7 +969,7 @@ def layout():
                                                                     data=DATAFRAME_REQUIRED.to_dict("rows"),
                                                                     row_selectable="multi",
                                                                     style_table={"Height":"500px",
-                                                                                 "Width" :"500px"},
+                                                                                 "Width":"500px"},
                                                                     style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                                                   "fontWeight": "bold",
                                                                                   'border': '1px solid #e4e4e4'},
@@ -1076,7 +1076,7 @@ def layout():
                                                                 data=DATAFRAME_REQUIRED.to_dict("rows"),
                                                                 row_selectable="single",
                                                                 style_table={"Height":"500px",
-                                                                             "Width" :"500px"},
+                                                                             "Width":"500px"},
                                                                 style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                                               "fontWeight": "bold",
                                                                               'border': '1px solid #e4e4e4'},
@@ -1152,7 +1152,7 @@ def callbacks(_app):
                                         data=DATAFRAME_DEVICE_STATUS.to_dict("rows"),
                                         row_selectable="single",
                                         style_table={"maxHeight":"500px",
-                                                     "maxWidth" :"400px"},
+                                                     "maxWidth":"400px"},
                                         style_header={'backgroundColor': 'rgb(30, 30, 30)'},
                                         style_cell={'backgroundColor': 'rgb(50, 50, 50)',
                                                     'color': 'white'},)
@@ -1164,7 +1164,7 @@ def callbacks(_app):
                                           data=DATAFRAME_REQUIRED.to_dict("rows"),
                                           row_selectable="single",
                                           style_table={"Height":"500px",
-                                                       "Width" :"500px"},
+                                                       "Width":"500px"},
                                           style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                         "fontWeight": "bold",
                                                         'border': '1px solid white'},
@@ -1350,7 +1350,7 @@ def callbacks(_app):
                                                      data=DATAFRAME_DEVICE_STATUS.to_dict("rows"),
                                                      row_selectable="multi",
                                                      style_table={"Height":"500px",
-                                                                  "Width" :"500px"},
+                                                                  "Width":"500px"},
                                                      style_header={'backgroundColor': 'rgb(30, 30, 30)', "fontWeight": "bold", 'border': '1px solid white'},
                                                      style_cell={'backgroundColor': 'rgb(50, 50, 50)',
                                                                  'color': 'white'},),])
@@ -1485,7 +1485,7 @@ def callbacks(_app):
                                                                 "deletable": True} for i in dataframe.columns],
                                                       data=dataframe.to_dict("rows"),
                                                       style_table={"Height":"400px",
-                                                                   "Width" :"450px"},
+                                                                   "Width":"450px"},
                                                       style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                                     "fontWeight": "bold",
                                                                     'border': '1px solid white'},
@@ -1532,7 +1532,7 @@ def callbacks(_app):
                                                       data=dataframe.to_dict("rows"),
                                                       style_table={"height":"300px",
                                                                    'overflowY': 'scroll',
-                                                                   "Width" :"450px"},
+                                                                   "Width":"450px"},
                                                       style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                                     "fontWeight": "bold",
                                                                     'border': '1px solid white'},

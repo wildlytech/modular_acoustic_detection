@@ -167,7 +167,7 @@ for each_emb, each_wav in zip(DF_TEST['features'].tolist(), DF_TEST["wav_file"].
                                     each_emb[3].reshape((10, 8000)))))
 
     # except any error then remove that file manually and then run the process again
-    except :
+    except:
         print('Test Pickling Error: ', each_wav)
 
 

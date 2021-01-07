@@ -88,10 +88,10 @@ def generate(path_to_write_embeddings, path_to_wav_files):
 
     for wav_file, wav_file_name in zip(wav_files_path, wav_file_list):
         path_to_pickle_file = path_to_write_embeddings + str(wav_file_name)[:-4] + '.pkl'
-        print (wav_file)
+        print(wav_file)
         # No need to generate the embeddings that are already generated.
         if path_to_pickle_file in pickle_files:
-            print ('Embeddings are already generated for', path_to_pickle_file)
+            print('Embeddings are already generated for', path_to_pickle_file)
 
         # In this simple example, we run the examples from a single audio file through
         # the model. If none is provided, we generate a synthetic input.

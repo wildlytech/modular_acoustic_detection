@@ -277,7 +277,7 @@ def display_page(pathname):
                                                         data=DATAFRAME_DEVICE.to_dict("rows"),
                                                         row_selectable="multi",
                                                         style_table={"maxHeight":"200px",
-                                                                     "maxWidth" :"200px"})])
+                                                                     "maxWidth":"200px"})])
                               ], style={"margin-bottom":"10px"})
                          ], className="six columns")
                      ], className="row "),
@@ -308,7 +308,7 @@ def display_page(pathname):
                                                                    data=DATAFRAME_DEVICE.to_dict("rows"),
                                                                    row_selectable="multi",
                                                                    style_table={"maxHeight":"200px",
-                                                                                "maxWidth" :"200px"})
+                                                                                "maxWidth":"200px"})
                                              ]),
                                    ], style={"margin-bottom":"10px"})
                          ], className="six columns")
@@ -339,7 +339,7 @@ def display_page(pathname):
                                                                    data=DATAFRAME_DEVICE.to_dict("rows"),
                                                                    row_selectable="multi",
                                                                    style_table={"maxHeight":"200px",
-                                                                                "maxWidth" :"200px"})
+                                                                                "maxWidth":"200px"})
                                              ]),
                                    ], style={"margin-bottom":"10px"})
                          ], className="six columns")
@@ -374,7 +374,7 @@ def display_page(pathname):
                                                                           data=DATAFRAME_DEVICE.to_dict("rows"),
                                                                           row_selectable="single",
                                                                           style_table={"maxHeight":"200px",
-                                                                                       "maxWidth" :"200px"})])
+                                                                                       "maxWidth":"200px"})])
                                           ], style={"margin-bottom":"10px"})
                                      ], className="six columns"),
                                   html.Div(id="device-details-id", className="six columns")
@@ -408,7 +408,7 @@ def display_page(pathname):
                                                         data=DATAFRAME_DEVICE.to_dict("rows"),
                                                         row_selectable="single",
                                                         style_table={"maxHeight":"200px",
-                                                                     "maxWidth" :"200px"})
+                                                                     "maxWidth":"200px"})
                                   ])
                               ], style={"margin-bottom":"10px"})
                          ], className="six columns"),
@@ -814,7 +814,7 @@ class FtpFile:
     sdfsg
     """
 
-    def __init__(self, ftp, name ):
+    def __init__(self, ftp, name):
         self.ftp = ftp
         self.name = name
         self.size = 10240
