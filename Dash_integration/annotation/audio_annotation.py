@@ -374,15 +374,15 @@ def next_audio_content(n_clicks):
 @app.callback(Output('next_tab_content', 'children'),
               [Input("next-tabs-example", "value")])
 def next_content_tab(value):
-  """
-  Displaying HTML page as per the TABS selection
-  """
-  if value == "annotation-tab":
-      return annotation_tab(False)
-  elif value == "spectrogram-tab":
-      return spectrogram_tab()
-  elif value == "model-prediction-tab":
-      return model_prediction_tab()
+    """
+    Displaying HTML page as per the TABS selection
+    """
+    if value == "annotation-tab":
+        return annotation_tab(False)
+    elif value == "spectrogram-tab":
+        return spectrogram_tab()
+    elif value == "model-prediction-tab":
+        return model_prediction_tab()
 
 
 
@@ -427,15 +427,15 @@ def initial_content(value, n_clicks):
 @app.callback(Output('intial_tab_content', 'children'),
               [Input("tabs-example", "value")])
 def initial_content_tab(value):
-  """
-  Returning HTML pages as per the TAB selection
-  """
-  if value == "annotation-tab":
-      return annotation_tab(True)
-  elif value == "spectrogram-tab":
-      return spectrogram_tab()
-  elif value == "model-prediction-tab":
-      return model_prediction_tab()
+    """
+    Returning HTML pages as per the TAB selection
+    """
+    if value == "annotation-tab":
+        return annotation_tab(True)
+    elif value == "spectrogram-tab":
+        return spectrogram_tab()
+    elif value == "model-prediction-tab":
+        return model_prediction_tab()
 
 
 
