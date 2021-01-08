@@ -17,7 +17,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from datetime import datetime
 from datetime import timedelta
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import dash_table
 import numpy as np
 import csv

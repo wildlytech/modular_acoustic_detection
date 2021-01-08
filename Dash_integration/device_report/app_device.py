@@ -13,7 +13,9 @@ from ftplib import FTP
 import socket
 import struct
 from datetime import timedelta
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 from time import strptime
 import glob
 import dash
