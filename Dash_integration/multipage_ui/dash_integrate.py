@@ -36,13 +36,11 @@ COLORS = {
 }
 
 
-
 ########################################################################
 # Description and Help
 ########################################################################
 DESCRIPTION = "Creates UI for uploading Files and checking FTP server status. Works Offline and Online"
 HELP = "Give the Required Arguments"
-
 
 
 ########################################################################
@@ -72,7 +70,6 @@ OPTIONAL_NAMED.add_argument('-csv_filename', '--csv_filename', action='store',
 
 ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
 PARSED_ARGS = ARGUMENT_PARSER.parse_args()
-
 
 
 ########################################################################
@@ -112,6 +109,8 @@ def predictions_from_models(wavfile_path, embeddings):
 ###############################################################################
 # Generates embeddings for each file and calls for predictions
 ###############################################################################
+
+
 def get_predictions(wavfile_path):
     """
     Get predictions from wav file path
@@ -126,6 +125,7 @@ def get_predictions(wavfile_path):
     except OSError:
         return None, None
 
+
 def format_label_name(name):
     """
     Format string label name to remove negative label if it is
@@ -137,6 +137,7 @@ def format_label_name(name):
         return name
     else:
         return m.group(1)
+
 
 def get_formatted_detected_sounds(prediction_rounded):
     """
@@ -160,6 +161,7 @@ def get_formatted_detected_sounds(prediction_rounded):
         output_sound = ', '.join(output_sound)
 
     return output_sound
+
 
 def get_prediction_bar_graph(filepath):
     """
@@ -242,8 +244,8 @@ def get_data_table_from_dataframe(dataframe):
                                              "overflowY":"scroll",
                                              "overflowX":"auto"})
 
-def check_pre_requiste_files():
 
+def check_pre_requiste_files():
     """
     check if wav files in FTP server are already
     downloaded locally
@@ -259,7 +261,6 @@ def check_pre_requiste_files():
         pickle.dump(files, file_obj)
     if not os.path.exists('uploaded_files_from_dash/'):
         os.makedirs('uploaded_files_from_dash/')
-
 
 
 #############################################################################
@@ -288,11 +289,9 @@ def call_for_data(dataframe,
                     [html.Br() for x in range(numPaddedLineBreaks)])
 
 
-
 ###############################################################################
 # INDEX PAGE / HOME PAGE
 ###############################################################################
-
 
 app = dash.Dash()
 app.config.suppress_callback_exceptions = True
@@ -362,7 +361,6 @@ INDEX_PAGE = html.Div(children=[html.Div(children=[html.Div(children=[html.H1('W
                                                    "color":"white",
                                                    "padding":"20px",
                                                    "textAlign":"center"})])
-
 
 
 ###############################################################################
@@ -443,7 +441,6 @@ def save_file(name, content):
         file_p.write(base64.b64decode(data))
 
 
-
 def parse_contents(contents, filename, date):
     """
     Read the file contents
@@ -494,6 +491,7 @@ def parse_contents(contents, filename, date):
                                         'fontSize': 12}),
                         ] + [html.Br() for x in range(3)])
 
+
 def parse_contents_batch(contents, names, dates):
     """
     Multiple files that are uploaded are handled
@@ -527,7 +525,6 @@ def parse_contents_batch(contents, names, dates):
     dum_df['features'] = emb
     if len(dum_df["FileNames"].tolist()) == 1:
         prediction_probs, prediction_rounded = predictions_from_models(path, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
-
 
         pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
         pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
@@ -590,7 +587,6 @@ def start_batch_run_ftp_live(path_for_folder):
     dum_df["FileNames"] = all_wav_files
     tag_names = ["FileNames"] + list(CONFIG_DATAS.keys())
 
-
     # Check if the csv file is already existing or not. If it is existing then append the result
     # to same csv file based on the downloaded file
     csv_file_exists = os.path.exists(CSV_FILENAME)
@@ -617,11 +613,13 @@ def start_batch_run_ftp_live(path_for_folder):
 # 1A UPLOAD PAGE : Reloading for Folder file results
 ###############################################################################
 
+
 PAGE_5_LAYOUT = html.Div(html.Div([html.H4('Prediction Result'),
                                    html.Div(id='live-update-text'),
                                    dcc.Interval(id='interval-component',
                                                 interval=1*1000,
                                                 n_intervals=0)]))
+
 
 @app.callback(Output('live-update-text', 'children'),
               [Input('interval-component', 'n_intervals')])
@@ -635,6 +633,7 @@ def display_reloading_csv(n_intervals):
                          titleElementType=html.H4,
                          titleColorStyle='white',
                          numPaddedLineBreaks=4)
+
 
 @app.callback(Output('button1', 'style'),
               [Input('button1', 'n_clicks')])
@@ -728,6 +727,8 @@ PAGE_2_LAYOUT = html.Div(id='Wildly listen', children=[
                        "textAlign":"center"})])
 
 # callback function for dropdown with tet graph
+
+
 @app.callback(Output('page-2-content', 'children'),
               [Input('my-dropdown', 'value')])
 def update_values(input_data):
@@ -779,6 +780,7 @@ def call_for_ftp():
     dataframe = dataframe.sort_values(["FileNames"], ascending=[1])
     return dataframe
 
+
 ###############################################################################
 # FTP STATUS PAGE : Layout and callbacks
 ###############################################################################
@@ -794,7 +796,6 @@ PAGE_3_LAYOUT = html.Div([
     html.Div(id="ftp_content_button"),
     html.Div(id="prediction-audio"),
     html.Div(id="datatable-interactivity-container")])
-
 
 
 ###############################################################################
@@ -835,7 +836,6 @@ def display_output(rows, columns, indices):
         return html.Div([html.Button('Input Batch to Model', id='button_batch', n_clicks=0)])
 
 
-
 ###############################################################################
 # FTP STATUS PAGE : Callback:
 # Disabling div elements if none are selected
@@ -863,7 +863,6 @@ def disabling_button(n_clicks):
         return {'display':"none"}
 
 
-
 ###############################################################################
 # FTP STATUS PAGE : Callback:
 # Playing the audio when file is selected
@@ -886,7 +885,6 @@ def play_button_for_prediction(rows, columns, indices):
             html.Audio(id='myaudio',
                        src='data:audio/WAV;base64,{}'.format(encoded_image_to_play),
                        controls=True)])
-
 
 
 ###############################################################################
@@ -928,7 +926,6 @@ def batch_downloading_and_predict(n_clicks):
         if len(dum_df["FileNames"].tolist()) == 1:
             prediction_probs, prediction_rounded = predictions_from_models(path, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
 
-
             pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
             pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
 
@@ -963,16 +960,11 @@ def batch_downloading_and_predict(n_clicks):
                                     style={"color":"white"})])
 
 
-
-
-
 ###############################################################################
 # SOUND LIBRARY - Requires MongoDB server
 ###############################################################################
-
 CLIENT = MongoClient('localhost', 27017)
 DATA_BASE = CLIENT.audio_library
-
 
 
 ###############################################################################
@@ -1008,8 +1000,6 @@ PAGE_4_LAYOUT = html.Div([
                        "textAlign":"center"})])
 
 
-
-
 #############################################################################
 # Sound Library: Helper: Get the list of labels in dropdown format
 #############################################################################
@@ -1022,7 +1012,6 @@ def call_for_labels(data):
         if label in list(CONFIG_DATAS.keys()):
             labels.append({"label":str(label), "value":str(label)})
     return labels
-
 
 
 #############################################################################
@@ -1054,7 +1043,6 @@ def select_class(value):
                      placeholder="Search for Label")])
 
 
-
 #############################################################################
 # Sound Library: Callback:
 # Disables appropiate div element if none are selected
@@ -1079,6 +1067,7 @@ def disabling_div_element_content_2(value, indices):
     if value is None or len(value) == 0 or indices is None:
         return {"display":"none"}
 
+
 @app.callback(Output('output_data', 'style'),
               [Input('select-labels', 'value')])
 def disabling_div_output_data(value):
@@ -1087,7 +1076,6 @@ def disabling_div_output_data(value):
     """
     if value is None or len(value) == 0:
         return {"display":"none"}
-
 
 
 #############################################################################
@@ -1143,7 +1131,6 @@ def generate_layout(value):
             return html.H5("Select Less number of Filter labels", style={"color":"green"})
 
 
-
 #############################################################################
 # Sound Library Callback:
         # Displays the play button option and other option
@@ -1186,14 +1173,12 @@ def display_output_from_data(rows, columns, indices):
             html.Button('Input audio to model', id='button', n_clicks=0)])
 
 
-
 #############################################################################
 # Sound Library: Callback:
         # actual predictions and executing the model
 #############################################################################
 @app.callback(Output('page-4-content-2', 'children'),
               [Input('button', 'n_clicks')])
-
 def predict_on_downloaded_file(n_clicks):
     """
     actual predictions takes place here
@@ -1226,14 +1211,12 @@ def predict_on_downloaded_file(n_clicks):
                                        html.P('Uploaded File : '+ filename)] + [html.Br() for x in range(3)])
 
 
-
 ###############################################################################
             # callback function for navigation settings
 ###############################################################################
 
 @app.callback(dash.dependencies.Output('page-content', 'children'),
               [dash.dependencies.Input('url', 'pathname')])
-
 def display_page(pathname):
     """
     Navigation setting
@@ -1252,10 +1235,8 @@ def display_page(pathname):
         return INDEX_PAGE
 
 
-
 ###############################################################################
 # Main Function
 ###############################################################################
-
 if __name__ == '__main__':
     app.run_server(debug=True, use_reloader=True)

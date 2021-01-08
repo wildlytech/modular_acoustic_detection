@@ -18,7 +18,6 @@ DESCRIPTION = 'Input the type of youtube sounds to mix. It can be motor, explosi
 HELP = 'Input type of audio sound'
 
 
-
 ###############################################################################
 # Arguments and parsing
 ###############################################################################
@@ -38,10 +37,6 @@ PARSER.add_argument('-path_type_two_audio_files', '--path_type_two_audio_files',
 RESULT = PARSER.parse_args()
 
 
-
-
-
-
 ###############################################################################
 # Define Constants
 ###############################################################################
@@ -49,8 +44,6 @@ RESULT = PARSER.parse_args()
 SAMPLING_RATE_ONE = 48000
 SAMPLING_RATE_TWO = 44100
 MAXIMUM_LIMIT_EXAMPLES = 8000
-
-
 
 
 ###############################################################################
@@ -79,7 +72,6 @@ def balanced_data():
     # with open(PATH_FOR_DATA+'pure/Wild/pure_wild_7061.pkl','rb') as file_obj:
     #     pure_wild=pickle.load(file_obj)
 
-
     # Balancing and experimenting
     exp = pd.concat([pure_exp], ignore_index=True)
     mot = pd.concat([pure_mot], ignore_index=True)
@@ -89,9 +81,7 @@ def balanced_data():
     dom = pd.concat([pure_dom], ignore_index=True)
     tools = pd.concat([pure_tools], ignore_index=True)
 
-
     return mot, exp, hum, nat, dom, tools
-
 
 
 ###############################################################################
@@ -130,7 +120,6 @@ def get_samplerate_44_48(dataframe):
         else:
             pass
     return samp_44k, samp_48k
-
 
 
 ###############################################################################
@@ -201,7 +190,6 @@ def start_mixing_two_audioclips_from_path(wavfile_list1, wavfile_list2, min_exam
             sound2 = AudioSegment.from_wav(each_file[1])
             output = sound1.overlay(sound2)
             output.export(RESULT.path_to_save_mixed_sounds+each_file[0].split("/")[-1][:-4]+"__mix__"+each_file[1].split("/")[-1][:-4]+".wav", format="wav")
-
 
 
 ###############################################################################

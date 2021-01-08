@@ -10,14 +10,12 @@ from tensorflow.compat.v1.keras.layers import Input
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, TimeDistributed, MaxPooling2D
 
 
-
 ###############################################################################
 # Description and Help
 ###############################################################################
 DESCRIPTION = "Compares the prediction my goertzel model and annotated labels"
 HELP_AUDIO = "Path for Dataframe with features( .pkl )"
 HELP_GOERTZEL = "Path to write predictions in csv( .csv )"
-
 
 
 ###############################################################################
@@ -33,8 +31,6 @@ PARSER.add_argument('-path_for_saved_weights',
 PARSER.add_argument("-path_to_write_prediction_csv", action="store",
                     help=HELP_GOERTZEL)
 RESULT = PARSER.parse_args()
-
-
 
 
 ###############################################################################
@@ -57,7 +53,6 @@ MAX_POOL_3 = MaxPooling2D((10, 1))(DENSE_5)
 PREDICTIONS = Flatten()(MAX_POOL_3)
 MODEL = Model(inputs=[INPUTS], outputs=[PREDICTIONS])
 print(MODEL.summary())
-
 
 
 ###############################################################################

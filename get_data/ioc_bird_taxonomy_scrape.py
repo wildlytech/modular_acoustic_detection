@@ -16,6 +16,7 @@ NEXT_TAXONOMY = {'bird':'order',
 # Nodes for the ontology json file
 ONTOLOGY_EXTENSION_NODES = []
 
+
 def parse_taxonomy(xml_dict, id_prefix, key):
     """
     Recursively perform depth-first search on taxonomy tree and
@@ -117,6 +118,7 @@ def parse_taxonomy(xml_dict, id_prefix, key):
             node_ontology_entry['child_ids'].append(child_id)
 
     return ontology_id
+
 
 ########################################################################
 # Main Function

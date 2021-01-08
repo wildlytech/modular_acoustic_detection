@@ -31,6 +31,7 @@ def separate_by_label(path, label_to_separate):
 
 ###############################################################################
 
+
 if __name__ == "__main__":
 
     DESCRIPTION = 'Copy the desired label row from given csv file and export to a new CSV file'

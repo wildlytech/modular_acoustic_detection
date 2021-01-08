@@ -12,7 +12,6 @@ from pydub import AudioSegment
 from sklearn.preprocessing import LabelBinarizer
 
 
-
 ###########################################################################
 # Define the Sounds
 ###########################################################################
@@ -156,7 +155,6 @@ NATURE_SOUNDS = [
 ]
 
 
-
 ###########################################################################
 # Description and Help
 ###########################################################################
@@ -164,8 +162,6 @@ NATURE_SOUNDS = [
 DESCRIPTION = 'Input one of these sounds : explosion_sounds , wood_sounds , motor_sounds,\
                human_sounds, tools ,domestic_sounds, Wild_animals, nature_sounds'
 HELP = 'Input the target sounds. It should be one of the listed sounds'
-
-
 
 
 ###########################################################################
@@ -177,7 +173,6 @@ IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
                 HUMAN_SOUNDS + TOOLS_SOUNDS + DOMESTIC_SOUNDS
 
 
-
 ###########################################################################
 # create a dictionary of sounds
 ###########################################################################
@@ -186,8 +181,6 @@ SOUNDS_DICT = {'explosion_sounds': EXPLOSION_SOUNDS, 'wood_sounds': WOOD_SOUNDS,
                'nature_sounds': NATURE_SOUNDS, 'motor_sounds': MOTOR_SOUNDS,
                'human_sounds': HUMAN_SOUNDS, 'tools': TOOLS_SOUNDS,
                'domestic_sounds': DOMESTIC_SOUNDS, 'Wild_animals':WILD_ANIMALS}
-
-
 
 
 ###########################################################################
@@ -246,7 +239,6 @@ def get_csv_data(target_sounds):
     train_label_binarized = pd.DataFrame(train_label_binarized, columns=name_bin.classes_)
     del train_label_binarized['None']
 
-
     # Remove rows for uninteresting sounds
     train = train.loc[train_label_binarized.sum(axis=1) > 0]
     train.index = list(range(train.shape[0]))
@@ -264,6 +256,8 @@ def get_csv_data(target_sounds):
 ###############################################################################
 # Downloads the youtube audio files
 ###############################################################################
+
+
 def download_clip(YTID, start_seconds, end_seconds, target_path):
     """
     Downloads the youtube audio files
@@ -298,8 +292,6 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
         print("Error while reading file!")
 
     os.remove(tmp_filename_w_extension)
-
-
 
 
 ###############################################################################
@@ -344,8 +336,6 @@ def download_data(target_sounds_list, target_path):
             threads = threads[1:]
     for t in threads:
         t.join()
-
-
 
 
 # call the function to dowload the target or sounds of Interest. Set the target

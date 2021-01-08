@@ -5,15 +5,12 @@ import argparse
 from pydub import AudioSegment
 
 
-
-
 ###############################################################################
 # description and Help
 ###############################################################################
 DESCRIPTION = '1. Input the path for base dataframe [YTID / wav_file, labels_name] and \n \
                2. Input the path for audio files '
 HELP = 'Input the path'
-
 
 
 ###############################################################################
@@ -25,7 +22,6 @@ PARSER.add_argument('-dataframe_path', '--dataframe_path', action='store',
 PARSER.add_argument('-path_for_audio_files', '--path_for_audio_files', action='store',
                     help='Input the path')
 RESULT = PARSER.parse_args()
-
 
 
 ###############################################################################
@@ -41,6 +37,7 @@ def glob_all_files_from_path(wavfiles_path):
         wav_files.append(each_file.split('/')[-1])
     return all_wav_files_path, wav_files
 
+
 def get_dbfs(wavfile_path):
     """
     calculate the dBFS( decibels to Full scale) to know audio is silent or no.
@@ -51,6 +48,7 @@ def get_dbfs(wavfile_path):
         dbfs.append(aud.dBFS)
     return dbfs
 
+
 def read_pickle_file(dataframe_path):
     """
     Reads pickle file
@@ -58,6 +56,7 @@ def read_pickle_file(dataframe_path):
     with open(dataframe_path, "rb") as file_obj:
         dataframe = pickle.load(file_obj)
     return dataframe
+
 
 def create_dataframe(column_list):
     """
@@ -91,8 +90,6 @@ def get_mislablled_silence_files(dataframe):
     list_of_wavfiles = mislabelled_as_silence.wav_file.tolist()
     with open('mislabelled_as_other_than_silence.txt', 'w') as file_obj:
         pickle.dump(list_of_wavfiles, file_obj)
-
-
 
 
 ###############################################################################

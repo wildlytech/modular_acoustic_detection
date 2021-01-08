@@ -110,6 +110,7 @@ def subsample_dataframe(dataframe, subsample):
 
     return dataframe
 
+
 def split_and_subsample_dataframe(dataframe, validation_split, subsample):
     """
     Perform validation split and sub/over sampling of dataframe
@@ -148,11 +149,13 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
 
     return train_df, test_df
 
+
 def get_select_vector(dataframe, label_filter_arr):
     """
     Get the boolean select vector on the dataframe from the label filter
     """
     return dataframe['labels_name'].apply(lambda arr: np.any([x.lower() in label_filter_arr for x in arr]))
+
 
 def import_dataframes(dataframe_file_list,
                       positive_label_filter_arr,
@@ -270,6 +273,7 @@ def import_dataframes(dataframe_file_list,
 
     return train_df, test_df
 
+
 DF_TRAIN, DF_TEST = \
     import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
                       positive_label_filter_arr=POSITIVE_LABELS,
@@ -310,7 +314,6 @@ X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 X_TEST_STANDARDIZED = X_TEST / 255
-
 
 
 #############################################################################
@@ -393,7 +396,6 @@ CLF2_TEST_PREDICTION = MODEL.predict(CLF2_TEST).round()
 CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 
 
-
 #############################################################################
 # To get the Misclassified examples
 #############################################################################
@@ -403,12 +405,10 @@ CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 
 
-
 #############################################################################
 # print misclassified number of examples
 #############################################################################
 print('Misclassified number of examples :', MISCLASSIFED_ARRAY.sum())
-
 
 
 #############################################################################
@@ -420,7 +420,6 @@ print('============================================')
 RESULT = confusion_matrix(CLF2_TEST_TARGET,
                           CLF2_TEST_PREDICTION)
 print(RESULT)
-
 
 
 #############################################################################
@@ -441,7 +440,6 @@ ACCURACY = accuracy_score(CLF2_TEST_TARGET,
 HL = hamming_loss(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION)
 print('Hamming Loss :', HL)
 print('Accuracy :', ACCURACY)
-
 
 
 #############################################################################

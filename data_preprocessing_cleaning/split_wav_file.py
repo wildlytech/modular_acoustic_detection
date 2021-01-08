@@ -14,6 +14,7 @@ import os
 # Helper Function
 ###############################################################################
 
+
 def get_duration_wav_file(wav_file):
     """
     Calculates the wav file duration
@@ -112,7 +113,6 @@ if __name__ == "__main__":
 
     DESCRIPTION = " Splits the long duration audio files into chunks of 10 seconds"
     HELP = "Input path for wav files directory or input single wav file path to split into chunks of 10seconds"
-
 
     ###########################################################################
     # Parse the arguments

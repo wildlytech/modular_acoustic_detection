@@ -12,6 +12,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score, classification_rep
 
 from youtube_audioset import get_recursive_sound_names
 
+
 def import_predict_configuration_json(predictions_cfg_json):
     """
     Import and process nested json data from predictions configuration file.
@@ -52,6 +53,7 @@ def import_predict_configuration_json(predictions_cfg_json):
 
     return config_data_dict
 
+
 def load_model(networkCfgJson, weightFile):
     """
     Returns the keras model using the network json configuration file and
@@ -68,6 +70,7 @@ def load_model(networkCfgJson, weightFile):
     model.load_weights(weightFile)
 
     return model
+
 
 def main(predictions_cfg_json,
          path_for_dataframe_with_features,
@@ -115,17 +118,14 @@ def main(predictions_cfg_json,
                 LABELS_BINARIZED[key] = binarized_op_column
         target_cols  = LABELS_BINARIZED.columns
 
-
     ###########################################################################
         # Filtering the sounds that are exactly 10 seconds
     ###########################################################################
     DF_TEST = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
 
-
     if IS_DATAFRAME_LABELED:
 
         LABELS_FILTERED = LABELS_BINARIZED.loc[DF_TEST.index, :]
-
 
     ###########################################################################
         # preprocess the data into required structure
@@ -137,7 +137,6 @@ def main(predictions_cfg_json,
     # reshaping the test data so as to align with input for model
     ###########################################################################
     CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
-
 
     ###########################################################################
     # Implementing using the keras usual prediction technique
@@ -199,7 +198,6 @@ def main(predictions_cfg_json,
                 with open(misclassified_pickle_file, "wb") as f:
                     pickle.dump(DF_TEST.loc[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 
-
             ###################################################################
             # Print confusion matrix and classification_report
             ###################################################################
@@ -212,7 +210,6 @@ def main(predictions_cfg_json,
                 RESULT_ = confusion_matrix(a,b)
                 print(RESULT_)
 
-
             ###################################################################
             # print classification report
             ###################################################################
@@ -221,7 +218,6 @@ def main(predictions_cfg_json,
             CL_REPORT = classification_report(gt_args,
                                               pred_args)
             print(CL_REPORT)
-
 
             ###################################################################
             # calculate accuracy and hamming loss
@@ -238,6 +234,7 @@ def main(predictions_cfg_json,
 
     if path_to_save_prediction_csv:
         DF_TEST.drop(["features"], axis=1).to_csv(path_to_save_prediction_csv)
+
 
 if __name__ == "__main__":
 

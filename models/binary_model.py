@@ -17,10 +17,6 @@ from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, \
 import balancing_dataset
 
 
-
-
-
-
 ########################################################################
 # get all the sounds
 ########################################################################
@@ -32,14 +28,12 @@ human_sounds = get_recursive_sound_names(HUMAN_SOUNDS, "./")
 nature_sounds = get_recursive_sound_names(NATURE_SOUNDS, "./")
 
 
-
 ########################################################################
 # Read the balanced data
 # Note that this is binary classification.
 # Balancing must be  [ Ambient ] vs  [ Impact ]
 ########################################################################
 DATA_FRAME = balancing_dataset.balanced_data(audiomoth_flag=0, mixed_sounds_flag=0)
-
 
 
 ########################################################################
@@ -53,14 +47,11 @@ for column in LABELS_SPLIT.columns:
 LABELS_BINARIZED = pd.DataFrame(LABELS_BINARIZED, columns=NAME_BIN.classes_)
 
 
-
-
 ########################################################################
 # print the percentage of Impact and Ambient sounds
 ########################################################################
 print("Percentage Impact Sounds:", (LABELS_BINARIZED[IMPACT_SOUNDS].sum(axis=1) > 0).mean())
 print("Percentage Ambient Sounds:", (LABELS_BINARIZED[AMBIENT_SOUNDS].sum(axis=1) > 0).mean())
-
 
 
 ########################################################################
@@ -70,15 +61,12 @@ DF_FILTERED = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 1
 LABELS_FILTERED = LABELS_BINARIZED.loc[DF_FILTERED.index, :]
 
 
-
 ########################################################################
 # Split the data into train and test
 ########################################################################
 DF_TRAIN, DF_TEST, LABELS_BINARIZED_TRAIN, LABELS_BINARIZED_TEST = train_test_split(DF_FILTERED, LABELS_FILTERED,
                                                                                     test_size=0.33, random_state=42,
                                                                                     stratify=LABELS_FILTERED.any(axis=1)*1)
-
-
 
 
 ########################################################################
@@ -92,8 +80,6 @@ Y_TRAIN = (LABELS_BINARIZED_TRAIN[IMPACT_SOUNDS].any(axis=1)*1).values
 Y_TEST = (LABELS_BINARIZED_TEST[IMPACT_SOUNDS].any(axis=1)*1).values
 
 
-
-
 ########################################################################
 # Print the percentage of each sounds in whole data
 ########################################################################
@@ -105,14 +91,12 @@ print(LABELS_FILTERED.loc[:, nature_sounds].any(axis=1).mean())
 print(LABELS_FILTERED.loc[:, IMPACT_SOUNDS].any(axis=1).mean())
 
 
-
 ########################################################################
 # Try experimenting with Logistic regression algorithm
 ########################################################################
 CLF1_ = LogisticRegression(max_iter=1000)
 CLF1_TRAIN = X_TRAIN
 CLF1_TEST = X_TEST
-
 
 
 ########################################################################
@@ -122,7 +106,6 @@ CLF1_TEST = X_TEST
 ########################################################################
 CLF1_TRAIN_TARGET = LABELS_BINARIZED_TRAIN.loc[:, IMPACT_SOUNDS].any(axis=1)
 CLF1_TEST_TARGET = LABELS_BINARIZED_TEST.loc[:, IMPACT_SOUNDS].any(axis=1)
-
 
 
 ########################################################################
@@ -152,7 +135,6 @@ print("Train Accuracy:", (CLF1_TRAIN_PREDICTION == CLF1_TRAIN_TARGET).mean())
 print(CLF1_CONF_TRAIN_MAT)
 
 
-
 ########################################################################
 # Print out the confusion matrix for test data
 ########################################################################
@@ -163,8 +145,6 @@ print("Test Precision:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_M
 print("Test Recall:", CLF1_CONF_TEST_MAT[True][True] / float(CLF1_CONF_TEST_MAT['All'][True]))
 print("Test Accuracy:", (CLF1_TEST_PREDICTION == CLF1_TEST_TARGET).mean())
 print(CLF1_CONF_TEST_MAT)
-
-
 
 
 ########################################################################
@@ -232,7 +212,6 @@ print("Train Precision:", CLF2_CONF_TRAIN_MAT[True][True] / float(CLF2_CONF_TRAI
 print("Train Recall:", CLF2_CONF_TRAIN_MAT[True][True] / float(CLF2_CONF_TRAIN_MAT['All'][True]))
 print("Train Accuracy:", (CLF2_TRAIN_PREDICTION == CLF2_TRAIN_TARGET).mean())
 print(CLF2_CONF_TRAIN_MAT)
-
 
 
 ########################################################################

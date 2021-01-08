@@ -24,6 +24,7 @@ def SetColor(x):
     elif(x < 10):
         return "red"
 
+
 def plot_function(dataframe):
 
     try:
@@ -114,9 +115,11 @@ def plot_function_bar(dataframe,device_value):
     )
     return trace1
 
+
 def read_csv_file(csv_file_name):
     df = pd.read_csv(csv_file_name)
     return df
+
 
 def get_data_specific_date(dataframe):
     list_of_date_time = dataframe['Time_Stamp'].values.tolist()
@@ -129,6 +132,7 @@ def get_data_specific_date(dataframe):
     dataframe["Date"] = only_date
     return dataframe, list(set(date_value))
 
+
 def get_data_specific_time(dataframe):
     list_of_date_time = dataframe["Time_Stamp"].values.tolist()
     only_time = []
@@ -139,6 +143,7 @@ def get_data_specific_time(dataframe):
 
     dataframe["Time"] = only_time
     return dataframe
+
 
 def filter_on_date(dataframe, date):
     return dataframe.loc[dataframe["Date"].apply(lambda arr: arr.split("/")[0] == date[0] or arr.split("/")[0] == date[1])]
@@ -151,11 +156,13 @@ def get_dataframe_for_plotting_transmission(file_index):
     df_date = get_data_specific_time(df_date)
     return df_date
 
+
 def get_dictionary(csv_files):
     req_dict = dict()
     for index, each_file in enumerate(csv_files):
         req_dict["Device_"+str(index)] = each_file
     return req_dict
+
 
 ###############################################################################
 # LOCATION HELPER FUNC
@@ -204,9 +211,7 @@ def get_layout():
                 pitch=0,
                 zoom=5))
 
-
     return layout
-
 
 
 def get_figure(list_of_devices):

@@ -7,12 +7,9 @@ import pandas as pd
 from . import generate_before_predict_BR
 
 
-
-
 ############################################################################
 # Target Path or Folder in FTP
 ############################################################################
-
 
 
 DESCRIPTION = "Generates the csv file with prediction results"
@@ -36,7 +33,6 @@ PARSER.add_argument('-csv_filename', '--csv_filename', action='store',
                     help='Input the name of csv file to save results', default=DEFAULT_CSV_FILENAME)
 
 RESULT = PARSER.parse_args()
-
 
 
 ############################################################################
@@ -64,7 +60,6 @@ def check_directory_to_write_wavfiles():
         os.mkdir("FTP_downloaded/")
 
 
-
 ############################################################################
 # List only wav files into
 ############################################################################
@@ -78,8 +73,6 @@ def check_for_wav_only(list_values):
             wav_files.append(each_value)
     print("Total file: ", len(wav_files))
     return wav_files
-
-
 
 
 ############################################################################
@@ -102,8 +95,6 @@ def sorting_files_same_as_upload_order(wav_files_list):
     sorted_filenames = [element[0] for element in sorted_list]
 
     return sorted_filenames
-
-
 
 
 ############################################################################
@@ -131,8 +122,6 @@ def call_for_ftp():
     return dataframe
 
 
-
-
 ############################################################################
     # Loops over the list of files in ftp & saves predictions in csv
 ############################################################################
@@ -146,7 +135,6 @@ def start_batch_run_ftp_live():
     tag_names = ["FileNames", "Motor_probability", "Explosion_probability",
                  "Human_probability", "Nature_probability", "Domestic_probability",
                  "Tools_probability"]
-
 
     # Check if the csv file is already existing or not. If it is existing then append the result
     # to same csv file based on the downloaded file
@@ -217,7 +205,6 @@ def start_batch_run_ftp_live():
                         predictions_each_model.append("NaN")
                 wav_information_object.writerow([each_file] + predictions_each_model)
                 file_object.flush()
-
 
 
 ############################################################################

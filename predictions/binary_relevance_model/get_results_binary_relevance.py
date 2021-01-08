@@ -11,6 +11,7 @@ import pickle
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
 from youtube_audioset import get_recursive_sound_names
 
+
 def import_predict_configuration_json(predictions_cfg_json):
     """
     Import and process nested json data from predictions configuration file.
@@ -53,6 +54,7 @@ def import_predict_configuration_json(predictions_cfg_json):
 
     return config_data_dict
 
+
 def load_model(networkCfgJson, weightFile):
     """
     Returns the keras model using the network json configuration file and
@@ -69,6 +71,7 @@ def load_model(networkCfgJson, weightFile):
     model.load_weights(weightFile)
 
     return model
+
 
 def main(predictions_cfg_json,
          path_for_dataframe_with_features,
@@ -118,18 +121,15 @@ def main(predictions_cfg_json,
     if IS_DATAFRAME_LABELED:
         LABELS_FILTERED = LABELS_BINARIZED.loc[DF_TEST.index, :]
 
-
     ###########################################################################
         # preprocess the data into required structure
     ###########################################################################
     X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 
-
     ###########################################################################
     # reshaping the test data so as to align with input for model
     ###########################################################################
     CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
-
 
     ###########################################################################
     # Implementing using the keras usual prediction technique
@@ -153,7 +153,6 @@ def main(predictions_cfg_json,
         DF_TEST.insert(len(DF_TEST.columns), label_name+"_Probability", CLF2_TEST_PREDICTION_PROB)
         DF_TEST.insert(len(DF_TEST.columns), label_name+"_Prediction", CLF2_TEST_PREDICTION)
 
-
         if IS_DATAFRAME_LABELED:
             ###################################################################
             # Target for the test labels
@@ -169,7 +168,6 @@ def main(predictions_cfg_json,
             print('\nMisclassified number of examples for '+ label_name + " :", \
                   DF_TEST.loc[MISCLASSIFED_ARRAY].shape[0])
 
-
             ###################################################################
             #  misclassified examples are to be saved
             ###################################################################
@@ -178,7 +176,6 @@ def main(predictions_cfg_json,
                               "misclassified_examples_br_model_"+label_name+".pkl"
                 with open(misclassified_pickle_file, "wb") as f:
                     pickle.dump(DF_TEST[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
-
 
             ###################################################################
                     # Print confusion matrix and classification_report
@@ -189,7 +186,6 @@ def main(predictions_cfg_json,
                                        CLF2_TEST_PREDICTION)
             print(RESULT_)
 
-
             ###################################################################
             # print classification report
             ###################################################################
@@ -198,7 +194,6 @@ def main(predictions_cfg_json,
             CL_REPORT = classification_report(CLF2_TEST_TARGET,
                                               CLF2_TEST_PREDICTION)
             print(CL_REPORT)
-
 
             ###################################################################
             # calculate accuracy and hamming loss
@@ -215,6 +210,7 @@ def main(predictions_cfg_json,
 
     if path_to_save_prediction_csv:
         DF_TEST.drop(["features"], axis=1).to_csv(path_to_save_prediction_csv)
+
 
 if __name__ == "__main__":
 

@@ -31,7 +31,6 @@ from predictions.binary_relevance_model import generate_before_predict_BR,\
                                                predict_on_wavfile_binary_relevance
 
 
-
 ###############################################################################
 # running directly with Python
 ###############################################################################
@@ -56,7 +55,6 @@ if os.path.exists("downloaded_audio_files/soi_csv_file.csv"):
     os.remove("downloaded_audio_files/soi_csv_file.csv")
 else:
     pass
-
 
 
 ###############################################################################
@@ -208,7 +206,6 @@ def active_or_inactive(dir_n_timestamp, directories_time_list):
     return dir_n_timestamp, status
 
 
-
 ###############################################################################
 # Connect to FTP server
 ###############################################################################
@@ -263,6 +260,8 @@ def predictions_from_models(wavfile_path, embeddings):
 ###############################################################################
 # Generates embeddings for each file and calls for predictions
 ###############################################################################
+
+
 def get_predictions(wavfile_path):
     """
     Get predictions from wav file path
@@ -290,6 +289,7 @@ def format_label_name(name):
     else:
         return m.group(1)
 
+
 def get_formatted_detected_sounds(prediction_rounded):
     """
     Get names of detected output sounds as a single string.
@@ -312,6 +312,7 @@ def get_formatted_detected_sounds(prediction_rounded):
         output_sound = ', '.join(output_sound)
 
     return output_sound
+
 
 def get_prediction_bar_graph(filepath):
     """
@@ -370,6 +371,8 @@ def get_prediction_bar_graph(filepath):
 ###############################################################################
 # Saves the audio file / Downloads audio file
 ###############################################################################
+
+
 def save_file(name, content):
     """
     Decode and store a file uploaded with Plotly Dash.
@@ -442,7 +445,6 @@ def sort_on_filenames(files_list):
         return None
 
 
-
 ###############################################################################
 # Downloads audio files but checks for already existed one
 ###############################################################################
@@ -460,7 +462,6 @@ def download_files(each_wav_file, path_to_download, blockalign, samplerate,ftp_o
     else:
         with open(path_to_download+each_wav_file, 'wb') as file_obj:
             ftp_obj.retrbinary('RETR '+ each_wav_file, file_obj.write)
-
 
 
 ###############################################################################
@@ -487,7 +488,6 @@ def write_csv_prediction(direct_name, filename, device_id, prediction_list, csv_
             file_object.flush()
 
 
-
 ###############################################################################
 # Checks if the predicted sounds consist of sound iof interest
 ###############################################################################
@@ -506,9 +506,6 @@ def check_for_soi(prediction_list_rounded, labels_aligned):
         else:
             pass
     return soi_predicted
-
-
-
 
 
 ###############################################################################
@@ -636,8 +633,6 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
                 pass
 
 
-
-
 ###############################################################################
 # Alert function
 ###############################################################################
@@ -667,7 +662,6 @@ def get_alerted(wavfile_path, soi_found, prediction_list, phoneNo):
         return text
     else:
         return
-
 
 
 ###############################################################################
@@ -740,8 +734,6 @@ class FtpFile:
         return data
 
 
-
-
 ###############################################################################
 # returns wavheader information
 ###############################################################################
@@ -774,7 +766,6 @@ def get_wavheader_subchunk1(name,ftp_obj):
             wavheader_dict[each_value[1]] = each_value[0]
 
         return wavheader_dict
-
 
 
 ###############################################################################
@@ -817,7 +808,6 @@ def parse_contents(contents, filename, date):
                                    style={"textAlign":"center"}))
 
 
-
 ###############################################################################
 # Color coding for selected labels
 ###############################################################################
@@ -835,8 +825,6 @@ def get_colored_for_soi_columns(value_list):
         return list_output
     else:
         return None
-
-
 
 
 ###############################################################################
@@ -879,8 +867,6 @@ def format_html_data_table(dataframe, list_of_malformed, addLineBreak=False):
                                                        "overflowX":"auto"}),
                      html.Hr()] + \
                     ([html.Br()] if addLineBreak else []))
-
-
 
 
 ###############################################################################
@@ -932,8 +918,6 @@ def parse_contents_batch(contents, names, dates):
                 pass
 
         return format_html_data_table(pred_df, list_of_malformed = malformed)
-
-
 
 
 ###############################################################################
@@ -1129,6 +1113,8 @@ def layout():
 ###############################################################################
 # Callback for each tab operation
 ###############################################################################
+
+
 def callbacks(_app):
     """
     All the callbacks grouped in this function
@@ -1177,11 +1163,10 @@ def callbacks(_app):
                                                                    'backgroundColor': '#3D9970',
                                                                    'color': 'black'}])
 
-
-
     ###########################################################################
     # Play selected audio
     ###########################################################################
+
     @_app.callback(
         Output('prediction-audio', 'children'),
         [Input('datatable-interactivity-predictions', 'data'),
@@ -1202,10 +1187,10 @@ def callbacks(_app):
                            controls=True,
                            style={"margin-left":"25%"})])
 
-
     ###########################################################################
     # Disabling div element not required
     ###########################################################################
+
     @_app.callback(
         Output('prediction-audio', 'style'),
         [Input('clustergram-tabs', 'value')])
@@ -1215,10 +1200,10 @@ def callbacks(_app):
         if value == "datasets" or value == "graph":
             return {"display":"none"}
 
-
     ###########################################################################
     # Play option for predicted and selected file
     ###########################################################################
+
     @_app.callback(
         Output('prediction-audio-upload', 'children'),
         [Input('datatable-interactivity-predictions', 'data'),
@@ -1238,10 +1223,10 @@ def callbacks(_app):
                                         controls=True,
                                         style={"margin-left":"25%"})])
 
-
     ###########################################################################
     # disabling div element that is not required
     ###########################################################################
+
     @_app.callback(
         Output('prediction-audio-upload', 'style'),
         [Input('clustergram-tabs', 'value')])
@@ -1251,10 +1236,10 @@ def callbacks(_app):
         if value == "what-is" or value == "graph":
             return {"display":"none"}
 
-
     ###########################################################################
     # disabling div element that is not required
     ###########################################################################
+
     @_app.callback(Output('display-all-directory-on-status-selection-div', 'style'),
             [Input('clustergram-datasets1', 'value')])
     def disabling_directory_change_filter_type(value):
@@ -1264,10 +1249,10 @@ def callbacks(_app):
         if value == "devid" or value == "none" or value == "timestamps":
             return {'display':"none"}
 
-
     ###########################################################################
     # disabling div element that is not required
     ###########################################################################
+
     @_app.callback(Output('display-directory-on-status-selection', 'style'),
             [Input('clustergram-datasets1', 'value')])
     def disabling_directory_on_status_selection(value):
@@ -1277,10 +1262,10 @@ def callbacks(_app):
         if value == "devid" or value == "none" or value == "timestamps":
             return {'display':"none"}
 
-
     ###########################################################################
     # Displays button to run predictions on selection of file
     ###########################################################################
+
     @_app.callback(
         Output('display-selection-buttons-single-monitor', 'children'),
         [Input('display-all-directory-on-status-selection-datatable', 'data'),
@@ -1308,15 +1293,13 @@ def callbacks(_app):
                              n_clicks = 0,
                              style={"marginTop":"10px"}),
 
-
         else:
             batch_ftp_file_df = pd.DataFrame()
-
-
 
     ###########################################################################
     # Displays all the directories of selected status
     ###########################################################################
+
     @_app.callback(
         Output('display-directory-on-status-selection', 'children'),
         [Input('display-all-directories-datatable', 'data'),
@@ -1357,11 +1340,10 @@ def callbacks(_app):
                                                      style_cell={'backgroundColor': 'rgb(50, 50, 50)',
                                                                  'color': 'white'},),])
 
-
-
     ###########################################################################
     # callback for upload of single file
     ###########################################################################
+
     @_app.callback(Output(component_id='graph-output-any', component_property='children'),
                    [Input(component_id='upload-data', component_property='contents')],
                    [State('upload-data', 'filename'),
@@ -1381,10 +1363,10 @@ def callbacks(_app):
             else:
                 return parse_contents_batch(list_of_contents, list_of_names, list_of_dates)
 
-
     ###########################################################################
     # callback for monitoring the directory with soi
     ###########################################################################
+
     @_app.callback(Output(component_id='graph-output-graph-tab-do-nothing', component_property='style'),
                   [Input(component_id='display-all-directories-datatable-graph-tab', component_property='data'),
                    Input('display-all-directories-datatable-graph-tab', 'columns'),
@@ -1455,11 +1437,10 @@ def callbacks(_app):
                     except (KeyboardInterrupt, SystemExit):
                         sys.exit(1)
 
-
-
     ###########################################################################
     # Refreshs continuously the div element to display predictions
     ###########################################################################
+
     @_app.callback(Output(component_id='graph-output-graph-tab', component_property='children'),
                    [Input("selected-all-active-devices-graph-tab", "n_clicks"),
                     Input("Selected-devices-button-graph-tab", "n_clicks"),
@@ -1555,11 +1536,10 @@ def callbacks(_app):
             else:
                 return html.Div([html.P("Waiting For getting SOI", style={"textAlign":"center"})])
 
-
-
     ###########################################################################
     # callback to stop monitoring
     ###########################################################################
+
     @_app.callback(Output(component_id='button-to-stop-threads', component_property='disable'),
                    [Input("button-to-stop-threads", "n_clicks")])
     def stop_threads_on_button_click(n_clicks):
@@ -1581,11 +1561,10 @@ def callbacks(_app):
                 pass
             return  True
 
-
-
     ###########################################################################
     # Disabling div elements that are not required
     ###########################################################################
+
     @_app.callback(
         Output('button-stop-threads', 'style'),
         [Input('clustergram-tabs', 'value')])
@@ -1596,11 +1575,10 @@ def callbacks(_app):
         if value == "datasets" or value == "what-is":
             return {"display":"none"}
 
-
-
     ###########################################################################
     #  Batch processing of the ftp files
     ###########################################################################
+
     @_app.callback(
         Output('graph-output-ftp', 'children'),
         [Input('selected-files-input-button', 'n_clicks')])
@@ -1681,12 +1659,10 @@ def callbacks(_app):
                                         "corrupted or Input a valid 10 second .wav file",
                                         style={"color":"white"})])
 
-
-
-
     ###########################################################################
     # Disabling div elements that are not required
     ###########################################################################
+
     @_app.callback(
         Output('graph-output-ftp', 'style'),
         [Input('clustergram-tabs', 'value')])
@@ -1706,6 +1682,7 @@ def callbacks(_app):
         """
         if value == "what-is" or value == "graph":
             return {"display":"none"}
+
     @_app.callback(
         Output('graph-output-graph-tab', 'style'),
         [Input('clustergram-tabs', 'value')])
@@ -1715,6 +1692,7 @@ def callbacks(_app):
         """
         if value == "what-is" or value == "datasets":
             return {"display":"none"}
+
 
 if __name__ == '__main__':
 
@@ -1734,7 +1712,6 @@ if __name__ == '__main__':
                                 help='Input FTP username', required=True)
     REQUIRED_NAMED.add_argument('-ftp_password', '--ftp_password', action='store',
                                 help='Input FTP Password', required=True)
-
 
     OPTIONAL_NAMED.add_argument('-predictions_cfg_json',
                             '--predictions_cfg_json', action='store',
@@ -1760,7 +1737,6 @@ if __name__ == '__main__':
     DIR_AND_TIMESTAMP, STATUS = active_or_inactive(DIR_AND_TIMESTAMP, DIRECTORIES_TIME_LIST)
     DATAFRAME_REQUIRED = pd.DataFrame()
 
-
     ###########################################################################
     # Creating a dataframe to display
     ###########################################################################
@@ -1776,7 +1752,6 @@ if __name__ == '__main__':
 ###############################################################################
 if 'DASH_PATH_ROUTING' in os.environ or __name__ == '__main__':
     app = run_standalone_app(layout, callbacks, header_colors, __file__)
-
 
 
 if __name__ == '__main__':

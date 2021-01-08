@@ -4,6 +4,7 @@ from pydub import AudioSegment
 import glob
 import os
 
+
 def convert_files_directory(path_for_mp3_files, path_to_save_wavfiles):
     """
     Convert all mp3 files in a particular directory to wav files
@@ -33,6 +34,7 @@ def convert_files_directory(path_for_mp3_files, path_to_save_wavfiles):
         mono = mysound.set_channels(1)
         mono.export(path_to_save_wavfiles+mp3_file.split(".")[-2].split("/")[-1]+".wav", format="wav")
     print("Conversion is done !")
+
 
 def convert_single_file(path_for_mp3_file, path_to_save_wavfiles):
     """
@@ -70,7 +72,6 @@ if __name__ == '__main__':
         help='Input path to save wav file(s)',
         required=True)
     RESULT = PARSER.parse_args()
-
 
     path_for_mp3 = RESULT.input_mp3_path
     path_to_save_wavfiles = RESULT.path_to_save_wav_files

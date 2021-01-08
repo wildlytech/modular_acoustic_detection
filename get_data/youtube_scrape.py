@@ -4,7 +4,6 @@ import os
 from subprocess import check_call, CalledProcessError
 
 
-
 ###########################################################################
 # Change as per the need
 ###########################################################################
@@ -26,7 +25,6 @@ else:
     pass
 
 
-
 ###########################################################################
     # Settings for scraping the youtube webpage with selected query keyword
 ###########################################################################
@@ -39,7 +37,6 @@ SOUP = bs(PAGE, 'html.parser')
 VIDEOS = SOUP.findAll('a', attrs={'class':'yt-uix-tile-link'})
 
 
-
 ###########################################################################
 # Create a list of query's with videoID's
 ###########################################################################
@@ -47,7 +44,6 @@ VIDEO_LIST = []
 for v in VIDEOS:
     tmp = 'https://www.youtube.com' + v['href']
     VIDEO_LIST.append(tmp)
-
 
 
 ###########################################################################

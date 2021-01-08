@@ -6,7 +6,6 @@ from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatt
 from tensorflow.compat.v1.keras.optimizers import Adam
 
 
-
 ##############################################################################
 
 ##############################################################################
@@ -32,7 +31,6 @@ def create_keras_model():
                   optimizer=Adam(lr=1e-4, epsilon=1e-8),
                   metrics=['accuracy'])
     return model
-
 
 
 ##############################################################################
@@ -75,7 +73,6 @@ def predictions_wavfile(data, model_type):
         return None, None
 
 
-
 ##############################################################################
 
 ##############################################################################
@@ -101,7 +98,6 @@ def predictions_batch_wavfiles(data, model_type):
         model.load_weights("predictions/binary_relevance_model/Binary_Relevance_Models/Nature_BR_Model/binary_relevance_nature_realised_multilabel_weights_mixedsounds_NM_NE_NH_added_maxpool_at_end_4times_500units_sigmoid_Test.h5")
     else:
         print("Invalid Model Selected")
-
 
     predictions_prob = model.predict(data)
     predictions = predictions_prob.round()

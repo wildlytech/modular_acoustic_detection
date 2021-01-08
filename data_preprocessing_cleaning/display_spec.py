@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import librosa.display
 import argparse
 
+
 def get_spectrogram(filepath):
     """
     Creates mel spectrogram using Librosa
@@ -16,6 +17,7 @@ def get_spectrogram(filepath):
     sig, fs = librosa.load(filepath)
     S = librosa.feature.melspectrogram(y=sig, sr=fs)
     return S
+
 
 def plot_spec(S,filepath=None):
     """
@@ -34,6 +36,7 @@ def plot_spec(S,filepath=None):
         plt.savefig(filepath, bbox_inches='tight', pad_inches=0)
     else:
         plt.show()
+
 
 if __name__=="__main__":
     DESCRIPTION = "SPECTROGRAM DISPLAY MODULE"

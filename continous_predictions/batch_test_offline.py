@@ -17,7 +17,6 @@ DESCRIPTION = "Generates the csv file with prediction results"
 HELP = "Give the Required Arguments"
 
 
-
 ############################################################################
 # Parsing argument
 ############################################################################
@@ -29,14 +28,11 @@ PARSER.add_argument('-csv_filename', '--csv_filename', action='store',
 RESULT = PARSER.parse_args()
 
 
-
 ############################################################################
 # Setting the input arguments
 ############################################################################
 FOLDER_FILES_PATH = RESULT.local_folder_path
 CSV_FILENAME = RESULT.csv_filename
-
-
 
 
 ############################################################################
@@ -55,7 +51,6 @@ def start_batch_run_ftp_live(path_for_folder):
     tag_names = ["FileNames", "Motor_probability", "Explosion_probability",
                  "Human_probability", "Nature_probability", "Domestic_probability",
                  "Tools_probability", "dBFS"]
-
 
     ###########################################################################
     # Check if the csv file is already existing or not.

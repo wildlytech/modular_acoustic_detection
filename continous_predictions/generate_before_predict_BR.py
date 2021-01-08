@@ -46,7 +46,6 @@ import vggish_postprocess
 import vggish_slim
 
 
-
 flags = tf.app.flags
 
 
@@ -86,7 +85,6 @@ flags.DEFINE_string(
     'Path to a TFRecord file where embeddings will be written.')
 
 FLAGS = flags.FLAGS
-
 
 
 ##############################################################################

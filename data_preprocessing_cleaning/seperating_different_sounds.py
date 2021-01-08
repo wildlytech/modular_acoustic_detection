@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 
 
-
 ###############################################################################
 # parse the input path to write the dataframes of seprated sounds
 ###############################################################################
@@ -29,13 +28,11 @@ PARSER.add_argument('-path_to_write_different_sounds',
 RESULT = PARSER.parse_args()
 
 
-
 ###############################################################################
 # create a path if not there
 ###############################################################################
 if not os.path.exists(RESULT.path_to_write_different_sounds):
     os.makedirs(RESULT.path_to_write_different_sounds)
-
 
 
 ###############################################################################
@@ -61,7 +58,6 @@ def check_for_null(data_frame):
         return False
 
 
-
 ###############################################################################
 # Reading a pickle file consiting of the unbalanced data and sound labels
 ###############################################################################
@@ -76,7 +72,6 @@ print(UN.shape)
 # Explosion, Motor, Nature, Human, Wood with numbers assigned
 # as 0,1,2,3,4 respectively.
 LAB = pd.read_csv('coarse_labels.csv')
-
 
 
 ###############################################################################
@@ -99,8 +94,6 @@ UN_4 = UN.loc[UN['len'] == 4]
 UN_5 = UN.loc[UN['len'] == 5]
 
 
-
-
 ###############################################################################
 # separate out the sounds from single labelled.
 # Check out the coarse_labels.csv file to know what
@@ -114,8 +107,6 @@ PURE_WOD = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 4)]
 PURE_WILD = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 5)]
 PURE_DOM = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 6)]
 PURE_TOOLS = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 7)]
-
-
 
 
 ###############################################################################
@@ -132,7 +123,6 @@ for i, j in zip(FILE_NAMES,
         path_initializer("pure/"+i)
         with open(RESULT.path_to_write_different_sounds+"pure/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
             pickle.dump(j, f)
-
 
 
 ###############################################################################
@@ -158,8 +148,6 @@ for i, j in zip(FILE_NAMES, [EXP_MOT, EXP_NAT, EXP_HUM, EXP_WOD, EXP_WILD, EXP_D
             pickle.dump(j, f)
 
 
-
-
 ###############################################################################
 # mot with other sounds
 ###############################################################################
@@ -179,8 +167,6 @@ for i, j in zip(FILE_NAMES, [MOT_NAT, MOT_HUM, MOT_WOD, MOT_WILD, MOT_DOM, MOT_T
         path_initializer("mixed_sounds/"+i)
         with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
             pickle.dump(j, f)
-
-
 
 
 ###############################################################################
@@ -203,8 +189,6 @@ for i, j in zip(FILE_NAMES, [NAT_HUM, NAT_WOD, NAT_WILD, NAT_DOM, NAT_TOOLS]):
             pickle.dump(j, f)
 
 
-
-
 ###############################################################################
 # human sounds with other Sounds
 ###############################################################################
@@ -220,7 +204,6 @@ for i, j in zip(FILE_NAMES, [HUM_WOD, HUM_WILD, HUM_DOM, HUM_TOOLS]):
         path_initializer("mixed_sounds/"+i)
         with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
             pickle.dump(j, f)
-
 
 
 ###############################################################################
@@ -241,8 +224,6 @@ for i, j in zip(FILE_NAMES, [WOD_WILD, WOD_DOM, WOD_TOOLS]):
             pickle.dump(j, f)
 
 
-
-
 ###############################################################################
 # wild and other sounds
 ###############################################################################
@@ -260,8 +241,6 @@ for i, j in zip(FILE_NAMES, [WILD_DOM, WILD_TOOLS]):
             pickle.dump(j, f)
 
 
-
-
 ###############################################################################
 # domestic and other
 ###############################################################################
@@ -269,8 +248,6 @@ DOM_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 6) & (a
 with open(RESULT.path_to_write_different_sounds+'dom_tools_'+
           str(DOM_TOOLS.shape[0])+'.pkl', 'wb') as f:
     pickle.dump(DOM_TOOLS, f)
-
-
 
 
 ###############################################################################

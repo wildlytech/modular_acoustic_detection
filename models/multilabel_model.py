@@ -29,10 +29,12 @@ parser.add_argument("-cfg_json",action="store",help=HELP,required=True)
 result = parser.parse_args()
 cfg_path = result.cfg_json
 
+
 def read_config(filepath):
     with open(filepath) as f:
         config = json.load(f)
     return config
+
 
 config = read_config(cfg_path)
 
@@ -65,8 +67,6 @@ for label_dicts in config["labels"]:
         neg_sounds[neg_lab_name] = comprising_neg_labels
 
 
-
-
 ########################################################################
     # Importing balanced data from the function.
     # Including audiomoth annotated files for training
@@ -86,6 +86,7 @@ def subsample_dataframe(dataframe, subsample):
             dataframe = pd.DataFrame([], columns=dataframe.columns)
 
     return dataframe
+
 
 def split_and_subsample_dataframe(dataframe, validation_split, subsample):
     """
@@ -126,11 +127,13 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
 
     return train_df, test_df
 
+
 def get_select_vector(dataframe, label_filter_arr):
     """
     Get the boolean select vector on the dataframe from the label filter
     """
     return dataframe['labels_name'].apply(lambda arr: np.any([x.lower() in label_filter_arr for x in arr]))
+
 
 def import_dataframes(dataframe_file_list,
                       positive_label_filter_arr,
@@ -234,8 +237,6 @@ DF_TRAIN, DF_TEST = import_dataframes(dataframe_file_list=config["train"]["input
                               validation_split=config["train"]["validationSplit"])
 
 
-
-
 LABELS_BINARIZED_TRAIN = pd.DataFrame()
 LABELS_BINARIZED_TEST = pd.DataFrame()
 for key in pos_sounds.keys():
@@ -243,9 +244,7 @@ for key in pos_sounds.keys():
     POSITIVE_LABELS = pos_sounds[key]
     LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(DF_TRAIN, POSITIVE_LABELS)
 
-
     LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
-
 
 
 print("TR: ",LABELS_BINARIZED_TRAIN.columns)
@@ -269,7 +268,6 @@ print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS / TOTAL_TRAIN_TEST_EXAMPLES)
 ########################################################################
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
-
 
 
 ########################################################################
@@ -297,8 +295,6 @@ def create_keras_model():
     return model
 
 
-
-
 ########################################################################
     # reshaping the train and test data so as to align with input for model
 ########################################################################
@@ -306,7 +302,6 @@ CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
 CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
 CLF2_TRAIN_TARGET = LABELS_BINARIZED_TRAIN
 CLF2_TEST_TARGET = LABELS_BINARIZED_TEST
-
 
 
 ########################################################################
@@ -333,8 +328,6 @@ MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
 
 
-
-
 ########################################################################
 # Predict on train and test data
 # Changing decision threshold can be done here
@@ -343,8 +336,6 @@ CLF2_TRAIN_PREDICTION = MODEL.predict(CLF2_TRAIN).round()
 CLF2_TRAIN_PREDICTION_PROB = MODEL.predict(CLF2_TRAIN)
 CLF2_TEST_PREDICTION = MODEL.predict(CLF2_TEST).round()
 CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
-
-
 
 
 ########################################################################
@@ -358,13 +349,10 @@ MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 
 
-
-
 ########################################################################
 # print misclassified number of examples
 ########################################################################
 print('Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shape[0])
-
 
 
 ########################################################################
@@ -385,8 +373,6 @@ CL_REPORT = classification_report(CLF2_TEST_TARGET.values.argmax(axis=1),
 print(CL_REPORT)
 
 
-
-
 ########################################################################
 # calculate accuracy and hamming loss
 ########################################################################
@@ -395,8 +381,6 @@ ACCURACY = accuracy_score(CLF2_TEST_TARGET.values.argmax(axis=1),
 HL = hamming_loss(CLF2_TEST_TARGET.values.argmax(axis=1), CLF2_TEST_PREDICTION.argmax(axis=1))
 print('Hamming Loss :', HL)
 print('Accuracy :', ACCURACY)
-
-
 
 
 ########################################################################

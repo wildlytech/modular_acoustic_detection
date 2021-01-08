@@ -10,7 +10,6 @@ import glob
 import argparse
 
 
-
 ###############################################################################
 # Description and Help
 ###############################################################################
@@ -34,8 +33,6 @@ PARSER.add_argument('-codec_type', '--codec_type',
 RESULT = PARSER.parse_args()
 
 
-
-
 ###############################################################################
 # set the path where compressed files to be written
 ###############################################################################
@@ -46,13 +43,11 @@ ORIGINAL_WAV_FILES_LIST = [wav_file.split("/")[-1] for wav_file in ORIGINAL_WAV_
 TYPE_OF_COMPRESSION = RESULT.codec_type
 
 
-
 ###############################################################################
 # create separate directories
 ###############################################################################
 if not os.path.exists(COMPRESSED_FILES_PATH):
     os.makedirs(COMPRESSED_FILES_PATH)
-
 
 
 ###############################################################################

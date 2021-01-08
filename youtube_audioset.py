@@ -14,7 +14,6 @@ from sklearn.preprocessing import LabelBinarizer
 import tensorflow.compat.v1 as tf
 
 
-
 ########################################################################
 # Define the class and sublabels in it
 ########################################################################
@@ -162,7 +161,6 @@ IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
                 HUMAN_SOUNDS + TOOLS_SOUNDS  + DOMESTIC_SOUNDS
 
 
-
 ###############################################################################
 # function to get the dataframe from csv data
 ###############################################################################
@@ -211,7 +209,6 @@ def get_csv_data(target_sounds):
     train_label_binarized = pd.DataFrame(train_label_binarized, columns=name_bin.classes_)
     del train_label_binarized['None']
 
-
     # Remove rows for uninteresting sounds
     train = train.loc[train_label_binarized.sum(axis=1) > 0]
     train.index = list(range(train.shape[0]))
@@ -225,7 +222,6 @@ def get_csv_data(target_sounds):
     train_label_binarized.columns = new_column_names
 
     return train, train_label_binarized
-
 
 
 ###############################################################################
@@ -265,8 +261,6 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
         print("Error while reading file!")
 
     os.remove(tmp_filename_w_extension)
-
-
 
 
 ###############################################################################
@@ -311,8 +305,6 @@ def download_data(target_sounds_list, target_path):
             threads = threads[1:]
     for t in threads:
         t.join()
-
-
 
 
 ###############################################################################
@@ -371,8 +363,6 @@ def read_audio_record(audio_record, output_to_file=None):
     return df
 
 
-
-
 ###############################################################################
 # Read the recursive names from JSON file
 ###############################################################################
@@ -411,6 +401,7 @@ def get_recursive_sound_names(designated_sound_names, path_to_ontology, ontology
         del ontology_entries
 
     designated_sound_ids = [ontology_dict_from_name[sound]['id'] for sound in designated_sound_names]
+
     def get_ids(id):
         """
         Get the ID of the sounds
@@ -432,13 +423,12 @@ def get_recursive_sound_names(designated_sound_names, path_to_ontology, ontology
 
     return recursive_sound_names
 
+
 def get_all_sound_names(path_to_ontology):
     """
     Get all the sound names
     """
     return get_recursive_sound_names(AMBIENT_SOUNDS, path_to_ontology), get_recursive_sound_names(IMPACT_SOUNDS, path_to_ontology)
-
-
 
 
 ###############################################################################

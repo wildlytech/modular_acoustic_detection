@@ -3,6 +3,7 @@ import librosa
 import numpy as np
 import argparse
 
+
 def read_soundfile(filepath):
     """
     Reads sound file from given path:
@@ -16,6 +17,7 @@ def read_soundfile(filepath):
     """
     sig, fs = librosa.load(filepath)
     return sig,fs
+
 
 def create_spec(sig,fs):
     """
@@ -65,6 +67,7 @@ def silence_detector(pdb,t, thresh=-60):
 
     time_silence = [(t[tup[0]], t[tup[1]]) for tup in silence_limits]
     return time_silence
+
 
 if __name__=="__main__":
     description = "Detects silences in a spectrogram"

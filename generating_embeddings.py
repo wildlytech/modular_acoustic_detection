@@ -49,7 +49,6 @@ import vggish_postprocess
 import vggish_slim
 
 
-
 ###############################################################################
 # Constants
 ###############################################################################
@@ -60,6 +59,7 @@ PCA_PARAMS_FILE = VGGISH_PATH + 'vggish_pca_params.npz'
 ###############################################################################
 # Functions
 ###############################################################################
+
 
 def generate(path_to_write_embeddings, path_to_wav_files):
     """
@@ -123,6 +123,7 @@ def generate(path_to_write_embeddings, path_to_wav_files):
             with open(path_to_pickle_file, 'wb') as file_obj:
                 pickle.dump(postprocessed_batch, file_obj)
 
+
 if __name__ == '__main__':
     DESCRIPTION = 'Generate Embeddings for wav files'
     PARSER = argparse.ArgumentParser(description=DESCRIPTION)
@@ -136,7 +137,6 @@ if __name__ == '__main__':
                                     help='Output path to save pkl files',
                                     required=True)
     RESULT = PARSER.parse_args()
-
 
     generate(path_to_write_embeddings = RESULT.path_to_write_embeddings,
              path_to_wav_files = RESULT.wav_file)

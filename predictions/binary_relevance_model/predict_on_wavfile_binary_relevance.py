@@ -7,6 +7,7 @@ import numpy as np
 from tensorflow.compat.v1.keras import backend as K
 from . import generate_before_predict_BR, get_results_binary_relevance
 
+
 def predict_on_embedding(embedding, label_names, config_datas):
     '''
     Predict on single embedding for audio clip
@@ -51,6 +52,7 @@ def predict_on_embedding(embedding, label_names, config_datas):
 
     return prediction_probs, prediction_rounded
 
+
 def main(predictions_cfg_json, path_for_wavfile):
 
     ###########################################################################
@@ -85,6 +87,7 @@ def main(predictions_cfg_json, path_for_wavfile):
     ###########################################################################
     results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB), columns=LABEL_NAMES)
     print(results)
+
 
 if __name__ == "__main__":
 

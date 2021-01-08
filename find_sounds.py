@@ -7,6 +7,7 @@ import pandas as pd
 import peakutils
 import librosa
 
+
 def find_sound_peaks(filepath, url):
     """
     Find the peak of the sound
@@ -94,6 +95,7 @@ def find_sound_peaks(filepath, url):
     df = df.loc[:, ['url', 'time']]
     return df
 
+
 def download_youtube_url(url):
     """
     Downloading the youtube URL of audio
@@ -104,6 +106,7 @@ def download_youtube_url(url):
         os.makedirs('sounds')
     check_call(['youtube-dl', url, '--audio-format', 'wav', '-x', '-o', filename +'.%(ext)s'])
     return filename_w_extension
+
 
 def extract_sound_clips(filepath, df, directory):
     """
@@ -119,6 +122,7 @@ def extract_sound_clips(filepath, df, directory):
                                                                 str(start_time) + '-' +
                                                                 str(end_time)+".wav",
                                                                 format="wav")
+
 
 if __name__ == "__main__":
 

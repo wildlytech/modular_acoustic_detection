@@ -14,9 +14,6 @@ AUDIOMOTH_MIXED_DATAPATH = "audiomoth_different_split/mixed_sounds/"
 YOUTUBE_MIXED_DATAPATH_AUGMENTED = "/media/wildly/Seagate/Embeddings_Aud_Mix/"
 
 
-
-
-
 def distinguished_audiomoth_sounds():
     """
     Files with single class : AudioMoth Source
@@ -41,8 +38,6 @@ def distinguished_audiomoth_sounds():
         ad_mot4 = pickle.load(file_obj)
     ad_mot4 = ad_mot4.sample(210)
 
-
-
     ###########################################################################
     # Pure Human sounds : AudioMoth (Different Locations)
     ###########################################################################
@@ -51,8 +46,6 @@ def distinguished_audiomoth_sounds():
         ad_hum1 = pickle.load(file_obj)
     with open(AUDIOMOTH_PURE_DATAPATH+"pure_hum/pure_hum_142_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
         ad_hum2 = pickle.load(file_obj)
-
-
 
     ###########################################################################
     # Pure Nature Sounds - AudioMoth (Different Locations)
@@ -67,7 +60,6 @@ def distinguished_audiomoth_sounds():
         ad_nat3 = pickle.load(file_obj)
     ad_nat3 = ad_nat3.sample(700)
 
-
     ###########################################################################
     # Pure Tools Sounds : AudioMoth (Different Locations)
     ###########################################################################
@@ -77,8 +69,6 @@ def distinguished_audiomoth_sounds():
     with open(AUDIOMOTH_PURE_DATAPATH+"pure_tools/pure_tools_672_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
         ad_tool1 = pickle.load(file_obj)
     ad_tool1 = ad_tool1.sample(500)
-
-
 
     ###########################################################################
     # Concatenate all the respective pure sounds
@@ -92,14 +82,11 @@ def distinguished_audiomoth_sounds():
     return ad_motor_pure, ad_human_pure, ad_nature_pure, ad_tool_pure
 
 
-
-
 def include_mixed_sounds(mixed_sounds_flag):
     """
     Including Mixed data also in the dataset
     """
     if mixed_sounds_flag:
-
 
         #######################################################################
         # Check for Motor and Human - 7500 : Youtube and AudioMoth
@@ -118,8 +105,6 @@ def include_mixed_sounds(mixed_sounds_flag):
         ad_hm2 = ad_hm2.sample(134)
 
         df_mixed_motor_human = pd.concat([df_hm, ad_hm1, ad_hm2], ignore_index=True)
-
-
 
         #######################################################################
         # Check for Nature Mixed sounds : Youtube and AudioMoth
@@ -144,11 +129,7 @@ def include_mixed_sounds(mixed_sounds_flag):
             ad_mn3 = pickle.load(file_obj)[:]
         ad_mn3 = ad_mn3.sample(50)
 
-
         df_mixed_nature = pd.concat([df_hn, df_mn, ad_mn1, ad_mn2, ad_mn3], ignore_index=True)
-
-
-
 
         #######################################################################
         # Check for sounds Mixed with Explosion : Youtube
@@ -167,9 +148,6 @@ def include_mixed_sounds(mixed_sounds_flag):
 
         df_mixed_explosion = pd.concat([df_me, df_ne, df_he], ignore_index=True)
 
-
-
-
         #######################################################################
         # Check for Mixed with Tools : Youtube and AudioMoth
         #######################################################################
@@ -187,8 +165,6 @@ def include_mixed_sounds(mixed_sounds_flag):
 
         df_mixed_tools = pd.concat([df_dt, df_ht, df_mt], ignore_index=True)
 
-
-
         #######################################################################
         # Check for Mixed with Domestic : Youtube
         #######################################################################
@@ -204,15 +180,11 @@ def include_mixed_sounds(mixed_sounds_flag):
             df_md = pickle.load(file_obj)
         df_md = df_md.sample(2500)
 
-
-
         df_mixed_domestic = pd.concat([df_td, df_hd, df_md], ignore_index=True)
 
         #######################################################################
         # concatenate sounds
         #######################################################################
-
-
 
         df_mixed = pd.concat([df_mixed_motor_human,
                               df_mixed_explosion,
@@ -220,13 +192,10 @@ def include_mixed_sounds(mixed_sounds_flag):
                               df_mixed_tools,
                               df_mixed_domestic], ignore_index=True)
 
-
         return df_mixed
 
 
-
 def balanced_data(audiomoth_flag, mixed_sounds_flag):
-
     """
     Function to read all data frames and balancing
     """
@@ -251,8 +220,6 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
     # with open(YOUTUBE_PURE_DATAPATH+'pure/Wild/pure_wild_7061.pkl','rb') as file_obj:
     #     pure_wild=pickle.load(file_obj)
 
-
-
     ###########################################################################
     # Balancing and experimenting
     ###########################################################################
@@ -264,9 +231,6 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
     tools = pd.concat([pure_tools], ignore_index=True)
     # wood= pd.concat([pure_wod],ignore_index=True)
     # wild = pd.concat([pure_wild[:300]],ignore_index=True)
-
-
-
 
     ###########################################################################
     # Shuffling the data
@@ -280,9 +244,7 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
     # wood_req = wood.loc[random.sample(range(0,wood.shape0]), wood.shape[0])]
     # wild_req = wild.loc[random.sample(range(0,wild.shape[0]),1000)]
 
-
     df_pure_sounds_youtube = pd.concat([mot_req, exp_req, hum_req, nat_req, dom_req, tools_req], ignore_index=True)
-
 
     ###########################################################################
     # Check to include audiomoth data or not
@@ -302,8 +264,6 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
     else:
         pass
 
-
-
     ###########################################################################
     # concat the required sounds
     ###########################################################################
@@ -320,7 +280,6 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
     ###########################################################################
     del pure_nat, pure_dom, pure_exp, pure_mot, pure_wod, pure_tools
     return data_frame
-
 
 
 ###############################################################################

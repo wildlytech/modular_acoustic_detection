@@ -31,7 +31,6 @@ from .utils import Header, make_dash_table
 import pathlib
 
 
-
 ###############################################################################
 # get relative data folder
 ###############################################################################
@@ -43,14 +42,12 @@ else:
     os.mkdir("data_downloaded/")
 
 
-
 ###############################################################################
 # Inputs Required: Path FTP
 ###############################################################################
 PRIMARY_PATH = "/home/user-u0xzU/BNP/"
 DIR_REQ = "BNP/"
 MAPBOX_ACCESS_TOKEN = "*************"
-
 
 
 ###############################################################################
@@ -68,9 +65,6 @@ DESCRIPTION = "Wildly Acoutsic Monitoring Device Report"
 HELP = "Give the Required Arguments"
 
 
-
-
-
 ###############################################################################
 # parse the input arguments given from command line
 ###############################################################################
@@ -80,8 +74,6 @@ PARSER.add_argument('-transmission_mode_csv_path', '--transmission_mode_csv_path
 PARSER.add_argument('-record_mode_csv_path', '--record_mode_csv_path', action='store',
                     help='Input the path')
 RESULT = PARSER.parse_args()
-
-
 
 
 ###############################################################################
@@ -95,7 +87,6 @@ if RESULT.record_mode_csv_path:
     CSV_FILES_1 = glob.glob(RESULT.record_mode_csv_path+"/*.csv")
 else:
     pass
-
 
 
 ###############################################################################
@@ -117,7 +108,6 @@ def get_dictionary(csv_files):
 DATAFRAME_DEVICE = pd.DataFrame()
 
 
-
 ###############################################################################
 # Main APP LAYOUT
 ###############################################################################
@@ -128,7 +118,6 @@ app.config['suppress_callback_exceptions']=True
 app.layout = html.Div(
     [dcc.Location(id="url", refresh=False), html.Div(id="page-content")]
 )
-
 
 
 ###############################################################################
@@ -147,6 +136,7 @@ def SetColor(x):
         return "red"
     elif x < 10:
         return "red"
+
 
 def plot_function(dataframe):
     """
@@ -210,6 +200,7 @@ def get_data_specific_date(dataframe):
     dataframe["Date"] = only_date
     return dataframe, list(set(date_value))
 
+
 def get_data_specific_time(dataframe):
     """
     separates time from time stamp
@@ -223,6 +214,7 @@ def get_data_specific_time(dataframe):
 
     dataframe["Time"] = only_time
     return dataframe
+
 
 def filter_on_date(dataframe, date):
     """
@@ -251,7 +243,6 @@ def get_dataframe_for_plotting_recording(file_index):
     df_date = filter_on_date(df, date_values)
     df_date = get_data_specific_time(df_date)
     return df_date
-
 
 
 ###############################################################################
@@ -289,9 +280,6 @@ def display_page(pathname):
                  ], className="sub_page"),
             ], className="page")
 
-
-
-
     ###########################################################################
     # CALLBACK FOR URL INPUT: LOCATION
     ###########################################################################
@@ -320,9 +308,6 @@ def display_page(pathname):
                       className="row ")
                  ], className="sub_page")
             ], className="page")
-
-
-
 
     ###########################################################################
     # CALLBACK FOR URL INPUT: BATTERY PERFORMANCE
@@ -355,10 +340,6 @@ def display_page(pathname):
                  ], className="sub_page")
             ], className="page")
 
-
-
-
-
     ###########################################################################
     # CALLBACK FOR URL INPUT: DEVICE DETAILS
     ###########################################################################
@@ -387,9 +368,6 @@ def display_page(pathname):
                                   [html.Div(id="inside-device-details")],
                                   className="row ")
                              ], className="sub_page")], className="page")
-
-
-
 
     ###########################################################################
     # CALLBACK FOR URL INPUT: REVIEWS
@@ -460,23 +438,17 @@ def display_page(pathname):
                  className="sub_page")
             ], className="page")
 
-
-
     ###########################################################################
     # CALLBACK FOR URL INPUT: FULL VIEW
     ###########################################################################
     elif pathname == "/acoustic-device-report/full-view":
         return overview.create_layout(app)
 
-
-
     ###########################################################################
     # CALLBACK FOR URL INPUT: OVERVIEW
     ###########################################################################
     elif pathname == "/acoustic-device-report/overview":
         return overview.create_layout(app)
-
-
 
     ###########################################################################
     # CALLBACK FOR URL INPUT: DEFAULT / HOME PAGE
@@ -515,8 +487,6 @@ def display_page(pathname):
         DATAFRAME_DEVICE_ACTIVE = DATAFRAME_DEVICE_ACTIVE.sort_values(by=['Last Modified Time'], ascending=False)
         DATAFRAME_DEVICE_ACTIVE["Device No."] = list(range(1, len(list_device)+1))
         DATAFRAME_DEVICE_ACTIVE = DATAFRAME_DEVICE_ACTIVE[["Device No.", "Device ID", "Last Modified Time", "Report", "Status   (5 mins)"]]
-
-
 
         #######################################################################
         # Return the page with Directory status and Graph
@@ -586,7 +556,6 @@ def display_page(pathname):
             className="page")
 
 
-
 ###############################################################################
 # connect to FTP server
 ###############################################################################
@@ -599,6 +568,7 @@ def connect(primary_path):
     print("connected to FTP")
     ftp.cwd(primary_path)
 
+
 def connect_group(primary_path):
     """
     To connect to ftp server for with different object
@@ -606,8 +576,6 @@ def connect_group(primary_path):
     global ftp_group
     ftp_group = FTP(FTP_HOST, user=FTP_USERNAME, passwd=FTP_PASSWORD)
     ftp_group.cwd(primary_path)
-
-
 
 
 ###############################################################################
@@ -653,8 +621,6 @@ def sort_on_filenames(files_list):
         return []
 
 
-
-
 ###############################################################################
         # sort files based on ftp timestamps: Very slow for large files
 ###############################################################################
@@ -673,8 +639,6 @@ def get_list_files_sorted(ftp_path):
             dictionary[time1[4:]] = name
     sorted_wav_files_list = sorted(list(dictionary.items()), key=operator.itemgetter(0))
     return sorted_wav_files_list
-
-
 
 
 ###############################################################################
@@ -699,7 +663,6 @@ def get_without_duplicates(csv_filename, sorted_wavfiles):
         return sorted_wavfiles
 
 
-
 ###############################################################################
 # Create and write csv file with all the details
 ###############################################################################
@@ -711,7 +674,6 @@ def write_csv(csv_filename, ftp_path):
     ftp.cwd(ftp_path)
     wav_files = ftp.nlst()
     sorted_files = sort_on_filenames(wav_files)
-
 
     ###########################################################################
     # CSV file column details
@@ -905,14 +867,12 @@ def get_wavheader_extraheader(name,ftp_path):
                                               "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]):
                 wavheader_dict[each_value[1]] = each_value[0]
 
-
             extra_header_info = extra_header.decode("ascii").split(',')
 
             return wavheader_dict, extra_header_info
         except UnicodeDecodeError:
             print("Got Unexpected File")
             return None, None
-
 
 
 ###############################################################################
@@ -950,7 +910,6 @@ def check_wav_file_size(each_wav_file, blockalign, samplerate):
     else:
         ftp_group.sendcmd("TYPE A")
         return False
-
 
 
 ###############################################################################
@@ -1060,9 +1019,6 @@ def Table(dataframe, column_name):
                                  'text-align':'center'}) for col in dataframe.columns])] + rows)
 
 
-
-
-
 ###############################################################################
 # Map plot for active and inactive devices on home page
 ###############################################################################
@@ -1082,7 +1038,6 @@ def get_data_active(device_list,color):
         marker=go.scattermapbox.Marker(size=7, color=color, opacity=0.7),
         subplot='mapbox')
     return data
-
 
 
 def get_figure_active(list_of_devices, status_list):
@@ -1157,9 +1112,7 @@ def get_layout_active():
                                style="light",
                                zoom=10))
 
-
         return layout
-
 
 
 ###############################################################################
@@ -1204,7 +1157,6 @@ def directory_details(ftp_path):
     return dir_n_timestamp
 
 
-
 def last_ftp_time(ftp_path):
     """
     Returns recent activity timestamp of the directory
@@ -1224,7 +1176,6 @@ def last_ftp_time(ftp_path):
         else:
             directories_time_list.append('inactive')
     return dir_n_timestamp, directories_time_list
-
 
 
 ###############################################################################
@@ -1257,8 +1208,6 @@ def active_or_inactive(dir_n_timestamp, directories_time_list):
     return dir_n_timestamp, status
 
 
-
-
 ###############################################################################
 # TRANSMISSION HELPER FUNCTION
 ###############################################################################
@@ -1282,9 +1231,6 @@ def plot_function_bar(dataframe):
     return trace1
 
 
-
-
-
 ###############################################################################
 # TIME STAMP DIFFERENCE HELPER FUNC
 ###############################################################################
@@ -1299,13 +1245,9 @@ def get_time_difference(timestamp1, timestamp2):
     return time_diff
 
 
-
-
-
 ###############################################################################
 # LOCATION HELPER FUNC
 ###############################################################################
-
 
 
 def get_data(name, latitudes, longitudes, device_name_location):
@@ -1346,7 +1288,6 @@ def get_layout(latitudes, longitudes):
                            pitch=0,
                            zoom=7))
 
-
     return layout
 
 
@@ -1369,7 +1310,6 @@ def get_figure(list_of_devices):
 ###############################################################################
 # CALLBACK FOR TRANSMISSION
 ###############################################################################
-
 
 
 @app.callback(
@@ -1521,7 +1461,6 @@ def update_figure_battery(rows,columns,indices):
                                    "margin-top":"30%"})
 
 
-
 ###############################################################################
 # CALLBACK FOR DEVICE DETAILS
 ###############################################################################
@@ -1547,11 +1486,9 @@ def update_figure_device_details(rows, columns, indices):
                      html.Table(make_dash_table(df_details)),]
 
 
-
 ###############################################################################
 # CALLBACK FOR DOWNLOAD REPORT
 ###############################################################################
-
 
 
 if __name__ == "__main__":

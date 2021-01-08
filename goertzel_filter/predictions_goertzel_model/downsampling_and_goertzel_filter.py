@@ -22,11 +22,11 @@ import numpy as np
 import resampy
 
 
-
 class ReadAudioFile(object):
     """
     reads the audio file and return the samples and sampling rate
     """
+
     def __init__(self, path):
         self.path = path
 
@@ -46,6 +46,7 @@ class DownsamplingImplementation(object):
     ISC License
     Copyright (c) 2016, Brian McFee
     """
+
     def __init__(self, samples, original_sampling_frequency):
         self.samples = samples
         self.original_sampling_frequency = original_sampling_frequency
@@ -123,8 +124,6 @@ class DownsamplingImplementation(object):
             # Increment the time register
             time_register += time_increment
 
-
-
     def implement_resample(self, sr_new, axis=-1):
 
         if self.original_sampling_frequency <= 0:
@@ -170,6 +169,7 @@ class DownsampleUsingLibrary(object):
     """
     here we downsample the audio using the
     """
+
     def __init__(self, samples, original_sampling_frequency):
         self.samples = samples
         self.original_sampling_frequency = original_sampling_frequency
@@ -181,17 +181,16 @@ class DownsampleUsingLibrary(object):
         return resampy.resample(self.samples, self.original_sampling_frequency, target_sampling_frequency)
 
 
-
 class GoertzelComponents(object):
     """
     executes goertzel filtering on audio
     """
+
     def __init__(self, samples, sample_rate, target_frequency, number_samples):
         self.samples = samples
         self.sample_rate = sample_rate
         self.target_frequency = target_frequency
         self.number_samples = number_samples
-
 
     def goertzel_filter(self):
         """

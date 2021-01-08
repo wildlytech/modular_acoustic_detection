@@ -32,8 +32,6 @@ PARSER.add_argument('-path_to_save_dataframe', '--path_to_save_dataframe', actio
 RESULT = PARSER.parse_args()
 
 
-
-
 LABELS_NAME_COLUMNS = ['Label_1', "Label_2", "Label_3", "Label_4"]
 
 
@@ -96,7 +94,6 @@ SET_DICTIONARY = {"crow":"Crow",
                   "----":''}
 
 
-
 ###########################################################################
 # Helper Function
 ###########################################################################
@@ -141,7 +138,6 @@ def check_for_unknown_label(data_frame, label_columns_list):
                 labels_not_found.append(each_label)
 
     print("Labels not found in Dictionary: \n", list(set(labels_not_found)))
-
 
 
 def read_embeddings(data_frame, path_to_embeddings):
@@ -190,6 +186,7 @@ def write_dataframe(path_to_write, dataframe):
     else:
         print("Input path to write dataframe")
 
+
 ###########################################################################
 # Main Function
 ###########################################################################
@@ -199,8 +196,6 @@ if __name__ == "__main__":
         DATAFRAME = initiate_preprocessing(RESULT.annotation_file, RESULT.path_for_saved_embeddings)
     else:
         DATAFRAME = initiate_preprocessing(RESULT.annotation_file, None)
-
-
 
     if RESULT.path_to_save_dataframe:
         write_dataframe(RESULT.path_to_save_dataframe, DATAFRAME)

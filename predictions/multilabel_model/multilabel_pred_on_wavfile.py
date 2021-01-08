@@ -9,11 +9,11 @@ from tensorflow.compat.v1.keras import backend as K
 from predictions.binary_relevance_model import generate_before_predict_BR
 from . import multilabel_pred
 
+
 def predict_on_embedding(embedding, config_datas):
     '''
     Predict on single embedding for audio clip
     '''
-
 
     config_data = config_datas
 
@@ -48,10 +48,12 @@ def predict_on_embedding(embedding, config_datas):
 
     return prediction_probs, prediction_rounded
 
+
 def read_config(filepath):
     with open(filepath,"r") as f:
         config = json.load(f)
     return config
+
 
 def main(predictions_cfg_json, path_for_wavfile):
 
@@ -90,6 +92,7 @@ def main(predictions_cfg_json, path_for_wavfile):
     results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB),columns = colnames)
 
     print(results)
+
 
 if __name__ == "__main__":
 

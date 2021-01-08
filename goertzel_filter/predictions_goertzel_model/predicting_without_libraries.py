@@ -20,8 +20,6 @@ import time
 import downsampling_and_goertzel_filter
 
 
-
-
 #############################################################################
 # Read all the global variables i.e weights and Inputs.
 #############################################################################
@@ -29,9 +27,6 @@ with open("weights_goertzel_model_layers.pkl", "rb") as file_obj:
     WEIGHTS_VALUE = pickle.load(file_obj)
 ARCHITECTURE_CSV = pd.read_csv("test_architecture.csv")
 TEN_SEC_INPUT_DATA = np.random.uniform(low=0.000002, high=0.001, size=(10, 8000, 4))
-
-
-
 
 
 #############################################################################
@@ -52,7 +47,6 @@ class ConvolutionalNeuralNetwork(object):
         self.bias = bias
         self.layer_index = layer_index
 
-
     def padding(self, filter_size, stride_length, type_padding):
         """
         apply padding to the input data
@@ -66,7 +60,6 @@ class ConvolutionalNeuralNetwork(object):
         else:
             self.input_data = self.input_data + [[0 for col in range(len(self.input_data[0]))] for row in range(filter_size-1)]
             return np.array(self.input_data, dtype='float64').tolist()
-
 
     def matrix_multiplication(self, data, nested_index):
         """
@@ -107,14 +100,11 @@ class ConvolutionalNeuralNetwork(object):
             apply_relu = [0 if arb < 0 else arb for arb in data[0]]
         return np.array(apply_relu, dtype='float64').tolist()
 
-
-
     def get_index_for_window_movement(self, stride_length):
         """
         returns the index values as per the strides
         """
         return list(range(0, len(self.input_data), stride_length))
-
 
     def start_window_moment(self, stride_length, filter_size, type_padding):
         """
@@ -140,9 +130,6 @@ class ConvolutionalNeuralNetwork(object):
         return np.array(result_final, dtype='float64').tolist()
 
 
-
-
-
 #############################################################################
 # Implementation of Dense Layer (Fully connected layer)
 #############################################################################
@@ -151,6 +138,7 @@ class FullyConnectedLayer(object):
     """
     implements dense layer computations
     """
+
     def __init__(self, units, input_data, weights, activation, bias):
         self.units = units
         self.input_data = input_data
@@ -184,7 +172,6 @@ class FullyConnectedLayer(object):
             add_bias = [sum(zip_values) for zip_values in zip(data[0], self.bias)]
         return np.array(add_bias, dtype='float64').tolist()
 
-
     def relu(self, data):
         """
         implements matrix multiplication
@@ -205,7 +192,6 @@ class FullyConnectedLayer(object):
         except:
             return 1/(1 + np.exp(-data))
 
-
     def dense_layer(self):
         """
         implements the actucal operations
@@ -225,9 +211,6 @@ class FullyConnectedLayer(object):
         return np.array(result_final, dtype='float64').tolist()
 
 
-
-
-
 #############################################################################
 # Implementation of Maxpool Layer
 #############################################################################
@@ -235,6 +218,7 @@ class MaxPoolingLayer(object):
     """
     implements maxpooling layer
     """
+
     def __init__(self, input_data, max_pool_length):
         self.input_data = input_data
         self.max_pool_length = max_pool_length
@@ -262,8 +246,6 @@ class MaxPoolingLayer(object):
         return np.array(result_final, dtype='float64').tolist()
 
 
-
-
 #############################################################################
 # Check for shape
 #############################################################################
@@ -272,6 +254,7 @@ class InitialCheckForShape(object):
     """
     checks for shape of weights and its corresponding layer outputs
     """
+
     def __init__(self, input_data, weights):
         self.input_data = input_data
         self.weights = weights
@@ -305,8 +288,6 @@ class InitialCheckForShape(object):
         """
         get_num_layers = len(self.input_data)
         return get_num_layers
-
-
 
 
 #############################################################################
@@ -350,8 +331,6 @@ def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
     except OSError:
         print(Fore.RED + "MismatchError: Layer and Weights mismatch\n")
         sys.exit("Input the correct order"+Style.RESET_ALL)
-
-
 
 
 #############################################################################
@@ -416,8 +395,6 @@ def flag_for_downsampling(audiofilepath):
             print(Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL)
 
 
-
-
 #############################################################################
 # Predictions on each second for 10second audio file
 #############################################################################
@@ -451,9 +428,6 @@ def predict_on_goertzelcomponents(ten_sec_data):
                 # print np.array(intermediate_result_values)
         end_time = time.time() - start_time
         print(Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL)
-
-
-
 
 
 #############################################################################

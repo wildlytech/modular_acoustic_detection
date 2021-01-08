@@ -12,15 +12,12 @@ import scipy.io.wavfile
 import resampy
 
 
-
-
 ###############################################################################
 # Description and Help
 ###############################################################################
 DESCRIPTION = 'Input the path of audio file \
               and target frequency to filter '
 HELP = 'Give relevant Inputs'
-
 
 
 ###############################################################################
@@ -32,8 +29,6 @@ PARSER.add_argument('-target_frequency_to_filter', '--target_frequency_to_filter
 PARSER.add_argument('-wavfile_path_to_filter', '--wavfile_path_to_filter',
                     action='store', help='Input the path (.wav file)')
 RESULT = PARSER.parse_args()
-
-
 
 
 ###############################################################################
@@ -58,7 +53,6 @@ print(WAV_FILE.shape)
 ###############################################################################
 WAV_FILE = resampy.resample(WAV_FILE, SAMPLE_RATE, RESAMPLING_RATE)
 print(WAV_FILE.shape)
-
 
 
 ###############################################################################

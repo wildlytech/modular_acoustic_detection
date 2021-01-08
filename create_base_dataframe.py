@@ -7,6 +7,8 @@ import pandas as pd
 ###############################################################################
 # Helper Functions
 ###############################################################################
+
+
 def read_pickle_file(filename):
     """
     Reads the pickle file
@@ -14,7 +16,6 @@ def read_pickle_file(filename):
     with open(filename, "rb") as file_obj:
         pickle_value = pickle.load(file_obj)
     return pickle_value
-
 
 
 def get_embeddings_path(path_for_saved_embeddings, audio_files_list):
@@ -37,6 +38,7 @@ def create_dataframe(column_names):
     """
     dataframe_inside_scope = pd.DataFrame(columns=column_names)
     return dataframe_inside_scope
+
 
 def read_all_embeddings(embedding_filespath):
     """
@@ -89,6 +91,7 @@ def create_new_dataframe(path_for_saved_embeddings, path_to_write_dataframe):
     """
     new_dataframe = start_from_initial(path_for_saved_embeddings)
     write_dataframe(path_to_write_dataframe, new_dataframe)
+
 
 ###############################################################################
 # Main function

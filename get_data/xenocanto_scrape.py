@@ -14,6 +14,7 @@ BASE_LINK = 'https://www.xeno-canto.org/explore?query='
 
 ###############################################################################
 
+
 def number_of_pages(birdspecies):
     """
     Get number of web pages for given bird species
@@ -37,6 +38,7 @@ def number_of_pages(birdspecies):
                 number_of_webpages.append(page1.text.replace('\n', ' ').strip())
         last_page = number_of_webpages[-2]
     return last_page
+
 
 def get_info_from_raw_html(bird_species, page_number):
     """
@@ -65,6 +67,7 @@ def get_info_from_raw_html(bird_species, page_number):
     row_data_list = row_data[2:-1]
     return row_data_list
 
+
 def get_rows_info(row_data):
     """
     Get audio ID and add each row information to a list
@@ -80,6 +83,7 @@ def get_rows_info(row_data):
         # remove any newlines and extra spaces from left and right
         td_rows.append(each_row.text.replace('\n', ' ').strip())
     return td_rows, audio_id
+
 
 def download_xc_audio(audio_files_path, xc_audio_ID):
     """
@@ -97,6 +101,7 @@ def download_xc_audio(audio_files_path, xc_audio_ID):
     ydl_opts = {'outtmpl': audio_files_path+xc_audio_ID[0]+'.%(ext)s'}
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([audio_link])
+
 
 def scrape(audio_files_path, bird_species):
     """
@@ -160,6 +165,7 @@ def scrape(audio_files_path, bird_species):
     print("\nDone..!\n")
 
     return dir_path, csv_filename
+
 
 ########################################################################
 # Main Function

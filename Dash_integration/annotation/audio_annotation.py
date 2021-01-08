@@ -82,7 +82,6 @@ app.layout = html.Div([html.Div([html.H1("Audio Annotation",
                                           "textAlign":"center"})])
 
 
-
 ###############################################################################
 # PREVIOUS and NEXT BUTTONS
 ###############################################################################
@@ -111,12 +110,9 @@ def previous_next_button_content(n_clicks):
                                            style={"width":"10%", 'display': 'inline-block'})])
 
 
-
-
 ###############################################################################
 # STYLING FOR TABS
 ###############################################################################
-
 TABS_STYLES = {
     'height': '40px'
 }
@@ -133,6 +129,7 @@ TAB_SELECTED_STYLE = {
     'color': 'white',
     'padding': '6px'
 }
+
 
 def model_prediction_tab():
 
@@ -211,6 +208,7 @@ def model_prediction_tab():
                style={'color': 'white',
                       'fontSize': 15})])
 
+
 def spectrogram_tab():
 
     global NUMBER_OF_WAVFILES, FILE_COUNT
@@ -240,6 +238,7 @@ def spectrogram_tab():
     return html.Div([dcc.Graph(figure=fig)],
                     style={"margin-top":"10%",
                            "text-align":"center"})
+
 
 def annotation_tab(initial):
     try:
@@ -364,9 +363,6 @@ def next_audio_content(n_clicks):
                                   style=TABS_STYLES)], style={"margin-top":"10px"})
 
 
-
-
-
 ###############################################################################
 # Next: TABS CONTENT ON SELECTION
 ###############################################################################
@@ -383,7 +379,6 @@ def next_content_tab(value):
         return spectrogram_tab()
     elif value == "model-prediction-tab":
         return model_prediction_tab()
-
 
 
 ###############################################################################
@@ -417,9 +412,6 @@ def initial_content(value, n_clicks):
                                   style=TABS_STYLES)], style={"margin-top":"10px"})
 
 
-
-
-
 ###############################################################################
 # INITIAL CONTENT TABS SELECTION
 ###############################################################################
@@ -438,13 +430,14 @@ def initial_content_tab(value):
         return model_prediction_tab()
 
 
-
 ###############################################################################
 # SAVING ANNOTATIONS IN CSV FILE
 ###############################################################################
 # WHEN SUBMITTED FROM INITIAL CONTENT
 LABELS_LIST_CHECKLIST_INITIAL = []
 LABELS_LIST_DROPDOWN_INITIAL = []
+
+
 @app.callback(Output('text_area_inside', 'value'),
               [Input('datatable-interactivity-inside', 'data'),
                Input('datatable-interactivity-inside', 'columns'),
@@ -468,7 +461,6 @@ def initial_content_annotation(rows, columns, indices, value_drop):
     else:
         pass
     return str(list(set(np.array(np.array(LABELS_LIST_CHECKLIST_INITIAL).flatten().tolist() + np.array(LABELS_LIST_DROPDOWN_INITIAL).flatten().tolist()).flatten())))
-
 
 
 @app.callback(Output('text_area_next', 'value'),
@@ -499,6 +491,8 @@ def next_audio_content_annotation(rows, columns, indices, value_drop):
 # WHEN SUBMITTED FROM PREVIOUS CONTENT
 LABELS_LIST_CHECKLIST_PREVIOUS = []
 LABELS_LIST_DROPDOWN_PREVIOUS = []
+
+
 @app.callback(Output('text_area_previous', 'value'),
               [Input('checklist_data_previous', 'values'),
                Input("dropdown_data_previous", "value")])
@@ -516,15 +510,12 @@ def previous_audio_content_annotation(value,value_drop):
     return list(set(np.array(np.array(LABELS_LIST_CHECKLIST_PREVIOUS).flatten().tolist() + np.array(LABELS_LIST_DROPDOWN_PREVIOUS).flatten().tolist()).flatten()))
 
 
-
-
 ###############################################################################
 # DISABLING CONTENTS THAT ARE NOT REQUIRED
 ###############################################################################
 
 @app.callback(Output('text_area', 'style'),
               [Input('button', 'n_clicks')])
-
 def disabling_text_area(n_clicks):
     """
     Disabling the button after its being clicked once
@@ -533,10 +524,8 @@ def disabling_text_area(n_clicks):
         return {'display':"none"}
 
 
-
 @app.callback(Output('name_area', 'style'),
               [Input('button', 'n_clicks')])
-
 def disabling_name_area(n_clicks):
     """
     Disabling the button after its being clicked once
@@ -545,10 +534,8 @@ def disabling_name_area(n_clicks):
         return {'display':"none"}
 
 
-
 @app.callback(Output('button', 'style'),
               [Input('button', 'n_clicks')])
-
 def disabling_button(n_clicks):
     """
     Disabling the button after its being clicked once
@@ -592,7 +579,6 @@ def disable_initial_content(n_clicks):
         return {"display":"none"}
 
 
-
 @app.callback(Output('intial_tab_content', 'style'),
               [Input('next_button', "n_clicks")])
 def disable_initial_content_tab(n_clicks):
@@ -600,7 +586,6 @@ def disable_initial_content_tab(n_clicks):
     Disbaling the content that is not required
     '''
     return {"display":"none"}
-
 
 
 @app.callback(Output('previous_button_content_display', 'style'),
@@ -613,8 +598,6 @@ def disable_next_audio_content_enable_previous_audio_content(value_next, value_p
     return {"display":"none"}
 
 
-
-
 ###############################################################################
 # SUBMISSION STATUS DISPLAY
 ###############################################################################
@@ -622,7 +605,6 @@ def disable_next_audio_content_enable_previous_audio_content(value_next, value_p
 @app.callback(Output('initial_submission', 'children'),
               [Input('submit_initial', 'n_clicks'),
                Input("text_area_inside", "value")])
-
 # STATUS IN INTIAL CONTENT
 def submit_initial_button(n_clicks, value):
     """
@@ -660,7 +642,6 @@ def submit_initial_button(n_clicks, value):
                                          style={"color":"white"})])
 
 
-
 ###############################################################################
 # STATUS IN NEXT CONTENT
 ###############################################################################
@@ -696,8 +677,6 @@ def submit_next_button(n_clicks, value):
                 print(value)
                 return html.Div([html.H5("Last Submitted: - " +NUMBER_OF_WAVFILES[FILE_COUNT].split("/")[-1],
                                          style={"color":"white"})])
-
-
 
 
 ###############################################################################

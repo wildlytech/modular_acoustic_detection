@@ -20,7 +20,6 @@ import resampy
 DESCRIPTION = 'Generates the target Goertzel filter components of audio files'
 
 
-
 ###############################################################################
 # parse the input arguments given from command line
 ###############################################################################
@@ -32,13 +31,11 @@ PARSER.add_argument('-path_to_freq_comp', '--path_to_freq_comp', action='store',
 RESULT = PARSER.parse_args()
 
 
-
 ###############################################################################
 # set the input arguments
 ###############################################################################
 AUDIO_FILES_PATH = RESULT.audio_files_path
 PATH_TO_GOERTZEL_COMPONENTS = RESULT.path_to_freq_comp
-
 
 
 ###############################################################################
@@ -89,7 +86,6 @@ def Goertzel_filter(sample, sample_rate, freq, number_samples):
     return  result_mag, result_real, result_imag, result_mag_sqre
 
 
-
 ###############################################################################
 # Getting the candle stick type of data
 ###############################################################################
@@ -116,8 +112,6 @@ def get_candlesticks_data(magnitude_data, sample_rate, time_stamp, length_of_aud
     return row, arb_df
 
 
-
-
 ###############################################################################
 # Batch processing for generating goertzel components
 ###############################################################################
@@ -141,7 +135,6 @@ def generate_frequency_components():
         try:
             read_file = scipy.io.wavfile.read(audio_path)
 
-
             ###################################################################
             # Check for the sampling rate of the audio file
             ###################################################################
@@ -153,7 +146,6 @@ def generate_frequency_components():
                     ###########################################################
                     if read_file[1].shape[1] == 2:
                         wave_file = np.array([i[0] for i in read_file[1]])
-
 
                     ###########################################################
                     # If mono take as it is
@@ -188,7 +180,6 @@ def generate_frequency_components():
 
         except OSError:
             print('Wave file not found in directory '+ audio_path.split("/")[-1])
-
 
 
 ###############################################################################

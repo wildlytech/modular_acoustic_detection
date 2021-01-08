@@ -57,6 +57,8 @@ FLAGS = {
 ##############################################################################
 
 ##############################################################################
+
+
 def main(wav_file, flag_for_data, data,model_type):
     """
     Specify the path for the downloaded or recorded audio files and
@@ -64,7 +66,6 @@ def main(wav_file, flag_for_data, data,model_type):
     """
     if flag_for_data == 0:
         examples_batch = vggish_input.wavfile_to_examples(wav_file)
-
 
         # Prepare a postprocessor to munge the model embeddings.
         pproc = vggish_postprocess.Postprocessor(FLAGS['pca_params'])

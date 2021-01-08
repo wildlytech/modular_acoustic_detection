@@ -14,7 +14,6 @@ DESCRIPTION = 'Input the path of the compressed audio files \
 HELP = 'Decompresses back to wav format'
 
 
-
 ###############################################################################
 # Parse the arguments
 ###############################################################################
@@ -28,7 +27,6 @@ PARSER.add_argument('-codec_type', '--codec_type',
 RESULT = PARSER.parse_args()
 
 
-
 ###############################################################################
 # give the path where the compressed files are stored
 ###############################################################################
@@ -37,12 +35,10 @@ DECOMPRESSED_FILES_PATH = RESULT.path_to_decompressed_audio_files
 TYPE_OF_COMPRESSION = RESULT.codec_type
 
 
-
 ###############################################################################
 # Read the balanced data and the get the wav files list
 ###############################################################################
 COMPRESSED_FILES_LIST = glob.glob(COMPRESSED_FILES_PATH+'*.'+TYPE_OF_COMPRESSION)
-
 
 
 ###############################################################################
@@ -50,7 +46,6 @@ COMPRESSED_FILES_LIST = glob.glob(COMPRESSED_FILES_PATH+'*.'+TYPE_OF_COMPRESSION
 ###############################################################################
 if not os.path.exists(DECOMPRESSED_FILES_PATH):
     os.makedirs(DECOMPRESSED_FILES_PATH)
-
 
 
 ###############################################################################
