@@ -69,7 +69,7 @@ def check_for_wav_only(list_values):
     """
     wav_files = []
     for each_value in list_values:
-        if each_value[-3:] == "WAV"  or each_value[-3:] == "wav":
+        if each_value[-3:] == "WAV" or each_value[-3:] == "wav":
             wav_files.append(each_value)
     print("Total file: ", len(wav_files))
     return wav_files
@@ -143,13 +143,13 @@ def start_batch_run_ftp_live():
             wav_information_object = csv.writer(file_object)
             file_object.flush()
             for each_file in dum_df['FileNames'].tolist():
-                path = "FTP_downloaded/"+each_file
+                path = "FTP_downloaded/" + each_file
                 check_directory_to_write_wavfiles()
                 if os.path.exists(path):
                     print("path Exists")
                 else:
                     with open(path, 'wb') as file_obj:
-                        ftp.retrbinary('RETR '+each_file, file_obj.write)
+                        ftp.retrbinary('RETR ' + each_file, file_obj.write)
                     try:
                         emb = generate_before_predict_BR.main(path, 0, 0, 0)
                     except ValueError:
@@ -163,7 +163,7 @@ def start_batch_run_ftp_live():
                     predictions_each_model = []
                     print("Predicting for :", each_file)
                     for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-                        pred_prob, pred = generate_before_predict_BR.main(path+each_file, 1, emb, each_model)
+                        pred_prob, pred = generate_before_predict_BR.main(path + each_file, 1, emb, each_model)
                         if pred_prob:
                             predictions_each_model.append("{0:.2f}".format(pred_prob[0][0] * 100))
                         else:
@@ -180,15 +180,15 @@ def start_batch_run_ftp_live():
 
             # Loop over the files
             for each_file in dum_df['FileNames'].tolist():
-                path = "FTP_downloaded/"+each_file
+                path = "FTP_downloaded/" + each_file
                 check_directory_to_write_wavfiles()
                 if os.path.exists(path):
                     print("path Exists")
                 else:
                     with open(path, 'wb') as file_obj:
-                        ftp.retrbinary('RETR '+ each_file, file_obj.write)
+                        ftp.retrbinary('RETR ' + each_file, file_obj.write)
                 try:
-                    emb = generate_before_predict_BR.main(path, 0, 0,0)
+                    emb = generate_before_predict_BR.main(path, 0, 0, 0)
                 except ValueError:
                     print("malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index)
                     dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
@@ -198,7 +198,7 @@ def start_batch_run_ftp_live():
                 predictions_each_model = []
                 print("Predicting for :", each_file)
                 for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-                    pred_prob, pred = generate_before_predict_BR.main(path+each_file, 1, emb, each_model)
+                    pred_prob, pred = generate_before_predict_BR.main(path + each_file, 1, emb, each_model)
                     if pred_prob:
                         predictions_each_model.append("{0:.2f}".format(pred_prob[0][0] * 100))
                     else:
@@ -210,7 +210,7 @@ def start_batch_run_ftp_live():
 ############################################################################
             # Main Function
 ############################################################################
-if __name__=="__main__":
+if __name__ == "__main__":
     while(True):
         start_batch_run_ftp_live()
         time.sleep(120)

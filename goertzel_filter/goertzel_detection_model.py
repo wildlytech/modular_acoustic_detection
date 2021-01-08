@@ -179,7 +179,7 @@ for each_emb, each_wav in zip(DF_TRAIN['features'].tolist(), DF_TRAIN["wav_file"
         # Reshaping the traininig data and applying normalization
 ###############################################################################
 CLF1_TRAIN_MINI = np.array(CLF1_TRAIN_MINI).reshape((-1, 10, 8000, 4))
-CLF1_TRAIN_MINI = CLF1_TRAIN_MINI/np.linalg.norm(CLF1_TRAIN_MINI)
+CLF1_TRAIN_MINI = CLF1_TRAIN_MINI / np.linalg.norm(CLF1_TRAIN_MINI)
 
 # start training on model
 MODEL.fit(CLF1_TRAIN_MINI,

@@ -47,7 +47,7 @@ def add_labels_to_dataframe(path_to_feature_dataframe, path_to_label_csv_file):
         # can also be labeled as species or genus). Make sure the examples is labeled with all
         # possible names. This will ensure that at leasrt one of the labels exist in the ontology even
         # when the more descriptive name does not exist
-        for length in range(1,min(3,len(sci_name_split))+1):
+        for length in range(1, min(3, len(sci_name_split)) + 1):
             labels_name.append(' '.join(sci_name_split[:length]))
 
         # Check if name format is not what we expect
@@ -83,10 +83,10 @@ def add_labels_to_dataframe(path_to_feature_dataframe, path_to_label_csv_file):
 
 def xenocanto_to_dataframe(bird_species,
                            output_path,
-                           delete_mp3_files = False,
-                           delete_wav_files = True,
-                           delete_split_wav_files = True,
-                           delete_embeddings = False):
+                           delete_mp3_files=False,
+                           delete_wav_files=True,
+                           delete_split_wav_files=True,
+                           delete_embeddings=False):
     """
     Download xeno-canto sound files for particular bird species
     and perform entire data preprocessing pipeline to generate dataframe
@@ -112,13 +112,13 @@ def xenocanto_to_dataframe(bird_species,
                                                    path_to_save_wavfiles=path_to_src_files)
 
     print("Splitting wav files into 10 second clips...")
-    split_wav_file.audio_split_directory(path_for_wavfiles = path_to_src_files,
-                                         path_to_write_chunks = path_to_split_files,
-                                         chunk_length_ms = 10000)
+    split_wav_file.audio_split_directory(path_for_wavfiles=path_to_src_files,
+                                         path_to_write_chunks=path_to_split_files,
+                                         chunk_length_ms=10000)
 
     print("Generating embeddings for each 10 second clip...")
-    generating_embeddings.generate(path_to_write_embeddings = path_to_embeddings,
-                                   path_to_wav_files = path_to_split_files)
+    generating_embeddings.generate(path_to_write_embeddings=path_to_embeddings,
+                                   path_to_wav_files=path_to_split_files)
 
     print("Building dataframe with features...")
     create_base_dataframe.create_new_dataframe(path_for_saved_embeddings=path_to_embeddings,
@@ -173,11 +173,11 @@ if __name__ == "__main__":
                                     required=True)
 
     for fileType in ['mp3', 'wav', 'split_wav', 'embeddings']:
-        OPTIONAL_ARGUMENTS.add_argument('--delete_'+ fileType +'_files',
+        OPTIONAL_ARGUMENTS.add_argument('--delete_' + fileType + '_files',
                                         dest='delete_' + fileType + '_files',
                                         action='store_true',
                                         help='Delete downloaded ' + fileType + ' files when script finishes')
-        OPTIONAL_ARGUMENTS.add_argument('--dont_delete_'+ fileType +'_files',
+        OPTIONAL_ARGUMENTS.add_argument('--dont_delete_' + fileType + '_files',
                                         dest='delete_' + fileType + '_files',
                                         action='store_false',
                                         help='Don\'t delete downloaded ' + fileType + ' files when script finishes')
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
     xenocanto_to_dataframe(bird_species=RESULT.bird_species,
                            output_path=RESULT.output_path,
-                           delete_mp3_files = RESULT.delete_mp3_files,
-                           delete_wav_files = RESULT.delete_wav_files,
-                           delete_split_wav_files = RESULT.delete_split_wav_files,
-                           delete_embeddings = RESULT.delete_embeddings_files)
+                           delete_mp3_files=RESULT.delete_mp3_files,
+                           delete_wav_files=RESULT.delete_wav_files,
+                           delete_split_wav_files=RESULT.delete_split_wav_files,
+                           delete_embeddings=RESULT.delete_embeddings_files)

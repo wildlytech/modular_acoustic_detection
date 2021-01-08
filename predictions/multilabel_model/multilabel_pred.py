@@ -19,7 +19,7 @@ def import_predict_configuration_json(predictions_cfg_json):
 
     Returns a dictionary with all configuration json data for all labels.
     """
-    config_data_dict  = {}
+    config_data_dict = {}
 
     with open(predictions_cfg_json) as predictions_json_file_obj:
 
@@ -74,8 +74,8 @@ def load_model(networkCfgJson, weightFile):
 
 def main(predictions_cfg_json,
          path_for_dataframe_with_features,
-         save_misclassified_examples = None,
-         path_to_save_prediction_csv = None):
+         save_misclassified_examples=None,
+         path_to_save_prediction_csv=None):
 
     ###########################################################################
     # Import json data
@@ -106,9 +106,9 @@ def main(predictions_cfg_json,
             config_data = CONFIG_DATAS[model_name]
             for label in config_data["labels"]:
                 positiveLabels[label["aggregatePositiveLabelName"]] = \
-                    get_recursive_sound_names(designated_sound_names = label["positiveLabels"],
-                                path_to_ontology = "./",
-                                ontology_extension_paths = config_data["ontology"]["extension"])
+                    get_recursive_sound_names(designated_sound_names=label["positiveLabels"],
+                                path_to_ontology="./",
+                                ontology_extension_paths=config_data["ontology"]["extension"])
 
             for key in positiveLabels.keys():
                 pos_lab = positiveLabels[key]
@@ -116,7 +116,7 @@ def main(predictions_cfg_json,
                                                lambda arr: np.any([x.lower() in pos_lab for x in arr]))
 
                 LABELS_BINARIZED[key] = binarized_op_column
-        target_cols  = LABELS_BINARIZED.columns
+        target_cols = LABELS_BINARIZED.columns
 
     ###########################################################################
         # Filtering the sounds that are exactly 10 seconds
@@ -160,8 +160,8 @@ def main(predictions_cfg_json,
 
         pred_args = CLF2_TEST_PREDICTION_PROB.argmax(axis=1)
 
-        prob_colnames = [label_name+"_Probability" for label_name in target_cols]
-        pred_colnames = [label_name+"_Prediction" for label_name in target_cols]
+        prob_colnames = [label_name + "_Probability" for label_name in target_cols]
+        pred_colnames = [label_name + "_Prediction" for label_name in target_cols]
 
         DF_TEST_PRED = pd.concat([pd.DataFrame(CLF2_TEST_PREDICTION_PROB, columns=prob_colnames),
                                   pd.DataFrame(CLF2_TEST_PREDICTION, columns=pred_colnames)],
@@ -178,14 +178,14 @@ def main(predictions_cfg_json,
             ###################################################################
             # To get the Misclassified examples
             ###################################################################
-            actual_colnames = [label_name+"_Actual" for label_name in target_cols]
+            actual_colnames = [label_name + "_Actual" for label_name in target_cols]
 
             CLF2_TEST_TARGET = pd.DataFrame(CLF2_TEST_TARGET,
                                             columns=actual_colnames).reset_index(drop=True)
-            DF_TEST = pd.concat([DF_TEST,CLF2_TEST_TARGET],axis=1)
+            DF_TEST = pd.concat([DF_TEST, CLF2_TEST_TARGET], axis=1)
 
             MISCLASSIFED_ARRAY = (CLF2_TEST_PREDICTION != CLF2_TEST_TARGET).any(axis=1)
-            print('\nMisclassified number of examples for '+ model_name + " :", \
+            print('\nMisclassified number of examples for ' + model_name + " :", \
                   MISCLASSIFED_ARRAY.sum())
 
             ###################################################################
@@ -193,27 +193,27 @@ def main(predictions_cfg_json,
             ###################################################################
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \
-                              "_misclassified_examples_multilabel_model_"+ \
-                              model_name.replace(' ','_')+".pkl"
+                              "_misclassified_examples_multilabel_model_" + \
+                              model_name.replace(' ', '_') + ".pkl"
                 with open(misclassified_pickle_file, "wb") as f:
                     pickle.dump(DF_TEST.loc[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 
             ###################################################################
             # Print confusion matrix and classification_report
             ###################################################################
-            print('Confusion Matrix for '+ model_name)
+            print('Confusion Matrix for ' + model_name)
             print('============================================')
             for i in range(CLF2_TEST_TARGET.shape[1]):
                 print("Confusion matrix for", target_cols[i])
-                a = CLF2_TEST_TARGET.iloc[:,i].values
-                b = CLF2_TEST_PREDICTION[:,i]
-                RESULT_ = confusion_matrix(a,b)
+                a = CLF2_TEST_TARGET.iloc[:, i].values
+                b = CLF2_TEST_PREDICTION[:, i]
+                RESULT_ = confusion_matrix(a, b)
                 print(RESULT_)
 
             ###################################################################
             # print classification report
             ###################################################################
-            print('Classification Report for '+ model_name)
+            print('Classification Report for ' + model_name)
             print('============================================')
             CL_REPORT = classification_report(gt_args,
                                               pred_args)
@@ -276,7 +276,7 @@ if __name__ == "__main__":
     ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
-    main(predictions_cfg_json = PARSED_ARGS.predictions_cfg_json,
-         path_for_dataframe_with_features = PARSED_ARGS.path_for_dataframe_with_features,
-         save_misclassified_examples = PARSED_ARGS.save_misclassified_examples,
-         path_to_save_prediction_csv = PARSED_ARGS.path_to_save_prediction_csv)
+    main(predictions_cfg_json=PARSED_ARGS.predictions_cfg_json,
+         path_for_dataframe_with_features=PARSED_ARGS.path_for_dataframe_with_features,
+         save_misclassified_examples=PARSED_ARGS.save_misclassified_examples,
+         path_to_save_prediction_csv=PARSED_ARGS.path_to_save_prediction_csv)

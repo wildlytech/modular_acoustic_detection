@@ -15,7 +15,7 @@ def separate_by_label(path, label_to_separate):
     # column names for csv file
     column_tags = ['wav_file', 'Label_1', 'Label_2', 'Label_3', 'Label_4']
     old_csv_file = path.split("/")[-1]
-    new_csv_file = ".".join(old_csv_file.split(".")[:-1])+"_"+label_to_separate.replace(' ', '_')+'.csv'
+    new_csv_file = ".".join(old_csv_file.split(".")[:-1]) + "_" + label_to_separate.replace(' ', '_') + '.csv'
     print("\nNew CSV file:", new_csv_file)
 
     # create a csv new file to export data

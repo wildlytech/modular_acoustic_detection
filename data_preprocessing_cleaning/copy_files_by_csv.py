@@ -22,19 +22,19 @@ def copy_files_by_csv(csv_path, wavfiles_src, wavfiles_dest):
         wavfiles_dest += '/'
 
     # create folder if not exists to copy files
-    if not os.path.exists(wavfiles_dest+csv_file_name):
-        os.makedirs(wavfiles_dest+csv_file_name)
+    if not os.path.exists(wavfiles_dest + csv_file_name):
+        os.makedirs(wavfiles_dest + csv_file_name)
     else:
         pass
 
     # get all the wav files from the wav files source path
-    org_wav_files = glob.glob(wavfiles_src+'*.wav') + glob.glob(wavfiles_src+'*.WAV')
+    org_wav_files = glob.glob(wavfiles_src + '*.wav') + glob.glob(wavfiles_src + '*.WAV')
     count = 0
     for wav_file in org_wav_files:
         if wav_file.split("/")[-1] in csv_wav_files_list:
             count += 1
             # copy wav file to the destination path
-            shutil.copy(wav_file, wavfiles_dest+csv_file_name)
+            shutil.copy(wav_file, wavfiles_dest + csv_file_name)
     print("\nNumber of files copied:", count)
 
 ###############################################################################

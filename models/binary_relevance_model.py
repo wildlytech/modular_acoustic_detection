@@ -118,7 +118,7 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
     """
 
     # split before sub/oversampling to ensure there is no leakage between train and test sets
-    test_size = int(validation_split*dataframe.shape[0])
+    test_size = int(validation_split * dataframe.shape[0])
     train_size = dataframe.shape[0] - test_size
 
     if test_size == 0:
@@ -132,7 +132,7 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
                                              test_size=test_size,
                                              random_state=42)
 
-    test_subsample = int(subsample*validation_split)
+    test_subsample = int(subsample * validation_split)
     train_subsample = subsample - test_subsample
 
     if (train_df.shape[0] == 0) and (train_subsample > 0):
@@ -305,7 +305,7 @@ print("NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
       TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES, "/", \
       TOTAL_TRAIN_TEST_NEGATIVE_EXAMPLES)
 
-print("PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100.0*TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES/TOTAL_TRAIN_TEST_EXAMPLES))
+print("PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100.0 * TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES / TOTAL_TRAIN_TEST_EXAMPLES))
 
 #############################################################################
 # preprocess the data into required structure
@@ -357,14 +357,14 @@ print("TRAIN NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
       CLF2_TRAIN_TARGET.shape[0], "/", \
       (CLF2_TRAIN_TARGET == 1).sum(), "/", \
       (CLF2_TRAIN_TARGET == 0).sum())
-print("TRAIN PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100*TRAIN_TARGET_POSITIVE_PERCENTAGE))
+print("TRAIN PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100 * TRAIN_TARGET_POSITIVE_PERCENTAGE))
 
 if TRAIN_TARGET_POSITIVE_PERCENTAGE > 0.5:
-    CLASS_WEIGHT_0 = TRAIN_TARGET_POSITIVE_PERCENTAGE / (1-TRAIN_TARGET_POSITIVE_PERCENTAGE)
+    CLASS_WEIGHT_0 = TRAIN_TARGET_POSITIVE_PERCENTAGE / (1 - TRAIN_TARGET_POSITIVE_PERCENTAGE)
     CLASS_WEIGHT_1 = 1
 else:
     CLASS_WEIGHT_0 = 1
-    CLASS_WEIGHT_1 = (1-TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
+    CLASS_WEIGHT_1 = (1 - TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
 
 #############################################################################
     # Implementing using the keras usual training techinque

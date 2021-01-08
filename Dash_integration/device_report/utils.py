@@ -31,13 +31,13 @@ def get_header(app):
          html.Div(
              [html.Div(
                  [html.H5("Acoustic Monitoring Device Report",
-                          style={'text-decoration':'underline'})
+                          style={'text-decoration': 'underline'})
                  ], className="seven columns main-title"),
               html.Div(
                   [html.A("Download Report",
                           id="download-link-report",
                           download='readMe.pdf',
-                          style={'text-decoration':'underline'},
+                          style={'text-decoration': 'underline'},
                           href="/readMe.pdf",
                           className="full-view-link")
                   ], className="five columns")

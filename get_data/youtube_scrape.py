@@ -19,8 +19,8 @@ if not os.path.exists(PATH_TO_WRITE_AUDIO):
     os.mkdir(PATH_TO_WRITE_AUDIO)
 else:
     pass
-if not os.path.exists(PATH_TO_WRITE_AUDIO+"_".join(SEARCH_KEYWORD.split(" "))):
-    os.mkdir(PATH_TO_WRITE_AUDIO+"_".join(SEARCH_KEYWORD.split(" ")))
+if not os.path.exists(PATH_TO_WRITE_AUDIO + "_".join(SEARCH_KEYWORD.split(" "))):
+    os.mkdir(PATH_TO_WRITE_AUDIO + "_".join(SEARCH_KEYWORD.split(" ")))
 else:
     pass
 
@@ -31,10 +31,10 @@ else:
 QUERY_CALL = SEARCH_KEYWORD
 BASE_QUERY = "https://www.youtube.com/results?search_query="
 QSTRING = "+".join(QUERY_CALL.split(" "))
-REQUESTS_CALL = requests.get(BASE_QUERY+QSTRING)
+REQUESTS_CALL = requests.get(BASE_QUERY + QSTRING)
 PAGE = REQUESTS_CALL.text
 SOUP = bs(PAGE, 'html.parser')
-VIDEOS = SOUP.findAll('a', attrs={'class':'yt-uix-tile-link'})
+VIDEOS = SOUP.findAll('a', attrs={'class': 'yt-uix-tile-link'})
 
 
 ###########################################################################
@@ -52,13 +52,13 @@ for v in VIDEOS:
 COUNT = 0
 for item in VIDEO_LIST[:NUMBER_AUDIOCLIPS_LIMIT]:
     COUNT += 1
-    path = PATH_TO_WRITE_AUDIO+ "_".join(SEARCH_KEYWORD.split(" "))+"/"+ \
-           SEARCH_KEYWORD+"_"+item.split("=")[-1]+"_"+ str(COUNT)
+    path = PATH_TO_WRITE_AUDIO + "_".join(SEARCH_KEYWORD.split(" ")) + "/" + \
+           SEARCH_KEYWORD + "_" + item.split("=")[-1] + "_" + str(COUNT)
     if not os.path.exists(path):
         try:
             check_call(['youtube-dl', item,
                         '--audio-format', 'wav',
-                        '-x', '-o', path+'.%(ext)s'])
+                        '-x', '-o', path + '.%(ext)s'])
         except CalledProcessError:
 
             # do nothing

@@ -180,7 +180,7 @@ IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
 SOUNDS_DICT = {'explosion_sounds': EXPLOSION_SOUNDS, 'wood_sounds': WOOD_SOUNDS,
                'nature_sounds': NATURE_SOUNDS, 'motor_sounds': MOTOR_SOUNDS,
                'human_sounds': HUMAN_SOUNDS, 'tools': TOOLS_SOUNDS,
-               'domestic_sounds': DOMESTIC_SOUNDS, 'Wild_animals':WILD_ANIMALS}
+               'domestic_sounds': DOMESTIC_SOUNDS, 'Wild_animals': WILD_ANIMALS}
 
 
 ###########################################################################
@@ -265,19 +265,19 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
     url = "https://www.youtube.com/watch?v=" + YTID
 
     # set the target path to download the audio files
-    target_file = target_path + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)+".wav"
+    target_file = target_path + YTID + '-' + str(start_seconds) + '-' + str(end_seconds) + ".wav"
 
     # No need to download audio file that already has been downloaded
     if os.path.isfile(target_file):
         return
 
-    tmp_filename = target_path+ '/tmp_clip_' + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)
-    tmp_filename_w_extension = tmp_filename +'.wav'
+    tmp_filename = target_path + '/tmp_clip_' + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)
+    tmp_filename_w_extension = tmp_filename + '.wav'
 
     try:
         check_call(['youtube-dl', url,
                     '--audio-format', 'wav',
-                    '-x', '-o', tmp_filename +'.%(ext)s'])
+                    '-x', '-o', tmp_filename + '.%(ext)s'])
     except CalledProcessError:
 
         # do nothing
@@ -285,7 +285,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
         return
 
     try:
-        aud_seg = AudioSegment.from_wav(tmp_filename_w_extension)[start_seconds*1000:end_seconds*1000]
+        aud_seg = AudioSegment.from_wav(tmp_filename_w_extension)[start_seconds * 1000:end_seconds * 1000]
 
         aud_seg.export(target_file, format="wav")
     except:
@@ -308,11 +308,11 @@ def download_data(target_sounds_list, target_path):
     df['positive_labels'] = df['positive_labels'].apply(lambda arr: arr.split(','))
     df['labels_name'] = df['positive_labels'].map(lambda arr: np.concatenate([labels_csv.loc[labels_csv['mid'] == x].display_name for x in arr]))
     df['wav_file'] = df['YTID'].astype(str) + '-' + df['start_seconds'].astype(str) +\
-                     '-' + df['end_seconds'].astype(str)+'.wav'
+                     '-' + df['end_seconds'].astype(str) + '.wav'
 
     # save the data frame which can be used for further balancing the data
     # and generating the embeddings for audio files.
-    with open(RESULT.target_sounds+'_downloaded_base_dataframe.pkl', 'wb') as file_obj:
+    with open(RESULT.target_sounds + '_downloaded_base_dataframe.pkl', 'wb') as file_obj:
         pickle.dump(df, file_obj)
 
     print('Base dataframe is saved as " downloaded_base_dataframe.pkl "..!!')

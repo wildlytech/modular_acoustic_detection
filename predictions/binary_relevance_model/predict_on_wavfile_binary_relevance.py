@@ -31,14 +31,14 @@ def predict_on_embedding(embedding, label_names, config_datas):
 
         if embedding.shape[0] < 10:
             # Pad by repeating the last second in embedding till we get to 10 seconds
-            padding = np.ones((10-embedding.shape[0], embedding.shape[1]))*embedding[-1,:]
+            padding = np.ones((10 - embedding.shape[0], embedding.shape[1])) * embedding[-1, :]
             embedding = np.vstack([embedding, padding])
 
         # If the clip is longer then 10 seconds, then predict on multiple 10-second
         # windows within the clip. Take the max probability across all windows.
         pred_prob = 0
-        for index in np.arange(10,embedding.shape[0]+1):
-            windowed_embedding = embedding[(index-10):index,:].reshape((1,10*128,1))
+        for index in np.arange(10, embedding.shape[0] + 1):
+            windowed_embedding = embedding[(index - 10):index, :].reshape((1, 10 * 128, 1))
             pred_prob = max(pred_prob, model.predict(windowed_embedding).ravel()[0])
 
         # Clear keras session after all predictions with model
@@ -75,9 +75,9 @@ def main(predictions_cfg_json, path_for_wavfile):
 
     for each_embedding in [EMBEDDINGS]:
 
-        prediction_probs, prediction_rounded = predict_on_embedding(embedding = each_embedding,
-                                                                    label_names = LABEL_NAMES,
-                                                                    config_datas = CONFIG_DATAS)
+        prediction_probs, prediction_rounded = predict_on_embedding(embedding=each_embedding,
+                                                                    label_names=LABEL_NAMES,
+                                                                    config_datas=CONFIG_DATAS)
 
         CLF2_TRAIN_PREDICTION_PROB.append(prediction_probs)
         CLF2_TRAIN_PREDICTION.append(prediction_rounded)
@@ -118,5 +118,5 @@ if __name__ == "__main__":
     ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
-    main(predictions_cfg_json = PARSED_ARGS.predictions_cfg_json,
-         path_for_wavfile = PARSED_ARGS.path_for_wavfile)
+    main(predictions_cfg_json=PARSED_ARGS.predictions_cfg_json,
+         path_for_wavfile=PARSED_ARGS.path_for_wavfile)

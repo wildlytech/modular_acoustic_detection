@@ -7,11 +7,11 @@ DOMAIN = "https://www.worldbirdnames.org/"
 URL = DOMAIN + "master_ioc-names_xml.xml"
 KEYTAGS = ['order', 'family', 'genus', 'species', 'subspecies']
 
-NEXT_TAXONOMY = {'bird':'order',
-                 'order':'family',
-                 'family':'genus',
-                 'genus':'species',
-                 'species':'subspecies'}
+NEXT_TAXONOMY = {'bird': 'order',
+                 'order': 'family',
+                 'family': 'genus',
+                 'genus': 'species',
+                 'species': 'subspecies'}
 
 # Nodes for the ontology json file
 ONTOLOGY_EXTENSION_NODES = []
@@ -30,7 +30,7 @@ def parse_taxonomy(xml_dict, id_prefix, key):
     if latin_name is None:
         # The only time this case should occur is for the highest node in tree
         # This node (type "bird") should not get added to the ontology
-        node_ontology_entry = {"child_ids":[]}
+        node_ontology_entry = {"child_ids": []}
     else:
         latin_name = latin_name.lower().replace("-", " ")
         name = latin_name
@@ -76,13 +76,13 @@ def parse_taxonomy(xml_dict, id_prefix, key):
             english_name = english_name.lower()
         note = xml_dict.get('note')
 
-        ontology_id = id_prefix+"_{0}_{1}".format(key, latin_name.replace(' ', '-'))
+        ontology_id = id_prefix + "_{0}_{1}".format(key, latin_name.replace(' ', '-'))
 
         description = "Bird {0} {1}(Common name:{2}) (Note:{3})".format( \
                             key, name, english_name, note)
         url = xml_dict.get('url')
         if url:
-            url = DOMAIN+url
+            url = DOMAIN + url
 
         # Some information is not necessary for the ontology
         # (e.g. authority, common name, breeding regions and subregions)
@@ -98,7 +98,7 @@ def parse_taxonomy(xml_dict, id_prefix, key):
                                "description": description,
                                "citation_uri": url,
                                "audioset_parent_id": "/m/015p6" if key == 'order' else None,
-                               "child_ids":[]}
+                               "child_ids": []}
 
         # Add node to ontology
         ONTOLOGY_EXTENSION_NODES.append(node_ontology_entry)

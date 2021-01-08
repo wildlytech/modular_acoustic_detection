@@ -100,9 +100,9 @@ def predictions_from_models(wavfile_path, embeddings):
 
     prediction_probs, prediction_rounded = \
             predict_on_wavfile_binary_relevance.predict_on_embedding(\
-                                                embedding = embeddings,
-                                                label_names = list(CONFIG_DATAS.keys()),
-                                                config_datas = CONFIG_DATAS)
+                                                embedding=embeddings,
+                                                label_names=list(CONFIG_DATAS.keys()),
+                                                config_datas=CONFIG_DATAS)
 
     return prediction_probs, prediction_rounded
 
@@ -118,7 +118,7 @@ def get_predictions(wavfile_path):
     try:
         embeddings = generate_before_predict_BR.main(wavfile_path, 0, 0, 0)
     except:
-        print(('\033[1m'+ "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1]))
+        print(('\033[1m' + "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1]))
         return None, None
     try:
         return predictions_from_models(wavfile_path, embeddings)
@@ -181,46 +181,46 @@ def get_prediction_bar_graph(filepath):
 
     output_sound = get_formatted_detected_sounds(prediction_rounded)
 
-    return  prediction_probs, \
+    return prediction_probs, \
             prediction_rounded, \
             output_sound, \
             dcc.Graph(id='example',
                       figure={
-                          'data':[{'x':[format_label_name(x) for x in list(CONFIG_DATAS.keys())],
+                          'data': [{'x': [format_label_name(x) for x in list(CONFIG_DATAS.keys())],
                                    'y':["{0:.2f}".format(x) for x in prediction_probs],
                                    'text':["{0:.2f}%".format(x) for x in prediction_probs],
                                    'textposition':'auto',
                                    'marker':{
-                                        'color':['rgba(26, 118, 255,0.8)', 'rgba(222,45,38,0.8)',
+                                        'color': ['rgba(26, 118, 255,0.8)', 'rgba(222,45,38,0.8)',
                                                  'rgba(204,204,204,1)', 'rgba(0,150,0,0.8)',
                                                  'rgba(204,204,204,1)', 'rgba(55, 128, 191, 0.7)']},
                                    'type':'bar'}],
                           'layout': {
-                              'title':'probabilistic prediction graph ',
-                              'titlefont':{
-                                  'family':'Courier New, monospace',
-                                  'size':22,
-                                  'color':'green'},
+                              'title': 'probabilistic prediction graph ',
+                              'titlefont': {
+                                  'family': 'Courier New, monospace',
+                                  'size': 22,
+                                  'color': 'green'},
 
-                              'xaxis':{
+                              'xaxis': {
                                   'title': 'Labels of the sound',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'green'}},
-                              'yaxis':{
+                                  'titlefont': {
+                                      'family': 'Courier New, monospace',
+                                      'size': 18,
+                                      'color': 'green'}},
+                              'yaxis': {
                                   'title': 'Percentage probabality',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'green'}},
-                              'height':400,
-                              'paper_bgcolor':'rgba(0,0,0,0)',
-                              'plot_bgcolor':'rgba(0,0,0,0)',
-                              'font': {'color':'#7f7f7f'}}},
+                                  'titlefont': {
+                                      'family': 'Courier New, monospace',
+                                      'size': 18,
+                                      'color': 'green'}},
+                              'height': 400,
+                              'paper_bgcolor': 'rgba(0,0,0,0)',
+                              'plot_bgcolor': 'rgba(0,0,0,0)',
+                              'font': {'color': '#7f7f7f'}}},
                         style={'marginBottom': 20,
                                'marginTop': 45,
-                               'color':'black'})
+                               'color': 'black'})
 
 
 def get_data_table_from_dataframe(dataframe):
@@ -238,11 +238,11 @@ def get_data_table_from_dataframe(dataframe):
                                           "deletable": True} for i in dataframe.columns],
                                 data=dataframe.to_dict("rows"),
                                 style_header={"fontWeight": "bold"},
-                                style_cell={'whiteSpace':'normal',
+                                style_cell={'whiteSpace': 'normal',
                                             'maxWidth': '240px'},
-                                style_table={"maxHeight":"350px",
-                                             "overflowY":"scroll",
-                                             "overflowX":"auto"})
+                                style_table={"maxHeight": "350px",
+                                             "overflowY": "scroll",
+                                             "overflowX": "auto"})
 
 
 def check_pre_requiste_files():
@@ -280,11 +280,11 @@ def call_for_data(dataframe,
     else:
         list_of_malformed = "None"
 
-    return html.Div([titleElementType("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
-                                      style={"color":titleColorStyle,
-                                             "text-decoration":"underline"}),
+    return html.Div([titleElementType("Total Number of Audio Clips : " + str(dataframe.shape[0]),
+                                      style={"color": titleColorStyle,
+                                             "text-decoration": "underline"}),
                      titleElementType("Error while prediction: " + list_of_malformed,
-                                      style={"color":"white"}),
+                                      style={"color": "white"}),
                      get_data_table_from_dataframe(dataframe)] + \
                     [html.Br() for x in range(numPaddedLineBreaks)])
 
@@ -295,7 +295,7 @@ def call_for_data(dataframe,
 
 app = dash.Dash()
 app.config.suppress_callback_exceptions = True
-IMAGE_FILENAME = os.path.dirname(__file__)+'/pic.png' # replace with your own image
+IMAGE_FILENAME = os.path.dirname(__file__) + '/pic.png'  # replace with your own image
 ENCODED_IMAGE_MAIN = base64.b64encode(open(IMAGE_FILENAME, 'rb').read()).decode()
 
 app.layout = html.Div([dcc.Location(id='url',
@@ -305,11 +305,11 @@ app.layout = html.Div([dcc.Location(id='url',
 INDEX_PAGE = html.Div(children=[html.Div(children=[html.Div(children=[html.H1('Wildly Listen',
                                                                               id='select',
                                                                               style={'text-align': 'center',
-                                                                                     'margin': '0 auto',})]),
+                                                                                     'margin': '0 auto', })]),
                                                    html.H2('Acoustic Monitoring and Audio Analysis')]),
                                 html.Div(children=[html.Div(children=[html.Img(src='data:image/png;base64,{}'.format(ENCODED_IMAGE_MAIN),
-                                                                               style={'width':'100%',
-                                                                                      'height':'250px'})]),
+                                                                               style={'width': '100%',
+                                                                                      'height': '250px'})]),
                                                    html.Div(id='t1',
                                                             className="app-header",
                                                             children=[html.Br(),
@@ -328,7 +328,7 @@ INDEX_PAGE = html.Div(children=[html.Div(children=[html.Div(children=[html.H1('W
                                                                                                   href='/page-1',
                                                                                                   style={'fontSize': '100%',
                                                                                                          'color': 'solid green',
-                                                                                                         'border':'3px solid green',
+                                                                                                         'border': '3px solid green',
                                                                                                          'text-decoration': 'none'}),
                                                                                          html.Br()]),
                                                                       html.Br(),
@@ -336,49 +336,49 @@ INDEX_PAGE = html.Div(children=[html.Div(children=[html.Div(children=[html.H1('W
                                                                                href='/page-3',
                                                                                style={'fontSize': '100%',
                                                                                       'color': 'solid green',
-                                                                                      'border':'3px solid green',
+                                                                                      'border': '3px solid green',
                                                                                       'position': 'relative',
-                                                                                      'display':'inline',
-                                                                                      'margin-top':100,
-                                                                                      'text-decoration':'none'}),
+                                                                                      'display': 'inline',
+                                                                                      'margin-top': 100,
+                                                                                      'text-decoration': 'none'}),
                                                                       html.Br(),
                                                                       html.Br(),
                                                                       dcc.Link('Sound Library',
                                                                                href='/page-4',
                                                                                style={'fontSize': '100%',
                                                                                       'color': 'solid green',
-                                                                                      'border':'3px solid green',
+                                                                                      'border': '3px solid green',
                                                                                       'position': 'relative',
                                                                                       'text-decoration': 'none'}),
                                                                       html.Br()])]),
-                                html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2020 ',
-                                            style={"position":"fixed",
-                                                   "left":"0",
-                                                   "bottom":"0",
-                                                   "height":"2%",
-                                                   "width":"100%",
-                                                   "background-color":"black",
-                                                   "color":"white",
-                                                   "padding":"20px",
-                                                   "textAlign":"center"})])
+                                html.Footer('\xc2\xa9' + ' Copyright WildlyTech Inc. 2020 ',
+                                            style={"position": "fixed",
+                                                   "left": "0",
+                                                   "bottom": "0",
+                                                   "height": "2%",
+                                                   "width": "100%",
+                                                   "background-color": "black",
+                                                   "color": "white",
+                                                   "padding": "20px",
+                                                   "textAlign": "center"})])
 
 
 ###############################################################################
 # 1 UPLOAD PAGE
 ###############################################################################
 PAGE_1_LAYOUT = html.Div(id='out-upload-data',
-                         children=[html.Div(style={"background-color":"green",
-                                                   "padding":"2px"},
+                         children=[html.Div(style={"background-color": "green",
+                                                   "padding": "2px"},
                                             children=[dcc.Link('Home page',
                                                                href='/',
                                                                style={'fontSize': 20,
                                                                       'color': 'white',
-                                                                      'text-decoration':'none'}),
+                                                                      'text-decoration': 'none'}),
                                                       html.H1('Upload Audio Files',
                                                               style={'color': 'white',
                                                                      'fontSize': 30,
-                                                                     'textAlign':'center',
-                                                                     'text-decoration':'none'})]),
+                                                                     'textAlign': 'center',
+                                                                     'text-decoration': 'none'})]),
                                    html.Div(id='display-play_1',
                                             children=[html.Br()]),
                                    dcc.Upload(id='upload-data1',
@@ -386,11 +386,11 @@ PAGE_1_LAYOUT = html.Div(id='out-upload-data',
                                                                  html.A(' Select File')],
                                                                 style={'color': 'green',
                                                                        'fontSize': 20,
-                                                                       'textAlign':'center'}),
+                                                                       'textAlign': 'center'}),
                                               style={'color': 'green',
                                                      'fontSize': 20,
-                                                     'border':'3px solid green',
-                                                     'textAlign':'center'},
+                                                     'border': '3px solid green',
+                                                     'textAlign': 'center'},
                                               # Allow multiple files to be uploaded
                                               multiple=True),
                                    html.Br(),
@@ -399,45 +399,45 @@ PAGE_1_LAYOUT = html.Div(id='out-upload-data',
                                                                   n_clicks=0,
                                                                   style={'text-decoration': 'none',
                                                                          'textAlign': 'center',
-                                                                         'border':'3px solid green',
+                                                                         'border': '3px solid green',
                                                                          # 'margin-left':'800',
                                                                          # 'align':'center',
                                                                          'color': 'green',
-                                                                         'fontSize':20}),
+                                                                         'fontSize': 20}),
                                                       html.Br(),
                                                       html.Br()],
-                                            style={"textAlign":"center"}),
+                                            style={"textAlign": "center"}),
                                    html.Div(children=[dcc.Link('FTP status',
                                                                href='/page-3',
                                                                style={'text-decoration': 'none',
                                                                       'textAlign': 'center',
-                                                                      'border':'3px solid green',
+                                                                      'border': '3px solid green',
                                                                       # 'margin-left':'800',
                                                                       # 'align':'center',
                                                                       'color': 'green',
-                                                                      'fontSize':20})],
-                                            style={"textAlign":"center"}),
+                                                                      'fontSize': 20})],
+                                            style={"textAlign": "center"}),
                                    html.Div(id="page-1-content"),
                                    html.Div(id="page-1-content-link"),
                                    html.Div(id='page1',
                                             children=[html.Br(),
                                                       html.Br()]),
-                                   html.Footer('\xc2\xa9'+' Copyright WildlyTech Inc. 2020 .',
-                                               style={"position":"fixed",
-                                                      "left":"0",
-                                                      "bottom":"0",
-                                                      "height":"4%",
-                                                      "width":"100%",
-                                                      "background-color":"black",
-                                                      "color":"white",
-                                                      "padding":"20px",
-                                                      "textAlign":"center"})])
+                                   html.Footer('\xc2\xa9' + ' Copyright WildlyTech Inc. 2020 .',
+                                               style={"position": "fixed",
+                                                      "left": "0",
+                                                      "bottom": "0",
+                                                      "height": "4%",
+                                                      "width": "100%",
+                                                      "background-color": "black",
+                                                      "color": "white",
+                                                      "padding": "20px",
+                                                      "textAlign": "center"})])
 
 
 def save_file(name, content):
     """Decode and store a file uploaded with Plotly Dash."""
     data = content.encode("utf8").split(b";base64,")[1]
-    with open("uploaded_files_from_dash/"+name, "wb") as file_p:
+    with open("uploaded_files_from_dash/" + name, "wb") as file_p:
         file_p.write(base64.b64decode(data))
 
 
@@ -461,18 +461,18 @@ def parse_contents(contents, filename, date):
         # unpack bar graph information
         _, prediction_rounded, output_sound, bar_graph = bar_graph_info
 
-        return  html.Div(style={'color': 'green', 'fontSize':14},
+        return html.Div(style={'color': 'green', 'fontSize': 14},
                          children=[html.Audio(id='myaudio',
                                               src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
                                               controls=True),
-                                   html.H4('Predictions rounded will be: '+ str(prediction_rounded)),
-                                   html.H4('Prediction seems to be '+ output_sound,
-                                           style={'color':'green',
+                                   html.H4('Predictions rounded will be: ' + str(prediction_rounded)),
+                                   html.H4('Prediction seems to be ' + output_sound,
+                                           style={'color': 'green',
                                                   'fontSize': 30,
-                                                  'textAlign':'center',
-                                                  'text-decoration':'underline'}),
+                                                  'textAlign': 'center',
+                                                  'text-decoration': 'underline'}),
                                    bar_graph,
-                                   html.P('Uploaded File : '+ filename)] + [html.Br() for x in range(3)])
+                                   html.P('Uploaded File : ' + filename)] + [html.Br() for x in range(3)])
     else:
 
         # Since the file is not a wav file or has problems, delete the file
@@ -481,13 +481,13 @@ def parse_contents(contents, filename, date):
         return html.Div([
                           html.Div(style={'color': 'blue', 'fontSize': 14}),
                           html.H5('Unkown file type',
-                                  style={'marginBottom':20,
-                                         'marginTop':45,
+                                  style={'marginBottom': 20,
+                                         'marginTop': 45,
                                          'color': 'red',
-                                         'fontSize':14}),
-                          html.P('Uploaded File : '+filename),
-                          html.P('Last Modified : '+ str(datetime.datetime.fromtimestamp(date)),
-                                 style={'color':'black',
+                                         'fontSize': 14}),
+                          html.P('Uploaded File : ' + filename),
+                          html.P('Last Modified : ' + str(datetime.datetime.fromtimestamp(date)),
+                                 style={'color': 'black',
                                         'fontSize': 12}),
                         ] + [html.Br() for x in range(3)])
 
@@ -505,7 +505,7 @@ def parse_contents_batch(contents, names, dates):
     for i in zip(contents, names, dates):
         if not os.path.exists("uploaded_files_from_dash/"):
             os.makedirs("uploaded_files_from_dash/")
-        path = "uploaded_files_from_dash/"+i[1]
+        path = "uploaded_files_from_dash/" + i[1]
         if os.path.exists(path):
             print("path Exists")
         else:
@@ -527,7 +527,7 @@ def parse_contents_batch(contents, names, dates):
         prediction_probs, prediction_rounded = predictions_from_models(path, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
 
         pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
-        pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
+        pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]] + prediction_probs
 
         return call_for_data(pred_df,
                              titleElementType=html.H4,
@@ -580,7 +580,7 @@ def start_batch_run_ftp_live(path_for_folder):
     """
     global CONFIG_DATAS
 
-    all_wav_files_path = glob.glob(path_for_folder+"*.WAV") + glob.glob(path_for_folder+"*.wav")
+    all_wav_files_path = glob.glob(path_for_folder + "*.WAV") + glob.glob(path_for_folder + "*.wav")
     all_wav_files = [each_file.split("/")[-1] for each_file in all_wav_files_path]
     print('len:', len(all_wav_files))
     dum_df = pd.DataFrame()
@@ -604,7 +604,7 @@ def start_batch_run_ftp_live(path_for_folder):
         for each_file in dum_df['FileNames'].tolist():
 
             # Predict the result and save the result to the csv file
-            pred_prob, pred = get_predictions(path_for_folder+each_file)
+            pred_prob, pred = get_predictions(path_for_folder + each_file)
 
             wav_information_object.writerow([each_file] + ["{0:.2f}".format(x) for x in pred_prob])
             file_object.flush()
@@ -617,7 +617,7 @@ def start_batch_run_ftp_live(path_for_folder):
 PAGE_5_LAYOUT = html.Div(html.Div([html.H4('Prediction Result'),
                                    html.Div(id='live-update-text'),
                                    dcc.Interval(id='interval-component',
-                                                interval=1*1000,
+                                                interval=1 * 1000,
                                                 n_intervals=0)]))
 
 
@@ -642,7 +642,7 @@ def disabling_button_1a(n_clicks):
     Disabling the button after its being clicked once
     """
     if n_clicks >= 1:
-        return {'display':"none"}
+        return {'display': "none"}
 
 
 @app.callback(Output('page-1-content', 'style'),
@@ -652,7 +652,7 @@ def disabling_button_1b(n_clicks):
     Disabling the button after its being clicked once
     """
     if n_clicks >= 1:
-        return {'display':"none"}
+        return {'display': "none"}
 
 
 @app.callback(Output('page-1-content-link', 'children'),
@@ -667,16 +667,16 @@ def disabling_button_1c(n_clicks):
         download_thread.start()
         return html.Div([html.Br(),
                          html.Br(),
-                         dcc.Link("Selected Folder: "+FOLDER_FILES_PATH,
+                         dcc.Link("Selected Folder: " + FOLDER_FILES_PATH,
                                   href="/page-5",
                                   style={'text-decoration': 'none',
                                          'textAlign': 'left',
-                                         'border':'3px solid green',
+                                         'border': '3px solid green',
                                          # 'margin-left':'800',
                                          # 'align':'center',
                                          'color': 'green',
-                                         'fontSize':20})],
-                        style={'textAlign':"left"})
+                                         'fontSize': 20})],
+                        style={'textAlign': "left"})
 
 
 ###############################################################################
@@ -685,10 +685,10 @@ def disabling_button_1c(n_clicks):
 
 
 PAGE_2_LAYOUT = html.Div(id='Wildly listen', children=[
-    html.Div(style={"background-color":"green", "padding":"2px"}, children=[
+    html.Div(style={"background-color": "green", "padding": "2px"}, children=[
         html.H1('Acoustic Monitoring and Audio Analysis',
-                style={'textAlign':'center',
-                       'color':'white'})]),
+                style={'textAlign': 'center',
+                       'color': 'white'})]),
     dcc.Dropdown(id='my-dropdown',
                  options=[{'label': 'Graph', 'value': 'graph'}],
                  style={'width': '80%',
@@ -699,32 +699,32 @@ PAGE_2_LAYOUT = html.Div(id='Wildly listen', children=[
              href='/page-1',
              style={'marginBottom': 20,
                     'marginTop': 20,
-                    'text-decoration':'none',
+                    'text-decoration': 'none',
                     'fontSize': 14}),
     html.Br(),
     dcc.Link('Home Page',
              href='/',
              style={'marginBottom': 20,
                     'marginTop': 20,
-                    'text-decoration':'none',
-                    'fontSize':14}),
+                    'text-decoration': 'none',
+                    'fontSize': 14}),
     html.Br(),
     dcc.Link('FTP status',
              href='/page-3',
              style={'marginBottom': 20,
                     'marginTop': 45,
-                    'text-decoration':'none',
+                    'text-decoration': 'none',
                     'fontSize': 14}),
-    html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2020 ',
-                style={"position":"fixed",
-                       "left":"0",
-                       "bottom":"0",
-                       "height":"4%",
-                       "width":"100%",
-                       "background-color":"green",
-                       "color":"white",
-                       "padding":"20px",
-                       "textAlign":"center"})])
+    html.Footer('\xc2\xa9' + ' Copyright WildlyTech Inc. 2020 ',
+                style={"position": "fixed",
+                       "left": "0",
+                       "bottom": "0",
+                       "height": "4%",
+                       "width": "100%",
+                       "background-color": "green",
+                       "color": "white",
+                       "padding": "20px",
+                       "textAlign": "center"})])
 
 # callback function for dropdown with tet graph
 
@@ -738,12 +738,12 @@ def update_values(input_data):
     if input_data == 'graph':
 
         return dcc.Graph(id='example',
-                         figure={'data':[{'x':[1, 2, 3, 4],
+                         figure={'data': [{'x': [1, 2, 3, 4],
                                           'y':[5, 9, 7, 8],
                                           'type':'line'}],
-                                 'layout': {'title':'Dash Plot',
-                                            'paper_bgcolor':'rgba(0,0,0,0)',
-                                            'plot_bgcolor':'rgba(0,0,0,0)',
+                                 'layout': {'title': 'Dash Plot',
+                                            'paper_bgcolor': 'rgba(0,0,0,0)',
+                                            'plot_bgcolor': 'rgba(0,0,0,0)',
                                             'font': {'color': COLORS['text']}}},
                          style={'marginBottom': 20,
                                 'marginTop': 45})
@@ -759,7 +759,7 @@ def check_for_wav_only(list_values):
     """
     wav_files = []
     for each_value in list_values:
-        if each_value[-3:] == "WAV"  or each_value[-3:] == "wav":
+        if each_value[-3:] == "WAV" or each_value[-3:] == "wav":
             wav_files.append(each_value)
     return wav_files
 
@@ -785,12 +785,12 @@ def call_for_ftp():
 # FTP STATUS PAGE : Layout and callbacks
 ###############################################################################
 PAGE_3_LAYOUT = html.Div([
-    html.Div(style={"background-color":"green", "padding":"2px"},
+    html.Div(style={"background-color": "green", "padding": "2px"},
              children=[html.H1("FTP Status",
-                               style={"color":"white",
-                                      "text-align":"center",
+                               style={"color": "white",
+                                      "text-align": "center",
                                       'fontSize': 20,
-                                      'text-decoration':'underline'})]),
+                                      'text-decoration': 'underline'})]),
     html.Div(id='page-new-content'),
     html.Button("FTP Status", id='button', n_clicks=0),
     html.Div(id="ftp_content_button"),
@@ -850,7 +850,7 @@ def play_button_for_prediction_disabling(rows, columns, indices):
     Disabling play button if none are selected
     """
     if indices is None:
-        return {"display":"none"}
+        return {"display": "none"}
 
 
 @app.callback(Output('button', 'style'),
@@ -860,7 +860,7 @@ def disabling_button(n_clicks):
     Disabling the button after its being clicked once
     """
     if n_clicks >= 1:
-        return {'display':"none"}
+        return {'display': "none"}
 
 
 ###############################################################################
@@ -878,7 +878,7 @@ def play_button_for_prediction(rows, columns, indices):
     """
     pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
     if indices is not None and indices != []:
-        path = "FTP_downloaded/"+str(pred_df.iloc[indices[0]]["FileNames"])
+        path = "FTP_downloaded/" + str(pred_df.iloc[indices[0]]["FileNames"])
         encoded_image_to_play = base64.b64encode(open(path, 'rb').read()).decode()
         return html.Div([
             html.Br(),
@@ -907,13 +907,13 @@ def batch_downloading_and_predict(n_clicks):
         for i in df["FileNames"].tolist():
             if not os.path.exists("FTP_downloaded/"):
                 os.makedirs("FTP_downloaded/")
-            path = "FTP_downloaded/"+i
+            path = "FTP_downloaded/" + i
             if os.path.exists(path):
                 print("path Exists")
             else:
                 print("Downloading and generating embeddings ", i)
                 with open(path, 'wb') as file_obj:
-                    ftp.retrbinary('RETR '+ i, file_obj.write)
+                    ftp.retrbinary('RETR ' + i, file_obj.write)
             try:
                 emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
             except ValueError:
@@ -927,7 +927,7 @@ def batch_downloading_and_predict(n_clicks):
             prediction_probs, prediction_rounded = predictions_from_models(path, np.array(dum_df.features.apply(lambda x: x.flatten()).tolist()))
 
             pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
-            pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
+            pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]] + prediction_probs
 
             return call_for_data(pred_df,
                                  titleElementType=html.H4,
@@ -954,10 +954,10 @@ def batch_downloading_and_predict(n_clicks):
 
         else:
             return html.Div([html.H3("Something went Wrong, Try again",
-                                     style={"color":"white"}),
-                             html.P("Note: If problem still persists file might be "+
+                                     style={"color": "white"}),
+                             html.P("Note: If problem still persists file might be " +
                                     "corrupted or Input a valid 10 second .wav file",
-                                    style={"color":"white"})])
+                                    style={"color": "white"})])
 
 
 ###############################################################################
@@ -971,33 +971,33 @@ DATA_BASE = CLIENT.audio_library
 # Sound Library Page : Layout and callbacks
 ###############################################################################
 PAGE_4_LAYOUT = html.Div([
-    html.Div(style={"background-color":"green", "padding":"2px"},
+    html.Div(style={"background-color": "green", "padding": "2px"},
              children=[html.H1("Sound Library",
-                               style={"color":"white",
-                                      "text-align":"center",
+                               style={"color": "white",
+                                      "text-align": "center",
                                       'fontSize': 20,
-                                      'text-decoration':'underline'})]),
+                                      'text-decoration': 'underline'})]),
     html.H3('Select the Audio category',
-            style={"color":"green",
-                   'text-decoration':'underline'}),
+            style={"color": "green",
+                   'text-decoration': 'underline'}),
     dcc.Dropdown(id="select-class",
-                 options=[{"label":i, "value":i} for i in list(CONFIG_DATAS.keys())],
+                 options=[{"label": i, "value": i} for i in list(CONFIG_DATAS.keys())],
                  multi=False,
                  placeholder="Search for Audio Category"),
     html.Div(id='output_dropdown'),
     html.Div(id='output_data'),
     html.Div(id="datatable-interactivity-container-2"),
     html.Div(id="page-4-content-2"),
-    html.Footer('\xc2\xa9'+ ' Copyright WildlyTech Inc. 2020 ',
-                style={"position":"fixed",
-                       "left":"0",
-                       "bottom":"0",
-                       "height":"4%",
-                       "width":"100%",
-                       "background-color":"black",
-                       "color":"white",
-                       "padding":"20px",
-                       "textAlign":"center"})])
+    html.Footer('\xc2\xa9' + ' Copyright WildlyTech Inc. 2020 ',
+                style={"position": "fixed",
+                       "left": "0",
+                       "bottom": "0",
+                       "height": "4%",
+                       "width": "100%",
+                       "background-color": "black",
+                       "color": "white",
+                       "padding": "20px",
+                       "textAlign": "center"})])
 
 
 #############################################################################
@@ -1010,7 +1010,7 @@ def call_for_labels(data):
     labels = []
     for label in list(set(np.concatenate(data["labels_name"].values.tolist()))):
         if label in list(CONFIG_DATAS.keys()):
-            labels.append({"label":str(label), "value":str(label)})
+            labels.append({"label": str(label), "value": str(label)})
     return labels
 
 
@@ -1028,14 +1028,14 @@ def select_class(value):
     final_d = []
     global COLLECTION
     COLLECTION = DATA_BASE[str(value)]
-    for labels in COLLECTION.find({}, {"labels_name":1}):
+    for labels in COLLECTION.find({}, {"labels_name": 1}):
         final_d.append(labels)
     data = pd.DataFrame(final_d)
     labels = call_for_labels(data)
     return html.Div([
         html.P("Select the labels: Number of labels : " + str(len(labels)),
-               style={"color":"green",
-                      'text-decoration':'underline'}),
+               style={"color": "green",
+                      'text-decoration': 'underline'}),
         dcc.Dropdown(id="select-labels",
                      options=labels,
                      multi=True,
@@ -1054,7 +1054,7 @@ def disabling_div_element(value):
     Disables div element if none are selected
     """
     if value is None or len(value) == 0:
-        return {"display":"none"}
+        return {"display": "none"}
 
 
 @app.callback(Output('page-4-content-2', 'style'),
@@ -1065,7 +1065,7 @@ def disabling_div_element_content_2(value, indices):
     Disables div element based none selection
     """
     if value is None or len(value) == 0 or indices is None:
-        return {"display":"none"}
+        return {"display": "none"}
 
 
 @app.callback(Output('output_data', 'style'),
@@ -1075,7 +1075,7 @@ def disabling_div_output_data(value):
     Disables the output div element based on none selection
     """
     if value is None or len(value) == 0:
-        return {"display":"none"}
+        return {"display": "none"}
 
 
 #############################################################################
@@ -1092,11 +1092,11 @@ def generate_layout(value):
     global label_name
     label_name = value
     if value is None or len(value) == 0:
-        return html.H5("Select any Label", style={"color":"green"})
+        return html.H5("Select any Label", style={"color": "green"})
     else:
         if len(value) == 1:
             final_d = []
-            for each_name in COLLECTION.find({"labels_name":str(value[0])}):
+            for each_name in COLLECTION.find({"labels_name": str(value[0])}):
                 final_d.append(each_name)
             try:
                 data_frame = pd.DataFrame(final_d).drop(["positive_labels", "len"],
@@ -1112,8 +1112,8 @@ def generate_layout(value):
             return call_for_data(data_frame, titleElementType=html.P, titleColorStyle='green')
         elif len(value) == 2:
             final_d = []
-            for each_name in COLLECTION.find({"$and":[{"labels_name":str(value[0])},
-                                                      {"labels_name":str(value[1])}]}):
+            for each_name in COLLECTION.find({"$and": [{"labels_name": str(value[0])},
+                                                      {"labels_name": str(value[1])}]}):
                 final_d.append(each_name)
             try:
                 data_frame = pd.DataFrame(final_d).drop(["positive_labels", "len"],
@@ -1128,7 +1128,7 @@ def generate_layout(value):
                                                     "labels_name"]].astype(str)
             return call_for_data(data_frame, titleElementType=html.P, titleColorStyle='green')
         else:
-            return html.H5("Select Less number of Filter labels", style={"color":"green"})
+            return html.H5("Select Less number of Filter labels", style={"color": "green"})
 
 
 #############################################################################
@@ -1146,15 +1146,15 @@ def display_output_from_data(rows, columns, indices):
     """
     df_inner = pd.DataFrame(rows, columns=[c['name'] for c in columns])
     if indices is None:
-        return html.Div(style={"padding":"20px"},
+        return html.Div(style={"padding": "20px"},
                         children=[html.P("Select Any audio ",
-                                         style={"color":"green"})])
+                                         style={"color": "green"})])
     else:
         global INPUT_NAME
-        path = subprocess.Popen("find /media/wildly/1TB-HDD/ -name "+\
-                             df_inner.iloc[indices]["YTID"].astype(str)+"-"+\
-                             df_inner.iloc[indices]["start_seconds"].astype(str)+"-"+\
-                             df_inner.iloc[indices]["end_seconds"].astype(str)+".wav",
+        path = subprocess.Popen("find /media/wildly/1TB-HDD/ -name " +\
+                             df_inner.iloc[indices]["YTID"].astype(str) + "-" +\
+                             df_inner.iloc[indices]["start_seconds"].astype(str) + "-" +\
+                             df_inner.iloc[indices]["end_seconds"].astype(str) + ".wav",
                                 shell=True,
                                 stdout=subprocess.PIPE)
 
@@ -1163,7 +1163,7 @@ def display_output_from_data(rows, columns, indices):
         encoded_image_from_path = base64.b64encode(open(path, 'rb').read()).decode()
         print("len of indices ", len(indices))
         INPUT_NAME = path
-        return html.Div(style={"padding-bottom":"10%"}, children=[
+        return html.Div(style={"padding-bottom": "10%"}, children=[
             html.Br(),
             html.Br(),
             html.Audio(id='myaudio',
@@ -1196,19 +1196,19 @@ def predict_on_downloaded_file(n_clicks):
 
             filename = INPUT_NAME.split("/")[-1]
 
-            return  html.Div(style={'color': 'green',
+            return html.Div(style={'color': 'green',
                                     'fontSize': 14,
-                                    "padding-top":"-50%",
-                                    "padding-bottom":"10px"},
+                                    "padding-top": "-50%",
+                                    "padding-bottom": "10px"},
                              children=[html.H4('predictions for: ' + filename),
-                                       html.H4('Predictions rounded will be: '+ str(prediction_rounded)),
-                                       html.H4('Prediction seems to be '+ output_sound,
+                                       html.H4('Predictions rounded will be: ' + str(prediction_rounded)),
+                                       html.H4('Prediction seems to be ' + output_sound,
                                                style={'color': 'green',
                                                       'fontSize': 30,
                                                       'textAlign': 'center',
-                                                      'text-decoration':'underline'}),
+                                                      'text-decoration': 'underline'}),
                                        bar_graph,
-                                       html.P('Uploaded File : '+ filename)] + [html.Br() for x in range(3)])
+                                       html.P('Uploaded File : ' + filename)] + [html.Br() for x in range(3)])
 
 
 ###############################################################################

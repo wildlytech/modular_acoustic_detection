@@ -6,14 +6,14 @@ import pickle
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-from tensorflow.compat.v1.keras.models import Sequential,model_from_json
+from tensorflow.compat.v1.keras.models import Sequential, model_from_json
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from tensorflow.compat.v1.keras.optimizers import Adam
 from youtube_audioset import get_recursive_sound_names
 import os
 from glob import glob
 import json
-from colorama import Fore,Style
+from colorama import Fore, Style
 import argparse
 
 #########################################################
@@ -25,7 +25,7 @@ HELP = "Input config filepath for the required model to be trained."
 # Parse the arguments
 #########################################################
 parser = argparse.ArgumentParser(description=DESCRIPTION)
-parser.add_argument("-cfg_json",action="store",help=HELP,required=True)
+parser.add_argument("-cfg_json", action="store", help=HELP, required=True)
 result = parser.parse_args()
 cfg_path = result.cfg_json
 
@@ -58,11 +58,11 @@ pos_sounds = {}
 neg_sounds = {}
 for label_dicts in config["labels"]:
     lab_name = label_dicts["aggregatePositiveLabelName"]
-    comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"],"./",ontologyExtFiles)
+    comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"], "./", ontologyExtFiles)
     pos_sounds[lab_name] = comprising_pos_labels
-    if label_dicts["negativeLabels"]!=None:
+    if label_dicts["negativeLabels"] != None:
         neg_lab_name = label_dicts["aggregateNegativeLabelName"]
-        comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"],"./",ontologyExtFiles)
+        comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"], "./", ontologyExtFiles)
         comprising_neg_labels = comprising_neg_labels.difference(comprising_pos_labels)
         neg_sounds[neg_lab_name] = comprising_neg_labels
 
@@ -95,7 +95,7 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
     """
 
     # split before sub/oversampling to ensure there is no leakage between train and test sets
-    test_size = int(validation_split*dataframe.shape[0])
+    test_size = int(validation_split * dataframe.shape[0])
 
     train_size = dataframe.shape[0] - test_size
 
@@ -110,7 +110,7 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
                                              test_size=test_size,
                                              random_state=42)
 
-    test_subsample = int(subsample*validation_split)
+    test_subsample = int(subsample * validation_split)
     train_subsample = subsample - test_subsample
 
     if (train_df.shape[0] == 0) and (train_subsample > 0):
@@ -176,7 +176,7 @@ def import_dataframes(dataframe_file_list,
         search_results = [x for x in search_results if x not in exclude_paths]
 
         if len(search_results) == 0:
-            print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths,Style.RESET_ALL)
+            print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths, Style.RESET_ALL)
             assert (False)
 
         for path in search_results:
@@ -247,8 +247,8 @@ for key in pos_sounds.keys():
     LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
 
 
-print("TR: ",LABELS_BINARIZED_TRAIN.columns)
-print("TS: ",LABELS_BINARIZED_TEST.columns)
+print("TR: ", LABELS_BINARIZED_TRAIN.columns)
+print("TS: ", LABELS_BINARIZED_TEST.columns)
 
 TOTAL_TRAIN_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TRAIN.sum(axis=0)
 TOTAL_TEST_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TEST.sum(axis=0)

@@ -38,7 +38,7 @@ TYPE_OF_COMPRESSION = RESULT.codec_type
 ###############################################################################
 # Read the balanced data and the get the wav files list
 ###############################################################################
-COMPRESSED_FILES_LIST = glob.glob(COMPRESSED_FILES_PATH+'*.'+TYPE_OF_COMPRESSION)
+COMPRESSED_FILES_LIST = glob.glob(COMPRESSED_FILES_PATH + '*.' + TYPE_OF_COMPRESSION)
 
 
 ###############################################################################
@@ -53,12 +53,12 @@ if not os.path.exists(DECOMPRESSED_FILES_PATH):
 ###############################################################################
 if COMPRESSED_FILES_LIST:
     for COMPRESSED_FILE in COMPRESSED_FILES_LIST:
-        if os.path.exists(DECOMPRESSED_FILES_PATH+(COMPRESSED_FILE.split('/')[-1])[:-4]+'.wav'):
+        if os.path.exists(DECOMPRESSED_FILES_PATH + (COMPRESSED_FILE.split('/')[-1])[:-4] + '.wav'):
             print(COMPRESSED_FILE.split('/')[-1] + 'has already been decompressed')
         else:
             try:
-                subprocess.call('ffmpeg -i ' + COMPRESSED_FILE + ' '+
-                                DECOMPRESSED_FILES_PATH+ (COMPRESSED_FILE.split('/')[-1])[:-4]+'.wav',
+                subprocess.call('ffmpeg -i ' + COMPRESSED_FILE + ' ' +
+                                DECOMPRESSED_FILES_PATH + (COMPRESSED_FILE.split('/')[-1])[:-4] + '.wav',
                                 shell=True)
                 print('De-compression : ' + COMPRESSED_FILE.split('/')[-1] + ' is done..')
             except ValueError:

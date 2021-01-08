@@ -55,19 +55,19 @@ def balanced_data():
     """
 
     # Files with single class
-    with open(PATH_FOR_DATA+'pure/Explosion/pure_exp_7957.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA + 'pure/Explosion/pure_exp_7957.pkl', 'rb') as file_obj:
         pure_exp = pickle.load(file_obj)
-    with open(PATH_FOR_DATA+'pure/Motor/pure_mot_76045.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA + 'pure/Motor/pure_mot_76045.pkl', 'rb') as file_obj:
         pure_mot = pickle.load(file_obj)
-    with open(PATH_FOR_DATA+'pure/Human_sounds/pure_hum_46525.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA + 'pure/Human_sounds/pure_hum_46525.pkl', 'rb') as file_obj:
         pure_hum = pickle.load(file_obj)
     # with open(PATH_FOR_DATA+'pure/Wood/pure_wod_1115.pkl', 'rb') as file_obj:
     #     pure_wod = pickle.load(file_obj)
-    with open(PATH_FOR_DATA+'pure/Nature_sounds/pure_nat_13527.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA + 'pure/Nature_sounds/pure_nat_13527.pkl', 'rb') as file_obj:
         pure_nat = pickle.load(file_obj)
-    with open(PATH_FOR_DATA+'pure/Domestic/pure_dom_9497.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA + 'pure/Domestic/pure_dom_9497.pkl', 'rb') as file_obj:
         pure_dom = pickle.load(file_obj)
-    with open(PATH_FOR_DATA+'pure/Tools/pure_tools_8113.pkl', 'rb') as file_obj:
+    with open(PATH_FOR_DATA + 'pure/Tools/pure_tools_8113.pkl', 'rb') as file_obj:
         pure_tools = pickle.load(file_obj)
     # with open(PATH_FOR_DATA+'pure/Wild/pure_wild_7061.pkl','rb') as file_obj:
     #     pure_wild=pickle.load(file_obj)
@@ -91,12 +91,12 @@ def balanced_data():
 # files are stored)
 ###############################################################################
 def get_file_path(filename):
-    if  os.path.exists("/media/wildly/Seagate/Audio_files/unbal_audio_data_178k/"+filename):
-        return "/media/wildly/Seagate/Audio_files/unbal_audio_data_178k/"+filename
-    elif os.path.exists("/media/wildly/Seagate/Audio_files/priority1/"+filename):
-        return "/media/wildly/Seagate/Audio_files/priority1/"+filename
-    elif os.path.exists("/media/wildly/Seagate/Audio_files/priority_2/"+filename):
-        return "/media/wildly/Seagate/Audio_files/priority_2/"+filename
+    if os.path.exists("/media/wildly/Seagate/Audio_files/unbal_audio_data_178k/" + filename):
+        return "/media/wildly/Seagate/Audio_files/unbal_audio_data_178k/" + filename
+    elif os.path.exists("/media/wildly/Seagate/Audio_files/priority1/" + filename):
+        return "/media/wildly/Seagate/Audio_files/priority1/" + filename
+    elif os.path.exists("/media/wildly/Seagate/Audio_files/priority_2/" + filename):
+        return "/media/wildly/Seagate/Audio_files/priority_2/" + filename
     else:
         return None
 
@@ -166,7 +166,7 @@ def get_selected_type(type_sound):
 def start_mixing_two_audioclips(wavfile_list1, wavfile_list2, min_examples):
     print("started mixing audio clips")
     for each_file in zip(wavfile_list1[:min_examples], wavfile_list2[:min_examples]):
-        if os.path.exists(RESULT.path_to_save_mixed_sounds+each_file[0][:-4]+"__mix__"+each_file[1][:-4]+".wav"):
+        if os.path.exists(RESULT.path_to_save_mixed_sounds + each_file[0][:-4] + "__mix__" + each_file[1][:-4] + ".wav"):
             pass
         else:
             path = get_file_path(each_file[0])
@@ -174,7 +174,7 @@ def start_mixing_two_audioclips(wavfile_list1, wavfile_list2, min_examples):
             sound1 = AudioSegment.from_wav(path)
             sound2 = AudioSegment.from_wav(path2)
             output = sound1.overlay(sound2)
-            output.export(RESULT.path_to_save_mixed_sounds+each_file[0][:-4]+"__mix__"+each_file[1][:-4]+".wav", format="wav")
+            output.export(RESULT.path_to_save_mixed_sounds + each_file[0][:-4] + "__mix__" + each_file[1][:-4] + ".wav", format="wav")
 
 
 ###############################################################################
@@ -183,13 +183,13 @@ def start_mixing_two_audioclips(wavfile_list1, wavfile_list2, min_examples):
 def start_mixing_two_audioclips_from_path(wavfile_list1, wavfile_list2, min_examples):
     print("started mixing")
     for each_file in zip(wavfile_list1[:min_examples], wavfile_list2[:min_examples]):
-        if os.path.exists(RESULT.path_to_save_mixed_sounds+each_file[0].split("/")[-1][:-4]+"__mix__"+each_file[1].split("/")[-1][:-4]+".wav"):
+        if os.path.exists(RESULT.path_to_save_mixed_sounds + each_file[0].split("/")[-1][:-4] + "__mix__" + each_file[1].split("/")[-1][:-4] + ".wav"):
             pass
         else:
             sound1 = AudioSegment.from_wav(each_file[0])
             sound2 = AudioSegment.from_wav(each_file[1])
             output = sound1.overlay(sound2)
-            output.export(RESULT.path_to_save_mixed_sounds+each_file[0].split("/")[-1][:-4]+"__mix__"+each_file[1].split("/")[-1][:-4]+".wav", format="wav")
+            output.export(RESULT.path_to_save_mixed_sounds + each_file[0].split("/")[-1][:-4] + "__mix__" + each_file[1].split("/")[-1][:-4] + ".wav", format="wav")
 
 
 ###############################################################################
@@ -227,13 +227,13 @@ if __name__ == "__main__":
         start_mixing_two_audioclips(TYPEONE48K, TYPETWO48K, MIN_48K)
     else:
         if RESULT.path_type_one_audio_files:
-            TYPEONE_FILES_PATH = glob.glob(RESULT.path_type_one_audio_files+"*.wav") + \
-                                 glob.glob(RESULT.path_type_one_audio_files+"*.WAV")
+            TYPEONE_FILES_PATH = glob.glob(RESULT.path_type_one_audio_files + "*.wav") + \
+                                 glob.glob(RESULT.path_type_one_audio_files + "*.WAV")
         else:
             print("Input path for type of sound")
         if RESULT.path_type_two_audio_files:
-            TYPETWO_FILES_PATH = glob.glob(RESULT.path_type_two_audio_files+"*.wav") + \
-                                 glob.glob(RESULT.path_type_two_audio_files+"*.WAV")
+            TYPETWO_FILES_PATH = glob.glob(RESULT.path_type_two_audio_files + "*.wav") + \
+                                 glob.glob(RESULT.path_type_two_audio_files + "*.WAV")
         else:
             print("Input path for type of sound")
 

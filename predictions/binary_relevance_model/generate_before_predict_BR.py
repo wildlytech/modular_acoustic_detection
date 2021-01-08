@@ -59,7 +59,7 @@ FLAGS = {
 ##############################################################################
 
 
-def main(wav_file, flag_for_data, data,model_type):
+def main(wav_file, flag_for_data, data, model_type):
     """
     Specify the path for the downloaded or recorded audio files and
     also path for writing the embeddings or pickle files

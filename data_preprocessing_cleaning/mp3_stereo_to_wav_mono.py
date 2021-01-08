@@ -25,14 +25,14 @@ def convert_files_directory(path_for_mp3_files, path_to_save_wavfiles):
         os.makedirs(path_to_save_wavfiles)
 
     # get all the mp3 files in the given path
-    mp3_list = glob.glob(path_for_mp3_files+"*.mp3") + glob.glob(path_for_mp3_files+"*.MP3")
+    mp3_list = glob.glob(path_for_mp3_files + "*.mp3") + glob.glob(path_for_mp3_files + "*.MP3")
     print("Number of mp3 files:", len(mp3_list))
     print("Converting...")
     # loop over the list of mp3 files to convert to wav files
     for mp3_file in mp3_list:
         mysound = AudioSegment.from_mp3(mp3_file)
         mono = mysound.set_channels(1)
-        mono.export(path_to_save_wavfiles+mp3_file.split(".")[-2].split("/")[-1]+".wav", format="wav")
+        mono.export(path_to_save_wavfiles + mp3_file.split(".")[-2].split("/")[-1] + ".wav", format="wav")
     print("Conversion is done !")
 
 
@@ -55,7 +55,7 @@ def convert_single_file(path_for_mp3_file, path_to_save_wavfiles):
     mysound = AudioSegment.from_mp3(path_for_mp3_file)
     mono = mysound.set_channels(1)
     mono.export(path_to_save_wavfiles + \
-                path_for_mp3_file.split(".")[-2].split("/")[-1]+".wav",
+                path_for_mp3_file.split(".")[-2].split("/")[-1] + ".wav",
                 format="wav")
     print("Conversion is done !")
 

@@ -138,5 +138,5 @@ if __name__ == '__main__':
                                     required=True)
     RESULT = PARSER.parse_args()
 
-    generate(path_to_write_embeddings = RESULT.path_to_write_embeddings,
-             path_to_wav_files = RESULT.wav_file)
+    generate(path_to_write_embeddings=RESULT.path_to_write_embeddings,
+             path_to_wav_files=RESULT.wav_file)

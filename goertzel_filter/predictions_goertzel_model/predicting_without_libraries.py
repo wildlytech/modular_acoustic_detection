@@ -52,13 +52,13 @@ class ConvolutionalNeuralNetwork(object):
         apply padding to the input data
         """
         if type_padding == "same" and stride_length > 1:
-            if type(self.input_data)==list:
+            if type(self.input_data) == list:
                 self.input_data = self.input_data + [[0 for col in range(len(self.input_data[0]))] for row in range(stride_length)]
             else:
                 self.input_data = self.input_data.tolist() + [[0 for col in range(len(self.input_data[0]))] for row in range(stride_length)]
             return np.array(self.input_data, dtype='float64').tolist()
         else:
-            self.input_data = self.input_data + [[0 for col in range(len(self.input_data[0]))] for row in range(filter_size-1)]
+            self.input_data = self.input_data + [[0 for col in range(len(self.input_data[0]))] for row in range(filter_size - 1)]
             return np.array(self.input_data, dtype='float64').tolist()
 
     def matrix_multiplication(self, data, nested_index):
@@ -76,7 +76,7 @@ class ConvolutionalNeuralNetwork(object):
                 for k in range(len(self.weights[nested_index])):
                     result[i][j] += data[i][k] * self.weights[nested_index][k][j]
 
-        return  np.array(result, dtype='float64').tolist()
+        return np.array(result, dtype='float64').tolist()
 
     def add_bias_terms(self, data):
         """
@@ -110,14 +110,14 @@ class ConvolutionalNeuralNetwork(object):
         """
         implements covolutional multiplication
         """
-        result_final = np.zeros((len(self.input_data)/stride_length, self.units)).tolist()
-        initial_input_data_length = len(self.input_data)/stride_length
+        result_final = np.zeros((len(self.input_data) / stride_length, self.units)).tolist()
+        initial_input_data_length = len(self.input_data) / stride_length
         self.input_data = self.padding(filter_size, stride_length, type_padding)
         index_range = self.get_index_for_window_movement(stride_length)
 
         for inter_index, index in enumerate(index_range[:initial_input_data_length]):
-            for nested_index, data_index in enumerate(range(index, index+filter_size)):
-                if  nested_index == 0:
+            for nested_index, data_index in enumerate(range(index, index + filter_size)):
+                if nested_index == 0:
                     result_after_mat_mull = []
                     result_after_mat_mull = self.matrix_multiplication(self.input_data, nested_index)
                 else:
@@ -160,7 +160,7 @@ class FullyConnectedLayer(object):
                 for k in range(len(self.weights)):
                     result[i][j] += data[i][k] * self.weights[k][j]
 
-        return  np.array(result, dtype='float64').tolist()
+        return np.array(result, dtype='float64').tolist()
 
     def add_bias_terms(self, data):
         """
@@ -190,7 +190,7 @@ class FullyConnectedLayer(object):
         try:
             return 1 / (1 + math.exp(-data))
         except:
-            return 1/(1 + np.exp(-data))
+            return 1 / (1 + np.exp(-data))
 
     def dense_layer(self):
         """
@@ -228,18 +228,18 @@ class MaxPoolingLayer(object):
         checks for length of the maxpool length
         """
         if self.max_pool_length > len(self.input_data):
-            sys.exit(Fore.RED+"IndexError: Maxpool length should be less than the input array length" + Style.RESET_ALL)
+            sys.exit(Fore.RED + "IndexError: Maxpool length should be less than the input array length" + Style.RESET_ALL)
 
     def max_pool_2d_array(self):
         """
         implements the max pooling on the two dimensional array / list
         """
-        result_final = np.zeros((len(self.input_data)/self.max_pool_length, len(self.input_data[0]))).tolist()
+        result_final = np.zeros((len(self.input_data) / self.max_pool_length, len(self.input_data[0]))).tolist()
         self.check_maxpool_length()
         intermediate_result = np.zeros((len(self.input_data[0]))).tolist()
         for index_value, index in enumerate(range(0, len(self.input_data), self.max_pool_length)):
             for columns in range(0, len(self.input_data[0])):
-                result = [value[columns] for value in self.input_data[index:index+self.max_pool_length]]
+                result = [value[columns] for value in self.input_data[index:index + self.max_pool_length]]
                 intermediate_result[columns] = max(result)
             result_final[index_value] = intermediate_result
 
@@ -265,7 +265,7 @@ class InitialCheckForShape(object):
         Input argument is [ units, kernal_size, stride_length ]
         """
         if len(list_uks) == 3:
-            output_shape = [len(self.input_data)/ list_uks[2], list_uks[1]]
+            output_shape = [len(self.input_data) / list_uks[2], list_uks[1]]
             return output_shape
         else:
             print("Give all the paramters for convolution layer")
@@ -280,7 +280,7 @@ class InitialCheckForShape(object):
         """
         calculates maxpool output
         """
-        return [len(self.input_data)/max_pool_length, len(self.input_data[0])]
+        return [len(self.input_data) / max_pool_length, len(self.input_data[0])]
 
     def check_for_shape_alignment(self, dictionary_layers_units):
         """
@@ -293,7 +293,7 @@ class InitialCheckForShape(object):
 #############################################################################
 # Architecture unrolling as per test_architecture.csv
 #############################################################################
-def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
+def unroll_the_architecture(arch_dict, layer_name, input_data, layer_index):
     """
     Initiates the neural network calculation as per the layer
     """
@@ -327,10 +327,10 @@ def unroll_the_architecture(arch_dict,layer_name, input_data,layer_index):
             return fully_connected.dense_layer()
         else:
             print(Fore.RED + "ERROR: Invalid Layer used \n")
-            sys.exit("try valid layer"+ Style.RESET_ALL)
+            sys.exit("try valid layer" + Style.RESET_ALL)
     except OSError:
         print(Fore.RED + "MismatchError: Layer and Weights mismatch\n")
-        sys.exit("Input the correct order"+Style.RESET_ALL)
+        sys.exit("Input the correct order" + Style.RESET_ALL)
 
 
 #############################################################################
@@ -354,7 +354,7 @@ def flag_for_downsampling(audiofilepath):
 
     # Downsampling the audio from any sampling rate to 8KHz for each second of the audio
     for seconds_index in range(0, samples_only.shape[0], samplingrate_samples[0])[:10]:
-        down_library = downsampling_and_goertzel_filter.DownsampleUsingLibrary(samples_only[seconds_index:seconds_index+samplingrate_samples[0]], samplingrate_samples[0])
+        down_library = downsampling_and_goertzel_filter.DownsampleUsingLibrary(samples_only[seconds_index:seconds_index + samplingrate_samples[0]], samplingrate_samples[0])
         resampled_using_lib = down_library.resample_using_resampy(8000)
         goertzel_components = np.zeros((4, 8000)).tolist()
         # Applying the goertzel filter on the downsampled audio
@@ -368,14 +368,14 @@ def flag_for_downsampling(audiofilepath):
             goertzel_components[ind] = goertzel_
 
         # Normalizing the data
-        goertzel_components = goertzel_components/np.linalg.norm(goertzel_components)
+        goertzel_components = goertzel_components / np.linalg.norm(goertzel_components)
 
         # Predicting using the goertzel model for each second
         for each_second in [goertzel_components]:
             each_second = each_second.T
             start_time = time.time()
             for layer_index, layer_name in enumerate(ARCHITECTURE_CSV['layer_name'].values.tolist()):
-                print(Fore.GREEN + str(layer_index)+ " "+layer_name + " " +str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2]+ Style.RESET_ALL)
+                print(Fore.GREEN + str(layer_index) + " " + layer_name + " " + str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2] + Style.RESET_ALL)
                 if layer_index == 0 and layer_name != "EOF":
                     intermediate_result_values = unroll_the_architecture(ARCHITECTURE_CSV.iloc[layer_index].to_dict(),
                                                                          layer_name=layer_name,
@@ -392,7 +392,7 @@ def flag_for_downsampling(audiofilepath):
                                                                          layer_index=layer_index
                                                                         )
             end_time = time.time() - start_time
-            print(Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL)
+            print(Fore.YELLOW + "Time Elapsed: " + str(end_time) + Style.RESET_ALL)
 
 
 #############################################################################
@@ -408,7 +408,7 @@ def predict_on_goertzelcomponents(ten_sec_data):
     for each_second in ten_sec_data:
         start_time = time.time()
         for layer_index, layer_name in enumerate(ARCHITECTURE_CSV['layer_name'].values.tolist()):
-            print(Fore.GREEN + str(layer_index)+ " "+layer_name + " " +str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2]+ Style.RESET_ALL)
+            print(Fore.GREEN + str(layer_index) + " " + layer_name + " " + str(ARCHITECTURE_CSV.iloc[layer_index].to_dict()['units'])[:-2] + Style.RESET_ALL)
             if layer_index == 0 and layer_name != "EOF":
                 intermediate_result_values = unroll_the_architecture(ARCHITECTURE_CSV.iloc[layer_index].to_dict(),
                                                                      layer_name=layer_name,
@@ -427,7 +427,7 @@ def predict_on_goertzelcomponents(ten_sec_data):
                                                                     )
                 # print np.array(intermediate_result_values)
         end_time = time.time() - start_time
-        print(Fore.YELLOW + "Time Elapsed: " +str(end_time) + Style.RESET_ALL)
+        print(Fore.YELLOW + "Time Elapsed: " + str(end_time) + Style.RESET_ALL)
 
 
 #############################################################################

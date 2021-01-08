@@ -26,15 +26,15 @@ def distinguished_audiomoth_sounds():
         ad_mot1 = pickle.load(file_obj)
     ad_mot1 = ad_mot1.sample(1000)
 
-    with open(AUDIOMOTH_PURE_DATAPATH+"pure_mot/pure_mot_3173_Nandi_hills_1_datafile_labels_emb.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_mot/pure_mot_3173_Nandi_hills_1_datafile_labels_emb.pkl", 'rb') as file_obj:
         ad_mot2 = pickle.load(file_obj)
     ad_mot2 = ad_mot2.sample(1500)
 
-    with open(AUDIOMOTH_PURE_DATAPATH +"pure_mot/pure_mot_224_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_mot/pure_mot_224_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
         ad_mot3 = pickle.load(file_obj)
     ad_mot3 = ad_mot3.sample(224)
 
-    with open(AUDIOMOTH_PURE_DATAPATH+"pure_mot/pure_mot_210_gbs_am2_chainsaw_data_labels.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_mot/pure_mot_210_gbs_am2_chainsaw_data_labels.pkl", 'rb') as file_obj:
         ad_mot4 = pickle.load(file_obj)
     ad_mot4 = ad_mot4.sample(210)
 
@@ -42,31 +42,31 @@ def distinguished_audiomoth_sounds():
     # Pure Human sounds : AudioMoth (Different Locations)
     ###########################################################################
 
-    with open(AUDIOMOTH_PURE_DATAPATH+"pure_hum/pure_hum_149_gbs_am2_chainsaw_data_labels.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_hum/pure_hum_149_gbs_am2_chainsaw_data_labels.pkl", 'rb') as file_obj:
         ad_hum1 = pickle.load(file_obj)
-    with open(AUDIOMOTH_PURE_DATAPATH+"pure_hum/pure_hum_142_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_hum/pure_hum_142_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
         ad_hum2 = pickle.load(file_obj)
 
     ###########################################################################
     # Pure Nature Sounds - AudioMoth (Different Locations)
     ###########################################################################
-    with open(AUDIOMOTH_PURE_DATAPATH+"pure_nat/pure_nat_3216_GBS_waynad_datafile_labels_emb.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_nat/pure_nat_3216_GBS_waynad_datafile_labels_emb.pkl", 'rb') as file_obj:
         ad_nat1 = pickle.load(file_obj)
     ad_nat1 = ad_nat1.sample(3000)
-    with open(AUDIOMOTH_PURE_DATAPATH+"pure_nat/pure_nat_2077_Erivikulam_datafile_labels_emb.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_nat/pure_nat_2077_Erivikulam_datafile_labels_emb.pkl", 'rb') as file_obj:
         ad_nat2 = pickle.load(file_obj)
     ad_nat2 = ad_nat2.sample(2000)
-    with open(AUDIOMOTH_PURE_DATAPATH+"pure_nat/pure_nat_922_gbs_am2_chainsaw_data_labels.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_nat/pure_nat_922_gbs_am2_chainsaw_data_labels.pkl", 'rb') as file_obj:
         ad_nat3 = pickle.load(file_obj)
     ad_nat3 = ad_nat3.sample(700)
 
     ###########################################################################
     # Pure Tools Sounds : AudioMoth (Different Locations)
     ###########################################################################
-    with open(AUDIOMOTH_PURE_DATAPATH+ "pure_tools/pure_tools_520_gbs_am2_chainsaw_data_labels.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_tools/pure_tools_520_gbs_am2_chainsaw_data_labels.pkl", 'rb') as file_obj:
         ad_tool = pickle.load(file_obj)
     ad_tool = ad_tool.sample(500)
-    with open(AUDIOMOTH_PURE_DATAPATH+"pure_tools/pure_tools_672_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
+    with open(AUDIOMOTH_PURE_DATAPATH + "pure_tools/pure_tools_672_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
         ad_tool1 = pickle.load(file_obj)
     ad_tool1 = ad_tool1.sample(500)
 
@@ -92,15 +92,15 @@ def include_mixed_sounds(mixed_sounds_flag):
         # Check for Motor and Human - 7500 : Youtube and AudioMoth
         #######################################################################
 
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"hum_mix_mot_9532.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "hum_mix_mot_9532.pkl", 'rb') as file_obj:
             df_hm = pickle.load(file_obj)
         df_hm = df_hm.sample(2000)
 
-        with open(AUDIOMOTH_MIXED_DATAPATH+"mot_hum/mot_hum_422_Nandi_hills_1_datafile_labels_emb.pkl", 'rb') as file_obj:
+        with open(AUDIOMOTH_MIXED_DATAPATH + "mot_hum/mot_hum_422_Nandi_hills_1_datafile_labels_emb.pkl", 'rb') as file_obj:
             ad_hm1 = pickle.load(file_obj)
         ad_hm1 = ad_hm1.sample(421)
 
-        with open(AUDIOMOTH_MIXED_DATAPATH+"mot_hum/mot_hum_135_Nandi_hills_2_datafile_labels_emb.pkl", 'rb') as file_obj:
+        with open(AUDIOMOTH_MIXED_DATAPATH + "mot_hum/mot_hum_135_Nandi_hills_2_datafile_labels_emb.pkl", 'rb') as file_obj:
             ad_hm2 = pickle.load(file_obj)
         ad_hm2 = ad_hm2.sample(134)
 
@@ -109,23 +109,23 @@ def include_mixed_sounds(mixed_sounds_flag):
         #######################################################################
         # Check for Nature Mixed sounds : Youtube and AudioMoth
         #######################################################################
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"hum_mix_nat_with_wavfiles_9532.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "hum_mix_nat_with_wavfiles_9532.pkl", 'rb') as file_obj:
             df_hn = pickle.load(file_obj)
         df_hn = df_hn.sample(2500)
 
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"motor_mixed_nature.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "motor_mixed_nature.pkl", 'rb') as file_obj:
             df_mn = pickle.load(file_obj)
         df_mn = df_mn.sample(2500)
 
-        with open(AUDIOMOTH_MIXED_DATAPATH+"mot_nat/mot_nat_1017_Nandi_hills_1_datafile_labels_emb.pkl", 'rb') as file_obj:
+        with open(AUDIOMOTH_MIXED_DATAPATH + "mot_nat/mot_nat_1017_Nandi_hills_1_datafile_labels_emb.pkl", 'rb') as file_obj:
             ad_mn1 = pickle.load(file_obj)[:]
         ad_mn1 = ad_mn1.sample(1000)
 
-        with open(AUDIOMOTH_MIXED_DATAPATH+"mot_nat/mot_nat_149_Nandi_hills_2_datafile_labels_emb.pkl", 'rb') as file_obj:
+        with open(AUDIOMOTH_MIXED_DATAPATH + "mot_nat/mot_nat_149_Nandi_hills_2_datafile_labels_emb.pkl", 'rb') as file_obj:
             ad_mn2 = pickle.load(file_obj)[:]
         ad_mn2 = ad_mn2.sample(100)
 
-        with open(AUDIOMOTH_MIXED_DATAPATH+"mot_nat/mot_nat_54_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
+        with open(AUDIOMOTH_MIXED_DATAPATH + "mot_nat/mot_nat_54_gbs_am1_chainsaw_data_labels.pkl", 'rb') as file_obj:
             ad_mn3 = pickle.load(file_obj)[:]
         ad_mn3 = ad_mn3.sample(50)
 
@@ -134,15 +134,15 @@ def include_mixed_sounds(mixed_sounds_flag):
         #######################################################################
         # Check for sounds Mixed with Explosion : Youtube
         #######################################################################
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"exp_mix_mot_7957.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "exp_mix_mot_7957.pkl", 'rb') as file_obj:
             df_me = pickle.load(file_obj)
         df_me = df_me.sample(2500)
 
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"nature_mixed_explosion.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "nature_mixed_explosion.pkl", 'rb') as file_obj:
             df_ne = pickle.load(file_obj)
         df_ne = df_ne.sample(2500)
 
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"human_mixed_explosion.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "human_mixed_explosion.pkl", 'rb') as file_obj:
             df_he = pickle.load(file_obj)
         df_he = df_he.sample(2500)
 
@@ -151,15 +151,15 @@ def include_mixed_sounds(mixed_sounds_flag):
         #######################################################################
         # Check for Mixed with Tools : Youtube and AudioMoth
         #######################################################################
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"dom_mixed_tools_7789_wavfiles.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "dom_mixed_tools_7789_wavfiles.pkl", 'rb') as file_obj:
             df_dt = pickle.load(file_obj)
         df_dt = df_dt.sample(2500)
 
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"human_mixed_tools.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "human_mixed_tools.pkl", 'rb') as file_obj:
             df_ht = pickle.load(file_obj)
         df_ht = df_ht.sample(2500)
 
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"motor_mixed_tools.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "motor_mixed_tools.pkl", 'rb') as file_obj:
             df_mt = pickle.load(file_obj)
         df_mt = df_mt.sample(2500)
 
@@ -168,15 +168,15 @@ def include_mixed_sounds(mixed_sounds_flag):
         #######################################################################
         # Check for Mixed with Domestic : Youtube
         #######################################################################
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"dom_mixed_tools_7789_wavfiles.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "dom_mixed_tools_7789_wavfiles.pkl", 'rb') as file_obj:
             df_td = pickle.load(file_obj)
         df_td = df_td.sample(2500)
 
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"human_mixed_domestic.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "human_mixed_domestic.pkl", 'rb') as file_obj:
             df_hd = pickle.load(file_obj)
         df_hd = df_hd.sample(2500)
 
-        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED+"motor_mixed_domestic.pkl", 'rb') as file_obj:
+        with open(YOUTUBE_MIXED_DATAPATH_AUGMENTED + "motor_mixed_domestic.pkl", 'rb') as file_obj:
             df_md = pickle.load(file_obj)
         df_md = df_md.sample(2500)
 
@@ -203,19 +203,19 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
     ###########################################################################
     # Files with single class : Youtube
     ###########################################################################
-    with open(YOUTUBE_PURE_DATAPATH+'Explosion/pure_exp_7957.pkl', 'rb') as file_obj:
+    with open(YOUTUBE_PURE_DATAPATH + 'Explosion/pure_exp_7957.pkl', 'rb') as file_obj:
         pure_exp = pickle.load(file_obj)
-    with open(YOUTUBE_PURE_DATAPATH+'Motor/pure_mot_76045.pkl', 'rb') as file_obj:
+    with open(YOUTUBE_PURE_DATAPATH + 'Motor/pure_mot_76045.pkl', 'rb') as file_obj:
         pure_mot = pickle.load(file_obj)
-    with open(YOUTUBE_PURE_DATAPATH+'Human_sounds/pure_hum_46525.pkl', 'rb') as file_obj:
+    with open(YOUTUBE_PURE_DATAPATH + 'Human_sounds/pure_hum_46525.pkl', 'rb') as file_obj:
         pure_hum = pickle.load(file_obj)
-    with open(YOUTUBE_PURE_DATAPATH+'Wood/pure_wod_1115.pkl', 'rb') as file_obj:
+    with open(YOUTUBE_PURE_DATAPATH + 'Wood/pure_wod_1115.pkl', 'rb') as file_obj:
         pure_wod = pickle.load(file_obj)
-    with open(YOUTUBE_PURE_DATAPATH+'Nature_sounds/pure_nat_13527.pkl', 'rb') as file_obj:
+    with open(YOUTUBE_PURE_DATAPATH + 'Nature_sounds/pure_nat_13527.pkl', 'rb') as file_obj:
         pure_nat = pickle.load(file_obj)
-    with open(YOUTUBE_PURE_DATAPATH+'Domestic/pure_dom_9497.pkl', 'rb') as file_obj:
+    with open(YOUTUBE_PURE_DATAPATH + 'Domestic/pure_dom_9497.pkl', 'rb') as file_obj:
         pure_dom = pickle.load(file_obj)
-    with open(YOUTUBE_PURE_DATAPATH+'Tools/pure_tools_8113.pkl', 'rb') as file_obj:
+    with open(YOUTUBE_PURE_DATAPATH + 'Tools/pure_tools_8113.pkl', 'rb') as file_obj:
         pure_tools = pickle.load(file_obj)
     # with open(YOUTUBE_PURE_DATAPATH+'pure/Wild/pure_wild_7061.pkl','rb') as file_obj:
     #     pure_wild=pickle.load(file_obj)
@@ -251,7 +251,7 @@ def balanced_data(audiomoth_flag, mixed_sounds_flag):
     ###########################################################################
     if audiomoth_flag == 1:
         audiomoth_nature, audiomoth_motor, audiomoth_hum, audiomoth_tool = distinguished_audiomoth_sounds()
-        sounds_to_concatenate = [df_pure_sounds_youtube+audiomoth_nature+audiomoth_motor+audiomoth_hum+audiomoth_tool]
+        sounds_to_concatenate = [df_pure_sounds_youtube + audiomoth_nature + audiomoth_motor + audiomoth_hum + audiomoth_tool]
     else:
         sounds_to_concatenate = [df_pure_sounds_youtube]
 

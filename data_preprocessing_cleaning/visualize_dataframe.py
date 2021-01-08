@@ -35,11 +35,11 @@ if "dBFS" not in df.columns:
     print("DataFrame does not contain dBFS column")
 else:
     fig = plt.figure()
-    (-df.dBFS.replace(-np.inf,1)).hist()
+    (-df.dBFS.replace(-np.inf, 1)).hist()
     plt.xlabel("-dBFS")
     plt.ylabel("Number of clips/examples")
     plt.title("Distribution of decibel level")
-    outputFile = filepath+"_dBFS_Dist.png"
+    outputFile = filepath + "_dBFS_Dist.png"
     plt.savefig(outputFile, dpi=fig.dpi)
     plt.close(fig)
     plt.clf()
@@ -59,7 +59,7 @@ if duration is not None:
     plt.xlabel("Clip duration")
     plt.ylabel("Number of clips/examples")
     plt.title("Distribution of audio length")
-    outputFile = filepath+"_AudioLength_Dist.png"
+    outputFile = filepath + "_AudioLength_Dist.png"
     plt.savefig(outputFile, dpi=fig.dpi)
     plt.close(fig)
     plt.clf()
@@ -73,7 +73,7 @@ else:
     plt.xlabel("Number of labels in clip")
     plt.ylabel("Number of clips/examples")
     plt.title("Distribution of label count")
-    outputFile = filepath+"_NumLabels_Dist.png"
+    outputFile = filepath + "_NumLabels_Dist.png"
     plt.savefig(outputFile, dpi=fig.dpi)
     plt.close(fig)
     plt.clf()
@@ -84,22 +84,22 @@ else:
     for label_name in setOfLabels:
         binarized_labels[label_name] = df.labels_name.apply(lambda x: label_name in x)
     label_percentages = binarized_labels.mean().sort_values(ascending=False)
-    outputFile = filepath+"_label_percent.csv"
+    outputFile = filepath + "_label_percent.csv"
     label_percentages.to_csv(outputFile)
     print("Created", outputFile)
 
     label_combo_percentages = {}
     for index, label_name1 in enumerate(setOfLabels):
-        for label_name2 in setOfLabels[(index+1):]:
-            combo_percentage = (binarized_labels[label_name1]&binarized_labels[label_name2]).mean()
+        for label_name2 in setOfLabels[(index + 1):]:
+            combo_percentage = (binarized_labels[label_name1] & binarized_labels[label_name2]).mean()
 
             if combo_percentage > 0:
-                label_combo_percentages['['+label_name1 + ']+[' + label_name2 + ']'] = combo_percentage
+                label_combo_percentages['[' + label_name1 + ']+[' + label_name2 + ']'] = combo_percentage
 
     if len(label_combo_percentages) == 0:
         print("All examples have only one label, so there are no label combos to report")
     else:
         label_combo_percentages = pd.Series(label_combo_percentages).sort_values(ascending=False)
-        outputFile = filepath+"_label_combo_percent.csv"
+        outputFile = filepath + "_label_combo_percent.csv"
         label_combo_percentages.to_csv(outputFile)
         print("Created", outputFile)

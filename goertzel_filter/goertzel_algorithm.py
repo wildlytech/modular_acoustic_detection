@@ -64,12 +64,12 @@ def Goertzel_filter(sample, sample_rate, target_frequency, number_samples):
     returs the target frequency components of the audio
     """
     # Initialize and precomputing all the constants
-    result_mag = np.zeros((sample_rate*10, 1))
+    result_mag = np.zeros((sample_rate * 10, 1))
     total_samples = number_samples
 
     # computing the constants
-    k_constant = int((total_samples * target_frequency)/sample_rate)
-    w_constant = ((2 * math.pi * k_constant)/total_samples)
+    k_constant = int((total_samples * target_frequency) / sample_rate)
+    w_constant = ((2 * math.pi * k_constant) / total_samples)
     cosine = math.cos(w_constant)
     sine = math.sin(w_constant)
     coeff = 2 * cosine
@@ -89,18 +89,18 @@ def Goertzel_filter(sample, sample_rate, target_frequency, number_samples):
         result_mag[index] = math.sqrt(magnitude)
         index += 1
     end = time.time()
-    print('Time elapsed :', (end-start))
-    return  result_mag
+    print('Time elapsed :', (end - start))
+    return result_mag
 
 
 ###############################################################################
 # applying Goertzel on those signals
 ###############################################################################
 MAGNITUDE = Goertzel_filter(WAV_FILE, RESAMPLING_RATE,
-                            TARGET_FREQUENCY, RESAMPLING_RATE*NUMBER_OF_SECONDS)
+                            TARGET_FREQUENCY, RESAMPLING_RATE * NUMBER_OF_SECONDS)
 MAGNITUDE = list(map(int, MAGNITUDE))
 SAMPLE_RATE = SAMPLE_RATE
-TIME_SPACE = np.linspace(0, NUMBER_OF_SECONDS, RESAMPLING_RATE*10)
+TIME_SPACE = np.linspace(0, NUMBER_OF_SECONDS, RESAMPLING_RATE * 10)
 
 
 ###############################################################################
@@ -112,7 +112,7 @@ plt.xlabel('Time (seconds)')
 plt.plot(TIME_SPACE, WAV_FILE)
 
 plt.subplot(2, 1, 2)
-plt.title('Goertzel Filter for '+ str(TARGET_FREQUENCY) + 'HZ component')
+plt.title('Goertzel Filter for ' + str(TARGET_FREQUENCY) + 'HZ component')
 plt.xlabel('Time (seconds)')
-plt.plot(np.linspace(0, NUMBER_OF_SECONDS, RESAMPLING_RATE*NUMBER_OF_SECONDS), MAGNITUDE)
+plt.plot(np.linspace(0, NUMBER_OF_SECONDS, RESAMPLING_RATE * NUMBER_OF_SECONDS), MAGNITUDE)
 plt.show()

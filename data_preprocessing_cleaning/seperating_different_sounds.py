@@ -44,8 +44,8 @@ def path_initializer(type_sound):
     creates path for each type of sound files and stores
     respectively
     """
-    if not os.path.exists(RESULT.path_to_write_different_sounds+type_sound):
-        os.makedirs(RESULT.path_to_write_different_sounds+type_sound)
+    if not os.path.exists(RESULT.path_to_write_different_sounds + type_sound):
+        os.makedirs(RESULT.path_to_write_different_sounds + type_sound)
 
 
 def check_for_null(data_frame):
@@ -120,8 +120,8 @@ for i, j in zip(FILE_NAMES,
     if check_for_null(j):
         pass
     else:
-        path_initializer("pure/"+i)
-        with open(RESULT.path_to_write_different_sounds+"pure/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("pure/" + i)
+        with open(RESULT.path_to_write_different_sounds + "pure/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
@@ -143,8 +143,8 @@ for i, j in zip(FILE_NAMES, [EXP_MOT, EXP_NAT, EXP_HUM, EXP_WOD, EXP_WILD, EXP_D
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
@@ -164,8 +164,8 @@ for i, j in zip(FILE_NAMES, [MOT_NAT, MOT_HUM, MOT_WOD, MOT_WILD, MOT_DOM, MOT_T
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
@@ -184,8 +184,8 @@ for i, j in zip(FILE_NAMES, [NAT_HUM, NAT_WOD, NAT_WILD, NAT_DOM, NAT_TOOLS]):
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
@@ -201,8 +201,8 @@ for i, j in zip(FILE_NAMES, [HUM_WOD, HUM_WILD, HUM_DOM, HUM_TOOLS]):
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
@@ -219,8 +219,8 @@ for i, j in zip(FILE_NAMES, [WOD_WILD, WOD_DOM, WOD_TOOLS]):
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
@@ -236,8 +236,8 @@ for i, j in zip(FILE_NAMES, [WILD_DOM, WILD_TOOLS]):
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
@@ -245,8 +245,8 @@ for i, j in zip(FILE_NAMES, [WILD_DOM, WILD_TOOLS]):
 # domestic and other
 ###############################################################################
 DOM_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 6) & (arr[1] == 7)))]
-with open(RESULT.path_to_write_different_sounds+'dom_tools_'+
-          str(DOM_TOOLS.shape[0])+'.pkl', 'wb') as f:
+with open(RESULT.path_to_write_different_sounds + 'dom_tools_' +
+          str(DOM_TOOLS.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(DOM_TOOLS, f)
 
 
@@ -254,14 +254,14 @@ with open(RESULT.path_to_write_different_sounds+'dom_tools_'+
 # Sounds with more than 2 classes labelled are witten
 ###############################################################################
 print('three labelled sounds shape: ', UN_3.shape)
-with open(RESULT.path_to_write_different_sounds+'3_labelled_priority1_'+
-          str(UN_3.shape[0])+'.pkl', 'wb') as f:
+with open(RESULT.path_to_write_different_sounds + '3_labelled_priority1_' +
+          str(UN_3.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(UN_3, f)
 print('four labelled sounds shape: ', UN_4.shape)
-with open(RESULT.path_to_write_different_sounds+'4_labelled_priority1_'+
-          str(UN_4.shape[0])+'.pkl', 'wb') as f:
+with open(RESULT.path_to_write_different_sounds + '4_labelled_priority1_' +
+          str(UN_4.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(UN_4, f)
 print('five labelled sounds shape: ', UN_5.shape)
-with open(RESULT.path_to_write_different_sounds+'5_labelled_prioirty1_'+
-          str(UN_5.shape[0])+'.pkl', 'wb') as f:
+with open(RESULT.path_to_write_different_sounds + '5_labelled_prioirty1_' +
+          str(UN_5.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(UN_5, f)

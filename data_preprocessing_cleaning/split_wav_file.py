@@ -42,15 +42,15 @@ def start_splitting(chunk_length_ms, wav_file, path_to_write_chunks):
     chunks = make_chunks(myaudio, chunk_length_ms)
     # Export all of the individual chunks as wav files
     for i, chunk in enumerate(chunks):
-        chunk_name = file_name+"_"+str(i)+'.wav'
+        chunk_name = file_name + "_" + str(i) + '.wav'
 
         # if the last chunk is not of length, then pad it with silence
         if len(chunk) < chunk_length_ms:
             print("Padding last file with", (chunk_length_ms - len(chunk)) / 1000.0, "seconds of silence")
-            chunk = chunk + AudioSegment.silent(duration = chunk_length_ms - len(chunk),
+            chunk = chunk + AudioSegment.silent(duration=chunk_length_ms - len(chunk),
                                                 frame_rate=chunk.frame_rate)
 
-        chunk.export(path_to_write_chunks+chunk_name, format="wav")
+        chunk.export(path_to_write_chunks + chunk_name, format="wav")
     return len(chunks)
 
 
@@ -94,7 +94,7 @@ def audio_split_directory(path_for_wavfiles, path_to_write_chunks, chunk_length_
     if not path_for_wavfiles.endswith('/'):
         path_for_wavfiles += '/'
 
-    wav_files_list = glob.glob(path_for_wavfiles+"*.wav") + glob.glob(path_for_wavfiles+"*.WAV")
+    wav_files_list = glob.glob(path_for_wavfiles + "*.wav") + glob.glob(path_for_wavfiles + "*.WAV")
     # iterate all the wav files in the list to split
     for wav_file in wav_files_list:
         audio_split_single_file(wav_file=wav_file,
@@ -131,10 +131,10 @@ if __name__ == "__main__":
     path_to_write_chunks = RESULT.path_to_write_chunks
 
     if path_for_wavfiles.split(".")[-1].lower() == 'wav':
-        audio_split_single_file(wav_file = path_for_wavfiles,
-                                path_to_write_chunks = path_to_write_chunks,
-                                chunk_length_ms = 10000)
+        audio_split_single_file(wav_file=path_for_wavfiles,
+                                path_to_write_chunks=path_to_write_chunks,
+                                chunk_length_ms=10000)
     else:
-        audio_split_directory(path_for_wavfiles = path_for_wavfiles,
-                              path_to_write_chunks = path_to_write_chunks,
-                              chunk_length_ms = 10000)
+        audio_split_directory(path_for_wavfiles=path_for_wavfiles,
+                              path_to_write_chunks=path_to_write_chunks,
+                              chunk_length_ms=10000)

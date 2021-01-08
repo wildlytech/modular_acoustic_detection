@@ -21,7 +21,7 @@ def find_sound_peaks(filepath, url):
     frame_rate = aud_seg.frame_rate
     num_channels = aud_seg.channels
 
-    down_sample_rate = frame_rate/10
+    down_sample_rate = frame_rate / 10
 
     # Separate the audio channels (if we have stereo)
     aud_seg = np.fromstring(aud_seg._data, np.int16).reshape((-1, num_channels)).astype(np.int32)
@@ -37,8 +37,8 @@ def find_sound_peaks(filepath, url):
     for i in range(num_frequency_bands):
         stft_band_ = stft_.copy()
         if i > 0:
-            stft_band_[:3*(2**(i-1)), :] = 0
-        stft_band_[3*(2**i):, :] = 0
+            stft_band_[:3 * (2**(i - 1)), :] = 0
+        stft_band_[3 * (2**i):, :] = 0
 
         stft_bands_ += [stft_band_]
         power_bands_ += [librosa.istft(stft_band_)**2]
@@ -52,11 +52,11 @@ def find_sound_peaks(filepath, url):
 
     # Aggregate all the local peaks from all the rolling-windows across the audio
     peaks = []
-    for index in range(0, len(aud_seg_energy), stride*frame_rate):
-        if index+window*frame_rate > len(aud_seg_energy):
+    for index in range(0, len(aud_seg_energy), stride * frame_rate):
+        if index + window * frame_rate > len(aud_seg_energy):
             sub_seg = aud_seg_energy[index::down_sample_rate]
         else:
-            sub_seg = aud_seg_energy[index:index+window*frame_rate:down_sample_rate]
+            sub_seg = aud_seg_energy[index:index + window * frame_rate:down_sample_rate]
 
         if len(sub_seg) == 0:
             continue
@@ -66,16 +66,16 @@ def find_sound_peaks(filepath, url):
             continue
         # Find the peaks within the window, add offset when done
         local_peaks = peakutils.peak.indexes(sub_seg,
-                                             min_dist=frame_rate*range_around_peak/2/down_sample_rate,
+                                             min_dist=frame_rate * range_around_peak / 2 / down_sample_rate,
                                              thres=0.2)
-        local_peaks = local_peaks*down_sample_rate + index
+        local_peaks = local_peaks * down_sample_rate + index
         if index > 0:
             # Make sure there are no overlaps between peaks from different windows
             while len(peaks) > 0 and len(local_peaks) > 0:
                 # print local_peaks[0], peaks[-1]
                 if local_peaks[0] <= peaks[-1]:
                     local_peaks = local_peaks[1:]
-                elif local_peaks[0] - peaks[-1] < frame_rate*range_around_peak/2:
+                elif local_peaks[0] - peaks[-1] < frame_rate * range_around_peak / 2:
                     if aud_seg_energy[peaks[-1]] > aud_seg_energy[local_peaks[0]]:
                         local_peaks = local_peaks[1:]
                     else:
@@ -89,8 +89,8 @@ def find_sound_peaks(filepath, url):
     # Convert sample indexes to seconds
     peaks = np.array(peaks) / float(frame_rate)
 
-    df = pd.DataFrame({'url':url,
-                       'time':peaks
+    df = pd.DataFrame({'url': url,
+                       'time': peaks
                       })
     df = df.loc[:, ['url', 'time']]
     return df
@@ -101,10 +101,10 @@ def download_youtube_url(url):
     Downloading the youtube URL of audio
     """
     filename = 'sounds/tmp_clip'
-    filename_w_extension = filename +'.wav'
+    filename_w_extension = filename + '.wav'
     if not os.path.exists('sounds'):
         os.makedirs('sounds')
-    check_call(['youtube-dl', url, '--audio-format', 'wav', '-x', '-o', filename +'.%(ext)s'])
+    check_call(['youtube-dl', url, '--audio-format', 'wav', '-x', '-o', filename + '.%(ext)s'])
     return filename_w_extension
 
 
@@ -116,11 +116,11 @@ def extract_sound_clips(filepath, df, directory):
         os.makedirs(directory)
     aud_seg = AudioSegment.from_wav(filepath)
     for time in df.time:
-        start_time = np.max([0, time-2.5])
-        end_time = np.min([time+2.5, len(aud_seg)/1000])
-        aud_seg[int(start_time*1000):int(end_time*1000)].export(directory + '/sound-' +
+        start_time = np.max([0, time - 2.5])
+        end_time = np.min([time + 2.5, len(aud_seg) / 1000])
+        aud_seg[int(start_time * 1000):int(end_time * 1000)].export(directory + '/sound-' +
                                                                 str(start_time) + '-' +
-                                                                str(end_time)+".wav",
+                                                                str(end_time) + ".wav",
                                                                 format="wav")
 
 

@@ -50,7 +50,7 @@ for layer in MODEL.layers:
 print('Length of  the weights : ', len(WEIGHTS))
 
 # predict on audiomoth files using keras library
-TEST_VAULES, DATA_FRAME = audiomoth_function_for_goertzel_model.dataframe_with_frequency_components(RESULT.audio_files_path,RESULT.path_to_goertzel_components)
+TEST_VAULES, DATA_FRAME = audiomoth_function_for_goertzel_model.dataframe_with_frequency_components(RESULT.audio_files_path, RESULT.path_to_goertzel_components)
 PREDICTIONS_OUT = MODEL.predict(TEST_VAULES).ravel()
 DATA_FRAME['predictions_prob'] = PREDICTIONS_OUT
 DATA_FRAME['predictions'] = PREDICTIONS_OUT.ravel().round()

@@ -18,7 +18,7 @@ def import_predict_configuration_json(predictions_cfg_json):
 
     Returns a dictionary with all configuration json data for all labels.
     """
-    config_data_dict  = {}
+    config_data_dict = {}
 
     with open(predictions_cfg_json) as predictions_json_file_obj:
 
@@ -47,7 +47,7 @@ def import_predict_configuration_json(predictions_cfg_json):
                 # Update extension paths in dictionary
                 config_data["ontology"]["extension"] = ontologyExtFiles
 
-                label_name = '['+config_data["aggregatePositiveLabelName"] + ']Vs[' + \
+                label_name = '[' + config_data["aggregatePositiveLabelName"] + ']Vs[' + \
                              config_data["aggregateNegativeLabelName"] + ']'
 
                 config_data_dict[label_name] = config_data
@@ -75,8 +75,8 @@ def load_model(networkCfgJson, weightFile):
 
 def main(predictions_cfg_json,
          path_for_dataframe_with_features,
-         save_misclassified_examples = None,
-         path_to_save_prediction_csv = None):
+         save_misclassified_examples=None,
+         path_to_save_prediction_csv=None):
 
     ###########################################################################
     # Import json data
@@ -106,9 +106,9 @@ def main(predictions_cfg_json,
 
             config_data = CONFIG_DATAS[label_name]
 
-            positiveLabels = get_recursive_sound_names(designated_sound_names = config_data["positiveLabels"],
-                                                       path_to_ontology = "./",
-                                                       ontology_extension_paths = config_data["ontology"]["extension"])
+            positiveLabels = get_recursive_sound_names(designated_sound_names=config_data["positiveLabels"],
+                                                       path_to_ontology="./",
+                                                       ontology_extension_paths=config_data["ontology"]["extension"])
 
             LABELS_BINARIZED[label_name] = 1.0 * DATA_FRAME['labels_name'].apply( \
                                            lambda arr: np.any([x.lower() in positiveLabels for x in arr]))
@@ -150,8 +150,8 @@ def main(predictions_cfg_json,
         CLF2_TEST_PREDICTION = CLF2_TEST_PREDICTION_PROB.round()
 
         # Add results to data frame
-        DF_TEST.insert(len(DF_TEST.columns), label_name+"_Probability", CLF2_TEST_PREDICTION_PROB)
-        DF_TEST.insert(len(DF_TEST.columns), label_name+"_Prediction", CLF2_TEST_PREDICTION)
+        DF_TEST.insert(len(DF_TEST.columns), label_name + "_Probability", CLF2_TEST_PREDICTION_PROB)
+        DF_TEST.insert(len(DF_TEST.columns), label_name + "_Prediction", CLF2_TEST_PREDICTION)
 
         if IS_DATAFRAME_LABELED:
             ###################################################################
@@ -163,9 +163,9 @@ def main(predictions_cfg_json,
             ###################################################################
             # To get the Misclassified examples
             ###################################################################
-            DF_TEST.insert(len(DF_TEST.columns), label_name+'_Actual', CLF2_TEST_TARGET)
+            DF_TEST.insert(len(DF_TEST.columns), label_name + '_Actual', CLF2_TEST_TARGET)
             MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
-            print('\nMisclassified number of examples for '+ label_name + " :", \
+            print('\nMisclassified number of examples for ' + label_name + " :", \
                   DF_TEST.loc[MISCLASSIFED_ARRAY].shape[0])
 
             ###################################################################
@@ -173,14 +173,14 @@ def main(predictions_cfg_json,
             ###################################################################
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \
-                              "misclassified_examples_br_model_"+label_name+".pkl"
+                              "misclassified_examples_br_model_" + label_name + ".pkl"
                 with open(misclassified_pickle_file, "wb") as f:
                     pickle.dump(DF_TEST[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 
             ###################################################################
                     # Print confusion matrix and classification_report
             ###################################################################
-            print('Confusion Matrix for '+ label_name)
+            print('Confusion Matrix for ' + label_name)
             print('============================================')
             RESULT_ = confusion_matrix(CLF2_TEST_TARGET,
                                        CLF2_TEST_PREDICTION)
@@ -189,7 +189,7 @@ def main(predictions_cfg_json,
             ###################################################################
             # print classification report
             ###################################################################
-            print('Classification Report for '+ label_name)
+            print('Classification Report for ' + label_name)
             print('============================================')
             CL_REPORT = classification_report(CLF2_TEST_TARGET,
                                               CLF2_TEST_PREDICTION)
@@ -252,7 +252,7 @@ if __name__ == "__main__":
     ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
-    main(predictions_cfg_json = PARSED_ARGS.predictions_cfg_json,
-         path_for_dataframe_with_features = PARSED_ARGS.path_for_dataframe_with_features,
-         save_misclassified_examples = PARSED_ARGS.save_misclassified_examples,
-         path_to_save_prediction_csv = PARSED_ARGS.path_to_save_prediction_csv)
+    main(predictions_cfg_json=PARSED_ARGS.predictions_cfg_json,
+         path_for_dataframe_with_features=PARSED_ARGS.path_for_dataframe_with_features,
+         save_misclassified_examples=PARSED_ARGS.save_misclassified_examples,
+         path_to_save_prediction_csv=PARSED_ARGS.path_to_save_prediction_csv)

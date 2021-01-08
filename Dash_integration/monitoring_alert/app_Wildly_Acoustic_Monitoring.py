@@ -76,57 +76,57 @@ def Table(dataframe, column_name):
         row = []
         for col in dataframe.columns:
             value = dataframe.iloc[i][col]
-            if os.path.exists("data_downloaded/"+dataframe.iloc[i][1]+".csv"):
-                csv_string = pd.read_csv("data_downloaded/"+dataframe.iloc[i][1]+".csv")
+            if os.path.exists("data_downloaded/" + dataframe.iloc[i][1] + ".csv"):
+                csv_string = pd.read_csv("data_downloaded/" + dataframe.iloc[i][1] + ".csv")
                 csv_string = csv_string.to_csv(index=False,
                                                encoding='utf-8')
                 csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
                 if col == column_name:
                     cell = html.Td(html.A(id="download-report",
                                           href=csv_string,
-                                          download="data_downloaded/"+dataframe.iloc[i][1]+".csv",
+                                          download="data_downloaded/" + dataframe.iloc[i][1] + ".csv",
                                           children=[value],
-                                          style={"color":"blue",
-                                                 'text-decoration':'underline'}),
-                                   style={"padding-top":"10px",
-                                          "padding-right":"13px",
-                                          "padding-left":"10px",
-                                          'text-align':'center',})
+                                          style={"color": "blue",
+                                                 'text-decoration': 'underline'}),
+                                   style={"padding-top": "10px",
+                                          "padding-right": "13px",
+                                          "padding-left": "10px",
+                                          'text-align': 'center', })
                 else:
                     cell = html.Td(children=value,
-                                   style={"padding-top":"10px",
-                                          'color':'white',
-                                          "padding-right":"13px",
-                                          "padding-left":"10px",
-                                          'text-align':'center'})
+                                   style={"padding-top": "10px",
+                                          'color': 'white',
+                                          "padding-right": "13px",
+                                          "padding-left": "10px",
+                                          'text-align': 'center'})
                 row.append(cell)
             else:
                 if col == column_name:
                     cell = html.Td(html.A(children=[value],
-                                          style={"color":"white",
-                                                 'text-decoration':'underline'}),
-                                   style={"padding-top":"10px",
-                                          "padding-right":"13px",
-                                          "padding-left":"10px",
-                                          'text-align':'center'})
+                                          style={"color": "white",
+                                                 'text-decoration': 'underline'}),
+                                   style={"padding-top": "10px",
+                                          "padding-right": "13px",
+                                          "padding-left": "10px",
+                                          'text-align': 'center'})
                 else:
                     cell = html.Td(children=value,
-                                   style={"padding-top":"10px",
-                                          'color':'white',
-                                          "padding-right":"13px",
-                                          "padding-left":"10px",
-                                          'text-align':'center'})
+                                   style={"padding-top": "10px",
+                                          'color': 'white',
+                                          "padding-right": "13px",
+                                          "padding-left": "10px",
+                                          'text-align': 'center'})
                 row.append(cell)
         rows.append(html.Tr(row))
 
     return html.Table(
         [html.Tr([html.Th(col,
-                          style={"padding-top":"10px",
-                                 "padding-right":"30px",
-                                 'color':'white',
-                                 "padding-left":"30px",
-                                 "padding-bottom":'10px',
-                                 'text-align':'center'}) for col in dataframe.columns])] + rows)
+                          style={"padding-top": "10px",
+                                 "padding-right": "30px",
+                                 'color': 'white',
+                                 "padding-left": "30px",
+                                 "padding-bottom": '10px',
+                                 'text-align': 'center'}) for col in dataframe.columns])] + rows)
 
 
 ###############################################################################
@@ -152,15 +152,15 @@ def get_directories_listed(ftp_path):
                     month = line.split(' ')[-4]
                 else:
                     month = line.split(' ')[-5]
-                timestamp1 = now_year +'/'+str(strptime(month, '%b').tm_mon)+'/'+\
-                line.split(' ')[-3]+'-'+line.split(' ')[-2]
+                timestamp1 = now_year + '/' + str(strptime(month, '%b').tm_mon) + '/' +\
+                line.split(' ')[-3] + '-' + line.split(' ')[-2]
                 time2 = str(datetime.strptime(timestamp1, datetimeformat_1) + timedelta(minutes=330))
                 dir_n_time = directory, time2, 'active'
                 dir_n_timestamp.append(dir_n_time)
 
             else:
-                timestamp1 = line.split(' ')[-2]+'/'+str(strptime(line.split(' ')[-5], '%b').tm_mon)\
-                +'/'+line.split(' ')[-4]
+                timestamp1 = line.split(' ')[-2] + '/' + str(strptime(line.split(' ')[-5], '%b').tm_mon)\
+                + '/' + line.split(' ')[-4]
                 dir_n_time = directory, timestamp1, 'inactive'
                 dir_n_timestamp.append(dir_n_time)
 
@@ -251,9 +251,9 @@ def predictions_from_models(wavfile_path, embeddings):
 
     prediction_probs, prediction_rounded = \
             predict_on_wavfile_binary_relevance.predict_on_embedding(\
-                                                embedding = embeddings,
-                                                label_names = list(CONFIG_DATAS.keys()),
-                                                config_datas = CONFIG_DATAS)
+                                                embedding=embeddings,
+                                                label_names=list(CONFIG_DATAS.keys()),
+                                                config_datas=CONFIG_DATAS)
 
     return prediction_probs, prediction_rounded
 
@@ -269,7 +269,7 @@ def get_predictions(wavfile_path):
     try:
         embeddings = generate_before_predict_BR.main(wavfile_path, 0, 0, 0)
     except:
-        print(('\033[1m'+ "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1]))
+        print(('\033[1m' + "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1]))
         return None, None
     try:
         return predictions_from_models(wavfile_path, embeddings)
@@ -332,39 +332,39 @@ def get_prediction_bar_graph(filepath):
 
     output_sound = get_formatted_detected_sounds(prediction_rounded)
 
-    return  prediction_probs, \
+    return prediction_probs, \
             prediction_rounded, \
             output_sound, \
             dcc.Graph(id='example',
                       figure={
-                          'data':[{'x':[format_label_name(x) for x in list(CONFIG_DATAS.keys())],
+                          'data': [{'x': [format_label_name(x) for x in list(CONFIG_DATAS.keys())],
                                    'y':["{0:.2f}".format(x) for x in prediction_probs],
                                    'text':["{0:.2f}%".format(x) for x in prediction_probs],
                                    'textposition':'auto',
                                    'type':'bar'}],
                           'layout': {
-                              'title':'probabilistic prediction graph ',
-                              'titlefont':{
-                                  'family':'Courier New, monospace',
-                                  'size':22,
-                                  'color':'#e4e4e4'},
+                              'title': 'probabilistic prediction graph ',
+                              'titlefont': {
+                                  'family': 'Courier New, monospace',
+                                  'size': 22,
+                                  'color': '#e4e4e4'},
 
-                              'xaxis':{
+                              'xaxis': {
                                   'title': 'Labels of the sound',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'#e4e4e4'}},
-                              'yaxis':{
+                                  'titlefont': {
+                                      'family': 'Courier New, monospace',
+                                      'size': 18,
+                                      'color': '#e4e4e4'}},
+                              'yaxis': {
                                   'title': 'Percentage probabality',
-                                  'titlefont':{
-                                      'family':'Courier New, monospace',
-                                      'size':18,
-                                      'color':'#e4e4e4'}},
-                              'height':400,
-                              'paper_bgcolor':'#232323',
-                              'plot_bgcolor':'#232323',
-                              'font': {'color':'#e4e4e4'}}},
+                                  'titlefont': {
+                                      'family': 'Courier New, monospace',
+                                      'size': 18,
+                                      'color': '#e4e4e4'}},
+                              'height': 400,
+                              'paper_bgcolor': '#232323',
+                              'plot_bgcolor': '#232323',
+                              'font': {'color': '#e4e4e4'}}},
                         style={'marginBottom': 0,
                                'marginTop': 10})
 
@@ -378,7 +378,7 @@ def save_file(name, content):
     Decode and store a file uploaded with Plotly Dash.
     """
     data = content.encode("utf8").split(b";base64,")[1]
-    with open("FTP_downloaded/"+name, "wb") as file_p:
+    with open("FTP_downloaded/" + name, "wb") as file_p:
         file_p.write(base64.b64decode(data))
 
 
@@ -439,7 +439,7 @@ def sort_on_filenames(files_list):
         sorted_wavfiles = sorted(wav_files_toint)
 
         for sorted_file in sorted_wavfiles:
-            wav_files_list.append(character + str(sorted_file)[:8]+"_"+ str(sorted_file)[8:]+ extension)
+            wav_files_list.append(character + str(sorted_file)[:8] + "_" + str(sorted_file)[8:] + extension)
         return wav_files_list
     else:
         return None
@@ -448,20 +448,20 @@ def sort_on_filenames(files_list):
 ###############################################################################
 # Downloads audio files but checks for already existed one
 ###############################################################################
-def download_files(each_wav_file, path_to_download, blockalign, samplerate,ftp_obj):
+def download_files(each_wav_file, path_to_download, blockalign, samplerate, ftp_obj):
     '''
     downloads single wav file
     '''
-    if os.path.exists(path_to_download+each_wav_file):
-        if os.path.getsize(path_to_download+each_wav_file) > samplerate*blockalign*10:
+    if os.path.exists(path_to_download + each_wav_file):
+        if os.path.getsize(path_to_download + each_wav_file) > samplerate * blockalign * 10:
             pass
         else:
-            with open(path_to_download+each_wav_file, 'wb') as file_obj:
-                ftp_obj.retrbinary('RETR '+ each_wav_file, file_obj.write)
+            with open(path_to_download + each_wav_file, 'wb') as file_obj:
+                ftp_obj.retrbinary('RETR ' + each_wav_file, file_obj.write)
 
     else:
-        with open(path_to_download+each_wav_file, 'wb') as file_obj:
-            ftp_obj.retrbinary('RETR '+ each_wav_file, file_obj.write)
+        with open(path_to_download + each_wav_file, 'wb') as file_obj:
+            ftp_obj.retrbinary('RETR ' + each_wav_file, file_obj.write)
 
 
 ###############################################################################
@@ -519,11 +519,11 @@ def directory_procedure(directory_listing, selected_device, ftp_obj):
     global done
     ftp_obj.cwd(FTP_PATH)
     print((ftp_obj.pwd()))
-    ftp_obj.cwd(directory_listing[0]+"/")
+    ftp_obj.cwd(directory_listing[0] + "/")
     for each_ in directory_listing:
         while True:
             wavfiles = get_without_duplicates(each_,
-                                              "downloaded_audio_files/"+each_+".csv",
+                                              "downloaded_audio_files/" + each_ + ".csv",
                                               ftp_obj)
             wavfiles = sort_on_filenames(wavfiles)
             if wavfiles:
@@ -533,28 +533,28 @@ def directory_procedure(directory_listing, selected_device, ftp_obj):
                                                wavheader["BlockAlign"],
                                                wavheader["SampleRate"],
                                                ftp_obj):
-                        check_path_for_downloading("downloaded_audio_files/"+each_)
+                        check_path_for_downloading("downloaded_audio_files/" + each_)
                         download_files(each_file,
-                                       "downloaded_audio_files/"+each_+"/",
+                                       "downloaded_audio_files/" + each_ + "/",
                                        wavheader["BlockAlign"],
                                        wavheader["SampleRate"],
                                        ftp_obj)
-                        prediction_list, prediction_rounded = get_predictions("downloaded_audio_files/"+each_+"/"+each_file)
+                        prediction_list, prediction_rounded = get_predictions("downloaded_audio_files/" + each_ + "/" + each_file)
                         if prediction_list:
                             write_csv_prediction(each_,
                                                  each_file,
                                                  selected_device,
                                                  prediction_list,
-                                                 "downloaded_audio_files/"+each_+".csv")
+                                                 "downloaded_audio_files/" + each_ + ".csv")
                             decide_to_alert = check_for_soi(prediction_rounded, list(CONFIG_DATAS.keys()))
-                            print("decide to alert:",decide_to_alert)
+                            print("decide to alert:", decide_to_alert)
                             if decide_to_alert:
                                 write_csv_prediction(each_,
                                                      each_file,
                                                      selected_device,
                                                      prediction_list,
-                                                     "downloaded_audio_files/"+"soi_csv_file.csv")
-                                get_alerted("downloaded_audio_files/"+each_+"/"+each_file,
+                                                     "downloaded_audio_files/" + "soi_csv_file.csv")
+                                get_alerted("downloaded_audio_files/" + each_ + "/" + each_file,
                                             decide_to_alert,
                                             prediction_list,
                                             None)
@@ -581,11 +581,11 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
     global done
     ftp_obj.cwd(FTP_PATH)
     print((ftp_obj.pwd()))
-    ftp_obj.cwd(directory_listing[0]+"/")
+    ftp_obj.cwd(directory_listing[0] + "/")
     for each in directory_listing:
         while not GLOBAL_STOP_THREAD:
             wavfiles = get_without_duplicates(each,
-                                              "downloaded_audio_files/"+each+".csv",
+                                              "downloaded_audio_files/" + each + ".csv",
                                               ftp_obj)
             wavfiles = sort_on_filenames(wavfiles)
             if wavfiles:
@@ -596,19 +596,19 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
                                                    wavheader["BlockAlign"],
                                                    wavheader["SampleRate"],
                                                    ftp_obj):
-                            check_path_for_downloading("downloaded_audio_files/"+each)
+                            check_path_for_downloading("downloaded_audio_files/" + each)
                             download_files(each_file,
-                                           "downloaded_audio_files/"+each+"/",
+                                           "downloaded_audio_files/" + each + "/",
                                            wavheader["BlockAlign"],
                                            wavheader["SampleRate"],
                                            ftp_obj)
-                            prediction_list, prediction_rounded = get_predictions("downloaded_audio_files/"+each+"/"+each_file)
+                            prediction_list, prediction_rounded = get_predictions("downloaded_audio_files/" + each + "/" + each_file)
                             if prediction_list:
                                 write_csv_prediction(each,
                                                      each_file,
                                                      selected_device,
                                                      prediction_list,
-                                                     "downloaded_audio_files/"+each+".csv")
+                                                     "downloaded_audio_files/" + each + ".csv")
                                 decide_to_alert = check_for_soi(prediction_rounded, list(CONFIG_DATAS.keys()))
                                 print("decide to alert:", decide_to_alert)
                                 if decide_to_alert:
@@ -616,8 +616,8 @@ def directory_procedure_threading(directory_listing, selected_device, ftp_obj, p
                                                          each_file,
                                                          selected_device,
                                                          prediction_list,
-                                                         "downloaded_audio_files/"+"soi_csv_file.csv")
-                                    get_alerted("downloaded_audio_files/"+each+"/"+each_file,
+                                                         "downloaded_audio_files/" + "soi_csv_file.csv")
+                                    get_alerted("downloaded_audio_files/" + each + "/" + each_file,
                                                 decide_to_alert,
                                                 prediction_list,
                                                 phoneno)
@@ -651,9 +651,9 @@ def get_alerted(wavfile_path, soi_found, prediction_list, phoneNo):
 
         wavfile_ = wavfile_path.split("/")[-1]
 
-        text = "\nWavFile-"+wavfile_ + "\n, Sound(s) Found- "+get_text
+        text = "\nWavFile-" + wavfile_ + "\n, Sound(s) Found- " + get_text
         url = "https://www.fast2sms.com/dev/bulk"
-        payload = "sender_id=FSTSMS&message="+ text+"&language=english&route=p&numbers="+phoneNo
+        payload = "sender_id=FSTSMS&message=" + text + "&language=english&route=p&numbers=" + phoneNo
         headers = {'authorization': AUTHORIZATION_TOKEN,
                    'Content-Type': "application/x-www-form-urlencoded",
                    'Cache-Control': "no-cache"}
@@ -667,12 +667,12 @@ def get_alerted(wavfile_path, soi_found, prediction_list, phoneNo):
 ###############################################################################
 # Checks for FTP size
 ###############################################################################
-def check_ftp_wav_file_size(each_wav_file, blockalign, samplerate,ftp_obj):
+def check_ftp_wav_file_size(each_wav_file, blockalign, samplerate, ftp_obj):
     '''
     checks wav file size
     '''
     ftp_obj.sendcmd("TYPE i")
-    if ftp_obj.size(each_wav_file) > samplerate*blockalign*10:
+    if ftp_obj.size(each_wav_file) > samplerate * blockalign * 10:
         ftp_obj.sendcmd("TYPE A")
         return True
     else:
@@ -707,7 +707,7 @@ class FtpFile:
         """
         return self.pos
 
-    def read(self, size= None):
+    def read(self, size=None):
         """
         """
         if size == None:
@@ -737,7 +737,7 @@ class FtpFile:
 ###############################################################################
 # returns wavheader information
 ###############################################################################
-def get_wavheader_subchunk1(name,ftp_obj):
+def get_wavheader_subchunk1(name, ftp_obj):
     '''
     To read wav file header details
     '''
@@ -792,20 +792,20 @@ def parse_contents(contents, filename, date):
         # unpack bar graph information
         _, _, _, bar_graph = bar_graph_info
 
-        return  html.Div(style={'color': '#e4e4e4', 'fontSize':14},
+        return html.Div(style={'color': '#e4e4e4', 'fontSize': 14},
                          children=[html.Div(children=[html.Audio(id='myaudio',
                                                                  src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
                                                                  controls=True)],
-                                            style={"margin-left":"27%"}),
+                                            style={"margin-left": "27%"}),
                                    bar_graph,
-                                   html.P('Uploaded File : '+ filename)])
+                                   html.P('Uploaded File : ' + filename)])
     else:
 
         # Since the file is not a wav file or has problems, delete the file
         os.remove(filepath)
 
         return html.Div(html.P("Error occured. Please try Again or Input proper Wav File.",
-                                   style={"textAlign":"center"}))
+                                   style={"textAlign": "center"}))
 
 
 ###############################################################################
@@ -818,7 +818,7 @@ def get_colored_for_soi_columns(value_list):
     if value_list:
         for each_ in value_list:
             dictionary = {}
-            dictionary['if'] = {"column_id":each_}
+            dictionary['if'] = {"column_id": each_}
             dictionary['backgroundColor'] = "#3D9970"
             dictionary['color'] = 'black'
             list_output.append(dictionary)
@@ -843,11 +843,11 @@ def format_html_data_table(dataframe, list_of_malformed, addLineBreak=False):
     for column_name in dataframe.select_dtypes(include=[np.float]).columns:
         dataframe[column_name] = dataframe[column_name].apply(lambda x: "{0:.2f}%".format(x))
 
-    return html.Div([html.P("Total Number of Audio Clips : "+ str(dataframe.shape[0]),
-                            style={"color":"white",
-                                   'text-decoration':'underline'}),
+    return html.Div([html.P("Total Number of Audio Clips : " + str(dataframe.shape[0]),
+                            style={"color": "white",
+                                   'text-decoration': 'underline'}),
                      html.P("Error while prediction: " + list_of_malformed,
-                            style={"color":"white"})] + \
+                            style={"color": "white"})] + \
                     ([html.Br()] if addLineBreak else []) + \
                     [html.Hr(),
                      dash_table.DataTable(id='datatable-interactivity-predictions',
@@ -860,11 +860,11 @@ def format_html_data_table(dataframe, list_of_malformed, addLineBreak=False):
                                                         'border': '1px solid white'},
                                           style_cell={'backgroundColor': 'rgb(50, 50, 50)',
                                                       'color': 'white',
-                                                      'whiteSpace':'normal',
+                                                      'whiteSpace': 'normal',
                                                       'maxWidth': '240px'},
-                                          style_table={"maxHeight":"350px",
-                                                       "overflowY":"scroll",
-                                                       "overflowX":"auto"}),
+                                          style_table={"maxHeight": "350px",
+                                                       "overflowY": "scroll",
+                                                       "overflowX": "auto"}),
                      html.Hr()] + \
                     ([html.Br()] if addLineBreak else []))
 
@@ -883,7 +883,7 @@ def parse_contents_batch(contents, names, dates):
     dum_df = pd.DataFrame()
     dum_df['FileNames'] = names
     for i in zip(contents, names, dates):
-        path = "FTP_downloaded/"+i[1]
+        path = "FTP_downloaded/" + i[1]
         if os.path.exists(path):
             print("path Exists")
         else:
@@ -898,12 +898,12 @@ def parse_contents_batch(contents, names, dates):
     dum_df['features'] = emb
     if len(dum_df["FileNames"].tolist()) == 1:
         try:
-            prediction_probs, prediction_rounded = predictions_from_models("FTP_downloaded/"+dum_df["FileNames"].tolist()[0], dum_df["features"].tolist()[0])
+            prediction_probs, prediction_rounded = predictions_from_models("FTP_downloaded/" + dum_df["FileNames"].tolist()[0], dum_df["features"].tolist()[0])
 
             pred_df = pd.DataFrame(columns=["File Name"] + list(CONFIG_DATAS.keys()))
-            pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]]+ prediction_probs
+            pred_df.loc[0] = [dum_df["FileNames"].tolist()[0]] + prediction_probs
 
-            return format_html_data_table(pred_df, list_of_malformed = malformed)
+            return format_html_data_table(pred_df, list_of_malformed=malformed)
         except:
             return html.Div(html.P("Got Error while Predictions"))
     else:
@@ -911,13 +911,13 @@ def parse_contents_batch(contents, names, dates):
 
         for index, each_file, each_embeddings in zip(list(range(0, dum_df.shape[0])), dum_df["FileNames"].tolist(), dum_df["features"].values.tolist()):
             try:
-                prediction_probs, prediction_rounded = predictions_from_models("FTP_downloaded/"+each_file, each_embeddings)
+                prediction_probs, prediction_rounded = predictions_from_models("FTP_downloaded/" + each_file, each_embeddings)
 
                 pred_df.loc[index] = [each_file] + prediction_probs
             except:
                 pass
 
-        return format_html_data_table(pred_df, list_of_malformed = malformed)
+        return format_html_data_table(pred_df, list_of_malformed=malformed)
 
 
 ###############################################################################
@@ -943,19 +943,19 @@ def layout():
                     children=[
                         html.Div(className='control-tab', children=[
                             html.Div('Select DeviceID',
-                                     title="Available directories from "+ FTP_PATH + "  directory",
+                                     title="Available directories from " + FTP_PATH + "  directory",
                                      className='fullwidth-app-controls-name',
-                                     style={"fontWeight":"bold",
+                                     style={"fontWeight": "bold",
                                             "color": '#FFBF01',
-                                            "text-decoration":"underline"}),
+                                            "text-decoration": "underline"}),
                             html.Div(id='display-all-directories-div-graph-tab',
                                      children=[dash_table.DataTable(id='display-all-directories-datatable-graph-tab',
                                                                     columns=[{"name": i,
-                                                                              "id": i,} for i in DATAFRAME_REQUIRED.columns],
+                                                                              "id": i, } for i in DATAFRAME_REQUIRED.columns],
                                                                     data=DATAFRAME_REQUIRED.to_dict("rows"),
                                                                     row_selectable="multi",
-                                                                    style_table={"Height":"500px",
-                                                                                 "Width":"500px"},
+                                                                    style_table={"Height": "500px",
+                                                                                 "Width": "500px"},
                                                                     style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                                                   "fontWeight": "bold",
                                                                                   'border': '1px solid #e4e4e4'},
@@ -965,15 +965,15 @@ def layout():
                                                                                                     'filter_query': '{Status} eq "Active"'},
                                                                                              'backgroundColor': '#3D9970',
                                                                                              'color': 'black'}])],
-                                     style={"marginTop":"20px"}),
+                                     style={"marginTop": "20px"}),
                             html.Br(),
                             html.Div(className='app-controls-block', children=[
                                 html.Div('Select Alert Based on Labels:',
                                          className='app-controls-name',
-                                         style={"fontSize":"10px",
-                                                "width":"155px",
-                                                "color":"white",
-                                                "fontWeight":"bold"}),
+                                         style={"fontSize": "10px",
+                                                "width": "155px",
+                                                "color": "white",
+                                                "fontWeight": "bold"}),
                                 dcc.Dropdown(id='sound-labels-dropdown-alert-tab',
                                              options=[{'label': format_label_name(x), 'value': x} for x in list(CONFIG_DATAS.keys())],
                                              multi=True,
@@ -981,9 +981,9 @@ def layout():
                                 html.Br(),
                                 html.Div('Select Alert Interval :',
                                          className='app-controls-name',
-                                         style={"fontSize":"10px",
-                                                "color":"white",
-                                                "fontWeight":"bold"}),
+                                         style={"fontSize": "10px",
+                                                "color": "white",
+                                                "fontWeight": "bold"}),
                                 dcc.Dropdown(id='time-interval-labels-dropdown-alert-tab',
                                              options=[{'label': 'Every Event', 'value': 'all_event'},
                                                       {'label': 'Every 5Mins', 'value': '5_mins'}],
@@ -993,24 +993,24 @@ def layout():
                                 html.Br(),
                                 html.Div('Alert SMS To [ +91- ]:',
                                          className='app-controls-name',
-                                         style={"fontSize":"10px",
-                                                "color":"white",
-                                                "fontWeight":"bold"}),
+                                         style={"fontSize": "10px",
+                                                "color": "white",
+                                                "fontWeight": "bold"}),
                                 dcc.Input(id='phone-number-alert-tab')]),
-                            html.Hr(style={"marginTop":"20px"}),
+                            html.Hr(style={"marginTop": "20px"}),
                             html.Div(className='app-controls-block', children=[
                                 html.Button(
                                     id='selected-all-active-devices-graph-tab',
                                     children='Monitor Active Devices',
                                     n_clicks=0,
                                     n_clicks_timestamp=0,
-                                    style={"border":"1px solid #FFBF01", "color":"white"}),
+                                    style={"border": "1px solid #FFBF01", "color": "white"}),
                                 html.Button(
                                     id='Selected-devices-button-graph-tab',
                                     children='Monitor Selected Devices',
                                     n_clicks=0,
                                     n_clicks_timestamp=0,
-                                    style={"border":"1px solid #FFBF01", "color":"white"})]),
+                                    style={"border": "1px solid #FFBF01", "color": "white"})]),
                             html.Div(id="graph-output-graph-tab-do-nothing")])]),
 
                 ###############################################################
@@ -1029,7 +1029,7 @@ def layout():
                                                             n_clicks=0,
                                                             children=html.Div(["Drag and Drop or click \
                                                                                to select files."],
-                                                                              style={"font-size":10})))],
+                                                                              style={"font-size": 10})))],
                                                 accept='.wav')]),
 
                         html.Div([
@@ -1050,19 +1050,19 @@ def layout():
                     children=html.Div(className='control-tab', children=[
                         html.Div(
                             'Available Directories',
-                            title="Available directories from "+ FTP_PATH + "  directory",
+                            title="Available directories from " + FTP_PATH + "  directory",
                             className='fullwidth-app-controls-name',
-                            style={"fontWeight":"bold",
+                            style={"fontWeight": "bold",
                                    "color": '#FFBF01',
-                                   "text-decoration":"underline"}),
+                                   "text-decoration": "underline"}),
                         html.Div(id='display-all-directories-div',
                                  children=[dash_table.DataTable(id='display-all-directories-datatable',
                                                                 columns=[{"name": i,
-                                                                          "id": i,} for i in DATAFRAME_REQUIRED.columns],
+                                                                          "id": i, } for i in DATAFRAME_REQUIRED.columns],
                                                                 data=DATAFRAME_REQUIRED.to_dict("rows"),
                                                                 row_selectable="single",
-                                                                style_table={"Height":"500px",
-                                                                             "Width":"500px"},
+                                                                style_table={"Height": "500px",
+                                                                             "Width": "500px"},
                                                                 style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                                               "fontWeight": "bold",
                                                                               'border': '1px solid #e4e4e4'},
@@ -1072,7 +1072,7 @@ def layout():
                                                                                                 'filter_query': '{Status} eq "Active"'},
                                                                                          'backgroundColor': '#3D9970',
                                                                                          'color': 'black'}])],
-                                 style={"marginTop":"20px"}),
+                                 style={"marginTop": "20px"}),
                         html.Br(),
                         dcc.Loading(className='dashbio-loading',
                                     type="dot",
@@ -1107,7 +1107,7 @@ def layout():
                          dcc.Loading(className='dashbio-loading',
                                      type="dot",
                                      children=[dcc.Interval(id='interval-component',
-                                                            interval=10*1000, # in milliseconds
+                                                            interval=10 * 1000,  # in milliseconds
                                                             n_intervals=0)])])])
 
 ###############################################################################
@@ -1135,24 +1135,24 @@ def callbacks(_app):
             DATAFRAME_DEVICE_STATUS["Select Status"] = ["Active", "Inactive"]
             return dash_table.DataTable(id='display-all-status-active-inactive',
                                         columns=[{"name": i,
-                                                  "id": i,}
+                                                  "id": i, }
                                                  for i in DATAFRAME_DEVICE_STATUS.columns],
                                         data=DATAFRAME_DEVICE_STATUS.to_dict("rows"),
                                         row_selectable="single",
-                                        style_table={"maxHeight":"500px",
-                                                     "maxWidth":"400px"},
+                                        style_table={"maxHeight": "500px",
+                                                     "maxWidth": "400px"},
                                         style_header={'backgroundColor': 'rgb(30, 30, 30)'},
                                         style_cell={'backgroundColor': 'rgb(50, 50, 50)',
                                                     'color': 'white'},)
         else:
-            return   dash_table.DataTable(id='display-all-directories-datatable',
+            return dash_table.DataTable(id='display-all-directories-datatable',
                                           columns=[{"name": i,
-                                                    "id": i,}
+                                                    "id": i, }
                                                    for i in DATAFRAME_REQUIRED.columns],
                                           data=DATAFRAME_REQUIRED.to_dict("rows"),
                                           row_selectable="single",
-                                          style_table={"Height":"500px",
-                                                       "Width":"500px"},
+                                          style_table={"Height": "500px",
+                                                       "Width": "500px"},
                                           style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                         "fontWeight": "bold",
                                                         'border': '1px solid white'},
@@ -1178,14 +1178,14 @@ def callbacks(_app):
         """
         pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
         if indices is not None and indices != []:
-            path = "FTP_downloaded/"+str(pred_df.iloc[indices[0]]["File Name"])
+            path = "FTP_downloaded/" + str(pred_df.iloc[indices[0]]["File Name"])
             encoded_image_to_play = base64.b64encode(open(path, 'rb').read()).decode()
             return html.Div([
                 html.Br(),
                 html.Audio(id='myaudio',
                            src='data:audio/WAV;base64,{}'.format(encoded_image_to_play),
                            controls=True,
-                           style={"margin-left":"25%"})])
+                           style={"margin-left": "25%"})])
 
     ###########################################################################
     # Disabling div element not required
@@ -1198,7 +1198,7 @@ def callbacks(_app):
         """
         """
         if value == "datasets" or value == "graph":
-            return {"display":"none"}
+            return {"display": "none"}
 
     ###########################################################################
     # Play option for predicted and selected file
@@ -1215,13 +1215,13 @@ def callbacks(_app):
         """
         pred_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
         if indices is not None and indices != []:
-            path = "FTP_downloaded/"+str(pred_df.iloc[indices[0]]["File Name"])
+            path = "FTP_downloaded/" + str(pred_df.iloc[indices[0]]["File Name"])
             encoded_image_to_play = base64.b64encode(open(path, 'rb').read()).decode()
             return html.Div([html.Br(),
                              html.Audio(id='myaudio',
                                         src='data:audio/WAV;base64,{}'.format(encoded_image_to_play),
                                         controls=True,
-                                        style={"margin-left":"25%"})])
+                                        style={"margin-left": "25%"})])
 
     ###########################################################################
     # disabling div element that is not required
@@ -1234,7 +1234,7 @@ def callbacks(_app):
         """
         """
         if value == "what-is" or value == "graph":
-            return {"display":"none"}
+            return {"display": "none"}
 
     ###########################################################################
     # disabling div element that is not required
@@ -1247,7 +1247,7 @@ def callbacks(_app):
         Disabling the button after its being clicked once
         """
         if value == "devid" or value == "none" or value == "timestamps":
-            return {'display':"none"}
+            return {'display': "none"}
 
     ###########################################################################
     # disabling div element that is not required
@@ -1260,7 +1260,7 @@ def callbacks(_app):
         Disabling the button after its being clicked once
         """
         if value == "devid" or value == "none" or value == "timestamps":
-            return {'display':"none"}
+            return {'display': "none"}
 
     ###########################################################################
     # Displays button to run predictions on selection of file
@@ -1280,7 +1280,7 @@ def callbacks(_app):
             batch_ftp_file_df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
             batch_ftp_file_df = batch_ftp_file_df.iloc[indices]
             print(batch_ftp_file_df)
-            return  html.Div(id='selected-files-input-button',
+            return html.Div(id='selected-files-input-button',
                              children=[
                                  html.Div(className='app-controls-name', children=[
                                      html.Br(),
@@ -1289,9 +1289,9 @@ def callbacks(_app):
                                          children='Run Predictions on selected Files',
                                          n_clicks=0,
                                          n_clicks_timestamp=0,
-                                         style={'border':'1px solid #FFBF01', "color":"white"})])],
-                             n_clicks = 0,
-                             style={"marginTop":"10px"}),
+                                         style={'border': '1px solid #FFBF01', "color": "white"})])],
+                             n_clicks=0,
+                             style={"marginTop": "10px"}),
 
         else:
             batch_ftp_file_df = pd.DataFrame()
@@ -1316,7 +1316,7 @@ def callbacks(_app):
             directory_selected = pred_df.iloc[indices]["Directories"].tolist()[0]
             print(directory_selected)
             if directory_selected:
-                connect(FTP_PATH+"/"+directory_selected+"/")
+                connect(FTP_PATH + "/" + directory_selected + "/")
                 print(ftp.pwd())
                 list_all_wavfiles = ftp.nlst("*.wav")
                 sort_list_of_all_wavfiles = sort_on_filenames(list_all_wavfiles)
@@ -1326,19 +1326,19 @@ def callbacks(_app):
                             children=[
                                 html.Br(),
                                 html.Br(),
-                                html.P("Select Files: "+ directory_selected + " Device (s)", style={"color":"#FFBF01"}),
+                                html.P("Select Files: " + directory_selected + " Device (s)", style={"color": "#FFBF01"}),
                                 html.Br(),
                                 dash_table.DataTable(id='display-all-directory-on-status-selection-datatable',
                                                      columns=[{"name": i,
-                                                               "id": i,}
+                                                               "id": i, }
                                                               for i in DATAFRAME_DEVICE_STATUS.columns],
                                                      data=DATAFRAME_DEVICE_STATUS.to_dict("rows"),
                                                      row_selectable="multi",
-                                                     style_table={"Height":"500px",
-                                                                  "Width":"500px"},
+                                                     style_table={"Height": "500px",
+                                                                  "Width": "500px"},
                                                      style_header={'backgroundColor': 'rgb(30, 30, 30)', "fontWeight": "bold", 'border': '1px solid white'},
                                                      style_cell={'backgroundColor': 'rgb(50, 50, 50)',
-                                                                 'color': 'white'},),])
+                                                                 'color': 'white'},), ])
 
     ###########################################################################
     # callback for upload of single file
@@ -1467,8 +1467,8 @@ def callbacks(_app):
                                                                 "id": i,
                                                                 "deletable": True} for i in dataframe.columns],
                                                       data=dataframe.to_dict("rows"),
-                                                      style_table={"Height":"400px",
-                                                                   "Width":"450px"},
+                                                      style_table={"Height": "400px",
+                                                                   "Width": "450px"},
                                                       style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                                     "fontWeight": "bold",
                                                                     'border': '1px solid white'},
@@ -1480,12 +1480,12 @@ def callbacks(_app):
                                              children='Stop Monitoring',
                                              n_clicks=0,
                                              n_clicks_timestamp=0,
-                                             style={'border':'1px solid #FFBF01',
-                                                    "margin-top":"20px",
-                                                    "margin-left":"20px",
-                                                    "color":"white"})])
+                                             style={'border': '1px solid #FFBF01',
+                                                    "margin-top": "20px",
+                                                    "margin-left": "20px",
+                                                    "color": "white"})])
             else:
-                return html.Div([html.P("Waiting For getting SOI", style={"textAlign":"center"})])
+                return html.Div([html.P("Waiting For getting SOI", style={"textAlign": "center"})])
 
         if select_dev_clicks >= 1:
             if os.path.exists("downloaded_audio_files/soi_csv_file.csv"):
@@ -1495,7 +1495,7 @@ def callbacks(_app):
                 for column_name in dataframe.select_dtypes(include=[np.float]).columns:
                     dataframe[column_name] = dataframe[column_name].apply(lambda x: "{0:.2f}%".format(x))
 
-                dataframe["No."] = list(range(1, dataframe.shape[0]+1))
+                dataframe["No."] = list(range(1, dataframe.shape[0] + 1))
                 devids = []
                 for each_ in dataframe["Directory"]:
                     devids.append(get_devid_from_dir(each_))
@@ -1513,9 +1513,9 @@ def callbacks(_app):
                                                                 "id": i,
                                                                 "deletable": True} for i in dataframe.columns],
                                                       data=dataframe.to_dict("rows"),
-                                                      style_table={"height":"300px",
+                                                      style_table={"height": "300px",
                                                                    'overflowY': 'scroll',
-                                                                   "Width":"450px"},
+                                                                   "Width": "450px"},
                                                       style_header={'backgroundColor': 'rgb(30, 30, 30)',
                                                                     "fontWeight": "bold",
                                                                     'border': '1px solid white'},
@@ -1529,12 +1529,12 @@ def callbacks(_app):
                                              children='Stop Monitoring',
                                              n_clicks=0,
                                              n_clicks_timestamp=0,
-                                             style={'border':'1px solid #FFBF01',
-                                                    "margin-top":"20px",
-                                                    "margin-left":"20px",
-                                                    "color":"white"})])
+                                             style={'border': '1px solid #FFBF01',
+                                                    "margin-top": "20px",
+                                                    "margin-left": "20px",
+                                                    "color": "white"})])
             else:
-                return html.Div([html.P("Waiting For getting SOI", style={"textAlign":"center"})])
+                return html.Div([html.P("Waiting For getting SOI", style={"textAlign": "center"})])
 
     ###########################################################################
     # callback to stop monitoring
@@ -1559,7 +1559,7 @@ def callbacks(_app):
                 os.remove("downloaded_audio_files/soi_csv_file.csv")
             else:
                 pass
-            return  True
+            return True
 
     ###########################################################################
     # Disabling div elements that are not required
@@ -1573,7 +1573,7 @@ def callbacks(_app):
         Disabling div elements that are not required
         """
         if value == "datasets" or value == "what-is":
-            return {"display":"none"}
+            return {"display": "none"}
 
     ###########################################################################
     #  Batch processing of the ftp files
@@ -1600,13 +1600,13 @@ def callbacks(_app):
                 os.makedirs(path_prefix)
 
             for i in dum_df["File Name"].tolist():
-                path = path_prefix+i
+                path = path_prefix + i
                 if os.path.exists(path):
                     print("path Exists")
                 else:
                     print("Downloading and generating embeddings ", i)
                     with open(path, 'wb') as file_obj:
-                        ftp.retrbinary('RETR '+ i, file_obj.write)
+                        ftp.retrbinary('RETR ' + i, file_obj.write)
                 try:
                     emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
                 except ValueError:
@@ -1628,8 +1628,8 @@ def callbacks(_app):
 
                 display_upload_graph = False
                 return format_html_data_table(dum_df[dum_df.drop("features", axis=1).columns],
-                                              list_of_malformed = malformed,
-                                              addLineBreak = True)
+                                              list_of_malformed=malformed,
+                                              addLineBreak=True)
 
             elif len(dum_df["File Name"]) > 1:
 
@@ -1646,18 +1646,18 @@ def callbacks(_app):
 
                 # populate dataframe with prediction probability
                 for index, label_name in enumerate(CONFIG_DATAS.keys()):
-                    dum_df[label_name] = whole_pred_prob[:,index]
+                    dum_df[label_name] = whole_pred_prob[:, index]
 
                 return format_html_data_table(dum_df[dum_df.drop("features", axis=1).columns],
-                                              list_of_malformed = malformed,
-                                              addLineBreak = True)
+                                              list_of_malformed=malformed,
+                                              addLineBreak=True)
 
             else:
                 return html.Div([html.H3("Something went Wrong, Try again",
-                                         style={"color":"white"}),
-                                 html.P("Note: If problem still persists file might be "+
+                                         style={"color": "white"}),
+                                 html.P("Note: If problem still persists file might be " +
                                         "corrupted or Input a valid 10 second .wav file",
-                                        style={"color":"white"})])
+                                        style={"color": "white"})])
 
     ###########################################################################
     # Disabling div elements that are not required
@@ -1671,7 +1671,7 @@ def callbacks(_app):
         Disbaling div elements that are not required
         """
         if value == "datasets" or value == "graph":
-            return {"display":"none"}
+            return {"display": "none"}
 
     @_app.callback(
         Output('graph-output-any', 'style'),
@@ -1681,7 +1681,7 @@ def callbacks(_app):
         Disbaling div elements that are not required
         """
         if value == "what-is" or value == "graph":
-            return {"display":"none"}
+            return {"display": "none"}
 
     @_app.callback(
         Output('graph-output-graph-tab', 'style'),
@@ -1691,7 +1691,7 @@ def callbacks(_app):
         Disbaling div elements that are not required
         """
         if value == "what-is" or value == "datasets":
-            return {"display":"none"}
+            return {"display": "none"}
 
 
 if __name__ == '__main__':

@@ -39,7 +39,7 @@ if __name__ == "__main__":
     ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
-    get_results_binary_relevance.main(predictions_cfg_json = PARSED_ARGS.predictions_cfg_json,
-                                      path_for_dataframe_with_features = PARSED_ARGS.path_for_dataframe_with_features,
-                                      save_misclassified_examples = None,
-                                      path_to_save_prediction_csv = PARSED_ARGS.results_in_csv)
+    get_results_binary_relevance.main(predictions_cfg_json=PARSED_ARGS.predictions_cfg_json,
+                                      path_for_dataframe_with_features=PARSED_ARGS.path_for_dataframe_with_features,
+                                      save_misclassified_examples=None,
+                                      path_to_save_prediction_csv=PARSED_ARGS.results_in_csv)

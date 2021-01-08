@@ -66,7 +66,7 @@ LABELS_FILTERED = LABELS_BINARIZED.loc[DF_FILTERED.index, :]
 ########################################################################
 DF_TRAIN, DF_TEST, LABELS_BINARIZED_TRAIN, LABELS_BINARIZED_TEST = train_test_split(DF_FILTERED, LABELS_FILTERED,
                                                                                     test_size=0.33, random_state=42,
-                                                                                    stratify=LABELS_FILTERED.any(axis=1)*1)
+                                                                                    stratify=LABELS_FILTERED.any(axis=1) * 1)
 
 
 ########################################################################
@@ -76,8 +76,8 @@ X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 X_TEST_STANDARDIZED = X_TEST / 255
-Y_TRAIN = (LABELS_BINARIZED_TRAIN[IMPACT_SOUNDS].any(axis=1)*1).values
-Y_TEST = (LABELS_BINARIZED_TEST[IMPACT_SOUNDS].any(axis=1)*1).values
+Y_TRAIN = (LABELS_BINARIZED_TRAIN[IMPACT_SOUNDS].any(axis=1) * 1).values
+Y_TEST = (LABELS_BINARIZED_TEST[IMPACT_SOUNDS].any(axis=1) * 1).values
 
 
 ########################################################################

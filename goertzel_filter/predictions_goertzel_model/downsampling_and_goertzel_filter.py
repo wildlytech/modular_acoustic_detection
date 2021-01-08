@@ -65,7 +65,7 @@ class DownsamplingImplementation(object):
         """
 
         scale = min(1.0, sample_ratio)
-        time_increment = 1./sample_ratio
+        time_increment = 1. / sample_ratio
         index_step = int(scale * num_table)
         time_register = 0.0
 
@@ -115,7 +115,7 @@ class DownsamplingImplementation(object):
             eta = index_frac - offset
 
             # Compute the right wing of the filter response
-            k_max = min(n_orig - n - 1, (nwin - offset)//index_step)
+            k_max = min(n_orig - n - 1, (nwin - offset) // index_step)
             for k in range(k_max):
                 weight = (interp_win[offset + k * index_step] + eta * interp_delta[offset + k * index_step])
                 for j in range(n_channels):
@@ -160,7 +160,7 @@ class DownsamplingImplementation(object):
         x_2d = self.samples.reshape((self.samples.shape[axis], -1))
         y_2d = y.reshape((y.shape[axis], -1))
         print("Process Initiated")
-        self.resample_f(x_2d,y_2d, sample_ratio, interp_win, interp_delta, precision)
+        self.resample_f(x_2d, y_2d, sample_ratio, interp_win, interp_delta, precision)
 
         return y
 
@@ -202,8 +202,8 @@ class GoertzelComponents(object):
         total_samples = self.number_samples
 
         # computing the constants
-        k_constant = int((total_samples * self.target_frequency)/self.sample_rate)
-        w_constant = ((2 * math.pi * k_constant)/total_samples)
+        k_constant = int((total_samples * self.target_frequency) / self.sample_rate)
+        w_constant = ((2 * math.pi * k_constant) / total_samples)
         cosine = math.cos(w_constant)
         sine = math.sin(w_constant)
         coeff = 2 * cosine
@@ -221,4 +221,4 @@ class GoertzelComponents(object):
             magnitude = np.square(real) + np.square(imag)
             result_mag[index] = np.sqrt(magnitude)
             index += 1
-        return  result_mag
+        return result_mag

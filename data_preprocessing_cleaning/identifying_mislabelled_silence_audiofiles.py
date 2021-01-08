@@ -31,7 +31,7 @@ def glob_all_files_from_path(wavfiles_path):
     """
     Define the path where the audiofiles(.wav format) are downloaded
     """
-    all_wav_files_path = glob.glob(wavfiles_path+"*.wav") + glob.glob(wavfiles_path+"*.WAV")
+    all_wav_files_path = glob.glob(wavfiles_path + "*.wav") + glob.glob(wavfiles_path + "*.WAV")
     wav_files = []
     for each_file in all_wav_files_path:
         wav_files.append(each_file.split('/')[-1])
@@ -98,7 +98,7 @@ def get_mislablled_silence_files(dataframe):
 if __name__ == "__main__":
     DATAFRAME = read_pickle_file(RESULT.dataframe_path)
     if DATAFRAME["YTID"]:
-        DATAFRAME['wav_file'] = DATAFRAME['YTID'].astype(str) +'-'+DATAFRAME['start_seconds'].astype(str)+'-'+DATAFRAME['end_seconds'].astype(str)+'.wav'
+        DATAFRAME['wav_file'] = DATAFRAME['YTID'].astype(str) + '-' + DATAFRAME['start_seconds'].astype(str) + '-' + DATAFRAME['end_seconds'].astype(str) + '.wav'
         WAVFILES_PATH, WAVFILES_NAMES = glob_all_files_from_path(RESULT.path_for_audio_files)
         DBFS = get_dbfs(WAVFILES_PATH)
         NEW_DATAFRAME = create_dataframe(["wav_file", "dbfs"])

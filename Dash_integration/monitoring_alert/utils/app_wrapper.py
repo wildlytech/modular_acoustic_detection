@@ -20,18 +20,18 @@ def app_page_layout(page_layout,
                 children=[
                     html.A(
                         id='dashbio-logo-graph', children=[
-                        html.P("<< Main Page", style={"display":"inline",
-                                                      "text-decoration":"underline"}),
+                        html.P("<< Main Page", style={"display": "inline",
+                                                      "text-decoration": "underline"}),
                         ],
                         href="/Monitoring" if standalone else "/dash-bio"
                     ),
                     html.H2(
                         app_title,
-                        style={"display":"inline",
-                               "font-family":"Courier New",
-                               "fontSize":"25px",
-                               "margin-left":"7%",
-                               "text-decoration":"underline"}
+                        style={"display": "inline",
+                               "font-family": "Courier New",
+                               "fontSize": "25px",
+                               "margin-left": "7%",
+                               "text-decoration": "underline"}
                     ),
 
                     html.A(
