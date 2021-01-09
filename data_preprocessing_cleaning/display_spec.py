@@ -32,7 +32,7 @@ def plot_spec(S, filepath=None):
     ax = plt.subplot(111)
     fig = librosa.display.specshow(librosa.power_to_db(S, ref=np.max), x_axis="time", y_axis="log", ax=ax)
     plt.colorbar(fig, ax=ax)
-    if filepath != None:
+    if filepath is not None:
         plt.savefig(filepath, bbox_inches='tight', pad_inches=0)
     else:
         plt.show()

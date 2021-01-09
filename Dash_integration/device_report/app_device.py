@@ -798,7 +798,7 @@ class FtpFile:
     def read(self, ftp_path, size=None):
         ftp = FTP(FTP_HOST, user=FTP_USERNAME, passwd=FTP_PASSWORD)
         ftp.cwd(ftp_path)
-        if size == None:
+        if size is None:
             size = self.size - self.pos
         data = B""
         ftp.voidcmd('TYPE I')

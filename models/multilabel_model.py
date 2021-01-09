@@ -60,7 +60,7 @@ for label_dicts in config["labels"]:
     lab_name = label_dicts["aggregatePositiveLabelName"]
     comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"], "./", ontologyExtFiles)
     pos_sounds[lab_name] = comprising_pos_labels
-    if label_dicts["negativeLabels"] != None:
+    if label_dicts["negativeLabels"] is not None:
         neg_lab_name = label_dicts["aggregateNegativeLabelName"]
         comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"], "./", ontologyExtFiles)
         comprising_neg_labels = comprising_neg_labels.difference(comprising_pos_labels)

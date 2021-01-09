@@ -710,7 +710,7 @@ class FtpFile:
     def read(self, size=None):
         """
         """
-        if size == None:
+        if size is None:
             size = self.size - self.pos
         data = B""
         self.ftp_.voidcmd('TYPE I')

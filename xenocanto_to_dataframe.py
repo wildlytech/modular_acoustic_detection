@@ -51,7 +51,7 @@ def add_labels_to_dataframe(path_to_feature_dataframe, path_to_label_csv_file):
             labels_name.append(' '.join(sci_name_split[:length]))
 
         # Check if name format is not what we expect
-        print_warning = False;
+        print_warning = False
         if len(sci_name_split) > 3:
             # Go ahead and add full scientific name as a label anyway
             labels_name.append(sci_name)
