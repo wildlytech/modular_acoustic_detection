@@ -118,8 +118,8 @@ def extract_sound_clips(filepath, df, directory):
     for time in df.time:
         start_time = np.max([0, time - 2.5])
         end_time = np.min([time + 2.5, len(aud_seg) / 1000])
-        aud_seg[int(start_time * 1000):int(end_time * 1000)].export(directory + '/sound-' +
-                                                                str(start_time) + '-' +
+        aud_seg[int(start_time * 1000):int(end_time * 1000)].export(directory + '/sound-' + \
+                                                                str(start_time) + '-' + \
                                                                 str(end_time) + ".wav",
                                                                 format="wav")
 

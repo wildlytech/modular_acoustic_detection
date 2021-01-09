@@ -245,7 +245,7 @@ for i, j in zip(FILE_NAMES, [WILD_DOM, WILD_TOOLS]):
 # domestic and other
 ###############################################################################
 DOM_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 6) & (arr[1] == 7)))]
-with open(RESULT.path_to_write_different_sounds + 'dom_tools_' +
+with open(RESULT.path_to_write_different_sounds + 'dom_tools_' + \
           str(DOM_TOOLS.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(DOM_TOOLS, f)
 
@@ -254,14 +254,14 @@ with open(RESULT.path_to_write_different_sounds + 'dom_tools_' +
 # Sounds with more than 2 classes labelled are witten
 ###############################################################################
 print('three labelled sounds shape: ', UN_3.shape)
-with open(RESULT.path_to_write_different_sounds + '3_labelled_priority1_' +
+with open(RESULT.path_to_write_different_sounds + '3_labelled_priority1_' + \
           str(UN_3.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(UN_3, f)
 print('four labelled sounds shape: ', UN_4.shape)
-with open(RESULT.path_to_write_different_sounds + '4_labelled_priority1_' +
+with open(RESULT.path_to_write_different_sounds + '4_labelled_priority1_' + \
           str(UN_4.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(UN_4, f)
 print('five labelled sounds shape: ', UN_5.shape)
-with open(RESULT.path_to_write_different_sounds + '5_labelled_prioirty1_' +
+with open(RESULT.path_to_write_different_sounds + '5_labelled_prioirty1_' + \
           str(UN_5.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(UN_5, f)

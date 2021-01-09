@@ -1655,7 +1655,7 @@ def callbacks(_app):
             else:
                 return html.Div([html.H3("Something went Wrong, Try again",
                                          style={"color": "white"}),
-                                 html.P("Note: If problem still persists file might be " +
+                                 html.P("Note: If problem still persists file might be " + \
                                         "corrupted or Input a valid 10 second .wav file",
                                         style={"color": "white"})])
 

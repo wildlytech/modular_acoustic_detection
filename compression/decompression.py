@@ -57,7 +57,7 @@ if COMPRESSED_FILES_LIST:
             print(COMPRESSED_FILE.split('/')[-1] + 'has already been decompressed')
         else:
             try:
-                subprocess.call('ffmpeg -i ' + COMPRESSED_FILE + ' ' +
+                subprocess.call('ffmpeg -i ' + COMPRESSED_FILE + ' ' + \
                                 DECOMPRESSED_FILES_PATH + (COMPRESSED_FILE.split('/')[-1])[:-4] + '.wav',
                                 shell=True)
                 print('De-compression : ' + COMPRESSED_FILE.split('/')[-1] + ' is done..')

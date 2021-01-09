@@ -59,8 +59,8 @@ if ORIGINAL_WAV_FILES_LIST:
             print(ORIGINAL_WAV + 'has already been compressed')
         else:
             try:
-                subprocess.call('ffmpeg -i ' + RESULT.path_to_original_audio_files + ORIGINAL_WAV +
-                                ' -c:a ' + TYPE_OF_COMPRESSION + ' -b:a 64k ' + COMPRESSED_FILES_PATH +
+                subprocess.call('ffmpeg -i ' + RESULT.path_to_original_audio_files + ORIGINAL_WAV + \
+                                ' -c:a ' + TYPE_OF_COMPRESSION + ' -b:a 64k ' + COMPRESSED_FILES_PATH + \
                                 ORIGINAL_WAV[:-4] + '.' + TYPE_OF_COMPRESSION, shell=True)
                 print('Compression : ' + ORIGINAL_WAV + ' is done..')
             except IOError:
