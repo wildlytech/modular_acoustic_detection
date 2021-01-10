@@ -31,7 +31,7 @@ def add_labels_to_dataframe(path_to_feature_dataframe, path_to_label_csv_file):
 
         labels_name = []
 
-        match = re.match("(.*) \((.+)\)", name)
+        match = re.match(r"(.*) \((.+)\)", name)
         if match:
             # Each entry in labels name array is an array of labels
             sci_name = match.group(2)

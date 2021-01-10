@@ -282,7 +282,7 @@ def format_label_name(name):
     Format string label name to remove negative label if it is
     EverythingElse
     """
-    m = re.match("\[([A-Za-z0-9]+)\]Vs\[EverythingElse\]", name)
+    m = re.match(r"\[([A-Za-z0-9]+)\]Vs\[EverythingElse\]", name)
 
     if m is None:
         return name
