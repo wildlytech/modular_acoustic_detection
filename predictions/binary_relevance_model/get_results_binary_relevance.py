@@ -29,7 +29,7 @@ def import_predict_configuration_json(predictions_cfg_json):
 
             with open(filepath) as json_data_obj:
 
-                   config_data = json.load(json_data_obj)
+                config_data = json.load(json_data_obj)
 
                 # Model only supports using audio set as main ontology
                 assert(config_data["ontology"]["useYoutubeAudioSet"])
