@@ -1,3 +1,4 @@
+autopep8==1.5.4
 beautifulsoup4 == 4.6.0
 colorama == 0.4.3
 coverage==5.3
@@ -7,6 +8,7 @@ dash_core_components_ppeterson == 0.43.2
 dash_daq == 0.5.0
 dash_html_components == 1.1.1
 dash_table == 4.10.1
+flake8==3.8.4
 h5py==2.10.0
 ipython==7.18.1
 keras == 2.4.3
