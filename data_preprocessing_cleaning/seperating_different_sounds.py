@@ -10,7 +10,7 @@ import pandas as pd
 
 
 ###############################################################################
-# parse the input path to write the dataframes of seprated sounds
+# parse the input path to write the dataframes of separated sounds
 ###############################################################################
 PARSER = argparse.ArgumentParser(description='Input path to write the dataframe \
                                  of separated sounds Make it interpretable directory name \

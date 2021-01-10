@@ -818,7 +818,7 @@ def ftp_data_display(n_clicks):
 
 ###############################################################################
 # FTP STATUS PAGE: Callback:
-        # Takes all the data that has been selected and stores as dataframe
+# Takes all the data that has been selected and stores as dataframe
 ###############################################################################
 @app.callback(
     Output('ftp_content_button', 'children'),
@@ -889,7 +889,7 @@ def play_button_for_prediction(rows, columns, indices):
 
 ###############################################################################
 # FTP STATUS PAGE : Callback:
-    # Downloading the selected batch of files and processing them to model
+# Downloading the selected batch of files and processing them to model
 ###############################################################################
 @app.callback(
     Output('datatable-interactivity-container', 'children'),
@@ -1080,7 +1080,7 @@ def disabling_div_output_data(value):
 
 #############################################################################
 # Sound Library: Callback:
-        # Querying MongoDB server based on selection
+# Querying MongoDB server based on selection
 #############################################################################
 @app.callback(Output('output_data', 'children'),
               [Input('select-labels', 'value')])
@@ -1133,7 +1133,7 @@ def generate_layout(value):
 
 #############################################################################
 # Sound Library Callback:
-        # Displays the play button option and other option
+# Displays the play button option and other option
 #############################################################################
 @app.callback(
     Output('datatable-interactivity-container-2', 'children'),
@@ -1175,7 +1175,7 @@ def display_output_from_data(rows, columns, indices):
 
 #############################################################################
 # Sound Library: Callback:
-        # actual predictions and executing the model
+# actual predictions and executing the model
 #############################################################################
 @app.callback(Output('page-4-content-2', 'children'),
               [Input('button', 'n_clicks')])
@@ -1212,7 +1212,7 @@ def predict_on_downloaded_file(n_clicks):
 
 
 ###############################################################################
-            # callback function for navigation settings
+# callback function for navigation settings
 ###############################################################################
 
 @app.callback(dash.dependencies.Output('page-content', 'children'),

@@ -119,7 +119,7 @@ def main(predictions_cfg_json,
         target_cols = LABELS_BINARIZED.columns
 
     ###########################################################################
-        # Filtering the sounds that are exactly 10 seconds
+    # Filtering the sounds that are exactly 10 seconds
     ###########################################################################
     DF_TEST = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
 
@@ -128,7 +128,7 @@ def main(predictions_cfg_json,
         LABELS_FILTERED = LABELS_BINARIZED.loc[DF_TEST.index, :]
 
     ###########################################################################
-        # preprocess the data into required structure
+    # preprocess the data into required structure
     ###########################################################################
 
     X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
@@ -189,7 +189,7 @@ def main(predictions_cfg_json,
                   MISCLASSIFED_ARRAY.sum())
 
             ###################################################################
-            #  misclassified examples are to be saved
+            # misclassified examples are to be saved
             ###################################################################
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \

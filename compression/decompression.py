@@ -42,7 +42,7 @@ COMPRESSED_FILES_LIST = glob.glob(COMPRESSED_FILES_PATH + '*.' + TYPE_OF_COMPRES
 
 
 ###############################################################################
-# create seperte directories
+# create separate directories
 ###############################################################################
 if not os.path.exists(DECOMPRESSED_FILES_PATH):
     os.makedirs(DECOMPRESSED_FILES_PATH)

@@ -68,8 +68,8 @@ for label_dicts in config["labels"]:
 
 
 ########################################################################
-    # Importing balanced data from the function.
-    # Including audiomoth annotated files for training
+# Importing balanced data from the function.
+# Including audiomoth annotated files for training
 ########################################################################
 
 def subsample_dataframe(dataframe, subsample):

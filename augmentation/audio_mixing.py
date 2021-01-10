@@ -123,7 +123,7 @@ def get_samplerate_44_48(dataframe):
 
 
 ###############################################################################
-    # Get different sampling rates audio Files in separate lists (When paths are given)
+# Get different sampling rates audio Files in separate lists (When paths are given)
 ###############################################################################
 def get_samplerate_44_48_paths(wavfiles_list):
     print("Sorting Files")
@@ -141,7 +141,7 @@ def get_samplerate_44_48_paths(wavfiles_list):
 
 
 ###############################################################################
-    # Returning the selection type
+# Returning the selection type
 ###############################################################################
 def get_selected_type(type_sound):
     if type_sound == "motor":
@@ -161,7 +161,7 @@ def get_selected_type(type_sound):
 
 
 ###############################################################################
-        # Mixing audio clips (Youtube)
+# Mixing audio clips (Youtube)
 ###############################################################################
 def start_mixing_two_audioclips(wavfile_list1, wavfile_list2, min_examples):
     print("started mixing audio clips")
@@ -178,7 +178,7 @@ def start_mixing_two_audioclips(wavfile_list1, wavfile_list2, min_examples):
 
 
 ###############################################################################
-        # Mixing audio clips from paths given
+# Mixing audio clips from paths given
 ###############################################################################
 def start_mixing_two_audioclips_from_path(wavfile_list1, wavfile_list2, min_examples):
     print("started mixing")
@@ -193,7 +193,7 @@ def start_mixing_two_audioclips_from_path(wavfile_list1, wavfile_list2, min_exam
 
 
 ###############################################################################
-        # Main Function
+# Main Function
 ###############################################################################
 if __name__ == "__main__":
 

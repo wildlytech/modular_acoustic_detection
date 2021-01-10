@@ -26,7 +26,7 @@ else:
 
 
 ###########################################################################
-    # Settings for scraping the youtube webpage with selected query keyword
+# Settings for scraping the youtube webpage with selected query keyword
 ###########################################################################
 QUERY_CALL = SEARCH_KEYWORD
 BASE_QUERY = "https://www.youtube.com/results?search_query="
@@ -47,7 +47,7 @@ for v in VIDEOS:
 
 
 ###########################################################################
-    # Download audio file onto the target directory
+# Download audio file onto the target directory
 ###########################################################################
 COUNT = 0
 for item in VIDEO_LIST[:NUMBER_AUDIOCLIPS_LIMIT]:

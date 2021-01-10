@@ -114,7 +114,7 @@ def main(predictions_cfg_json,
                                            lambda arr: np.any([x.lower() in positiveLabels for x in arr]))
 
     ###########################################################################
-        # Filtering the sounds that are exactly 10 seconds
+    # Filtering the sounds that are exactly 10 seconds
     ###########################################################################
     DF_TEST = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
 
@@ -122,7 +122,7 @@ def main(predictions_cfg_json,
         LABELS_FILTERED = LABELS_BINARIZED.loc[DF_TEST.index, :]
 
     ###########################################################################
-        # preprocess the data into required structure
+    # preprocess the data into required structure
     ###########################################################################
     X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 
@@ -169,7 +169,7 @@ def main(predictions_cfg_json,
                   DF_TEST.loc[MISCLASSIFED_ARRAY].shape[0])
 
             ###################################################################
-            #  misclassified examples are to be saved
+            # misclassified examples are to be saved
             ###################################################################
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \
@@ -178,7 +178,7 @@ def main(predictions_cfg_json,
                     pickle.dump(DF_TEST[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 
             ###################################################################
-                    # Print confusion matrix and classification_report
+            # Print confusion matrix and classification_report
             ###################################################################
             print('Confusion Matrix for ' + label_name)
             print('============================================')
@@ -205,7 +205,7 @@ def main(predictions_cfg_json,
             print('Accuracy :', ACCURACY)
 
     ###########################################################################
-        # save the prediction in pickle format
+    # save the prediction in pickle format
     ###########################################################################
 
     if path_to_save_prediction_csv:

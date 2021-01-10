@@ -622,7 +622,7 @@ def sort_on_filenames(files_list):
 
 
 ###############################################################################
-        # sort files based on ftp timestamps: Very slow for large files
+# sort files based on ftp timestamps: Very slow for large files
 ###############################################################################
 def get_list_files_sorted(ftp_path):
     """
@@ -771,7 +771,7 @@ def write_csv(csv_filename, ftp_path):
 
 
 ###############################################################################
-        # FTP class to read data without downloading file
+# FTP class to read data without downloading file
 ###############################################################################
 class FtpFile:
     """
@@ -954,7 +954,7 @@ def group_by_device_id():
 
 
 ###############################################################################
-        # Creates a table in dash format from pandas dataframe format
+# Creates a table in dash format from pandas dataframe format
 ###############################################################################
 def Table(dataframe, column_name):
     """

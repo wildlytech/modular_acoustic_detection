@@ -83,7 +83,7 @@ def main(predictions_cfg_json, path_for_wavfile):
         CLF2_TRAIN_PREDICTION.append(prediction_rounded)
 
     ###########################################################################
-        # Print results
+    # Print results
     ###########################################################################
     results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB), columns=LABEL_NAMES)
     print(results)
