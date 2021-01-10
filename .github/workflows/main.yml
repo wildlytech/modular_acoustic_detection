@@ -2,7 +2,7 @@ name: codecheck
 on:
   pull_request:
     branches: [ py3_migration ]
-  
+
 jobs:
   lint:
     runs-on: ubuntu-latest
