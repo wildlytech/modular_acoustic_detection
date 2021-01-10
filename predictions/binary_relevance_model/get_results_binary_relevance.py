@@ -111,7 +111,7 @@ def main(predictions_cfg_json,
                                                        ontology_extension_paths=config_data["ontology"]["extension"])
 
             LABELS_BINARIZED[label_name] = 1.0 * DATA_FRAME['labels_name'].apply( \
-                                           lambda arr: np.any([x.lower() in positiveLabels for x in arr]))
+                lambda arr: np.any([x.lower() in positiveLabels for x in arr]))
 
     ###########################################################################
     # Filtering the sounds that are exactly 10 seconds
@@ -173,7 +173,7 @@ def main(predictions_cfg_json,
             ###################################################################
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \
-                              "misclassified_examples_br_model_" + label_name + ".pkl"
+                    "misclassified_examples_br_model_" + label_name + ".pkl"
                 with open(misclassified_pickle_file, "wb") as f:
                     pickle.dump(DF_TEST[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 

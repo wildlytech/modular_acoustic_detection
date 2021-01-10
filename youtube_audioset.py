@@ -158,7 +158,7 @@ NATURE_SOUNDS = [
 ###############################################################################
 AMBIENT_SOUNDS = NATURE_SOUNDS
 IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
-                HUMAN_SOUNDS + TOOLS_SOUNDS + DOMESTIC_SOUNDS
+    HUMAN_SOUNDS + TOOLS_SOUNDS + DOMESTIC_SOUNDS
 
 
 ###############################################################################
@@ -175,14 +175,14 @@ def get_csv_data(target_sounds):
                                  skipinitialspace=True,
                                  skiprows=2)
     balanced_train.columns = [balanced_train.columns[0][2:]] + \
-                              balanced_train.columns[1:].values.tolist()
+        balanced_train.columns[1:].values.tolist()
 
     unbalanced_train = pd.read_csv("data/audioset/unbalanced_train_segments.csv",
                                    quotechar='"',
                                    skipinitialspace=True,
                                    skiprows=2)
     unbalanced_train.columns = [unbalanced_train.columns[0][2:]] + \
-                                unbalanced_train.columns[1:].values.tolist()
+        unbalanced_train.columns[1:].values.tolist()
 
     train = pd.concat([unbalanced_train, balanced_train], axis=0, ignore_index=True)
 
@@ -277,7 +277,7 @@ def download_data(target_sounds_list, target_path):
     df['positive_labels'] = df['positive_labels'].apply(lambda arr: arr.split(','))
     df['labels_name'] = df['positive_labels'].map(lambda arr: np.concatenate([labels_csv.loc[labels_csv['mid'] == x].display_name for x in arr]))
     df['wav_file'] = df['YTID'].astype(str) + '-' + df['start_seconds'].astype(str) +\
-                     '-' + df['end_seconds'].astype(str) + '.wav'
+        '-' + df['end_seconds'].astype(str) + '.wav'
 
     # save the data frame which can be used for further balancing the data
     # and generating the embeddings for audio files.
@@ -344,7 +344,7 @@ def read_audio_record(audio_record, output_to_file=None):
                 audio_frame.append(tf.cast(tf.decode_raw(
                     tf_seq_example.feature_lists.feature_list['audio_embedding'].feature[i].bytes_list.value[0],
                     tf.uint8),
-                                           tf.float32).eval())
+                    tf.float32).eval())
 
             feat_audio.append([])
             feat_audio[count].append(audio_frame)
@@ -459,7 +459,7 @@ def get_data():
         else:
             os.waitpid(pid, 0)
     pickle_files = ['bal_train/' + x for x in os.listdir('data/audioset/audioset_v1_embeddings/bal_train')] + \
-                  ['unbal_train/' + x for x in os.listdir('data/audioset/audioset_v1_embeddings/unbal_train')]
+        ['unbal_train/' + x for x in os.listdir('data/audioset/audioset_v1_embeddings/unbal_train')]
     pickle_files = [x for x in pickle_files if x.endswith('.pkl')]
     pickle_files.sort()
 

@@ -38,9 +38,9 @@ if __name__ == "__main__":
     PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     RequiredArguments = PARSER.add_argument_group('required arguments')
     RequiredArguments.add_argument('-csv', '--csv_file_path', action='store', \
-        help='Input csv file path', required=True)
+                                   help='Input csv file path', required=True)
     RequiredArguments.add_argument('-label', '--label_to_separate', action='store', \
-        help='Input label to separate from csv file, for instance "bird"', required=True)
+                                   help='Input label to separate from csv file, for instance "bird"', required=True)
     RESULT = PARSER.parse_args()
 
     print("\nGiven CSV file path:", RESULT.csv_file_path)

@@ -228,12 +228,12 @@ if __name__ == "__main__":
     else:
         if RESULT.path_type_one_audio_files:
             TYPEONE_FILES_PATH = glob.glob(RESULT.path_type_one_audio_files + "*.wav") + \
-                                 glob.glob(RESULT.path_type_one_audio_files + "*.WAV")
+                glob.glob(RESULT.path_type_one_audio_files + "*.WAV")
         else:
             print("Input path for type of sound")
         if RESULT.path_type_two_audio_files:
             TYPETWO_FILES_PATH = glob.glob(RESULT.path_type_two_audio_files + "*.wav") + \
-                                 glob.glob(RESULT.path_type_two_audio_files + "*.WAV")
+                glob.glob(RESULT.path_type_two_audio_files + "*.WAV")
         else:
             print("Input path for type of sound")
 

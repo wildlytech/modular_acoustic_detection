@@ -215,9 +215,9 @@ def import_dataframes(dataframe_file_list,
             df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
             train_file_examples_df, test_file_examples_df = \
-                        split_and_subsample_dataframe(dataframe=df,
-                              validation_split=validation_split,
-                              subsample=input_file_dict["subsample"])
+                split_and_subsample_dataframe(dataframe=df,
+                                              validation_split=validation_split,
+                                              subsample=input_file_dict["subsample"])
 
             # append to overall list of examples
             list_of_train_dataframes.append(train_file_examples_df)
@@ -232,9 +232,9 @@ def import_dataframes(dataframe_file_list,
 
 
 DF_TRAIN, DF_TEST = import_dataframes(dataframe_file_list=config["train"]["inputDataFrames"],
-                              positive_label_filter_arr=pos_sounds,
-                              negative_label_filter_arr=neg_sounds,
-                              validation_split=config["train"]["validationSplit"])
+                                      positive_label_filter_arr=pos_sounds,
+                                      negative_label_filter_arr=neg_sounds,
+                                      validation_split=config["train"]["validationSplit"])
 
 
 LABELS_BINARIZED_TRAIN = pd.DataFrame()

@@ -21,7 +21,7 @@ def predict_on_embedding(embedding, config_datas):
     K.clear_session()
 
     model = multilabel_pred.load_model(config_data["networkCfgJson"],
-                                                    config_data["train"]["outputWeightFile"])
+                                       config_data["train"]["outputWeightFile"])
 
     ###########################################################################
     # Predict on test data

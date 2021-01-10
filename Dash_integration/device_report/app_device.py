@@ -271,14 +271,14 @@ def display_page(pathname):
                                                         row_selectable="multi",
                                                         style_table={"maxHeight": "200px",
                                                                      "maxWidth": "200px"})])
-                              ], style={"margin-bottom": "10px"})
-                         ], className="six columns")
-                     ], className="row "),
+                               ], style={"margin-bottom": "10px"})
+                          ], className="six columns")
+                      ], className="row "),
                   html.Div(
                       [html.Div(id="inside-transmission")],
                       className="row "),
-                 ], className="sub_page"),
-            ], className="page")
+                  ], className="sub_page"),
+             ], className="page")
 
     ###########################################################################
     # CALLBACK FOR URL INPUT: LOCATION
@@ -299,15 +299,15 @@ def display_page(pathname):
                                                                    row_selectable="multi",
                                                                    style_table={"maxHeight": "200px",
                                                                                 "maxWidth": "200px"})
-                                             ]),
-                                   ], style={"margin-bottom": "10px"})
-                         ], className="six columns")
-                     ], className="row "),
+                                              ]),
+                                    ], style={"margin-bottom": "10px"})
+                          ], className="six columns")
+                      ], className="row "),
                   html.Div(
                       [html.Div(id="inside-location")],
                       className="row ")
-                 ], className="sub_page")
-            ], className="page")
+                  ], className="sub_page")
+             ], className="page")
 
     ###########################################################################
     # CALLBACK FOR URL INPUT: BATTERY PERFORMANCE
@@ -327,18 +327,18 @@ def display_page(pathname):
                                                                    row_selectable="multi",
                                                                    style_table={"maxHeight": "200px",
                                                                                 "maxWidth": "200px"})
-                                             ]),
-                                   ], style={"margin-bottom": "10px"})
-                         ], className="six columns")
-                     ], className="row "),
+                                              ]),
+                                    ], style={"margin-bottom": "10px"})
+                          ], className="six columns")
+                      ], className="row "),
                   html.Div(
                       [html.Div(id="inside-battery")],
                       className="row "),
                   html.Div(
                       [html.A(id="my-link")],
                       className="row ")
-                 ], className="sub_page")
-            ], className="page")
+                  ], className="sub_page")
+             ], className="page")
 
     ###########################################################################
     # CALLBACK FOR URL INPUT: DEVICE DETAILS
@@ -358,16 +358,16 @@ def display_page(pathname):
                                                                           row_selectable="single",
                                                                           style_table={"maxHeight": "200px",
                                                                                        "maxWidth": "200px"})])
-                                          ], style={"margin-bottom": "10px"})
-                                     ], className="six columns"),
+                                           ], style={"margin-bottom": "10px"})
+                                      ], className="six columns"),
                                   html.Div(id="device-details-id", className="six columns")
-                                 ], className="row "),
+                                  ], className="row "),
 
                               # Row 2
                               html.Div(
                                   [html.Div(id="inside-device-details")],
                                   className="row ")
-                             ], className="sub_page")], className="page")
+                              ], className="sub_page")], className="page")
 
     ###########################################################################
     # CALLBACK FOR URL INPUT: REVIEWS
@@ -389,9 +389,9 @@ def display_page(pathname):
                                                         row_selectable="single",
                                                         style_table={"maxHeight": "200px",
                                                                      "maxWidth": "200px"})
-                                  ])
-                              ], style={"margin-bottom": "10px"})
-                         ], className="six columns"),
+                                   ])
+                               ], style={"margin-bottom": "10px"})
+                          ], className="six columns"),
                       html.Div(
                           [html.Div(
                               [html.H6("Device Transmission Performance Review",
@@ -404,7 +404,7 @@ def display_page(pathname):
                                     html.P("Estimated Recorded Files:   3600 (.wav) Files. ",
                                            style={"margin-left": "5%"})],
                                    style={"color": "#7a7a7a"})
-                              ], className="six columns"),
+                               ], className="six columns"),
 
                            html.Div(
                                [html.H6("Network Related", className="subtitle padded"),
@@ -413,7 +413,7 @@ def display_page(pathname):
                                     [html.P("TYpe of Network Quality"),
                                      html.P("Consistency of the Network Quality")],
                                     style={"color": "#7a7a7a"})
-                               ],
+                                ],
                                style={"margin-top": "5%",
                                       "margin-right": "-20%"},
                                className="six columns"),
@@ -425,18 +425,18 @@ def display_page(pathname):
                                     [html.P(""),
                                      html.P("")],
                                     style={"color": "#7a7a7a"})
-                               ],
+                                ],
                                style={"margin-top": "5%"},
                                className="six columns")
-                          ],
+                           ],
                           className="row ")
-                     ],
+                      ],
                      className="row "),
 
                   html.Div([html.Div(id="inside-device-details")],
                            className="row ")],
                  className="sub_page")
-            ], className="page")
+             ], className="page")
 
     ###########################################################################
     # CALLBACK FOR URL INPUT: FULL VIEW
@@ -494,66 +494,66 @@ def display_page(pathname):
         fig_active = get_figure_active(list_device, status)
         if list_wavfiles:
             return html.Div(
-        [
-            html.Div([Header(app)]),
-            html.Div(
                 [
+                    html.Div([Header(app)]),
                     html.Div(
                         [
                             html.Div(
-                                [html.H5("Device (s) Summary", style={"text-align": "center", 'text-decoration': 'underline'}),
-                                 html.Div([
-                                     html.Br([]),
-                                     html.Br([]),
-                                     html.P("Active Device (s) : " + str(len(list_device)) + " Device (s)",
-                                            style={'text-decoration': 'underline',
-                                                   "margin-left": "10px"}
-                                           ),
-                                     html.Br([]),
-                                     html.Div([Table(DATAFRAME_DEVICE_ACTIVE, "Report")],
-                                              style={"padding-left": "2px",
-                                                     "padding-right": "8px",
-                                                     "margin-top": "20px"}
-                                             )
-                                     ],
-                                          style={"margin-bottom": "10px"}),
-                                 html.Br([]),
-                                 html.Br([]),
-                                 html.P("NOTE: Refresh to see recent activity.[Needs Refresh]",
-                                        style={"margin-left": "70%", 'text-decoration': 'underline'})
+                                [
+                                    html.Div(
+                                        [html.H5("Device (s) Summary", style={"text-align": "center", 'text-decoration': 'underline'}),
+                                         html.Div([
+                                             html.Br([]),
+                                             html.Br([]),
+                                             html.P("Active Device (s) : " + str(len(list_device)) + " Device (s)",
+                                                    style={'text-decoration': 'underline',
+                                                           "margin-left": "10px"}
+                                                    ),
+                                             html.Br([]),
+                                             html.Div([Table(DATAFRAME_DEVICE_ACTIVE, "Report")],
+                                                      style={"padding-left": "2px",
+                                                             "padding-right": "8px",
+                                                             "margin-top": "20px"}
+                                                      )
+                                         ],
+                                            style={"margin-bottom": "10px"}),
+                                            html.Br([]),
+                                            html.Br([]),
+                                            html.P("NOTE: Refresh to see recent activity.[Needs Refresh]",
+                                                   style={"margin-left": "70%", 'text-decoration': 'underline'})
 
+                                         ],
+                                        className="product",
+                                    )
                                 ],
-                                className="product",
-                            )
-                        ],
-                        className="row",
-                    ),
-                    # Row
-                    html.Div(
-                        [html.Div([
-                            html.Div([
-                                html.Div([
-                                    html.H6("Device Location Plot",
-                                            className="subtitle padded",
-                                            style={"margin-bottom": "20px"}),
-                                    dcc.Graph(figure={"data": fig_active["data"],
-                                                      "layout":fig_active["layout"]},
-                                              config={"displayModeBar": False})
+                                className="row",
+                            ),
+                            # Row
+                            html.Div(
+                                [html.Div([
+                                    html.Div([
+                                        html.Div([
+                                            html.H6("Device Location Plot",
+                                                    className="subtitle padded",
+                                                    style={"margin-bottom": "20px"}),
+                                            dcc.Graph(figure={"data": fig_active["data"],
+                                                              "layout":fig_active["layout"]},
+                                                      config={"displayModeBar": False})
+                                        ],
+                                            className="twelve columns",
+                                            style={"margin-left": "-57%",
+                                                   "margin-top": "20%"})
                                     ],
-                                         className="twelve columns",
-                                         style={"margin-left": "-57%",
-                                                "margin-top": "20%"})
+                                        style={"margin-bottom": "10px"})
                                 ],
-                                     style={"margin-bottom": "10px"})
-                            ],
-                                  className="six columns"),
-                         html.Div(id="device-details-id",
-                                  className="six columns")
-                        ], className="row ")
-                    ],
-                className="sub_page")
-            ],
-            className="page")
+                                    className="six columns"),
+                                    html.Div(id="device-details-id",
+                                             className="six columns")
+                                ], className="row ")
+                        ],
+                        className="sub_page")
+                ],
+                className="page")
 
 
 ###############################################################################
@@ -680,13 +680,13 @@ def write_csv(csv_filename, ftp_path):
     ###########################################################################
     non_repeated = get_without_duplicates(csv_filename, sorted_files)
     wav_info_tags = ["Filename", "Operator", "DeviceID", "Battery_Voltage", "Battery_Percentage",\
-    "Network_Status", "Network_Type", "Firmare_Revision", "Time_Stamp", "Latitude", "Longitude", \
-    "Clock", "ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size", "AudioFormat", \
-    "NumChannels", "SampleRate", "ByteRate", "BlockAlign", "BitsPerSample", "SubChunk2ID", \
-    "SubChunk2Size"]
+                     "Network_Status", "Network_Type", "Firmare_Revision", "Time_Stamp", "Latitude", "Longitude", \
+                     "Clock", "ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size", "AudioFormat", \
+                     "NumChannels", "SampleRate", "ByteRate", "BlockAlign", "BitsPerSample", "SubChunk2ID", \
+                     "SubChunk2Size"]
     wav_info_tags2 = ["ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size", \
-    "AudioFormat", "NumChannels", "SampleRate", "ByteRate", "BlockAlign", \
-    "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]
+                      "AudioFormat", "NumChannels", "SampleRate", "ByteRate", "BlockAlign", \
+                      "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]
 
     ###########################################################################
     # If CSV file already exists append rows to it
@@ -860,11 +860,11 @@ def get_wavheader_extraheader(name, ftp_path):
             chunkoffset = file_header_info.tell()
 
             wav_header = [riff, size, fformat, subchunkid, subchunksize, aformat, \
-            channels, samplerate, byterate, blockalign, bps, subchunk2id, subchunk2size]
+                          channels, samplerate, byterate, blockalign, bps, subchunk2id, subchunk2size]
 
             for each_value in zip(wav_header, ["ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size",
-                                              "AudioFormat", "NumChannels", "SampleRate", "ByteRate", "BlockAlign",
-                                              "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]):
+                                               "AudioFormat", "NumChannels", "SampleRate", "ByteRate", "BlockAlign",
+                                               "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]):
                 wavheader_dict[each_value[1]] = each_value[0]
 
             extra_header_info = extra_header.decode("ascii").split(',')
@@ -1089,11 +1089,11 @@ def get_layout_active():
                                center=go.layout.mapbox.Center(
                                    lat=float("{0:.4f}".format(LATITUDES_ACTIVE[0])),
                                    lon=float("{0:.4f}".format(LONGITUDES_ACTIVE[0]))
-                                   ),
+                               ),
                                pitch=0,
                                style="light",
                                zoom=10)
-                          )
+                           )
         return layout
 
     else:
@@ -1140,7 +1140,7 @@ def directory_details(ftp_path):
                 else:
                     month = line.split(' ')[-5]
                 timestamp1 = now_year + '/' + str(strptime(month, '%b').tm_mon) + '/' +\
-                line.split(' ')[-3] + '-' + line.split(' ')[-2]
+                    line.split(' ')[-3] + '-' + line.split(' ')[-2]
                 time2 = str(datetime.strptime(timestamp1, datetimeFormat1) + timedelta(minutes=330))
 
                 dir_n_time = directory, time2, 'active'
@@ -1148,7 +1148,7 @@ def directory_details(ftp_path):
                 print("timestamp(time):", time2)
             else:
                 timestamp1 = line.split(' ')[-2] + '/' + str(strptime(line.split(' ')[-5], '%b').tm_mon)\
-                + '/' + line.split(' ')[-4]
+                    + '/' + line.split(' ')[-4]
                 print("timestamp(year):", timestamp1)
                 dir_n_time = directory, timestamp1, 'inactive'
                 dir_n_timestamp.append(dir_n_time)
@@ -1225,7 +1225,7 @@ def plot_function_bar(dataframe):
         x=[dataframe["DeviceID"].iloc[0]],
         y=[dataframe.shape[0]],
         name="Duration:- " + str(get_time_difference(dataframe["Time_Stamp"].iloc[0],
-                                                   dataframe["Time_Stamp"].iloc[dataframe.shape[0] - 1])),
+                                                     dataframe["Time_Stamp"].iloc[dataframe.shape[0] - 1])),
         text="No. Files:- " + str(dataframe.shape[0]),
         textposition="outside")
     return trace1
@@ -1353,23 +1353,23 @@ def update_figure_transmission(rows, columns, indices):
                                                               "size": 10},
                                                    xaxis={'title': 'Device ID',
                                                           'titlefont': {'family': 'Courier New, monospace',
-                                                                       'size': 16,
-                                                                       'color': 'black'}
-                                                         },
+                                                                        'size': 16,
+                                                                        'color': 'black'}
+                                                          },
                                                    yaxis={'title': 'No. Files Transmitted',
                                                           'titlefont': {'family': 'Courier New, monospace',
-                                                                       'size': 16,
-                                                                       'color': 'black'}
-                                                         }),
-                                              },
+                                                                        'size': 16,
+                                                                        'color': 'black'}
+                                                          }),
+                                               },
                                        config={"displayModeBar": False},
                                        style={"margin-top": "20px",
                                               "margin-bottom": "10px"}
-                                      )
-                            ], className="twelve columns",
+                                       )
+                             ], className="twelve columns",
                             style={"margin-left": "-57%",
                                    "margin-top": "20%"}
-                           )
+                            )
 
 
 ###############################################################################
@@ -1396,7 +1396,7 @@ def update_figure_location(rows, columns, indices):
                              dcc.Graph(figure={"data": fig["data"],
                                                "layout":fig["layout"]},
                                        config={"displayModeBar": False})
-                            ],
+                             ],
                             className="twelve columns",
                             style={"margin-left": "-57%",
                                    "margin-top": "20%"})
@@ -1446,17 +1446,17 @@ def update_figure_battery(rows, columns, indices):
                                                               "size": 10},
                                                    xaxis={'title': 'Time ( Seconds )',
                                                           'titlefont': {'family': 'Courier New, monospace',
-                                                                       'size': 16,
-                                                                       'color': 'black'}},
+                                                                        'size': 16,
+                                                                        'color': 'black'}},
                                                    yaxis={'title': 'Battery Level ( Percentage )',
                                                           'titlefont': {'family': 'Courier New, monospace',
-                                                                       'size': 16,
-                                                                       'color': 'black'}})},
+                                                                        'size': 16,
+                                                                        'color': 'black'}})},
                                        config={"displayModeBar": False},
                                        style={"margin-top": "20px",
                                               "margin-bottom": "10px"}
-                                      ),
-                            ], className="twelve columns",
+                                       ),
+                             ], className="twelve columns",
                             style={"margin-left": "-59%",
                                    "margin-top": "30%"})
 
@@ -1482,8 +1482,8 @@ def update_figure_device_details(rows, columns, indices):
             df_details["label"] = dataframe.columns
             df_details["value"] = dataframe.iloc[1, :].values.tolist()
             return [html.H6(["Device Details - " + selected[0]],
-                             className="subtitle padded"),
-                     html.Table(make_dash_table(df_details)), ]
+                            className="subtitle padded"),
+                    html.Table(make_dash_table(df_details)), ]
 
 
 ###############################################################################

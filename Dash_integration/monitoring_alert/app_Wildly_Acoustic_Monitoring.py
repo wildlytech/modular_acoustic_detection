@@ -27,8 +27,8 @@ import re
 import requests
 
 from predictions.binary_relevance_model import generate_before_predict_BR,\
-                                               get_results_binary_relevance,\
-                                               predict_on_wavfile_binary_relevance
+    get_results_binary_relevance,\
+    predict_on_wavfile_binary_relevance
 
 
 ###############################################################################
@@ -153,14 +153,14 @@ def get_directories_listed(ftp_path):
                 else:
                     month = line.split(' ')[-5]
                 timestamp1 = now_year + '/' + str(strptime(month, '%b').tm_mon) + '/' +\
-                line.split(' ')[-3] + '-' + line.split(' ')[-2]
+                    line.split(' ')[-3] + '-' + line.split(' ')[-2]
                 time2 = str(datetime.strptime(timestamp1, datetimeformat_1) + timedelta(minutes=330))
                 dir_n_time = directory, time2, 'active'
                 dir_n_timestamp.append(dir_n_time)
 
             else:
                 timestamp1 = line.split(' ')[-2] + '/' + str(strptime(line.split(' ')[-5], '%b').tm_mon)\
-                + '/' + line.split(' ')[-4]
+                    + '/' + line.split(' ')[-4]
                 dir_n_time = directory, timestamp1, 'inactive'
                 dir_n_timestamp.append(dir_n_time)
 
@@ -250,10 +250,10 @@ def predictions_from_models(wavfile_path, embeddings):
     global CONFIG_DATAS
 
     prediction_probs, prediction_rounded = \
-            predict_on_wavfile_binary_relevance.predict_on_embedding(\
-                                                embedding=embeddings,
-                                                label_names=list(CONFIG_DATAS.keys()),
-                                                config_datas=CONFIG_DATAS)
+        predict_on_wavfile_binary_relevance.predict_on_embedding(\
+            embedding=embeddings,
+            label_names=list(CONFIG_DATAS.keys()),
+            config_datas=CONFIG_DATAS)
 
     return prediction_probs, prediction_rounded
 
@@ -333,28 +333,28 @@ def get_prediction_bar_graph(filepath):
     output_sound = get_formatted_detected_sounds(prediction_rounded)
 
     return prediction_probs, \
-            prediction_rounded, \
-            output_sound, \
-            dcc.Graph(id='example',
-                      figure={
-                          'data': [{'x': [format_label_name(x) for x in list(CONFIG_DATAS.keys())],
-                                   'y':["{0:.2f}".format(x) for x in prediction_probs],
-                                   'text':["{0:.2f}%".format(x) for x in prediction_probs],
-                                   'textposition':'auto',
-                                   'type':'bar'}],
-                          'layout': {
-                              'title': 'probabilistic prediction graph ',
+        prediction_rounded, \
+        output_sound, \
+        dcc.Graph(id='example',
+                  figure={
+                      'data': [{'x': [format_label_name(x) for x in list(CONFIG_DATAS.keys())],
+                                'y':["{0:.2f}".format(x) for x in prediction_probs],
+                                'text':["{0:.2f}%".format(x) for x in prediction_probs],
+                                'textposition':'auto',
+                                'type':'bar'}],
+                      'layout': {
+                          'title': 'probabilistic prediction graph ',
+                          'titlefont': {
+                              'family': 'Courier New, monospace',
+                              'size': 22,
+                              'color': '#e4e4e4'},
+
+                          'xaxis': {
+                              'title': 'Labels of the sound',
                               'titlefont': {
                                   'family': 'Courier New, monospace',
-                                  'size': 22,
-                                  'color': '#e4e4e4'},
-
-                              'xaxis': {
-                                  'title': 'Labels of the sound',
-                                  'titlefont': {
-                                      'family': 'Courier New, monospace',
-                                      'size': 18,
-                                      'color': '#e4e4e4'}},
+                                  'size': 18,
+                                  'color': '#e4e4e4'}},
                               'yaxis': {
                                   'title': 'Percentage probabality',
                                   'titlefont': {
@@ -365,8 +365,8 @@ def get_prediction_bar_graph(filepath):
                               'paper_bgcolor': '#232323',
                               'plot_bgcolor': '#232323',
                               'font': {'color': '#e4e4e4'}}},
-                        style={'marginBottom': 0,
-                               'marginTop': 10})
+                  style={'marginBottom': 0,
+                         'marginTop': 10})
 
 ###############################################################################
 # Saves the audio file / Downloads audio file
@@ -752,7 +752,7 @@ def get_wavheader_subchunk1(name, ftp_obj):
         subchunkid, subchunksize = struct.unpack('<4sI', chunk_header)
 
         aformat, channels, samplerate, byterate, blockalign, bps = struct.unpack('HHIIHH', \
-            file_header_info.read(16))
+                                                                                 file_header_info.read(16))
 
         wav_header = [riff, size, fformat, subchunkid, \
                       subchunksize, aformat, channels, \
@@ -762,7 +762,7 @@ def get_wavheader_subchunk1(name, ftp_obj):
                               ["ChunkID", "TotalSize", "Format", \
                                "SubChunk1ID", "SubChunk1Size", "AudioFormat", \
                                "NumChannels", "SampleRate", "ByteRate", \
-                                "BlockAlign", "BitsPerSample"]):
+                               "BlockAlign", "BitsPerSample"]):
             wavheader_dict[each_value[1]] = each_value[0]
 
         return wavheader_dict
@@ -793,19 +793,19 @@ def parse_contents(contents, filename, date):
         _, _, _, bar_graph = bar_graph_info
 
         return html.Div(style={'color': '#e4e4e4', 'fontSize': 14},
-                         children=[html.Div(children=[html.Audio(id='myaudio',
-                                                                 src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
-                                                                 controls=True)],
-                                            style={"margin-left": "27%"}),
-                                   bar_graph,
-                                   html.P('Uploaded File : ' + filename)])
+                        children=[html.Div(children=[html.Audio(id='myaudio',
+                                                                src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
+                                                                controls=True)],
+                                           style={"margin-left": "27%"}),
+                                  bar_graph,
+                                  html.P('Uploaded File : ' + filename)])
     else:
 
         # Since the file is not a wav file or has problems, delete the file
         os.remove(filepath)
 
         return html.Div(html.P("Error occured. Please try Again or Input proper Wav File.",
-                                   style={"textAlign": "center"}))
+                               style={"textAlign": "center"}))
 
 
 ###############################################################################
@@ -929,186 +929,186 @@ def layout():
     global FTP_PATH
 
     return html.Div(id='clustergram-body', className='app-body',
-        children=[
-            html.Div(id='clustergram-control-tabs', className='control-tabs',
-            children=[
-            dcc.Tabs(id='clustergram-tabs', value='graph',
-                children=[
-                ###############################################################
-                # Monitoring Tab
-                ###############################################################
-                dcc.Tab(
-                    label='Monitor Device',
-                    value='graph',
                     children=[
-                        html.Div(className='control-tab', children=[
-                            html.Div('Select DeviceID',
-                                     title="Available directories from " + FTP_PATH + "  directory",
-                                     className='fullwidth-app-controls-name',
-                                     style={"fontWeight": "bold",
-                                            "color": '#FFBF01',
-                                            "text-decoration": "underline"}),
-                            html.Div(id='display-all-directories-div-graph-tab',
-                                     children=[dash_table.DataTable(id='display-all-directories-datatable-graph-tab',
-                                                                    columns=[{"name": i,
-                                                                              "id": i, } for i in DATAFRAME_REQUIRED.columns],
-                                                                    data=DATAFRAME_REQUIRED.to_dict("rows"),
-                                                                    row_selectable="multi",
-                                                                    style_table={"Height": "500px",
-                                                                                 "Width": "500px"},
-                                                                    style_header={'backgroundColor': 'rgb(30, 30, 30)',
-                                                                                  "fontWeight": "bold",
-                                                                                  'border': '1px solid #e4e4e4'},
-                                                                    style_cell={'backgroundColor': 'rgb(50, 50, 50)',
-                                                                                'color': 'white'},
-                                                                    style_data_conditional=[{'if': {'column_id': 'Status',
-                                                                                                    'filter_query': '{Status} eq "Active"'},
-                                                                                             'backgroundColor': '#3D9970',
-                                                                                             'color': 'black'}])],
-                                     style={"marginTop": "20px"}),
-                            html.Br(),
-                            html.Div(className='app-controls-block', children=[
-                                html.Div('Select Alert Based on Labels:',
-                                         className='app-controls-name',
-                                         style={"fontSize": "10px",
-                                                "width": "155px",
-                                                "color": "white",
-                                                "fontWeight": "bold"}),
-                                dcc.Dropdown(id='sound-labels-dropdown-alert-tab',
-                                             options=[{'label': format_label_name(x), 'value': x} for x in list(CONFIG_DATAS.keys())],
-                                             multi=True,
-                                             value=None),
-                                html.Br(),
-                                html.Div('Select Alert Interval :',
-                                         className='app-controls-name',
-                                         style={"fontSize": "10px",
-                                                "color": "white",
-                                                "fontWeight": "bold"}),
-                                dcc.Dropdown(id='time-interval-labels-dropdown-alert-tab',
-                                             options=[{'label': 'Every Event', 'value': 'all_event'},
-                                                      {'label': 'Every 5Mins', 'value': '5_mins'}],
-                                             multi=False,
-                                             value=None),
-                                html.Br(),
-                                html.Br(),
-                                html.Div('Alert SMS To [ +91- ]:',
-                                         className='app-controls-name',
-                                         style={"fontSize": "10px",
-                                                "color": "white",
-                                                "fontWeight": "bold"}),
-                                dcc.Input(id='phone-number-alert-tab')]),
-                            html.Hr(style={"marginTop": "20px"}),
-                            html.Div(className='app-controls-block', children=[
-                                html.Button(
-                                    id='selected-all-active-devices-graph-tab',
-                                    children='Monitor Active Devices',
-                                    n_clicks=0,
-                                    n_clicks_timestamp=0,
-                                    style={"border": "1px solid #FFBF01", "color": "white"}),
-                                html.Button(
-                                    id='Selected-devices-button-graph-tab',
-                                    children='Monitor Selected Devices',
-                                    n_clicks=0,
-                                    n_clicks_timestamp=0,
-                                    style={"border": "1px solid #FFBF01", "color": "white"})]),
-                            html.Div(id="graph-output-graph-tab-do-nothing")])]),
-
-                ###############################################################
-                # Upload Tab
-                ###############################################################
-                dcc.Tab(
-                    label='Upload Data',
-                    value='datasets',
-                    children=html.Div(className='control-tab', children=[
-                        html.Div(id='file-upload-name'),
-                        html.Div(id='clustergram-file-upload-container',
-                                 title='Upload your files here.',
+                        html.Div(id='clustergram-control-tabs', className='control-tabs',
                                  children=[
-                                     dcc.Upload(id='upload-data', multiple=True, children=[
-                                         html.A(html.Button(className='control-download',
-                                                            n_clicks=0,
-                                                            children=html.Div(["Drag and Drop or click \
+                                     dcc.Tabs(id='clustergram-tabs', value='graph',
+                                              children=[
+                                                  ###############################################################
+                                                  # Monitoring Tab
+                                                  ###############################################################
+                                                  dcc.Tab(
+                                                      label='Monitor Device',
+                                                      value='graph',
+                                                      children=[
+                                                          html.Div(className='control-tab', children=[
+                                                              html.Div('Select DeviceID',
+                                                                       title="Available directories from " + FTP_PATH + "  directory",
+                                                                       className='fullwidth-app-controls-name',
+                                                                       style={"fontWeight": "bold",
+                                                                              "color": '#FFBF01',
+                                                                              "text-decoration": "underline"}),
+                                                              html.Div(id='display-all-directories-div-graph-tab',
+                                                                       children=[dash_table.DataTable(id='display-all-directories-datatable-graph-tab',
+                                                                                                      columns=[{"name": i,
+                                                                                                                "id": i, } for i in DATAFRAME_REQUIRED.columns],
+                                                                                                      data=DATAFRAME_REQUIRED.to_dict("rows"),
+                                                                                                      row_selectable="multi",
+                                                                                                      style_table={"Height": "500px",
+                                                                                                                   "Width": "500px"},
+                                                                                                      style_header={'backgroundColor': 'rgb(30, 30, 30)',
+                                                                                                                    "fontWeight": "bold",
+                                                                                                                    'border': '1px solid #e4e4e4'},
+                                                                                                      style_cell={'backgroundColor': 'rgb(50, 50, 50)',
+                                                                                                                  'color': 'white'},
+                                                                                                      style_data_conditional=[{'if': {'column_id': 'Status',
+                                                                                                                                      'filter_query': '{Status} eq "Active"'},
+                                                                                                                               'backgroundColor': '#3D9970',
+                                                                                                                               'color': 'black'}])],
+                                                                       style={"marginTop": "20px"}),
+                                                              html.Br(),
+                                                              html.Div(className='app-controls-block', children=[
+                                                                  html.Div('Select Alert Based on Labels:',
+                                                                           className='app-controls-name',
+                                                                           style={"fontSize": "10px",
+                                                                                  "width": "155px",
+                                                                                  "color": "white",
+                                                                                  "fontWeight": "bold"}),
+                                                                  dcc.Dropdown(id='sound-labels-dropdown-alert-tab',
+                                                                               options=[{'label': format_label_name(x), 'value': x} for x in list(CONFIG_DATAS.keys())],
+                                                                               multi=True,
+                                                                               value=None),
+                                                                  html.Br(),
+                                                                  html.Div('Select Alert Interval :',
+                                                                           className='app-controls-name',
+                                                                           style={"fontSize": "10px",
+                                                                                  "color": "white",
+                                                                                  "fontWeight": "bold"}),
+                                                                  dcc.Dropdown(id='time-interval-labels-dropdown-alert-tab',
+                                                                               options=[{'label': 'Every Event', 'value': 'all_event'},
+                                                                                        {'label': 'Every 5Mins', 'value': '5_mins'}],
+                                                                               multi=False,
+                                                                               value=None),
+                                                                  html.Br(),
+                                                                  html.Br(),
+                                                                  html.Div('Alert SMS To [ +91- ]:',
+                                                                           className='app-controls-name',
+                                                                           style={"fontSize": "10px",
+                                                                                  "color": "white",
+                                                                                  "fontWeight": "bold"}),
+                                                                  dcc.Input(id='phone-number-alert-tab')]),
+                                                              html.Hr(style={"marginTop": "20px"}),
+                                                              html.Div(className='app-controls-block', children=[
+                                                                  html.Button(
+                                                                      id='selected-all-active-devices-graph-tab',
+                                                                      children='Monitor Active Devices',
+                                                                      n_clicks=0,
+                                                                      n_clicks_timestamp=0,
+                                                                      style={"border": "1px solid #FFBF01", "color": "white"}),
+                                                                  html.Button(
+                                                                      id='Selected-devices-button-graph-tab',
+                                                                      children='Monitor Selected Devices',
+                                                                      n_clicks=0,
+                                                                      n_clicks_timestamp=0,
+                                                                      style={"border": "1px solid #FFBF01", "color": "white"})]),
+                                                              html.Div(id="graph-output-graph-tab-do-nothing")])]),
+
+                                                  ###############################################################
+                                                  # Upload Tab
+                                                  ###############################################################
+                                                  dcc.Tab(
+                                                      label='Upload Data',
+                                                      value='datasets',
+                                                      children=html.Div(className='control-tab', children=[
+                                                          html.Div(id='file-upload-name'),
+                                                          html.Div(id='clustergram-file-upload-container',
+                                                                   title='Upload your files here.',
+                                                                   children=[
+                                                                       dcc.Upload(id='upload-data', multiple=True, children=[
+                                                                           html.A(html.Button(className='control-download',
+                                                                                              n_clicks=0,
+                                                                                              children=html.Div(["Drag and Drop or click \
                                                                                to select files."],
-                                                                              style={"font-size": 10})))],
-                                                accept='.wav')]),
+                                                                                                                style={"font-size": 10})))],
+                                                                                  accept='.wav')]),
 
-                        html.Div([
-                            html.A(
-                                html.Button(
-                                    'Download sample data',
-                                    id='clustergram-download-sample-data',
-                                    n_clicks=0,
-                                    className='control-download'))]),
-                        html.Div(id='clustergram-info')])),
+                                                          html.Div([
+                                                              html.A(
+                                                                  html.Button(
+                                                                      'Download sample data',
+                                                                      id='clustergram-download-sample-data',
+                                                                      n_clicks=0,
+                                                                      className='control-download'))]),
+                                                          html.Div(id='clustergram-info')])),
 
-                ###############################################################
-                # FTP server Tab
-                ###############################################################
-                dcc.Tab(
-                    label='FTP Server',
-                    value='what-is',
-                    children=html.Div(className='control-tab', children=[
-                        html.Div(
-                            'Available Directories',
-                            title="Available directories from " + FTP_PATH + "  directory",
-                            className='fullwidth-app-controls-name',
-                            style={"fontWeight": "bold",
-                                   "color": '#FFBF01',
-                                   "text-decoration": "underline"}),
-                        html.Div(id='display-all-directories-div',
-                                 children=[dash_table.DataTable(id='display-all-directories-datatable',
-                                                                columns=[{"name": i,
-                                                                          "id": i, } for i in DATAFRAME_REQUIRED.columns],
-                                                                data=DATAFRAME_REQUIRED.to_dict("rows"),
-                                                                row_selectable="single",
-                                                                style_table={"Height": "500px",
-                                                                             "Width": "500px"},
-                                                                style_header={'backgroundColor': 'rgb(30, 30, 30)',
-                                                                              "fontWeight": "bold",
-                                                                              'border': '1px solid #e4e4e4'},
-                                                                style_cell={'backgroundColor': 'rgb(50, 50, 50)',
-                                                                            'color': 'white'},
-                                                                style_data_conditional=[{'if': {'column_id': 'Status',
-                                                                                                'filter_query': '{Status} eq "Active"'},
-                                                                                         'backgroundColor': '#3D9970',
-                                                                                         'color': 'black'}])],
-                                 style={"marginTop": "20px"}),
-                        html.Br(),
-                        dcc.Loading(className='dashbio-loading',
-                                    type="dot",
-                                    children=[html.Div(id='display-directory-on-status-selection')]),
-                        html.Div(id='display-directory-on-deviceid-selection'),
-                        html.Div(id='display-directory-on-timestamp-selection'),
-                        html.Div(id='display-directory-on-location-selection'),
-                        html.Div(id='display-selection-buttons-single-monitor')])
-                )
-                ])]),
+                                                  ###############################################################
+                                                  # FTP server Tab
+                                                  ###############################################################
+                                                  dcc.Tab(
+                                                      label='FTP Server',
+                                                      value='what-is',
+                                                      children=html.Div(className='control-tab', children=[
+                                                          html.Div(
+                                                              'Available Directories',
+                                                              title="Available directories from " + FTP_PATH + "  directory",
+                                                              className='fullwidth-app-controls-name',
+                                                              style={"fontWeight": "bold",
+                                                                     "color": '#FFBF01',
+                                                                     "text-decoration": "underline"}),
+                                                          html.Div(id='display-all-directories-div',
+                                                                   children=[dash_table.DataTable(id='display-all-directories-datatable',
+                                                                                                  columns=[{"name": i,
+                                                                                                            "id": i, } for i in DATAFRAME_REQUIRED.columns],
+                                                                                                  data=DATAFRAME_REQUIRED.to_dict("rows"),
+                                                                                                  row_selectable="single",
+                                                                                                  style_table={"Height": "500px",
+                                                                                                               "Width": "500px"},
+                                                                                                  style_header={'backgroundColor': 'rgb(30, 30, 30)',
+                                                                                                                "fontWeight": "bold",
+                                                                                                                'border': '1px solid #e4e4e4'},
+                                                                                                  style_cell={'backgroundColor': 'rgb(50, 50, 50)',
+                                                                                                              'color': 'white'},
+                                                                                                  style_data_conditional=[{'if': {'column_id': 'Status',
+                                                                                                                                  'filter_query': '{Status} eq "Active"'},
+                                                                                                                           'backgroundColor': '#3D9970',
+                                                                                                                           'color': 'black'}])],
+                                                                   style={"marginTop": "20px"}),
+                                                          html.Br(),
+                                                          dcc.Loading(className='dashbio-loading',
+                                                                      type="dot",
+                                                                      children=[html.Div(id='display-directory-on-status-selection')]),
+                                                          html.Div(id='display-directory-on-deviceid-selection'),
+                                                          html.Div(id='display-directory-on-timestamp-selection'),
+                                                          html.Div(id='display-directory-on-location-selection'),
+                                                          html.Div(id='display-selection-buttons-single-monitor')])
+                                                  )
+                                              ])]),
 
-            ###################################################################
-            # Right side DIV element
-            ###################################################################
-            html.Div(id='clustergram-page-content-right',
-                     className='control-tabs-right',
-                     children=[
-                         html.Br(),
-                         dcc.Loading(className='dashbio-loading',
-                                     type="graph",
-                                     children=[html.Div(id='graph-output-any')]),
-                         html.Div(id='prediction-audio-upload'),
-                         dcc.Loading(className='dashbio-loading',
-                                     type="graph",
-                                     children=[html.Div(id='graph-output-ftp')]),
-                         html.Div(id='prediction-audio'),
-                         html.Div([dcc.Loading(className='dashbio-loading',
-                                               type="graph",
-                                               children=[html.Div(id='graph-output-graph-tab')]),
-                                   html.Br(),
-                                   html.Div(id="button-stop-threads")]),
-                         dcc.Loading(className='dashbio-loading',
-                                     type="dot",
-                                     children=[dcc.Interval(id='interval-component',
-                                                            interval=10 * 1000,  # in milliseconds
-                                                            n_intervals=0)])])])
+                        ###################################################################
+                        # Right side DIV element
+                        ###################################################################
+                        html.Div(id='clustergram-page-content-right',
+                                 className='control-tabs-right',
+                                 children=[
+                                     html.Br(),
+                                     dcc.Loading(className='dashbio-loading',
+                                                 type="graph",
+                                                 children=[html.Div(id='graph-output-any')]),
+                                     html.Div(id='prediction-audio-upload'),
+                                     dcc.Loading(className='dashbio-loading',
+                                                 type="graph",
+                                                 children=[html.Div(id='graph-output-ftp')]),
+                                     html.Div(id='prediction-audio'),
+                                     html.Div([dcc.Loading(className='dashbio-loading',
+                                                           type="graph",
+                                                           children=[html.Div(id='graph-output-graph-tab')]),
+                                               html.Br(),
+                                               html.Div(id="button-stop-threads")]),
+                                     dcc.Loading(className='dashbio-loading',
+                                                 type="dot",
+                                                 children=[dcc.Interval(id='interval-component',
+                                                                        interval=10 * 1000,  # in milliseconds
+                                                                        n_intervals=0)])])])
 
 ###############################################################################
 # Callback for each tab operation
@@ -1146,22 +1146,22 @@ def callbacks(_app):
                                                     'color': 'white'},)
         else:
             return dash_table.DataTable(id='display-all-directories-datatable',
-                                          columns=[{"name": i,
-                                                    "id": i, }
-                                                   for i in DATAFRAME_REQUIRED.columns],
-                                          data=DATAFRAME_REQUIRED.to_dict("rows"),
-                                          row_selectable="single",
-                                          style_table={"Height": "500px",
+                                        columns=[{"name": i,
+                                                  "id": i, }
+                                                 for i in DATAFRAME_REQUIRED.columns],
+                                        data=DATAFRAME_REQUIRED.to_dict("rows"),
+                                        row_selectable="single",
+                                        style_table={"Height": "500px",
                                                        "Width": "500px"},
-                                          style_header={'backgroundColor': 'rgb(30, 30, 30)',
-                                                        "fontWeight": "bold",
-                                                        'border': '1px solid white'},
-                                          style_cell={'backgroundColor': 'rgb(50, 50, 50)',
-                                                      'color': 'white'},
-                                          style_data_conditional=[{'if': {'column_id': 'Status',
-                                                                          'filter_query': '{Status} eq "Active"'},
-                                                                   'backgroundColor': '#3D9970',
-                                                                   'color': 'black'}])
+                                        style_header={'backgroundColor': 'rgb(30, 30, 30)',
+                                                      "fontWeight": "bold",
+                                                      'border': '1px solid white'},
+                                        style_cell={'backgroundColor': 'rgb(50, 50, 50)',
+                                                    'color': 'white'},
+                                        style_data_conditional=[{'if': {'column_id': 'Status',
+                                                                        'filter_query': '{Status} eq "Active"'},
+                                                                 'backgroundColor': '#3D9970',
+                                                                 'color': 'black'}])
 
     ###########################################################################
     # Play selected audio
@@ -1241,7 +1241,7 @@ def callbacks(_app):
     ###########################################################################
 
     @_app.callback(Output('display-all-directory-on-status-selection-div', 'style'),
-            [Input('clustergram-datasets1', 'value')])
+                   [Input('clustergram-datasets1', 'value')])
     def disabling_directory_change_filter_type(value):
         """
         Disabling the button after its being clicked once
@@ -1254,7 +1254,7 @@ def callbacks(_app):
     ###########################################################################
 
     @_app.callback(Output('display-directory-on-status-selection', 'style'),
-            [Input('clustergram-datasets1', 'value')])
+                   [Input('clustergram-datasets1', 'value')])
     def disabling_directory_on_status_selection(value):
         """
         Disabling the button after its being clicked once
@@ -1281,17 +1281,17 @@ def callbacks(_app):
             batch_ftp_file_df = batch_ftp_file_df.iloc[indices]
             print(batch_ftp_file_df)
             return html.Div(id='selected-files-input-button',
-                             children=[
-                                 html.Div(className='app-controls-name', children=[
-                                     html.Br(),
-                                     html.Button(
+                            children=[
+                                html.Div(className='app-controls-name', children=[
+                                    html.Br(),
+                                    html.Button(
                                          id='selected-file-selection-button',
                                          children='Run Predictions on selected Files',
                                          n_clicks=0,
                                          n_clicks_timestamp=0,
                                          style={'border': '1px solid #FFBF01', "color": "white"})])],
-                             n_clicks=0,
-                             style={"marginTop": "10px"}),
+                            n_clicks=0,
+                            style={"marginTop": "10px"}),
 
         else:
             batch_ftp_file_df = pd.DataFrame()
@@ -1368,14 +1368,14 @@ def callbacks(_app):
     ###########################################################################
 
     @_app.callback(Output(component_id='graph-output-graph-tab-do-nothing', component_property='style'),
-                  [Input(component_id='display-all-directories-datatable-graph-tab', component_property='data'),
-                   Input('display-all-directories-datatable-graph-tab', 'columns'),
-                   Input('display-all-directories-datatable-graph-tab', 'derived_virtual_selected_rows'),
-                   Input("sound-labels-dropdown-alert-tab", "value"),
-                   Input("time-interval-labels-dropdown-alert-tab", "value"),
-                   Input("selected-all-active-devices-graph-tab", "n_clicks"),
-                   Input("Selected-devices-button-graph-tab", "n_clicks"),
-                   Input("phone-number-alert-tab", "value")])
+                   [Input(component_id='display-all-directories-datatable-graph-tab', component_property='data'),
+                    Input('display-all-directories-datatable-graph-tab', 'columns'),
+                    Input('display-all-directories-datatable-graph-tab', 'derived_virtual_selected_rows'),
+                    Input("sound-labels-dropdown-alert-tab", "value"),
+                    Input("time-interval-labels-dropdown-alert-tab", "value"),
+                    Input("selected-all-active-devices-graph-tab", "n_clicks"),
+                    Input("Selected-devices-button-graph-tab", "n_clicks"),
+                    Input("phone-number-alert-tab", "value")])
     def update_output_soi_alert(rows,
                                 columns,
                                 indices,
@@ -1714,9 +1714,9 @@ if __name__ == '__main__':
                                 help='Input FTP Password', required=True)
 
     OPTIONAL_NAMED.add_argument('-predictions_cfg_json',
-                            '--predictions_cfg_json', action='store',
-                            help='Input json configuration file for predictions output',
-                            default='predictions/binary_relevance_model/binary_relevance_prediction_config.json')
+                                '--predictions_cfg_json', action='store',
+                                help='Input json configuration file for predictions output',
+                                default='predictions/binary_relevance_model/binary_relevance_prediction_config.json')
 
     ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()

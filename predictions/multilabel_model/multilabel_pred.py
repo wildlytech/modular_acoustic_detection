@@ -107,13 +107,13 @@ def main(predictions_cfg_json,
             for label in config_data["labels"]:
                 positiveLabels[label["aggregatePositiveLabelName"]] = \
                     get_recursive_sound_names(designated_sound_names=label["positiveLabels"],
-                                path_to_ontology="./",
-                                ontology_extension_paths=config_data["ontology"]["extension"])
+                                              path_to_ontology="./",
+                                              ontology_extension_paths=config_data["ontology"]["extension"])
 
             for key in positiveLabels.keys():
                 pos_lab = positiveLabels[key]
                 binarized_op_column = 1.0 * DATA_FRAME['labels_name'].apply( \
-                                               lambda arr: np.any([x.lower() in pos_lab for x in arr]))
+                    lambda arr: np.any([x.lower() in pos_lab for x in arr]))
 
                 LABELS_BINARIZED[key] = binarized_op_column
         target_cols = LABELS_BINARIZED.columns
@@ -193,8 +193,8 @@ def main(predictions_cfg_json,
             ###################################################################
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \
-                              "_misclassified_examples_multilabel_model_" + \
-                              model_name.replace(' ', '_') + ".pkl"
+                    "_misclassified_examples_multilabel_model_" + \
+                    model_name.replace(' ', '_') + ".pkl"
                 with open(misclassified_pickle_file, "wb") as f:
                     pickle.dump(DF_TEST.loc[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 

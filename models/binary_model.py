@@ -13,7 +13,7 @@ from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatt
 from tensorflow.compat.v1.keras.optimizers import RMSprop
 from youtube_audioset import get_recursive_sound_names, get_all_sound_names
 from youtube_audioset import EXPLOSION_SOUNDS, MOTOR_SOUNDS, \
-                             WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS
+    WOOD_SOUNDS, HUMAN_SOUNDS, NATURE_SOUNDS
 import balancing_dataset
 
 

@@ -66,11 +66,11 @@ if __name__ == '__main__':
     PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     REQUIRED_ARGUMENTS = PARSER.add_argument_group('required arguments')
     REQUIRED_ARGUMENTS.add_argument('-input_mp3_path', action='store', \
-        help='Input path to mp3 file or mp3 files directory',
-        required=True)
+                                    help='Input path to mp3 file or mp3 files directory',
+                                    required=True)
     REQUIRED_ARGUMENTS.add_argument('-path_to_save_wav_files', action='store', \
-        help='Input path to save wav file(s)',
-        required=True)
+                                    help='Input path to save wav file(s)',
+                                    required=True)
     RESULT = PARSER.parse_args()
 
     path_for_mp3 = RESULT.input_mp3_path

@@ -79,7 +79,7 @@ def parse_taxonomy(xml_dict, id_prefix, key):
         ontology_id = id_prefix + "_{0}_{1}".format(key, latin_name.replace(' ', '-'))
 
         description = "Bird {0} {1}(Common name:{2}) (Note:{3})".format( \
-                            key, name, english_name, note)
+            key, name, english_name, note)
         url = xml_dict.get('url')
         if url:
             url = DOMAIN + url

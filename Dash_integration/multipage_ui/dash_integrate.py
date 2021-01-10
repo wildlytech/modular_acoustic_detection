@@ -23,8 +23,8 @@ from pymongo import MongoClient
 import re
 
 from predictions.binary_relevance_model import generate_before_predict_BR,\
-                                               get_results_binary_relevance,\
-                                               predict_on_wavfile_binary_relevance
+    get_results_binary_relevance,\
+    predict_on_wavfile_binary_relevance
 
 
 ########################################################################
@@ -99,10 +99,10 @@ def predictions_from_models(wavfile_path, embeddings):
     global CONFIG_DATAS
 
     prediction_probs, prediction_rounded = \
-            predict_on_wavfile_binary_relevance.predict_on_embedding(\
-                                                embedding=embeddings,
-                                                label_names=list(CONFIG_DATAS.keys()),
-                                                config_datas=CONFIG_DATAS)
+        predict_on_wavfile_binary_relevance.predict_on_embedding(\
+            embedding=embeddings,
+            label_names=list(CONFIG_DATAS.keys()),
+            config_datas=CONFIG_DATAS)
 
     return prediction_probs, prediction_rounded
 
@@ -182,32 +182,32 @@ def get_prediction_bar_graph(filepath):
     output_sound = get_formatted_detected_sounds(prediction_rounded)
 
     return prediction_probs, \
-            prediction_rounded, \
-            output_sound, \
-            dcc.Graph(id='example',
-                      figure={
-                          'data': [{'x': [format_label_name(x) for x in list(CONFIG_DATAS.keys())],
-                                   'y':["{0:.2f}".format(x) for x in prediction_probs],
-                                   'text':["{0:.2f}%".format(x) for x in prediction_probs],
-                                   'textposition':'auto',
-                                   'marker':{
-                                        'color': ['rgba(26, 118, 255,0.8)', 'rgba(222,45,38,0.8)',
-                                                 'rgba(204,204,204,1)', 'rgba(0,150,0,0.8)',
-                                                 'rgba(204,204,204,1)', 'rgba(55, 128, 191, 0.7)']},
-                                   'type':'bar'}],
-                          'layout': {
-                              'title': 'probabilistic prediction graph ',
+        prediction_rounded, \
+        output_sound, \
+        dcc.Graph(id='example',
+                  figure={
+                      'data': [{'x': [format_label_name(x) for x in list(CONFIG_DATAS.keys())],
+                                'y':["{0:.2f}".format(x) for x in prediction_probs],
+                                'text':["{0:.2f}%".format(x) for x in prediction_probs],
+                                'textposition':'auto',
+                                'marker':{
+                          'color': ['rgba(26, 118, 255,0.8)', 'rgba(222,45,38,0.8)',
+                                    'rgba(204,204,204,1)', 'rgba(0,150,0,0.8)',
+                                    'rgba(204,204,204,1)', 'rgba(55, 128, 191, 0.7)']},
+                                'type':'bar'}],
+                      'layout': {
+                          'title': 'probabilistic prediction graph ',
+                          'titlefont': {
+                              'family': 'Courier New, monospace',
+                              'size': 22,
+                              'color': 'green'},
+
+                          'xaxis': {
+                              'title': 'Labels of the sound',
                               'titlefont': {
                                   'family': 'Courier New, monospace',
-                                  'size': 22,
-                                  'color': 'green'},
-
-                              'xaxis': {
-                                  'title': 'Labels of the sound',
-                                  'titlefont': {
-                                      'family': 'Courier New, monospace',
-                                      'size': 18,
-                                      'color': 'green'}},
+                                  'size': 18,
+                                  'color': 'green'}},
                               'yaxis': {
                                   'title': 'Percentage probabality',
                                   'titlefont': {
@@ -218,9 +218,9 @@ def get_prediction_bar_graph(filepath):
                               'paper_bgcolor': 'rgba(0,0,0,0)',
                               'plot_bgcolor': 'rgba(0,0,0,0)',
                               'font': {'color': '#7f7f7f'}}},
-                        style={'marginBottom': 20,
-                               'marginTop': 45,
-                               'color': 'black'})
+                  style={'marginBottom': 20,
+                         'marginTop': 45,
+                         'color': 'black'})
 
 
 def get_data_table_from_dataframe(dataframe):
@@ -462,34 +462,34 @@ def parse_contents(contents, filename, date):
         _, prediction_rounded, output_sound, bar_graph = bar_graph_info
 
         return html.Div(style={'color': 'green', 'fontSize': 14},
-                         children=[html.Audio(id='myaudio',
-                                              src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
-                                              controls=True),
-                                   html.H4('Predictions rounded will be: ' + str(prediction_rounded)),
-                                   html.H4('Prediction seems to be ' + output_sound,
-                                           style={'color': 'green',
-                                                  'fontSize': 30,
-                                                  'textAlign': 'center',
-                                                  'text-decoration': 'underline'}),
-                                   bar_graph,
-                                   html.P('Uploaded File : ' + filename)] + [html.Br() for x in range(3)])
+                        children=[html.Audio(id='myaudio',
+                                             src='data:audio/WAV;base64,{}'.format(encoded_image_uploaded_file),
+                                             controls=True),
+                                  html.H4('Predictions rounded will be: ' + str(prediction_rounded)),
+                                  html.H4('Prediction seems to be ' + output_sound,
+                                          style={'color': 'green',
+                                                 'fontSize': 30,
+                                                 'textAlign': 'center',
+                                                 'text-decoration': 'underline'}),
+                                  bar_graph,
+                                  html.P('Uploaded File : ' + filename)] + [html.Br() for x in range(3)])
     else:
 
         # Since the file is not a wav file or has problems, delete the file
         os.remove(filepath)
 
         return html.Div([
-                          html.Div(style={'color': 'blue', 'fontSize': 14}),
-                          html.H5('Unkown file type',
-                                  style={'marginBottom': 20,
-                                         'marginTop': 45,
-                                         'color': 'red',
-                                         'fontSize': 14}),
-                          html.P('Uploaded File : ' + filename),
-                          html.P('Last Modified : ' + str(datetime.datetime.fromtimestamp(date)),
-                                 style={'color': 'black',
-                                        'fontSize': 12}),
-                        ] + [html.Br() for x in range(3)])
+            html.Div(style={'color': 'blue', 'fontSize': 14}),
+            html.H5('Unkown file type',
+                    style={'marginBottom': 20,
+                           'marginTop': 45,
+                           'color': 'red',
+                           'fontSize': 14}),
+            html.P('Uploaded File : ' + filename),
+            html.P('Last Modified : ' + str(datetime.datetime.fromtimestamp(date)),
+                   style={'color': 'black',
+                          'fontSize': 12}),
+        ] + [html.Br() for x in range(3)])
 
 
 def parse_contents_batch(contents, names, dates):
@@ -739,8 +739,8 @@ def update_values(input_data):
 
         return dcc.Graph(id='example',
                          figure={'data': [{'x': [1, 2, 3, 4],
-                                          'y':[5, 9, 7, 8],
-                                          'type':'line'}],
+                                           'y':[5, 9, 7, 8],
+                                           'type':'line'}],
                                  'layout': {'title': 'Dash Plot',
                                             'paper_bgcolor': 'rgba(0,0,0,0)',
                                             'plot_bgcolor': 'rgba(0,0,0,0)',
@@ -1113,7 +1113,7 @@ def generate_layout(value):
         elif len(value) == 2:
             final_d = []
             for each_name in COLLECTION.find({"$and": [{"labels_name": str(value[0])},
-                                                      {"labels_name": str(value[1])}]}):
+                                                       {"labels_name": str(value[1])}]}):
                 final_d.append(each_name)
             try:
                 data_frame = pd.DataFrame(final_d).drop(["positive_labels", "len"],
@@ -1152,9 +1152,9 @@ def display_output_from_data(rows, columns, indices):
     else:
         global INPUT_NAME
         path = subprocess.Popen("find /media/wildly/1TB-HDD/ -name " +\
-                             df_inner.iloc[indices]["YTID"].astype(str) + "-" +\
-                             df_inner.iloc[indices]["start_seconds"].astype(str) + "-" +\
-                             df_inner.iloc[indices]["end_seconds"].astype(str) + ".wav",
+                                df_inner.iloc[indices]["YTID"].astype(str) + "-" +\
+                                df_inner.iloc[indices]["start_seconds"].astype(str) + "-" +\
+                                df_inner.iloc[indices]["end_seconds"].astype(str) + ".wav",
                                 shell=True,
                                 stdout=subprocess.PIPE)
 
@@ -1197,18 +1197,18 @@ def predict_on_downloaded_file(n_clicks):
             filename = INPUT_NAME.split("/")[-1]
 
             return html.Div(style={'color': 'green',
-                                    'fontSize': 14,
-                                    "padding-top": "-50%",
-                                    "padding-bottom": "10px"},
-                             children=[html.H4('predictions for: ' + filename),
-                                       html.H4('Predictions rounded will be: ' + str(prediction_rounded)),
-                                       html.H4('Prediction seems to be ' + output_sound,
-                                               style={'color': 'green',
-                                                      'fontSize': 30,
-                                                      'textAlign': 'center',
-                                                      'text-decoration': 'underline'}),
-                                       bar_graph,
-                                       html.P('Uploaded File : ' + filename)] + [html.Br() for x in range(3)])
+                                   'fontSize': 14,
+                                   "padding-top": "-50%",
+                                   "padding-bottom": "10px"},
+                            children=[html.H4('predictions for: ' + filename),
+                                      html.H4('Predictions rounded will be: ' + str(prediction_rounded)),
+                                      html.H4('Prediction seems to be ' + output_sound,
+                                              style={'color': 'green',
+                                                     'fontSize': 30,
+                                                     'textAlign': 'center',
+                                                     'text-decoration': 'underline'}),
+                                      bar_graph,
+                                      html.P('Uploaded File : ' + filename)] + [html.Br() for x in range(3)])
 
 
 ###############################################################################

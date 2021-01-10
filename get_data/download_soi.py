@@ -170,7 +170,7 @@ HELP = 'Input the target sounds. It should be one of the listed sounds'
 
 AMBIENT_SOUNDS = NATURE_SOUNDS
 IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
-                HUMAN_SOUNDS + TOOLS_SOUNDS + DOMESTIC_SOUNDS
+    HUMAN_SOUNDS + TOOLS_SOUNDS + DOMESTIC_SOUNDS
 
 
 ###########################################################################
@@ -205,14 +205,14 @@ def get_csv_data(target_sounds):
                                  skipinitialspace=True,
                                  skiprows=2)
     balanced_train.columns = [balanced_train.columns[0][2:]] + \
-                              balanced_train.columns[1:].values.tolist()
+        balanced_train.columns[1:].values.tolist()
 
     unbalanced_train = pd.read_csv("data/audioset/unbalanced_train_segments.csv",
                                    quotechar='"',
                                    skipinitialspace=True,
                                    skiprows=2)
     unbalanced_train.columns = [unbalanced_train.columns[0][2:]] + \
-                                unbalanced_train.columns[1:].values.tolist()
+        unbalanced_train.columns[1:].values.tolist()
 
     train = pd.concat([unbalanced_train, balanced_train], axis=0, ignore_index=True)
 
@@ -308,7 +308,7 @@ def download_data(target_sounds_list, target_path):
     df['positive_labels'] = df['positive_labels'].apply(lambda arr: arr.split(','))
     df['labels_name'] = df['positive_labels'].map(lambda arr: np.concatenate([labels_csv.loc[labels_csv['mid'] == x].display_name for x in arr]))
     df['wav_file'] = df['YTID'].astype(str) + '-' + df['start_seconds'].astype(str) +\
-                     '-' + df['end_seconds'].astype(str) + '.wav'
+        '-' + df['end_seconds'].astype(str) + '.wav'
 
     # save the data frame which can be used for further balancing the data
     # and generating the embeddings for audio files.

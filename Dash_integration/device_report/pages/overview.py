@@ -59,8 +59,8 @@ def plot_function(dataframe):
             elif color_main == "yellow":
                 name = "Network Quality:- AVERAGE"
         data = go.Scatter(x=pd.Series(list(range(0, 20000, 1))), text=values_list, mode="markers", hoverinfo="text",
-                            name=name, marker=dict(color=list(map(SetColor, dataframe['Network_Status']))),
-                            y=dataframe['Battery_Percentage'])
+                          name=name, marker=dict(color=list(map(SetColor, dataframe['Network_Status']))),
+                          y=dataframe['Battery_Percentage'])
         return data
     except TypeError:
         val = dataframe[["Filename", "DeviceID"]].values
@@ -76,7 +76,7 @@ def plot_function(dataframe):
         else:
             name = "Network Quality"
         data = go.Scatter(x=pd.Series(list(range(0, 10000, 1))), text=values_list, mode="markers", name="Network Quality", hoverinfo="text",
-                       marker={"color": "blue"}, y=dataframe['Battery_Percentage'])
+                          marker={"color": "blue"}, y=dataframe['Battery_Percentage'])
         return data
 
 
@@ -108,9 +108,9 @@ def plot_function_bar(dataframe, device_value):
         name="Device-" + str(device_value),
         textposition="outside",
         marker=dict(
-        line=dict(
-            color='red',
-            width=0.01),
+            line=dict(
+                color='red',
+                width=0.01),
         )
     )
     return trace1
@@ -191,25 +191,25 @@ def get_data(name):
 def get_layout():
 
     layout = go.Layout(
-            height=360, width=390,
-            hovermode='closest',
-            margin={
-                "r": 0,
-                "t": 0,
-                "b": 0,
-                "l": 10,
-            },
+        height=360, width=390,
+        hovermode='closest',
+        margin={
+            "r": 0,
+            "t": 0,
+            "b": 0,
+            "l": 10,
+        },
 
-            mapbox=go.layout.Mapbox(
-                accesstoken=mapbox_access_token,
-                domain={'x': [0, 1.0], 'y': [0, 1]},
-                bearing=0,
-                center=go.layout.mapbox.Center(
-                    lat=float(latitudes[-1]),
-                    lon=float(longitudes[-1])
-                ),
-                pitch=0,
-                zoom=5))
+        mapbox=go.layout.Mapbox(
+            accesstoken=mapbox_access_token,
+            domain={'x': [0, 1.0], 'y': [0, 1]},
+            bearing=0,
+            center=go.layout.mapbox.Center(
+                lat=float(latitudes[-1]),
+                lon=float(longitudes[-1])
+            ),
+            pitch=0,
+            zoom=5))
 
     return layout
 
@@ -275,9 +275,9 @@ def create_layout(app):
                                     html.H5("Product Summary"),
                                     html.Br([]),
                                     html.P("Wildly Listen Product Specifications and Operations in detail",
-                                        style={"color": "#ffffff"},
-                                        className="row",
-                                    ),
+                                           style={"color": "#ffffff"},
+                                           className="row",
+                                           ),
                                 ],
                                 className="product",
                             )
@@ -305,42 +305,42 @@ def create_layout(app):
                                     dcc.Graph(
                                         id="graph-1",
                                         figure={"data": fig_device_trans,
-                                            "layout": dict(
-                                                autosize=False,
-                                                bargap=0.4,
-                                                font={"family": "Courier New, monospace", "size": 10},
-                                                height=500,
-                                                hovermode="closest",
-                                                legend={
-                                                    "x": -0.0228945952895,
-                                                    "y": -0.189563896463,
-                                                    "orientation": "h",
-                                                    "yanchor": "top",
+                                                "layout": dict(
+                                                    autosize=False,
+                                                    bargap=0.4,
+                                                    font={"family": "Courier New, monospace", "size": 10},
+                                                    height=500,
+                                                    hovermode="closest",
+                                                    legend={
+                                                        "x": -0.0228945952895,
+                                                        "y": -0.189563896463,
+                                                        "orientation": "h",
+                                                        "yanchor": "top",
+                                                    },
+                                                    margin={
+                                                        "r": 10,
+                                                        "t": 40,
+                                                        # "b": 35,
+                                                        # "l": 45,
+                                                    },
+                                                    showlegend=False,
+                                                    # title="Transmission",
+                                                    width=350,
+                                                    xaxis={
+                                                        'title': 'Device ID',
+                                                        'titlefont': {
+                                                            'family': 'Courier New, monospace',
+                                                            'size': 16,
+                                                            'color': 'black'}
+                                                    },
+                                                    yaxis={
+                                                        'title': 'No. Files',
+                                                        'titlefont': {
+                                                            'family': 'Courier New, monospace',
+                                                            'size': 16,
+                                                            'color': 'black'}
+                                                    })
                                                 },
-                                                margin={
-                                                    "r": 10,
-                                                    "t": 40,
-                                                    # "b": 35,
-                                                    # "l": 45,
-                                                },
-                                                showlegend=False,
-                                                # title="Transmission",
-                                                width=350,
-                                                xaxis={
-                                                  'title': 'Device ID',
-                                                  'titlefont': {
-                                                      'family': 'Courier New, monospace',
-                                                      'size': 16,
-                                                      'color': 'black'}
-                                                },
-                                                yaxis={
-                                                  'title': 'No. Files',
-                                                  'titlefont': {
-                                                      'family': 'Courier New, monospace',
-                                                      'size': 16,
-                                                      'color': 'black'}
-                                                })
-                                            },
 
                                         config={"displayModeBar": False},
                                     ),
@@ -364,40 +364,40 @@ def create_layout(app):
                                         id="graph-2",
                                         figure={"data": fig_battery,
 
-                                            "layout": go.Layout(
-                                                autosize=True,
-                                                font={"family": 'Courier New, monospace', "size": 8},
-                                                height=400,
-                                                width=350,
-                                                hovermode="closest",
-                                                legend={
-                                                    "x": -0.0277108433735,
-                                                    "y": -0.142606516291,
-                                                    "orientation": "h",
+                                                "layout": go.Layout(
+                                                    autosize=True,
+                                                    font={"family": 'Courier New, monospace', "size": 8},
+                                                    height=400,
+                                                    width=350,
+                                                    hovermode="closest",
+                                                    legend={
+                                                        "x": -0.0277108433735,
+                                                        "y": -0.142606516291,
+                                                        "orientation": "h",
+                                                    },
+                                                    margin={
+                                                        "r": 0,
+                                                        "t": 0,
+                                                        "b": 35,
+                                                        "l": 45,
+                                                    },
+                                                    showlegend=False,
+                                                    xaxis={
+                                                        'title': 'Time (Seconds) ',
+                                                        'titlefont': {
+                                                            'family': 'Courier New, monospace',
+                                                            'size': 16,
+                                                            'color': 'black'}
+                                                    },
+                                                    yaxis={
+                                                        'title': 'Battey Level (Percentage) ',
+                                                        'titlefont': {
+                                                            'family': 'Courier New, monospace',
+                                                            'size': 16,
+                                                            'color': 'black'}
+                                                    },
+                                                ),
                                                 },
-                                                margin={
-                                                    "r": 0,
-                                                    "t": 0,
-                                                    "b": 35,
-                                                    "l": 45,
-                                                },
-                                                showlegend=False,
-                                                xaxis={
-                                                  'title': 'Time (Seconds) ',
-                                                  'titlefont': {
-                                                      'family': 'Courier New, monospace',
-                                                      'size': 16,
-                                                      'color': 'black'}
-                                                },
-                                                yaxis={
-                                                  'title': 'Battey Level (Percentage) ',
-                                                  'titlefont': {
-                                                      'family': 'Courier New, monospace',
-                                                      'size': 16,
-                                                      'color': 'black'}
-                                                },
-                                            ),
-                                        },
                                         config={"displayModeBar": False},
                                         style={"margin-bottom": "10px"}
                                     ),
@@ -413,7 +413,7 @@ def create_layout(app):
                                     dcc.Graph(
                                         id="graph-3",
                                         figure={"data": data_location,
-                                            "layout": fig_location["layout"]},
+                                                "layout": fig_location["layout"]},
                                         config={"displayModeBar": False},
                                     ),
                                 ], style={"margin-right": "-20%", "margin-bottom": "10px"},

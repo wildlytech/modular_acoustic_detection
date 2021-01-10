@@ -20,8 +20,8 @@ import pandas as pd
 import plotly.express
 
 from predictions.binary_relevance_model import generate_before_predict_BR,\
-                                               get_results_binary_relevance,\
-                                               predict_on_wavfile_binary_relevance
+    get_results_binary_relevance,\
+    predict_on_wavfile_binary_relevance
 
 
 ###############################################################################
@@ -65,7 +65,7 @@ app.layout = html.Div([html.Div([html.H1("Audio Annotation",
                        html.Div(id="play_audio1"),
                        html.Br(),
                        html.Div(children=[html.Button("Start Annotation", id='button', n_clicks=0)],
-                              style={"margin-left": "45%", "margin-top": "20px"}),
+                                style={"margin-left": "45%", "margin-top": "20px"}),
                        html.Br(),
                        html.Div(id="initial_submission"),
                        html.Div(id="next_submission"),
@@ -102,7 +102,7 @@ def previous_next_button_content(n_clicks):
                                            style={"margin-left": '8%',
                                                   "width": "65%",
                                                   'display': 'inline-block'}),
-                                        html.Div(children=[html.Button("Next Audio",
+                                  html.Div(children=[html.Button("Next Audio",
                                                                  value="next",
                                                                  id='next_button',
                                                                  n_clicks=0,
@@ -149,10 +149,10 @@ def model_prediction_tab():
     ###########################################################################
 
     prediction_probs, prediction_rounded = \
-            predict_on_wavfile_binary_relevance.predict_on_embedding(\
-                                                embedding=embeddings,
-                                                label_names=label_names,
-                                                config_datas=CONFIG_DATAS)
+        predict_on_wavfile_binary_relevance.predict_on_embedding(\
+            embedding=embeddings,
+            label_names=label_names,
+            config_datas=CONFIG_DATAS)
 
     output_sound = []
     for label_name, pred_round in zip(label_names, prediction_rounded):
@@ -175,11 +175,11 @@ def model_prediction_tab():
         dcc.Graph(id='example',
                   figure={
                       'data': [{'x': label_names,
-                               'y': prediction_probs, 'marker': {
-                                   'color': 'rgb(158,202,225)'},
-                               'type': 'bar',
-                               "text": ["{0:.2f}%".format(i) for i in prediction_probs],
-                               "textposition": 'auto', }],
+                                'y': prediction_probs, 'marker': {
+                                    'color': 'rgb(158,202,225)'},
+                                'type': 'bar',
+                                "text": ["{0:.2f}%".format(i) for i in prediction_probs],
+                                "textposition": 'auto', }],
                       'layout': {
                           'title': 'probabilistic prediction graph ',
                           'titlefont': {
@@ -220,20 +220,20 @@ def spectrogram_tab():
     n_fft = int(np.exp2(np.ceil(np.log2(window_length))))
 
     spec = librosa.feature.melspectrogram(clip, sr,
-                                        n_mels=64,
-                                        n_fft=n_fft,
-                                        hop_length=hop_length,
-                                        win_length=window_length)
+                                          n_mels=64,
+                                          n_fft=n_fft,
+                                          hop_length=hop_length,
+                                          win_length=window_length)
     spec_db = librosa.power_to_db(spec, ref=np.max)
 
     spec_db = cv2.resize(spec_db, (0, 0), fx=1, fy=4)
 
     fig = plotly.express.imshow(spec_db, origin='lower',
-            title='Spectrogram: ' + \
-                    NUMBER_OF_WAVFILES[FILE_COUNT].split('/')[-1],
-            labels={'x': 'Time (ms)',
-                      'y': 'Frequency (Hz / {:.2f})'.format(sr / 2 / spec_db.shape[0]),
-                      'color': 'Decibel'})
+                                title='Spectrogram: ' + \
+                                NUMBER_OF_WAVFILES[FILE_COUNT].split('/')[-1],
+                                labels={'x': 'Time (ms)',
+                                        'y': 'Frequency (Hz / {:.2f})'.format(sr / 2 / spec_db.shape[0]),
+                                        'color': 'Decibel'})
 
     return html.Div([dcc.Graph(figure=fig)],
                     style={"margin-top": "10%",

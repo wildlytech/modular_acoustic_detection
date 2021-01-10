@@ -91,7 +91,7 @@ def find_sound_peaks(filepath, url):
 
     df = pd.DataFrame({'url': url,
                        'time': peaks
-                      })
+                       })
     df = df.loc[:, ['url', 'time']]
     return df
 
@@ -119,9 +119,9 @@ def extract_sound_clips(filepath, df, directory):
         start_time = np.max([0, time - 2.5])
         end_time = np.min([time + 2.5, len(aud_seg) / 1000])
         aud_seg[int(start_time * 1000):int(end_time * 1000)].export(directory + '/sound-' + \
-                                                                str(start_time) + '-' + \
-                                                                str(end_time) + ".wav",
-                                                                format="wav")
+                                                                    str(start_time) + '-' + \
+                                                                    str(end_time) + ".wav",
+                                                                    format="wav")
 
 
 if __name__ == "__main__":

@@ -130,7 +130,7 @@ def scrape(audio_files_path, bird_species):
     print("csv file path:", csv_filename)
 
     column_tags = ['XenoCanto_ID', 'Common name/Scientific', 'Length', 'Recordist', 'Date', \
-    'Time', 'Country', 'Location', 'Elev(m)', 'Type', 'Remarks']
+                   'Time', 'Country', 'Location', 'Elev(m)', 'Type', 'Remarks']
 
     # get number of pages for given bird species
     web_pages = number_of_pages(bird_species)

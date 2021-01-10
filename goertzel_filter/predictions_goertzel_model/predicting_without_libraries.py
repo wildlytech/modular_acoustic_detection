@@ -381,7 +381,7 @@ def flag_for_downsampling(audiofilepath):
                                                                          layer_name=layer_name,
                                                                          input_data=each_second,
                                                                          layer_index=layer_index
-                                                                        )
+                                                                         )
 
                 elif layer_name == "EOF":
                     print(intermediate_result_values)
@@ -390,7 +390,7 @@ def flag_for_downsampling(audiofilepath):
                                                                          layer_name=layer_name,
                                                                          input_data=intermediate_result_values,
                                                                          layer_index=layer_index
-                                                                        )
+                                                                         )
             end_time = time.time() - start_time
             print(Fore.YELLOW + "Time Elapsed: " + str(end_time) + Style.RESET_ALL)
 
@@ -414,7 +414,7 @@ def predict_on_goertzelcomponents(ten_sec_data):
                                                                      layer_name=layer_name,
                                                                      input_data=each_second,
                                                                      layer_index=layer_index
-                                                                    )
+                                                                     )
                 # print np.array(intermediate_result_values)
 
             elif layer_name == "EOF":
@@ -424,7 +424,7 @@ def predict_on_goertzelcomponents(ten_sec_data):
                                                                      layer_name=layer_name,
                                                                      input_data=intermediate_result_values,
                                                                      layer_index=layer_index
-                                                                    )
+                                                                     )
                 # print np.array(intermediate_result_values)
         end_time = time.time() - start_time
         print(Fore.YELLOW + "Time Elapsed: " + str(end_time) + Style.RESET_ALL)

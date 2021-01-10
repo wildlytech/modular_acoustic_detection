@@ -20,8 +20,8 @@ def app_page_layout(page_layout,
                 children=[
                     html.A(
                         id='dashbio-logo-graph', children=[
-                        html.P("<< Main Page", style={"display": "inline",
-                                                      "text-decoration": "underline"}),
+                            html.P("<< Main Page", style={"display": "inline",
+                                                          "text-decoration": "underline"}),
                         ],
                         href="/Monitoring" if standalone else "/dash-bio"
                     ),

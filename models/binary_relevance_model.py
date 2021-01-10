@@ -251,15 +251,15 @@ def import_dataframes(dataframe_file_list,
             del df
 
             train_positive_examples_df, test_positive_examples_df = \
-                        split_and_subsample_dataframe(dataframe=positive_examples_df,
-                                                      validation_split=validation_split,
-                                                      subsample=input_file_dict["positiveSubsample"])
+                split_and_subsample_dataframe(dataframe=positive_examples_df,
+                                              validation_split=validation_split,
+                                              subsample=input_file_dict["positiveSubsample"])
             del positive_examples_df
 
             train_negative_examples_df, test_negative_examples_df = \
-                        split_and_subsample_dataframe(dataframe=negative_examples_df,
-                                                      validation_split=validation_split,
-                                                      subsample=input_file_dict["negativeSubsample"])
+                split_and_subsample_dataframe(dataframe=negative_examples_df,
+                                              validation_split=validation_split,
+                                              subsample=input_file_dict["negativeSubsample"])
             del negative_examples_df
 
             # append to overall list of examples

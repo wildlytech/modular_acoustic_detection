@@ -38,7 +38,7 @@ RESULT = PARSER.parse_args()
 ###############################################################################
 COMPRESSED_FILES_PATH = RESULT.path_to_compressed_audio_files
 ORIGINAL_WAV_FILES_PATH = glob.glob(RESULT.path_to_original_audio_files + "*.wav") + \
-                          glob.glob(RESULT.path_to_original_audio_files + "*.WAV")
+    glob.glob(RESULT.path_to_original_audio_files + "*.WAV")
 ORIGINAL_WAV_FILES_LIST = [wav_file.split("/")[-1] for wav_file in ORIGINAL_WAV_FILES_PATH]
 TYPE_OF_COMPRESSION = RESULT.codec_type
 

@@ -32,7 +32,7 @@ def get_header(app):
              [html.Div(
                  [html.H5("Acoustic Monitoring Device Report",
                           style={'text-decoration': 'underline'})
-                 ], className="seven columns main-title"),
+                  ], className="seven columns main-title"),
               html.Div(
                   [html.A("Download Report",
                           id="download-link-report",
@@ -40,10 +40,10 @@ def get_header(app):
                           style={'text-decoration': 'underline'},
                           href="/readMe.pdf",
                           className="full-view-link")
-                  ], className="five columns")
-             ], className="twelve columns",
+                   ], className="five columns")
+              ], className="twelve columns",
              style={"padding-left": "0"})
-        ], className="row")
+         ], className="row")
 
     return header
 
