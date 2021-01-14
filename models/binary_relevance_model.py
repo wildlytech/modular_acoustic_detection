@@ -35,7 +35,6 @@ REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
 REQUIRED_NAMED.add_argument('-model_cfg_json', '--model_cfg_json',
                             help='Input json configuration file for label',
                             required=True)
-OPTIONAL_NAMED.add_argument('-output_weight_file', '--output_weight_file', help='Output weight file name')
 ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
 PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 
@@ -48,12 +47,8 @@ with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
 
 FULL_NAME = CONFIG_DATA["aggregatePositiveLabelName"] + 'vs' + CONFIG_DATA["aggregateNegativeLabelName"]
 
-if PARSED_ARGS.output_weight_file is None:
-    # Set default output weight file name
-    OUTPUT_WEIGHT_FILE = CONFIG_DATA["train"]["outputWeightFile"]
-else:
-    # Use argument weight file name
-    OUTPUT_WEIGHT_FILE = PARSED_ARGS.output_weight_file
+# Set default output weight file name
+OUTPUT_WEIGHT_FILE = CONFIG_DATA["train"]["outputWeightFile"]
 
 # create directory to the folder
 pathToFileDirectory = "/".join(OUTPUT_WEIGHT_FILE.split('/')[:-1]) + '/'

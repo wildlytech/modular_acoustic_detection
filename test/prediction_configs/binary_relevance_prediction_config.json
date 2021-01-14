@@ -1,0 +1,4 @@
+[
+    "test/model_configs/binary_relevance_model/domesticVsWild.json",
+    "test/model_configs/binary_relevance_model/explosion.json"
+]

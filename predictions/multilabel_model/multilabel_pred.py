@@ -6,6 +6,7 @@ import argparse
 import json
 from tensorflow.compat.v1.keras.models import model_from_json
 import numpy as np
+import os
 import pandas as pd
 import pickle
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
@@ -195,6 +196,11 @@ def main(predictions_cfg_json,
                 misclassified_pickle_file = save_misclassified_examples + \
                     "_misclassified_examples_multilabel_model_" + \
                     model_name.replace(' ', '_') + ".pkl"
+
+                pathToFileDirectory = "/".join(misclassified_pickle_file.split('/')[:-1]) + '/'
+                if not os.path.exists(pathToFileDirectory):
+                    os.makedirs(pathToFileDirectory)
+
                 with open(misclassified_pickle_file, "wb") as f:
                     pickle.dump(DF_TEST.loc[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 
@@ -233,6 +239,10 @@ def main(predictions_cfg_json,
     ###########################################################################
 
     if path_to_save_prediction_csv:
+        pathToFileDirectory = "/".join(path_to_save_prediction_csv.split('/')[:-1]) + '/'
+        if not os.path.exists(pathToFileDirectory):
+            os.makedirs(pathToFileDirectory)
+
         DF_TEST.drop(["features"], axis=1).to_csv(path_to_save_prediction_csv)
 
 

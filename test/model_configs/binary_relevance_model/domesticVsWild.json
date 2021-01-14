@@ -1,0 +1,77 @@
+{
+    "name": "DomesticAnimals",
+    "description": "Identifies Domestic Animals vs Wild Animals",
+    "aggregatePositiveLabelName": "DomesticAnimals",
+    "aggregateNegativeLabelName": "WildAnimals",
+    "positiveLabels": [
+        "Dog",
+        "Bark",
+        "Howl",
+        "Bow-wow",
+        "Growling",
+        "Bay",
+        "Livestock, farm animals, working animals",
+        "Yip",
+        "Cattle, bovinae",
+        "Moo",
+        "Cowbell",
+        "Goat",
+        "Bleat",
+        "Sheep",
+        "Domestic animals, pets"
+    ],
+    "negativeLabels": [
+        "Roaring cats (lions, tigers)",
+        "Roar",
+        "Bird",
+        "Bird vocalization, bird call, bird song",
+        "Squawk",
+        "Pigeon, dove",
+        "Chirp, tweet",
+        "Coo",
+        "Crow",
+        "Caw",
+        "Owl",
+        "Hoot",
+        "Gull, seagull",
+        "Bird flight, flapping wings",
+        "Canidae, dogs, wolves",
+        "Rodents, rats, mice",
+        "Mouse",
+        "Chipmunk",
+        "Patter",
+        "Insect",
+        "Cricket",
+        "Mosquito",
+        "Fly, housefly",
+        "Buzz",
+        "Bee, wasp, etc.",
+        "Frog",
+        "Croak",
+        "Snake",
+        "Rattle"
+    ],
+    "ontology": {
+        "useYoutubeAudioSet": true,
+        "extension": null
+    },
+    "networkCfgJson": "model_configs/binary_relevance_model/topology/Conv1D500-128x128_Dense500_Dense500_Dense500_Dense1_MaxPool.json",
+    "train": {
+        "epochs": 5,
+        "batchSize": 500,
+        "validationSplit": 0.3,
+        "inputDataFrames": [
+            {
+                "path": "diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl",
+                "positiveSubsample": 1000,
+                "negativeSubsample": 0
+            },
+            {
+                "path": "diff_class_datasets/Datasets/pure/Wild/pure_wild_7061.pkl",
+                "positiveSubsample": 0,
+                "negativeSubsample": 1000
+            }
+        ],
+        "outputWeightFile": "test/weights/binary_relevance_model/domestic.h5"
+    }
+}
