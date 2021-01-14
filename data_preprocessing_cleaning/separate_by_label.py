@@ -15,7 +15,7 @@ def separate_by_label(path, label_to_separate):
     # column names for csv file
     column_tags = ['wav_file', 'Label_1', 'Label_2', 'Label_3', 'Label_4']
     old_csv_file = path.split("/")[-1]
-    new_csv_file = ".".join(old_csv_file.split(".")[:-1])+"_"+label_to_separate.replace(' ', '_')+'.csv'
+    new_csv_file = ".".join(old_csv_file.split(".")[:-1]) + "_" + label_to_separate.replace(' ', '_') + '.csv'
     print("\nNew CSV file:", new_csv_file)
 
     # create a csv new file to export data
@@ -29,7 +29,8 @@ def separate_by_label(path, label_to_separate):
                     csvwriter.writerow(new_csv_df.iloc[row])
                     break
 
-###################################################################################################
+###############################################################################
+
 
 if __name__ == "__main__":
 
@@ -37,9 +38,9 @@ if __name__ == "__main__":
     PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     RequiredArguments = PARSER.add_argument_group('required arguments')
     RequiredArguments.add_argument('-csv', '--csv_file_path', action='store', \
-        help='Input csv file path', required=True)
+                                   help='Input csv file path', required=True)
     RequiredArguments.add_argument('-label', '--label_to_separate', action='store', \
-        help='Input label to separate from csv file, for instance "bird"', required=True)
+                                   help='Input label to separate from csv file, for instance "bird"', required=True)
     RESULT = PARSER.parse_args()
 
     print("\nGiven CSV file path:", RESULT.csv_file_path)

@@ -10,9 +10,10 @@ from colorama import Fore, Style
 import glob
 import os
 
-######################################################################################
-                    # Helper Function
-######################################################################################
+###############################################################################
+# Helper Function
+###############################################################################
+
 
 def get_duration_wav_file(wav_file):
     """
@@ -39,17 +40,17 @@ def start_splitting(chunk_length_ms, wav_file, path_to_write_chunks):
     print("splitting audio files into chunks of", chunk_length_ms / 1000.0, "seconds :", file_name)
     myaudio = AudioSegment.from_wav(wav_file)
     chunks = make_chunks(myaudio, chunk_length_ms)
-    #Export all of the individual chunks as wav files
+    # Export all of the individual chunks as wav files
     for i, chunk in enumerate(chunks):
-        chunk_name = file_name+"_"+str(i)+'.wav'
+        chunk_name = file_name + "_" + str(i) + '.wav'
 
         # if the last chunk is not of length, then pad it with silence
         if len(chunk) < chunk_length_ms:
             print("Padding last file with", (chunk_length_ms - len(chunk)) / 1000.0, "seconds of silence")
-            chunk = chunk + AudioSegment.silent(duration = chunk_length_ms - len(chunk),
+            chunk = chunk + AudioSegment.silent(duration=chunk_length_ms - len(chunk),
                                                 frame_rate=chunk.frame_rate)
 
-        chunk.export(path_to_write_chunks+chunk_name, format="wav")
+        chunk.export(path_to_write_chunks + chunk_name, format="wav")
     return len(chunks)
 
 
@@ -93,7 +94,7 @@ def audio_split_directory(path_for_wavfiles, path_to_write_chunks, chunk_length_
     if not path_for_wavfiles.endswith('/'):
         path_for_wavfiles += '/'
 
-    wav_files_list = glob.glob(path_for_wavfiles+"*.wav") + glob.glob(path_for_wavfiles+"*.WAV")
+    wav_files_list = glob.glob(path_for_wavfiles + "*.wav") + glob.glob(path_for_wavfiles + "*.WAV")
     # iterate all the wav files in the list to split
     for wav_file in wav_files_list:
         audio_split_single_file(wav_file=wav_file,
@@ -101,22 +102,21 @@ def audio_split_directory(path_for_wavfiles, path_to_write_chunks, chunk_length_
                                 chunk_length_ms=chunk_length_ms)
 
 
-######################################################################################
-            # Main Function
-######################################################################################
+###############################################################################
+# Main Function
+###############################################################################
 if __name__ == "__main__":
 
-    ##################################################################################
-            # Description and help
-    ##################################################################################
+    ###########################################################################
+    # Description and help
+    ###########################################################################
 
     DESCRIPTION = " Splits the long duration audio files into chunks of 10 seconds"
     HELP = "Input path for wav files directory or input single wav file path to split into chunks of 10seconds"
 
-
-    ##################################################################################
-                # Parse the arguments
-    ##################################################################################
+    ###########################################################################
+    # Parse the arguments
+    ###########################################################################
     PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     REQUIRED_ARGUMENTS = PARSER.add_argument_group('required arguments')
     REQUIRED_ARGUMENTS.add_argument('-path_for_wavfiles', '--path_for_wavfiles', action='store',
@@ -131,10 +131,10 @@ if __name__ == "__main__":
     path_to_write_chunks = RESULT.path_to_write_chunks
 
     if path_for_wavfiles.split(".")[-1].lower() == 'wav':
-        audio_split_single_file(wav_file = path_for_wavfiles,
-                                path_to_write_chunks = path_to_write_chunks,
-                                chunk_length_ms = 10000)
+        audio_split_single_file(wav_file=path_for_wavfiles,
+                                path_to_write_chunks=path_to_write_chunks,
+                                chunk_length_ms=10000)
     else:
-        audio_split_directory(path_for_wavfiles = path_for_wavfiles,
-                              path_to_write_chunks = path_to_write_chunks,
-                              chunk_length_ms = 10000)
+        audio_split_directory(path_for_wavfiles=path_for_wavfiles,
+                              path_to_write_chunks=path_to_write_chunks,
+                              chunk_length_ms=10000)

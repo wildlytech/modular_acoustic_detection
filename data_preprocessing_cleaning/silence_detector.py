@@ -3,6 +3,7 @@ import librosa
 import numpy as np
 import argparse
 
+
 def read_soundfile(filepath):
     """
     Reads sound file from given path:
@@ -15,9 +16,10 @@ def read_soundfile(filepath):
     fs,float: Sampling rate at which the signal was sampled
     """
     sig, fs = librosa.load(filepath)
-    return sig,fs
+    return sig, fs
 
-def create_spec(sig,fs):
+
+def create_spec(sig, fs):
     """
     Reads signal and frame rate and creates a spectrogram
 
@@ -31,10 +33,10 @@ def create_spec(sig,fs):
     """
     f, t, sxx = scipy.signal.spectrogram(sig, fs)
     pdb = librosa.power_to_db(sxx, ref=np.max)
-    return pdb,t
+    return pdb, t
 
 
-def silence_detector(pdb,t, thresh=-60):
+def silence_detector(pdb, t, thresh=-60):
     """
     Reads the spectrogram and detects silences
 
@@ -66,17 +68,18 @@ def silence_detector(pdb,t, thresh=-60):
     time_silence = [(t[tup[0]], t[tup[1]]) for tup in silence_limits]
     return time_silence
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     description = "Detects silences in a spectrogram"
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("-filepath","--filepath",action="store",help="Input path to the file",required=True)
-    parser.add_argument("-thresh","--thresh",action="store",help="threshold below which sound is silence")
+    parser.add_argument("-filepath", "--filepath", action="store", help="Input path to the file", required=True)
+    parser.add_argument("-thresh", "--thresh", action="store", help="threshold below which sound is silence")
 
     args = parser.parse_args()
-    sig,fs = read_soundfile(args.filepath)
-    pdb,t = create_spec(sig,fs)
+    sig, fs = read_soundfile(args.filepath)
+    pdb, t = create_spec(sig, fs)
     if args.thresh:
         time_silence = silence_detector(pdb, t, args.thresh)
     else:
-        time_silence = silence_detector(pdb,t)
+        time_silence = silence_detector(pdb, t)
     print(time_silence)

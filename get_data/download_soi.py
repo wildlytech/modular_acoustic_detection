@@ -2,21 +2,18 @@
 Downloads Sounds of Interest audio files amoung the list
 """
 import argparse
-import sys
 from subprocess import check_call, CalledProcessError
 import threading
 import pickle
 import os
-import sys
 import numpy as np
 import pandas as pd
 from pydub import AudioSegment
 from sklearn.preprocessing import LabelBinarizer
 
 
-
 ###########################################################################
-                    #Define the Sounds
+# Define the Sounds
 ###########################################################################
 
 EXPLOSION_SOUNDS = [
@@ -158,9 +155,8 @@ NATURE_SOUNDS = [
 ]
 
 
-
 ###########################################################################
-            #Description and Help
+# Description and Help
 ###########################################################################
 
 DESCRIPTION = 'Input one of these sounds : explosion_sounds , wood_sounds , motor_sounds,\
@@ -168,32 +164,27 @@ DESCRIPTION = 'Input one of these sounds : explosion_sounds , wood_sounds , moto
 HELP = 'Input the target sounds. It should be one of the listed sounds'
 
 
-
-
 ###########################################################################
-    #Defining Ambient and Impact sounds as to what sounds it must comprise of.
+# Defining Ambient and Impact sounds as to what sounds it must comprise of.
 ###########################################################################
 
 AMBIENT_SOUNDS = NATURE_SOUNDS
 IMPACT_SOUNDS = EXPLOSION_SOUNDS + WOOD_SOUNDS + MOTOR_SOUNDS + \
-                HUMAN_SOUNDS + TOOLS_SOUNDS + DOMESTIC_SOUNDS
-
+    HUMAN_SOUNDS + TOOLS_SOUNDS + DOMESTIC_SOUNDS
 
 
 ###########################################################################
-        #create a dictionary of sounds
+# create a dictionary of sounds
 ###########################################################################
 
 SOUNDS_DICT = {'explosion_sounds': EXPLOSION_SOUNDS, 'wood_sounds': WOOD_SOUNDS,
                'nature_sounds': NATURE_SOUNDS, 'motor_sounds': MOTOR_SOUNDS,
                'human_sounds': HUMAN_SOUNDS, 'tools': TOOLS_SOUNDS,
-               'domestic_sounds': DOMESTIC_SOUNDS, 'Wild_animals':WILD_ANIMALS}
-
-
+               'domestic_sounds': DOMESTIC_SOUNDS, 'Wild_animals': WILD_ANIMALS}
 
 
 ###########################################################################
-        #parse the input arguments given from command line
+# parse the input arguments given from command line
 ###########################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-target_sounds', '--target_sounds', action='store',
@@ -214,14 +205,14 @@ def get_csv_data(target_sounds):
                                  skipinitialspace=True,
                                  skiprows=2)
     balanced_train.columns = [balanced_train.columns[0][2:]] + \
-                              balanced_train.columns[1:].values.tolist()
+        balanced_train.columns[1:].values.tolist()
 
     unbalanced_train = pd.read_csv("data/audioset/unbalanced_train_segments.csv",
                                    quotechar='"',
                                    skipinitialspace=True,
                                    skiprows=2)
     unbalanced_train.columns = [unbalanced_train.columns[0][2:]] + \
-                                unbalanced_train.columns[1:].values.tolist()
+        unbalanced_train.columns[1:].values.tolist()
 
     train = pd.concat([unbalanced_train, balanced_train], axis=0, ignore_index=True)
 
@@ -248,7 +239,6 @@ def get_csv_data(target_sounds):
     train_label_binarized = pd.DataFrame(train_label_binarized, columns=name_bin.classes_)
     del train_label_binarized['None']
 
-
     # Remove rows for uninteresting sounds
     train = train.loc[train_label_binarized.sum(axis=1) > 0]
     train.index = list(range(train.shape[0]))
@@ -263,29 +253,31 @@ def get_csv_data(target_sounds):
 
     return train, train_label_binarized
 
-############################################################################################
-            # Downloads the youtube audio files
-############################################################################################
+###############################################################################
+# Downloads the youtube audio files
+###############################################################################
+
+
 def download_clip(YTID, start_seconds, end_seconds, target_path):
     """
     Downloads the youtube audio files
     """
     url = "https://www.youtube.com/watch?v=" + YTID
 
-    #set the target path to download the audio files
-    target_file = target_path + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)+".wav"
+    # set the target path to download the audio files
+    target_file = target_path + YTID + '-' + str(start_seconds) + '-' + str(end_seconds) + ".wav"
 
     # No need to download audio file that already has been downloaded
     if os.path.isfile(target_file):
         return
 
-    tmp_filename = target_path+ '/tmp_clip_' + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)
-    tmp_filename_w_extension = tmp_filename +'.wav'
+    tmp_filename = target_path + '/tmp_clip_' + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)
+    tmp_filename_w_extension = tmp_filename + '.wav'
 
     try:
         check_call(['youtube-dl', url,
                     '--audio-format', 'wav',
-                    '-x', '-o', tmp_filename +'.%(ext)s'])
+                    '-x', '-o', tmp_filename + '.%(ext)s'])
     except CalledProcessError:
 
         # do nothing
@@ -293,7 +285,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
         return
 
     try:
-        aud_seg = AudioSegment.from_wav(tmp_filename_w_extension)[start_seconds*1000:end_seconds*1000]
+        aud_seg = AudioSegment.from_wav(tmp_filename_w_extension)[start_seconds * 1000:end_seconds * 1000]
 
         aud_seg.export(target_file, format="wav")
     except:
@@ -302,11 +294,9 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
     os.remove(tmp_filename_w_extension)
 
 
-
-
-############################################################################################
-                # To download the audio files from youtube
-############################################################################################
+###############################################################################
+# To download the audio files from youtube
+###############################################################################
 def download_data(target_sounds_list, target_path):
     """
     Get the data necessary for downloading audio files
@@ -318,11 +308,11 @@ def download_data(target_sounds_list, target_path):
     df['positive_labels'] = df['positive_labels'].apply(lambda arr: arr.split(','))
     df['labels_name'] = df['positive_labels'].map(lambda arr: np.concatenate([labels_csv.loc[labels_csv['mid'] == x].display_name for x in arr]))
     df['wav_file'] = df['YTID'].astype(str) + '-' + df['start_seconds'].astype(str) +\
-                     '-' + df['end_seconds'].astype(str)+'.wav'
+        '-' + df['end_seconds'].astype(str) + '.wav'
 
-    #save the data frame which can be used for further balancing the data
-    #and generating the embeddings for audio files.
-    with open(RESULT.target_sounds+'_downloaded_base_dataframe.pkl', 'wb') as file_obj:
+    # save the data frame which can be used for further balancing the data
+    # and generating the embeddings for audio files.
+    with open(RESULT.target_sounds + '_downloaded_base_dataframe.pkl', 'wb') as file_obj:
         pickle.dump(df, file_obj)
 
     print('Base dataframe is saved as " downloaded_base_dataframe.pkl "..!!')
@@ -348,8 +338,6 @@ def download_data(target_sounds_list, target_path):
         t.join()
 
 
-
-
-#call the function to dowload the target or sounds of Interest. Set the target
+# call the function to dowload the target or sounds of Interest. Set the target
 if __name__ == '__main__':
     download_data(SOUNDS_DICT[RESULT.target_sounds], RESULT.target_path)

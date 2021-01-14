@@ -6,32 +6,35 @@ import pickle
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-from tensorflow.compat.v1.keras.models import Sequential,model_from_json
+from tensorflow.compat.v1.keras.models import Sequential, model_from_json
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from tensorflow.compat.v1.keras.optimizers import Adam
 from youtube_audioset import get_recursive_sound_names
 import os
+from glob import glob
 import json
-from colorama import Fore,Style
+from colorama import Fore, Style
 import argparse
 
 #########################################################
-    #Description and Help
+# Description and Help
 #########################################################
 DESCRIPTION = "Reads config file from user and trains multilabel model accordingly."
 HELP = "Input config filepath for the required model to be trained."
 #########################################################
-    #Parse the arguments
+# Parse the arguments
 #########################################################
 parser = argparse.ArgumentParser(description=DESCRIPTION)
-parser.add_argument("-cfg_json",action="store",help=HELP,required=True)
+parser.add_argument("-cfg_json", action="store", help=HELP, required=True)
 result = parser.parse_args()
 cfg_path = result.cfg_json
+
 
 def read_config(filepath):
     with open(filepath) as f:
         config = json.load(f)
     return config
+
 
 config = read_config(cfg_path)
 
@@ -55,20 +58,18 @@ pos_sounds = {}
 neg_sounds = {}
 for label_dicts in config["labels"]:
     lab_name = label_dicts["aggregatePositiveLabelName"]
-    comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"],"./",ontologyExtFiles)
+    comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"], "./", ontologyExtFiles)
     pos_sounds[lab_name] = comprising_pos_labels
-    if label_dicts["negativeLabels"]!=None:
+    if label_dicts["negativeLabels"] is not None:
         neg_lab_name = label_dicts["aggregateNegativeLabelName"]
-        comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"],"./",ontologyExtFiles)
+        comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"], "./", ontologyExtFiles)
         comprising_neg_labels = comprising_neg_labels.difference(comprising_pos_labels)
         neg_sounds[neg_lab_name] = comprising_neg_labels
 
 
-
-
 ########################################################################
-      # Importing balanced data from the function.
-      # Including audiomoth annotated files for training
+# Importing balanced data from the function.
+# Including audiomoth annotated files for training
 ########################################################################
 
 def subsample_dataframe(dataframe, subsample):
@@ -86,6 +87,7 @@ def subsample_dataframe(dataframe, subsample):
 
     return dataframe
 
+
 def split_and_subsample_dataframe(dataframe, validation_split, subsample):
     """
     Perform validation split and sub/over sampling of dataframe
@@ -93,7 +95,7 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
     """
 
     # split before sub/oversampling to ensure there is no leakage between train and test sets
-    test_size = int(validation_split*dataframe.shape[0])
+    test_size = int(validation_split * dataframe.shape[0])
 
     train_size = dataframe.shape[0] - test_size
 
@@ -108,7 +110,7 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
                                              test_size=test_size,
                                              random_state=42)
 
-    test_subsample = int(subsample*validation_split)
+    test_subsample = int(subsample * validation_split)
     train_subsample = subsample - test_subsample
 
     if (train_df.shape[0] == 0) and (train_subsample > 0):
@@ -125,11 +127,13 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
 
     return train_df, test_df
 
+
 def get_select_vector(dataframe, label_filter_arr):
     """
     Get the boolean select vector on the dataframe from the label filter
     """
     return dataframe['labels_name'].apply(lambda arr: np.any([x.lower() in label_filter_arr for x in arr]))
+
 
 def import_dataframes(dataframe_file_list,
                       positive_label_filter_arr,
@@ -172,7 +176,7 @@ def import_dataframes(dataframe_file_list,
         search_results = [x for x in search_results if x not in exclude_paths]
 
         if len(search_results) == 0:
-            print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths,Style.RESET_ALL)
+            print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths, Style.RESET_ALL)
             assert (False)
 
         for path in search_results:
@@ -211,9 +215,9 @@ def import_dataframes(dataframe_file_list,
             df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
             train_file_examples_df, test_file_examples_df = \
-                        split_and_subsample_dataframe(dataframe=df,
-                              validation_split=validation_split,
-                              subsample=input_file_dict["subsample"])
+                split_and_subsample_dataframe(dataframe=df,
+                                              validation_split=validation_split,
+                                              subsample=input_file_dict["subsample"])
 
             # append to overall list of examples
             list_of_train_dataframes.append(train_file_examples_df)
@@ -228,11 +232,9 @@ def import_dataframes(dataframe_file_list,
 
 
 DF_TRAIN, DF_TEST = import_dataframes(dataframe_file_list=config["train"]["inputDataFrames"],
-                              positive_label_filter_arr=pos_sounds,
-                              negative_label_filter_arr=neg_sounds,
-                              validation_split=config["train"]["validationSplit"])
-
-
+                                      positive_label_filter_arr=pos_sounds,
+                                      negative_label_filter_arr=neg_sounds,
+                                      validation_split=config["train"]["validationSplit"])
 
 
 LABELS_BINARIZED_TRAIN = pd.DataFrame()
@@ -242,13 +244,11 @@ for key in pos_sounds.keys():
     POSITIVE_LABELS = pos_sounds[key]
     LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(DF_TRAIN, POSITIVE_LABELS)
 
-
     LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
 
 
-
-print("TR: ",LABELS_BINARIZED_TRAIN.columns)
-print("TS: ",LABELS_BINARIZED_TEST.columns)
+print("TR: ", LABELS_BINARIZED_TRAIN.columns)
+print("TS: ", LABELS_BINARIZED_TEST.columns)
 
 TOTAL_TRAIN_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TRAIN.sum(axis=0)
 TOTAL_TEST_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TEST.sum(axis=0)
@@ -264,17 +264,16 @@ print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS)
 print("PERCENT EXAMPLES (BY CLASS):")
 print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS / TOTAL_TRAIN_TEST_EXAMPLES)
 ########################################################################
-      # preprecess the data into required structure
+# preprocess the data into required structure
 ########################################################################
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 
 
-
 ########################################################################
-      # create the keras model.
-      # Change and play around with model architecture
-      # Hyper parameters can be tweaked here
+# create the keras model.
+# Change and play around with model architecture
+# Hyper parameters can be tweaked here
 ########################################################################
 def create_keras_model():
     """
@@ -296,8 +295,6 @@ def create_keras_model():
     return model
 
 
-
-
 ########################################################################
     # reshaping the train and test data so as to align with input for model
 ########################################################################
@@ -307,9 +304,8 @@ CLF2_TRAIN_TARGET = LABELS_BINARIZED_TRAIN
 CLF2_TEST_TARGET = LABELS_BINARIZED_TEST
 
 
-
 ########################################################################
-      # Implementing & Training the keras model
+# Implementing & Training the keras model
 ########################################################################
 
 if config["networkCfgJson"] is None:
@@ -332,11 +328,9 @@ MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
 
 
-
-
 ########################################################################
-      # Predict on train and test data
-      # Changing decision threshold can be done here
+# Predict on train and test data
+# Changing decision threshold can be done here
 ########################################################################
 CLF2_TRAIN_PREDICTION = MODEL.predict(CLF2_TRAIN).round()
 CLF2_TRAIN_PREDICTION_PROB = MODEL.predict(CLF2_TRAIN)
@@ -344,10 +338,8 @@ CLF2_TEST_PREDICTION = MODEL.predict(CLF2_TEST).round()
 CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 
 
-
-
 ########################################################################
-      # To get the Misclassified examples
+# To get the Misclassified examples
 ########################################################################
 DF_TEST['actual_labels'] = np.split(LABELS_BINARIZED_TEST.values, DF_TEST.shape[0])
 DF_TEST['predicted_labels'] = np.split(CLF2_TEST_PREDICTION, DF_TEST.shape[0])
@@ -357,17 +349,14 @@ MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 
 
-
-
 ########################################################################
-      # print misclassified number of examples
+# print misclassified number of examples
 ########################################################################
 print('Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shape[0])
 
 
-
 ########################################################################
-      # Print confusion matrix and classification_report
+# Print confusion matrix and classification_report
 ########################################################################
 print('        Confusion Matrix          ')
 print('============================================')
@@ -384,10 +373,8 @@ CL_REPORT = classification_report(CLF2_TEST_TARGET.values.argmax(axis=1),
 print(CL_REPORT)
 
 
-
-
 ########################################################################
-        # calculate accuracy and hamming loss
+# calculate accuracy and hamming loss
 ########################################################################
 ACCURACY = accuracy_score(CLF2_TEST_TARGET.values.argmax(axis=1),
                           CLF2_TEST_PREDICTION.argmax(axis=1))
@@ -396,10 +383,8 @@ print('Hamming Loss :', HL)
 print('Accuracy :', ACCURACY)
 
 
-
-
 ########################################################################
-        # Save the model weights
-        # Change the name if you are tweaking hyper parameters
+# Save the model weights
+# Change the name if you are tweaking hyper parameters
 ########################################################################
 MODEL.save_weights(config["train"]["outputWeightFile"])

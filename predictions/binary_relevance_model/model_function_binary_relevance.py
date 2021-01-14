@@ -7,7 +7,6 @@ from tensorflow.compat.v1.keras.optimizers import Adam
 import os
 
 
-
 ##############################################################################
 
 ##############################################################################
@@ -33,7 +32,6 @@ def create_keras_model():
                   optimizer=Adam(lr=1e-4, epsilon=1e-8),
                   metrics=['accuracy'])
     return model
-
 
 
 ##############################################################################
@@ -63,7 +61,6 @@ def predictions_wavfile(data, model_type):
     else:
         print("Invalid Model Selected")
 
-
     test_data = data.reshape((-1, 1280, 1))
     if len(test_data) == 1:
         predictions_prob = model.predict(test_data)
@@ -74,7 +71,6 @@ def predictions_wavfile(data, model_type):
         predictions_prob = model.predict(test_data).ravel()
         predictions = predictions_prob.round()
     return predictions_prob, predictions
-
 
 
 ##############################################################################
@@ -105,8 +101,6 @@ def predictions_batch_wavfiles(data, model_type):
     else:
         print("Invalid Model Selected")
 
-
     predictions_prob = model.predict(data)
     predictions = predictions_prob.round()
     return predictions_prob, predictions
-

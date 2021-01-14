@@ -14,20 +14,19 @@
 # To calculate Pi value
 import math
 # To log the time elapsed
-import time
 # To read the wavfile
 from scipy.io import wavfile
 # To initialize the lists
 import numpy as np
-# To resample. We will also be implementing without 
+# To resample. We will also be implementing without
 import resampy
-
 
 
 class ReadAudioFile(object):
     """
     reads the audio file and return the samples and sampling rate
     """
+
     def __init__(self, path):
         self.path = path
 
@@ -47,6 +46,7 @@ class DownsamplingImplementation(object):
     ISC License
     Copyright (c) 2016, Brian McFee
     """
+
     def __init__(self, samples, original_sampling_frequency):
         self.samples = samples
         self.original_sampling_frequency = original_sampling_frequency
@@ -65,7 +65,7 @@ class DownsamplingImplementation(object):
         """
 
         scale = min(1.0, sample_ratio)
-        time_increment = 1./sample_ratio
+        time_increment = 1. / sample_ratio
         index_step = int(scale * num_table)
         time_register = 0.0
 
@@ -115,7 +115,7 @@ class DownsamplingImplementation(object):
             eta = index_frac - offset
 
             # Compute the right wing of the filter response
-            k_max = min(n_orig - n - 1, (nwin - offset)//index_step)
+            k_max = min(n_orig - n - 1, (nwin - offset) // index_step)
             for k in range(k_max):
                 weight = (interp_win[offset + k * index_step] + eta * interp_delta[offset + k * index_step])
                 for j in range(n_channels):
@@ -123,8 +123,6 @@ class DownsamplingImplementation(object):
 
             # Increment the time register
             time_register += time_increment
-
-
 
     def implement_resample(self, sr_new, axis=-1):
 
@@ -150,7 +148,6 @@ class DownsamplingImplementation(object):
 
         if sample_ratio < 1:
             interp_win *= sample_ratio
-        
 
         # create a numpy array of zeros similar to shape of interpolation window i.e interp_win
         interp_delta = np.zeros_like(interp_win)
@@ -163,7 +160,7 @@ class DownsamplingImplementation(object):
         x_2d = self.samples.reshape((self.samples.shape[axis], -1))
         y_2d = y.reshape((y.shape[axis], -1))
         print("Process Initiated")
-        self.resample_f(x_2d,y_2d, sample_ratio, interp_win, interp_delta, precision)
+        self.resample_f(x_2d, y_2d, sample_ratio, interp_win, interp_delta, precision)
 
         return y
 
@@ -172,6 +169,7 @@ class DownsampleUsingLibrary(object):
     """
     here we downsample the audio using the
     """
+
     def __init__(self, samples, original_sampling_frequency):
         self.samples = samples
         self.original_sampling_frequency = original_sampling_frequency
@@ -183,17 +181,16 @@ class DownsampleUsingLibrary(object):
         return resampy.resample(self.samples, self.original_sampling_frequency, target_sampling_frequency)
 
 
-
 class GoertzelComponents(object):
     """
     executes goertzel filtering on audio
     """
-    def __init__(self, samples, sample_rate, target_frequency, number_samples ):
+
+    def __init__(self, samples, sample_rate, target_frequency, number_samples):
         self.samples = samples
         self.sample_rate = sample_rate
         self.target_frequency = target_frequency
         self.number_samples = number_samples
-
 
     def goertzel_filter(self):
         """
@@ -205,8 +202,8 @@ class GoertzelComponents(object):
         total_samples = self.number_samples
 
         # computing the constants
-        k_constant = int((total_samples * self.target_frequency)/self.sample_rate)
-        w_constant = ((2 * math.pi * k_constant)/total_samples)
+        k_constant = int((total_samples * self.target_frequency) / self.sample_rate)
+        w_constant = ((2 * math.pi * k_constant) / total_samples)
         cosine = math.cos(w_constant)
         sine = math.sin(w_constant)
         coeff = 2 * cosine
@@ -221,8 +218,7 @@ class GoertzelComponents(object):
 
             real = (q_1 - q_2 * cosine)
             imag = (q_2 * sine)
-            magnitude = np.square(real) + np.square(imag) 
+            magnitude = np.square(real) + np.square(imag)
             result_mag[index] = np.sqrt(magnitude)
             index += 1
-        return  result_mag
-
+        return result_mag
