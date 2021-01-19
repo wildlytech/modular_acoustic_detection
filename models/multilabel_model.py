@@ -269,32 +269,6 @@ print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS / TOTAL_TRAIN_TEST_EXAMPLES)
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 
-
-########################################################################
-# create the keras model.
-# Change and play around with model architecture
-# Hyper parameters can be tweaked here
-########################################################################
-def create_keras_model():
-    """
-    Creating a Model
-    """
-    model = Sequential()
-    model.add(Conv1D(500, input_shape=(1280, 1), kernel_size=128,
-                     strides=128, activation='relu', padding='same'))
-    model.add(Dense(500, activation='relu'))
-    model.add(Dense(500, activation='relu'))
-    model.add(Dense(500, activation='relu'))
-    model.add(Dense(7, activation='sigmoid'))
-    model.add(MaxPooling1D(10))
-    model.add(Flatten())
-    print(model.summary())
-    # Compile model
-    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
-                  metrics=['accuracy'])
-    return model
-
-
 ########################################################################
     # reshaping the train and test data so as to align with input for model
 ########################################################################
@@ -307,17 +281,13 @@ CLF2_TEST_TARGET = LABELS_BINARIZED_TEST
 ########################################################################
 # Implementing & Training the keras model
 ########################################################################
+json_file = open(config["networkCfgJson"], 'r')
+loaded_model_json = json_file.read()
+json_file.close()
 
-if config["networkCfgJson"] is None:
-    MODEL = create_keras_model()
-else:
-    json_file = open(config["networkCfgJson"], 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-
-    MODEL = model_from_json(loaded_model_json)
-    MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
-                  metrics=['accuracy'])
+MODEL = model_from_json(loaded_model_json)
+MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+              metrics=['accuracy'])
 
 epochs = config["train"]["epochs"]
 batch_size = config["train"]["batchSize"]

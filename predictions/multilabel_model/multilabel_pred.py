@@ -239,6 +239,7 @@ def main(predictions_cfg_json,
     ###########################################################################
 
     if path_to_save_prediction_csv:
+
         pathToFileDirectory = "/".join(path_to_save_prediction_csv.split('/')[:-1]) + '/'
         if not os.path.exists(pathToFileDirectory):
             os.makedirs(pathToFileDirectory)

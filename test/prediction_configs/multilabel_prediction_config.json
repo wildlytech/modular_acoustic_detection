@@ -1,3 +1,4 @@
 [
-    "test/model_configs/multilabel_model/multilabel_maxpool.json"
+    "test/model_configs/multilabel_model/multilabel_maxpool.json",
+    "test/model_configs/multilabel_model/multilabel_maxpool2.json"
 ]

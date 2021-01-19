@@ -25,23 +25,14 @@
         "inputDataFrames": [
             {
                 "path": "diff_class_datasets/Datasets/pure/Explosion/pure_exp_7957.pkl",
-                "positiveSubsample": 1500,
+                "positiveSubsample": 1400,
                 "negativeSubsample": 0
             },
             {
-                "path": "diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl",
+                "patternPath": "diff_class_datasets/Datasets/pure/*/pure_*.pkl",
+                "excludePaths": ["diff_class_datasets/Datasets/pure/Explosion/pure_exp_7957.pkl"],
                 "positiveSubsample": 0,
-                "negativeSubsample": 500
-            },
-            {
-                "path": "diff_class_datasets/Datasets/pure/Tools/pure_tools_8113.pkl",
-                "positiveSubsample": 0,
-                "negativeSubsample": 500
-            },
-            {
-                "path": "diff_class_datasets/Datasets/pure/Wild/pure_wild_7061.pkl",
-                "positiveSubsample": 0,
-                "negativeSubsample": 500
+                "negativeSubsample": 200
             }
         ],
         "outputWeightFile": "test/weights/binary_relevance_model/explosion.h5"
