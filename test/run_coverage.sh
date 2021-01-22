@@ -15,17 +15,19 @@ cp -r ./test/bird_sounds_xc/rhinoptilus_bitorquatus/*.* ./test/test_mp3/
 
 coverage run -a -m data_preprocessing_cleaning.mp3_stereo_to_wav_mono -path_to_save_wav_files test/test_wav/ -input_mp3_path test/test_mp3/
 coverage run -a -m data_preprocessing_cleaning.split_wav_file -path_for_wavfiles test/test_wav/ -path_to_write_chunks test/wav_10sec/
+coverage run -a -m data_preprocessing_cleaning.copy_files_by_csv -csv test/test_annotations.csv -src test/ -dest test/data_preprocessing/
+coverage run -a -m data_preprocessing_cleaning.separate_by_label -csv test/test_annotations.csv -label Vehicle
+coverage run -a -m data_preprocessing_cleaning.seperating_different_sounds -dataframe_path test/dataframe_with_labels.pkl -path_to_write_different_sounds test/
 
 coverage run -a -m generating_embeddings -wav_file test/wav_10sec/ -path_to_write_embeddings test/test_embeddings
 coverage run -a -m create_base_dataframe -path_for_saved_embeddings test/test_embeddings -path_to_write_dataframe test/test_dataframe.pkl
 
-# coverage run -a -m balancing_dataset -- Update user gude. How does it work?
-# coverage run -a -m find_sounds -- Update user gude. How does it work?
-# coverage run -a -m youtube_audioset -- Update user gude. How does it work?
+# coverage run -a -m find_sounds -- Update user gude. 
+# coverage run -a -m youtube_audioset -- Update user gude. 
 
 coverage run -a -m xenocanto_to_dataframe -b "rhinoptilus bitorquatus" -o data/birds/
 
-# coverage run -a -m augmentation.audio_mixing -- Update user gude. How does it work?
+coverage run -a -m augmentation.audio_mixing -path_to_save_mixed_sounds test/augmentation/mixed/ -path_type_one_audio_files test/augmentation/type1_sounds/ -path_type_two_audio_files test/augmentation/type2_sounds/
 
 coverage run -a -m compression.compression -path_to_original_audio_files test/test_wav/ -path_to_compressed_audio_files test/compressed/ -codec_type aac 
 coverage run -a -m compression.compression -path_to_original_audio_files test/test_wav/ -path_to_compressed_audio_files test/compressed/ -codec_type mp3
@@ -52,10 +54,8 @@ coverage run -a -m continous_predictions.batch_test_offline -local_folder_path t
 # # coverage run -a -m Dash_integration.monitoring_alert.app_Wildly_Acoustic_Monitoring
 # # coverage run -a -m Dash_integration.multipage_ui.dash_integrate
 
-# coverage run -a -m data_preprocessing_cleaning.copy_files_by_csv
-# coverage run -a -m data_preprocessing_cleaning.separate_by_label
-# coverage run -a -m data_preprocessing_cleaning.identifying_mislabelled_silence_audiofiles
-# coverage run -a -m data_preprocessing_cleaning.seperating_different_sounds
+
+# coverage run -a -m data_preprocessing_cleaning.identifying_mislabelled_silence_audiofiles - broken 
 
 coverage run -a -m data_preprocessing_cleaning.visualize_dataframe -f test/dataframe_with_labels.pkl 
 coverage run -a -m get_data.data_preprocessing -annotation_file test/test_annotations.csv -path_for_saved_embeddings test/test_embeddings/ -path_to_save_dataframe test/test_dataframe.pkl
@@ -66,30 +66,28 @@ coverage run -a -m get_data.data_preprocessing -annotation_file test/test_annota
 # coverage run -a -m goertzel_filter.goertzel_filter_components
 
 # Binary relevance model
-##coverage run -a -m models.binary_relevance_model -model_cfg_json test/model_configs/binary_relevance_model/domesticVsWild.json
-##coverage run -a -m models.binary_relevance_model -model_cfg_json test/model_configs/binary_relevance_model/explosion.json
+coverage run -a -m models.binary_relevance_model -model_cfg_json test/model_configs/binary_relevance_model/domesticVsWild.json
+coverage run -a -m models.binary_relevance_model -model_cfg_json test/model_configs/binary_relevance_model/explosion.json
 # coverage run -a -m predictions.binary_relevance_model.generate_before_predict_BR
 # coverage run -a -m predictions.binary_relevance_model.get_predictions_on_dataframe
-##coverage run -a -m predictions.binary_relevance_model.get_results_binary_relevance \
-##            --predictions_cfg_json=test/prediction_configs/binary_relevance_prediction_config.json \
-##            --path_for_dataframe_with_features=diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl \
-##            --save_misclassified_examples=test/out_misclassified/br \
-##            --path_to_save_prediction_csv=test/out_csv/br_pred.csv
+coverage run -a -m predictions.binary_relevance_model.get_results_binary_relevance \
+            --predictions_cfg_json=test/prediction_configs/binary_relevance_prediction_config.json \
+            --path_for_dataframe_with_features=diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl \
+            --save_misclassified_examples=test/out_misclassified/br \
+            --path_to_save_prediction_csv=test/out_csv/br_pred.csv
 # coverage run -a -m predictions.binary_relevance_model.model_function_binary_relevance
 # coverage run -a -m predictions.binary_relevance_model.predict_on_wavfile_binary_relevance
 
 
-##coverage run -a -m models.multilabel_model -cfg_json test/model_configs/multilabel_model/multilabel_maxpool.json
-##coverage run -a -m predictions.multilabel_model.multilabel_pred \
-##            --predictions_cfg_json=test/prediction_configs/multilabel_prediction_config.json \
-##            --path_for_dataframe_with_features=diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl \
-##            --save_misclassified_examples=test/out_misclassified/multilabel \
-##            --path_to_save_prediction_csv=test/out_csv/multilabel_pred.csv
+coverage run -a -m models.multilabel_model -cfg_json test/model_configs/multilabel_model/multilabel_maxpool.json
+coverage run -a -m predictions.multilabel_model.multilabel_pred \
+            --predictions_cfg_json=test/prediction_configs/multilabel_prediction_config.json \
+            --path_for_dataframe_with_features=diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl \
+            --save_misclassified_examples=test/out_misclassified/multilabel \
+            --path_to_save_prediction_csv=test/out_csv/multilabel_pred.csv
 
 
 # coverage run -a -m predictions.multilabel_model.mutlilabel_pred_on_wavfile
-
-# coverage run -a -m models.binary_model
 
 coverage report -m -i
 
