@@ -71,7 +71,7 @@ print(UN.shape)
 # It consists of separate classes for sounds related to
 # Explosion, Motor, Nature, Human, Wood with numbers assigned
 # as 0,1,2,3,4 respectively.
-LAB = pd.read_csv('coarse_labels.csv')
+LAB = pd.read_csv('data_preprocessing_cleaning/coarse_labels.csv')
 
 
 ###############################################################################
