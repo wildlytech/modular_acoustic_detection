@@ -6,8 +6,7 @@ import pickle
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-from tensorflow.compat.v1.keras.models import Sequential, model_from_json
-from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
+from tensorflow.compat.v1.keras.models import model_from_json
 from tensorflow.compat.v1.keras.optimizers import Adam
 from youtube_audioset import get_recursive_sound_names
 import os
@@ -270,7 +269,7 @@ X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 
 ########################################################################
-    # reshaping the train and test data so as to align with input for model
+# reshaping the train and test data so as to align with input for model
 ########################################################################
 CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
 CLF2_TEST = X_TEST.reshape((-1, 1280, 1))

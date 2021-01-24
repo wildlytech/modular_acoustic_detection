@@ -35,10 +35,10 @@ if __name__ == '__main__':
 
     REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
     REQUIRED_NAMED.add_argument('-target_sounds', '--target_sounds', action='store',
-                        help=HELP, required=True)
+                                help=HELP, required=True)
     REQUIRED_NAMED.add_argument('-target_path', '--target_path', action='store',
-                        help='Input the path',
-                        required=True)
+                                help='Input the path',
+                                required=True)
     OPTIONAL_NAMED.add_argument('-file_limit', '--file_limit', type=int,
                                 help='limit of files to download',
                                 default=sys.maxsize)

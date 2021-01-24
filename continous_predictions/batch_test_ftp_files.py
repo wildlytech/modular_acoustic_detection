@@ -10,6 +10,7 @@ import sys
 
 global FTP_OBJ
 
+
 ############################################################################
 # List only wav files into
 ############################################################################
@@ -76,6 +77,7 @@ def call_for_ftp(ftp_folder_path, ftp_password):
     dataframe = dataframe.sort_values(["FileNames"], ascending=[1])
     return dataframe
 
+
 def start_batch_run(predictions_cfg_json,
                     path_for_folder,
                     wav_files_list,
@@ -139,6 +141,7 @@ def start_batch_run(predictions_cfg_json,
 
     return malformed
 
+
 def start_batch_run_ftp_live(ftp_folder_path,
                              ftp_password,
                              download_folder_path,
@@ -163,8 +166,9 @@ def start_batch_run_ftp_live(ftp_folder_path,
     for path in malformed:
         os.remove(path)
 
+
 ############################################################################
-            # Main Function
+# Main Function
 ############################################################################
 if __name__ == "__main__":
 
@@ -174,12 +178,10 @@ if __name__ == "__main__":
     DESCRIPTION = "Generates the csv file with prediction results"
     HELP = "Give the Required Arguments"
 
-
     ########################################################################
     # Target Path or Folder in FTP
     ########################################################################
     DEFAULT_CSV_FILENAME = "predictions_FTP_folder.csv"
-
 
     ########################################################################
     # Parsing argument
@@ -222,5 +224,5 @@ if __name__ == "__main__":
                                  csv_filename=RESULT.csv_filename)
 
         print("Waiting to FTP files to get accumulate:", WAIT_TIME_MINUTES, "Minutes")
-        time.sleep(WAIT_TIME_MINUTES*60)
+        time.sleep(WAIT_TIME_MINUTES * 60)
         MAX_MINUTES -= WAIT_TIME_MINUTES

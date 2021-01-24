@@ -82,7 +82,6 @@ def main(predictions_cfg_json, path_for_wavfile, print_results=False):
         CLF2_TRAIN_PREDICTION_PROB.append(prediction_probs)
         CLF2_TRAIN_PREDICTION.append(prediction_rounded)
 
-
     results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB), columns=LABEL_NAMES)
 
     if print_results:

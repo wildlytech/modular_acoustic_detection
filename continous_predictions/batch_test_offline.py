@@ -5,6 +5,7 @@ import glob
 import argparse
 from .batch_test_ftp_files import start_batch_run
 
+
 ############################################################################
 # Loops over the list of files in the directory specified
 ############################################################################
@@ -22,8 +23,9 @@ def start_batch_run_offline(predictions_cfg_json, path_for_folder, csv_filename)
                     csv_filename=csv_filename,
                     online=False)
 
+
 ############################################################################
-            # Main Function
+# Main Function
 ############################################################################
 if __name__ == "__main__":
 
@@ -33,7 +35,6 @@ if __name__ == "__main__":
     DESCRIPTION = "Generates the csv file with prediction results"
     HELP = "Give the Required Arguments"
 
-
     ########################################################################
     # Parsing argument
     ########################################################################
@@ -42,13 +43,13 @@ if __name__ == "__main__":
 
     REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
     REQUIRED_NAMED.add_argument('-local_folder_path', '--local_folder_path', action='store',
-                        help='Input the path', required=True)
+                                help='Input the path', required=True)
     REQUIRED_NAMED.add_argument('-predictions_cfg_json',
-                        '--predictions_cfg_json',
-                        help='Input (binary relevance) json configuration file for predictions output',
-                        required=True)
+                                '--predictions_cfg_json',
+                                help='Input (binary relevance) json configuration file for predictions output',
+                                required=True)
     OPTIONAL_NAMED.add_argument('-csv_filename', '--csv_filename', action='store',
-                        help='Input the name of csv file to save results', default='offline_predictions.csv')
+                                help='Input the name of csv file to save results', default='offline_predictions.csv')
     ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
     RESULT = ARGUMENT_PARSER.parse_args()
 
