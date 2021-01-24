@@ -116,7 +116,7 @@ def get_predictions(wavfile_path):
     Get predictions from wav file path
     """
     try:
-        embeddings = generate_before_predict_BR.main(wavfile_path, 0, 0, 0)
+        embeddings = generate_before_predict_BR.main(wavfile_path)
     except:
         print(('\033[1m' + "Predictions: " + '\033[0m' + "Error occured in File:- " + wavfile_path.split("/")[-1]))
         return None, None
@@ -514,7 +514,7 @@ def parse_contents_batch(contents, names, dates):
             # with open(path, 'wb') as file_obj:
             #     ftp.retrbinary('RETR '+ i, file_obj.write)
         try:
-            emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
+            emb.append(generate_before_predict_BR.main(path))
             os.remove(path)
         except ValueError:
             print("malformed index", dum_df.loc[dum_df["FileNames"] == i[1]].index)
@@ -915,7 +915,7 @@ def batch_downloading_and_predict(n_clicks):
                 with open(path, 'wb') as file_obj:
                     ftp.retrbinary('RETR ' + i, file_obj.write)
             try:
-                emb.append(generate_before_predict_BR.main(path, 0, 0, 0))
+                emb.append(generate_before_predict_BR.main(path))
             except ValueError:
                 print("malformed index", dum_df.loc[dum_df["FileNames"] == i].index)
                 dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == i].index)

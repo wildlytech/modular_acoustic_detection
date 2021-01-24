@@ -53,12 +53,12 @@ def predict_on_embedding(embedding, label_names, config_datas):
     return prediction_probs, prediction_rounded
 
 
-def main(predictions_cfg_json, path_for_wavfile):
+def main(predictions_cfg_json, path_for_wavfile, print_results=False):
 
     ###########################################################################
     # read the dataframe with feature and labels_name column
     ###########################################################################
-    EMBEDDINGS = generate_before_predict_BR.main(path_for_wavfile, 0, None, None)
+    EMBEDDINGS = generate_before_predict_BR.main(path_for_wavfile)
 
     ###########################################################################
     # Import json data
@@ -82,11 +82,16 @@ def main(predictions_cfg_json, path_for_wavfile):
         CLF2_TRAIN_PREDICTION_PROB.append(prediction_probs)
         CLF2_TRAIN_PREDICTION.append(prediction_rounded)
 
-    ###########################################################################
-    # Print results
-    ###########################################################################
+
     results = pd.DataFrame(np.array(CLF2_TRAIN_PREDICTION_PROB), columns=LABEL_NAMES)
-    print(results)
+
+    if print_results:
+        #######################################################################
+        # Print results
+        #######################################################################
+        print(results)
+
+    return results
 
 
 if __name__ == "__main__":

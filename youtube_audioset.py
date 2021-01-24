@@ -240,7 +240,7 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
     if os.path.isfile(target_file):
         return
 
-    tmp_filename = 'sounds/tmp_clip_' + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)
+    tmp_filename = target_path + '/tmp_clip_' + YTID + '-' + str(start_seconds) + '-' + str(end_seconds)
     tmp_filename_w_extension = tmp_filename + '.wav'
 
     try:
@@ -266,12 +266,17 @@ def download_clip(YTID, start_seconds, end_seconds, target_path):
 ###############################################################################
 # To download the audio files from youtube
 ###############################################################################
-def download_data(target_sounds_list, target_path):
+def download_data(aggregate_name, target_sounds_list, target_path, file_limit):
     """
     Get the data necessary for downloading audio files
     """
     df, labels_binarized = get_csv_data(target_sounds_list)
     labels_csv = pd.read_csv("data/audioset/class_labels_indices.csv")
+
+    assert(file_limit > 0)
+    if file_limit < df.shape[0]:
+        df = df.iloc[:file_limit]
+        labels_binarized = labels_binarized.iloc[:file_limit]
 
     # create a column with name of the labels given to sounds and also column with wav file names
     df['positive_labels'] = df['positive_labels'].apply(lambda arr: arr.split(','))
@@ -281,10 +286,10 @@ def download_data(target_sounds_list, target_path):
 
     # save the data frame which can be used for further balancing the data
     # and generating the embeddings for audio files.
-    with open('downloaded_base_dataframe.pkl', 'wb') as file_obj:
+    with open(aggregate_name + '_downloaded_base_dataframe.pkl', 'wb') as file_obj:
         pickle.dump(df, file_obj)
 
-    print('Base dataframe is saved as " downloaded_base_dataframe.pkl "..!!')
+    print("Base dataframe is saved as", aggregate_name, "downloaded_base_dataframe.pkl ..!!")
 
     # create a path if it doesn't exists
     if not os.path.exists(target_path):

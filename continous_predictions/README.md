@@ -11,8 +11,9 @@
 
 
 ```shell
-$ python -m continous_predictions.batch_test_offline    -local_folder_path
-                                                        -csv_filename
+$ python -m continous_predictions.batch_test_offline [-h] -local_folder_path LOCAL_FOLDER_PATH
+                                                          -predictions_cfg_json PREDICTIONS_CFG_JSON
+                                                          [-csv_filename CSV_FILENAME]
 ```
 
 <br>
@@ -25,16 +26,13 @@ $ python -m continous_predictions.batch_test_offline    -local_folder_path
 - Follow the command to get the predictions ```.csv```  for ```.wav``` files in any FTP directory
 
 ```shell
-$ python -m continous_predictions.batch_test_ftp_files  -ftp_folder_path
-                                                        -csv_filename
+$ python -m continous_predictions.batch_test_ftp_files batch_test_ftp_files.py [-h] -ftp_folder_path FTP_FOLDER_PATH
+                                                                                    -ftp_password FTP_PASSWORD
+                                                                                    -predictions_cfg_json PREDICTIONS_CFG_JSON
+                                                                                    [-download_folder_path DOWNLOAD_FOLDER_PATH]
+                                                                                    [-csv_filename CSV_FILENAME]
+                                                                                    [-max_runtime_minutes MAX_RUNTIME_MINUTES]
+                                                                                    [-wait_time_minutes WAIT_TIME_MINUTES]
 ```
-###### Note
-- FTP credentials must be passed in script [here](https://github.com/wildlytech/modular_acoustic_detection/blob/3a0b30c5f8590ea6130eb0cfc5ec35132172f318/continous_predictions/batch_test_ftp_files.py#L26)
-```python
-FTP_PASSWORD = "********"
-```
-- You can change the wait time from default 2 Minutes ```(120 seconds)``` to any required duration in ```seconds``` [here](https://github.com/wildlytech/modular_acoustic_detection/blob/3a0b30c5f8590ea6130eb0cfc5ec35132172f318/continous_predictions/batch_test_ftp_files.py#L230)
-```python
-time.sleep(120)
-```
+
 

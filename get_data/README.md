@@ -7,13 +7,17 @@
 -  Download only Sounds of Interest
     - This will download the sounds ```( .wav files )``` that you are interested in, from enlisted sounds of . you can see the list for class of sounds by using ```[-h]``` argument for script in command line .
 
-``` $ python -m get_data.download_soi [-h] -target_sounds -target_path```
+```shell
+$ python -m get_data.download_soi [-h] -target_sounds TARGET_SOUNDS
+                                       -target_path TARGET_PATH
+                                       [-file_limit FILE_LIMIT]
+```
 
 - Downloading whole sound Library
     - This is a really lengthy process and hence is not advisable unless you absolutely have to.
     - This will download all the ```Impact``` and ```Ambient ``` sounds from Google Audioset from the definition that we defined in the [youtube_audioset.py](https://github.com/wildlytech/modular_acoustic_detection/blob/bce293f40520baf4967646f67a19918a144b0f3e/youtube_audioset.py#L160)
 
-```$ python -m get_data.download_all_sounds ```
+```$ python -m download_all_sounds [-h] [-file_limit FILE_LIMIT]```
 
 <br>
 
