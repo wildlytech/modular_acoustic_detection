@@ -36,14 +36,13 @@ coverage run -a -m data_preprocessing_cleaning.split_wav_file -path_for_wavfiles
 coverage run -a -m generating_embeddings -wav_file test/wav_10sec/ -path_to_write_embeddings test/test_embeddings
 coverage run -a -m create_base_dataframe -path_for_saved_embeddings test/test_embeddings -path_to_write_dataframe test/test_dataframe.pkl
 
-# coverage run -a -m balancing_dataset -- Update user gude. How does it work?
-# coverage run -a -m find_sounds -- Update user gude. How does it work?
-# coverage run -a -m youtube_audioset -- Update user gude. How does it work?
+# coverage run -a -m find_sounds -- Update user gude. 
+# coverage run -a -m youtube_audioset -- Update user gude. 
 
 coverage run -a -m xenocanto_to_dataframe -b "struthio camelus" \
             -o test/bird_sounds_xc/ --dont_delete_wav_files
 
-# coverage run -a -m augmentation.audio_mixing -- Update user gude. How does it work?
+coverage run -a -m augmentation.audio_mixing -path_to_save_mixed_sounds test/augmentation/mixed/ -path_type_one_audio_files test/augmentation/type1_sounds/ -path_type_two_audio_files test/augmentation/type2_sounds/
 
 coverage run -a -m compression.compression -path_to_original_audio_files test/test_wav/ -path_to_compressed_audio_files test/compressed/ -codec_type aac
 coverage run -a -m compression.compression -path_to_original_audio_files test/test_wav/ -path_to_compressed_audio_files test/compressed/ -codec_type mp3
