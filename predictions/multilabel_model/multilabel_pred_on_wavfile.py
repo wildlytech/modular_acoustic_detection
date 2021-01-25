@@ -83,8 +83,11 @@ def main(predictions_cfg_json, path_for_wavfile):
             prediction_probs, prediction_rounded = predict_on_embedding(embedding=each_embedding,
                                                                         config_datas=data)
 
-            CLF2_TRAIN_PREDICTION_PROB.append(prediction_probs)
-            CLF2_TRAIN_PREDICTION.append(prediction_rounded)
+            CLF2_TRAIN_PREDICTION_PROB += prediction_probs.tolist()
+            CLF2_TRAIN_PREDICTION += prediction_rounded.tolist()
+
+    # Ensure prediction of one example is a matrix
+    CLF2_TRAIN_PREDICTION_PROB = [CLF2_TRAIN_PREDICTION_PROB]
 
     ###########################################################################
     # Print results

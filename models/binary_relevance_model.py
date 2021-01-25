@@ -312,29 +312,6 @@ X_TEST_STANDARDIZED = X_TEST / 255
 
 
 #############################################################################
-# create the keras model. It is a maxpool version BR model
-#############################################################################
-def create_keras_model():
-    """
-    Creating a Model
-    """
-    model = Sequential()
-    model.add(Conv1D(500, input_shape=(1280, 1), kernel_size=128,
-                     strides=128, activation='relu', padding='same'))
-    model.add(Dense(500, activation='relu'))
-    model.add(Dense(500, activation='relu'))
-    model.add(Dense(500, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
-    model.add(MaxPooling1D(10))
-    model.add(Flatten())
-    print(model.summary())
-    # Compile model
-    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
-                  metrics=['accuracy'])
-    return model
-
-
-#############################################################################
 # reshaping the train and test data so as to align with input for model
 #############################################################################
 CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
@@ -364,16 +341,13 @@ else:
 #############################################################################
     # Implementing using the keras usual training techinque
 #############################################################################
-if CONFIG_DATA["networkCfgJson"] is None:
-    MODEL = create_keras_model()
-else:
-    # load json and create model
-    json_file = open(CONFIG_DATA["networkCfgJson"], 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-    MODEL = model_from_json(loaded_model_json)
-    MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
-                  metrics=['accuracy'])
+# load json and create model
+json_file = open(CONFIG_DATA["networkCfgJson"], 'r')
+loaded_model_json = json_file.read()
+json_file.close()
+MODEL = model_from_json(loaded_model_json)
+MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+              metrics=['accuracy'])
 
 MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            epochs=CONFIG_DATA["train"]["epochs"],

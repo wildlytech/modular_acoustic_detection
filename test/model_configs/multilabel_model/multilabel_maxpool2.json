@@ -188,7 +188,7 @@
     ],
     "ontology": {
         "useYoutubeAudioSet": true,
-        "extension": "data/ioc_ontology_extension.json"
+        "extension": null
     },
     "networkCfgJson": "model_configs/multilabel_model/topology/Conv1D500-128x128_Dense500_Dense500_Dense500_Dense7_MaxPool.json",
     "train": {
@@ -197,15 +197,22 @@
         "validationSplit": 0.3,
         "inputDataFrames": [
             {
-                "patternPath": "diff_class_datasets/Datasets/pure/*/pure_*.pkl",
-                "excludePaths": ["diff_class_datasets/Datasets/pure/Wood/pure_wod_1115.pkl"],
-                "subsample": 200
+                "path": "diff_class_datasets/Datasets/pure/Explosion/pure_exp_7957.pkl",
+                "subsample": 500
             },
             {
-                "path": "diff_class_datasets/Datasets/pure/Wood/pure_wod_1115.pkl",
-                "subsample": 200
+                "path": "diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl",
+                "subsample": 500
+            },
+            {
+                "path": "diff_class_datasets/Datasets/pure/Tools/pure_tools_8113.pkl",
+                "subsample": 500
+            },
+            {
+                "path": "diff_class_datasets/Datasets/pure/Wild/pure_wild_7061.pkl",
+                "subsample": 500
             }
         ],
-        "outputWeightFile": "test/weights/multilabel_model/multilabel.h5"
+        "outputWeightFile": "test/weights/multilabel_model/multilabel2.h5"
     }
 }
