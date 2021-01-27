@@ -60,7 +60,7 @@ def main(predictions_cfg_json, path_for_wavfile):
     ###########################################################################
     # read the dataframe with feature and labels_name column
     ###########################################################################
-    EMBEDDINGS = generate_before_predict_BR.main(path_for_wavfile, 0, None, None)
+    EMBEDDINGS = generate_before_predict_BR.main(path_for_wavfile)
 
     ###########################################################################
     # Import json data

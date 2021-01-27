@@ -137,7 +137,7 @@ def model_prediction_tab():
 
     encoded_image_uploaded_file = NUMBER_OF_WAVFILES[FILE_COUNT]
     encoded_image_uploaded_file = base64.b64encode(open(encoded_image_uploaded_file, 'rb').read()).decode()
-    embeddings = generate_before_predict_BR.main(NUMBER_OF_WAVFILES[FILE_COUNT], 0, 0, 0)
+    embeddings = generate_before_predict_BR.main(NUMBER_OF_WAVFILES[FILE_COUNT])
 
     ###########################################################################
     # Get label names
