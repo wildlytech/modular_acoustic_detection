@@ -32,15 +32,18 @@ coverage run -a -m data_preprocessing_cleaning.mp3_stereo_to_wav_mono -path_to_s
 coverage run -a -m data_preprocessing_cleaning.mp3_stereo_to_wav_mono -path_to_save_wav_files test/test_wav/ -input_mp3_path test/test_mp3/
 
 coverage run -a -m data_preprocessing_cleaning.split_wav_file -path_for_wavfiles test/test_wav/ -path_to_write_chunks test/wav_10sec/
-coverage run -a -m data_preprocessing_cleaning.copy_files_by_csv -csv test/test_annotations.csv -src test/ -dest test/data_preprocessing/
-coverage run -a -m data_preprocessing_cleaning.separate_by_label -csv test/test_annotations.csv -label Vehicle
-coverage run -a -m data_preprocessing_cleaning.seperating_different_sounds -dataframe_path test/dataframe_with_labels.pkl -path_to_write_different_sounds test/
+coverage run -a -m data_preprocessing_cleaning.copy_files_by_csv -csv test/test_annotations.testcsv -src test/ -dest test/data_preprocessing/
+coverage run -a -m data_preprocessing_cleaning.separate_by_label -csv test/test_annotations.testcsv -label Vehicle
+
+# Script needs properly formatted pkl file
+# coverage run -a -m data_preprocessing_cleaning.seperating_different_sounds -dataframe_path test/dataframe_with_labels.pkl -path_to_write_different_sounds test/
+
 
 coverage run -a -m generating_embeddings -wav_file test/wav_10sec/ -path_to_write_embeddings test/test_embeddings
 coverage run -a -m create_base_dataframe -path_for_saved_embeddings test/test_embeddings -path_to_write_dataframe test/test_dataframe.pkl
 
-# coverage run -a -m find_sounds -- Update user gude. 
-# coverage run -a -m youtube_audioset -- Update user gude. 
+# coverage run -a -m find_sounds -- Update user guide.
+# coverage run -a -m youtube_audioset -- Update user guide.
 
 coverage run -a -m xenocanto_to_dataframe -b "struthio camelus" \
             -o test/bird_sounds_xc/ --dont_delete_wav_files
@@ -77,7 +80,7 @@ coverage run -a -m continous_predictions.batch_test_offline -local_folder_path t
 # coverage run -a -m Dash_integration.multipage_ui.dash_integrate
 
 
-# coverage run -a -m data_preprocessing_cleaning.identifying_mislabelled_silence_audiofiles - broken 
+# coverage run -a -m data_preprocessing_cleaning.identifying_mislabelled_silence_audiofiles - broken
 
 coverage run -a -m data_preprocessing_cleaning.visualize_dataframe -f test/bird_sounds_xc/struthio_camelus/dataframe_with_labels.pkl
 coverage run -a -m get_data.data_preprocessing -annotation_file test/test_annotations.testcsv \

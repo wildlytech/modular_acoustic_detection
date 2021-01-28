@@ -165,6 +165,10 @@ def get_selected_type(type_sound):
 ###############################################################################
 def start_mixing_two_audioclips(wavfile_list1, wavfile_list2, min_examples):
     print("started mixing audio clips")
+
+    if not os.path.exists(RESULT.path_to_save_mixed_sounds):
+        os.makedirs(RESULT.path_to_save_mixed_sounds)
+
     for each_file in zip(wavfile_list1[:min_examples], wavfile_list2[:min_examples]):
         if os.path.exists(RESULT.path_to_save_mixed_sounds + each_file[0][:-4] + "__mix__" + each_file[1][:-4] + ".wav"):
             pass
@@ -182,6 +186,10 @@ def start_mixing_two_audioclips(wavfile_list1, wavfile_list2, min_examples):
 ###############################################################################
 def start_mixing_two_audioclips_from_path(wavfile_list1, wavfile_list2, min_examples):
     print("started mixing")
+
+    if not os.path.exists(RESULT.path_to_save_mixed_sounds):
+        os.makedirs(RESULT.path_to_save_mixed_sounds)
+
     for each_file in zip(wavfile_list1[:min_examples], wavfile_list2[:min_examples]):
         if os.path.exists(RESULT.path_to_save_mixed_sounds + each_file[0].split("/")[-1][:-4] + "__mix__" + each_file[1].split("/")[-1][:-4] + ".wav"):
             pass
