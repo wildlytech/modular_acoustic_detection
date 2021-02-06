@@ -28,7 +28,7 @@ import sys
 import datetime
 import tensorflow as tf
 from youtube_audioset import get_recursive_sound_names
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score,precision_score,recall_score
 from tensorflow.compat.v1.keras.models import Model
 #############################################################################
                 # Description and help
@@ -55,9 +55,9 @@ PARSED_ARGS = ARGUMENT_PARSER.parse_args()
           # Parse the arguments
 #############################################################################
 ### SET SEEDS
-np.random.seed(42)
-random.seed(42)
-tf.compat.v1.set_random_seed(42)
+np.random.seed(10)
+random.seed(10)
+tf.compat.v1.set_random_seed(10)
 
 
 with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
@@ -298,19 +298,22 @@ with open("diff_class_datasets/Datasets/Nandi.pkl","rb") as f:
 
 
 
-DF_TRAIN = DF_TRAIN.sample(frac=0.1)
+#DF_TRAIN = DF_TRAIN.sample(frac=0.1)
 pool_df = DF_TEST.sample(frac=0.2)
-
+#DF_TRAIN = DF_TRAIN.drop(pool_df.index)
 DF_TEST = DF_TEST.drop(pool_df.index)
 X_pool = np.array(pool_df.features.apply(lambda x: x.flatten()).tolist())
 drop_indices_pool = []
+new_x_pool = []
 for ii,i in enumerate(X_pool):
 
     if len(i)!=1280:
 
         drop_indices_pool.append(ii)
-
-X_pool = np.delete(X_pool,drop_indices_pool)
+    else:
+        new_x_pool.append(i)
+#X_pool = np.delete(X_pool,drop_indices_pool)
+X_pool = np.array(new_x_pool)
 X_pool_STANDARDIZED = X_pool / 255
 CLF2_pool = X_pool.reshape((-1, 1280, 1))
 LABELS_BINARIZED_pool = pd.DataFrame()
@@ -443,7 +446,7 @@ def train_model(CONFIG_DATA):
 
       #mismatch_model.load_weights(CONFIG_DATA["train"]["outputWeightFile"])
       MODEL.load_weights(CONFIG_DATA["train"]["outputWeightFile"])
-      MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4,epsilon=1e-8),
+      MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5,epsilon=1e-8),
                     metrics=['accuracy'])
 
     #CONFIG_DATA["train"]["epochs"]
@@ -620,6 +623,15 @@ def active_mismatch(mismatch_model,pool_df,ground_feats,ground_probs,n_instances
     indices = indices//10
     return indices[:n_instances]
 
+def specificity(true,preds):
+    req  = preds[preds==true]
+
+    num_tn = len(req[req==0])
+    num_total_n = len(true[true==0])
+    return num_tn/num_total_n
+
+
+
 
 
 
@@ -628,8 +640,8 @@ def query_entropy(model,pool_df,n_instances):
     entropy = -pool_preds*np.log(pool_preds)
     entropy = np.ravel(entropy)
     indices = (-entropy).argsort()
-
-    return indices[:n_instances]
+    return_probs = pool_preds[indices[:n_instances]]
+    return indices[:n_instances],return_probs
 
 
 def random_sampling(len_df,n_instances):
@@ -665,12 +677,22 @@ def active_learning_loop(CLF2_pool,LABELS_BINARIZED_pool,CLF2_TRAIN,CLF2_TRAIN_T
     labels_pool_arr = LABELS_BINARIZED_pool
     model_accuracy = []
     query_list = []
+    prec = []
+    rec = []
+    tnr = []
     zeroes = np.where(CLF2_TRAIN_TARGET==0)[0]
     ones = np.where(CLF2_TRAIN_TARGET==1)[0]
     MODEL = train_model(CONFIG_DATA)
 
-    mismatch_model = Model(MODEL.input, MODEL.layers[-3].output)
+    preds = MODEL.predict(X_test)
+    query_list.append(0)
+    model_accuracy.append(accuracy_score(y_test,np.round(preds)))
+    prec.append(precision_score(y_test,np.round(preds)))
+    rec.append(recall_score(y_test,np.round(preds)))
 
+    tnr.append(specificity(y_test,np.round(preds).reshape(-1)))
+    mismatch_model = Model(MODEL.input, MODEL.layers[-3].output)
+    print("CONFUSION: ",confusion_matrix(y_test,np.round(preds)))
     def equality(l1,l2):
 
         for el1,el2 in zip(l1,l2):
@@ -679,8 +701,9 @@ def active_learning_loop(CLF2_pool,LABELS_BINARIZED_pool,CLF2_TRAIN,CLF2_TRAIN_T
                 print("Equal weights found")
 
     prev_ls = mismatch_model.get_weights()
-
+    train_acc = []
     queries = []
+    prob_t_plot = []
     for idx in range(n_queries):
 
         print('Query no. %d' % (idx + 1))
@@ -688,8 +711,9 @@ def active_learning_loop(CLF2_pool,LABELS_BINARIZED_pool,CLF2_TRAIN,CLF2_TRAIN_T
         #query_idx, query_instance = learner.query(CLF2_pool, n_instances=10, verbose=0)
         #preds = MODEL.predict(CLF2_pool)
         if strategy=="active":
-            man_idx = query_KNN(CLF2_TRAIN,CLF2_TRAIN_TARGET,CLF2_pool,labels_pool_arr,10)
-            #man_idx = query_entropy(MODEL,CLF2_pool,10)
+            #man_idx = query_KNN(CLF2_TRAIN,CLF2_TRAIN_TARGET,CLF2_pool,labels_pool_arr,10)
+            man_idx,ret_probs = query_entropy(MODEL,CLF2_pool,10)
+            prob_t_plot.append(ret_probs)
             #man_idx  = active_mismatch(mismatch_model,CLF2_pool,ground_feats,ground_probs,n_instances=10)
         elif strategy=="random":
             man_idx = random_sampling(len(CLF2_pool),10)
@@ -737,8 +761,8 @@ def active_learning_loop(CLF2_pool,LABELS_BINARIZED_pool,CLF2_TRAIN,CLF2_TRAIN_T
             value_counts[0.0]=0
         if 1.0 not in value_counts.keys():
             value_counts[1.0] = 0
-        extra_zs = 20-value_counts[0]
-        extra_ons = 20-value_counts[1]
+        extra_zs = 10-value_counts[0]
+        extra_ons = 10-value_counts[1]
 
 
 
@@ -760,7 +784,9 @@ def active_learning_loop(CLF2_pool,LABELS_BINARIZED_pool,CLF2_TRAIN,CLF2_TRAIN_T
         print("Final Counter Query: ", dict(zip(unique, counts)))
 
         #MODEL.train_on_batch(CLF2_pool[man_idx],y=y_pool)
-        MODEL.train_on_batch(final_query_x,final_query_y)
+        ret = MODEL.train_on_batch(final_query_x,final_query_y)
+
+        train_acc.append(ret[0])
         #if strategy=="active":
         #    queries.append((final_query_x,final_query_y))
 
@@ -801,7 +827,10 @@ def active_learning_loop(CLF2_pool,LABELS_BINARIZED_pool,CLF2_TRAIN,CLF2_TRAIN_T
         model_accuracy.append(acc)
         #print("BOOL ACCURACY: ",np.sum(true==preds)/len(true))
         print("SCIKIT ACCURACY: ",accuracy_score(true,preds))
-        query_list.append(idx)
+        query_list.append(idx+1)
+        prec.append(precision_score(true,preds))
+        rec.append(recall_score(true,preds))
+        tnr.append(specificity(true,preds.reshape(-1)))
         # remove queried instance from pool
         #CLF2_pool = np.delete(CLF2_pool, query_idx, axis=0)
         #labels_pool_arr = np.delete(labels_pool_arr,query_idx,axis=0)
@@ -811,18 +840,18 @@ def active_learning_loop(CLF2_pool,LABELS_BINARIZED_pool,CLF2_TRAIN,CLF2_TRAIN_T
     if strategy=="active":
         with open("queried_ex.pkl", "wb") as f:
             pickle.dump(queries,f)
-    #plt.plot(query_list,model_accuracy)
-    #plt.xlabel("Query Index")
-    #plt.ylabel("Accuracy")
+    plt.plot(query_list[1:],train_acc)
+    plt.xlabel("Query Index")
+    plt.ylabel("Train Loss")
     #plt.savefig("Accuracy_vs_query.png")
-    #plt.show()
-    return query_list,model_accuracy
+    plt.show()
+    return query_list,model_accuracy,prec,rec,tnr,prob_t_plot
 
-q_list_active,acc_active = active_learning_loop(CLF2_pool,CLF2_pool_target,CLF2_TRAIN,CLF2_TRAIN_TARGET,20,"active")
-q_list_rand,acc_rand = active_learning_loop(CLF2_pool,CLF2_pool_target,CLF2_TRAIN,CLF2_TRAIN_TARGET,20,"random")
+q_list_active,acc_active,prec_active,rec_active,tnr_active,prob_t_plot = active_learning_loop(CLF2_pool,CLF2_pool_target,CLF2_TRAIN,CLF2_TRAIN_TARGET,20,"active")
+#q_list_rand,acc_rand,prec_rand,rec_rand,tnr_rand,prob_t_plot = active_learning_loop(CLF2_pool,CLF2_pool_target,CLF2_TRAIN,CLF2_TRAIN_TARGET,20,"random")
 
-
-
+plt.plot(np.ravel(np.array(prob_t_plot)))
+plt.show()
 
 plt.plot(q_list_active,acc_active,"blue",label="active_learning")
 plt.plot(q_list_rand,acc_rand,"red",label="random_sampling")
@@ -831,6 +860,34 @@ plt.ylabel("Accuracy")
 plt.legend(['active_learning', 'random_sampling'], loc='upper left')
 plt.savefig("acc_vs_query.png")
 plt.show()
+
+
+
+plt.plot(q_list_active,prec_active,"blue",label="active_learning")
+plt.plot(q_list_rand,prec_rand,"red",label="random_sampling")
+plt.xlabel("Query Index")
+plt.ylabel("Precision")
+plt.legend(['active_learning', 'random_sampling'], loc='upper left')
+plt.savefig("precision_vs_query.png")
+plt.show()
+
+plt.plot(q_list_active,rec_active,"blue",label="active_learning")
+plt.plot(q_list_rand,rec_rand,"red",label="random_sampling")
+plt.xlabel("Query Index")
+plt.ylabel("Recall")
+plt.legend(['active_learning', 'random_sampling'], loc='upper left')
+plt.savefig("Recall_vs_query.png")
+plt.show()
+
+
+plt.plot(q_list_active,tnr_active,"blue",label="active_learning")
+plt.plot(q_list_rand,tnr_rand,"red",label="random_sampling")
+plt.xlabel("Query Index")
+plt.ylabel("TNR")
+plt.legend(['active_learning', 'random_sampling'], loc='upper left')
+plt.savefig("TNR_vs_query.png")
+plt.show()
+
 
 #############################################################################
       # Predict on train and test data
