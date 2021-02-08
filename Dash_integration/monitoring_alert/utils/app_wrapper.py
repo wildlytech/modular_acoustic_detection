@@ -1,6 +1,7 @@
 import base64
 import dash_core_components as dcc
 import dash_html_components as html
+import os
 
 
 def app_page_layout(page_layout,
@@ -19,18 +20,18 @@ def app_page_layout(page_layout,
                 children=[
                     html.A(
                         id='dashbio-logo-graph', children=[
-                        html.P("<< Main Page", style={"display":"inline",
-                                                      "text-decoration":"underline"}),
+                            html.P("<< Main Page", style={"display": "inline",
+                                                          "text-decoration": "underline"}),
                         ],
                         href="/Monitoring" if standalone else "/dash-bio"
                     ),
                     html.H2(
                         app_title,
-                        style={"display":"inline",
-                               "font-family":"Courier New",
-                               "fontSize":"25px",
-                               "margin-left":"7%",
-                               "text-decoration":"underline"}
+                        style={"display": "inline",
+                               "font-family": "Courier New",
+                               "fontSize": "25px",
+                               "margin-left": "7%",
+                               "text-decoration": "underline"}
                     ),
 
                     html.A(
@@ -47,7 +48,7 @@ def app_page_layout(page_layout,
                         src='data:image/png;base64,{}'.format(
                             base64.b64encode(
                                 open(
-                                    'assets/GitHub-Mark-{}64px.png'.format(
+                                    os.path.dirname(__file__) + '/../assets/GitHub-Mark-{}64px.png'.format(
                                         'Light-' if light_logo else ''
                                     ),
                                     'rb'

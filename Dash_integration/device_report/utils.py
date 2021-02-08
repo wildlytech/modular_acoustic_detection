@@ -2,9 +2,9 @@ import dash_html_components as html
 import dash_core_components as dcc
 
 
-##########################################################################################
-                # consolidation of the header
-##########################################################################################
+###############################################################################
+# consolidation of the header
+###############################################################################
 def Header(app):
     """
     consolidation of the header
@@ -12,13 +12,12 @@ def Header(app):
     return html.Div([get_header(app), html.Br([]), get_menu()])
 
 
-
-##########################################################################################
-                # Returns the heder of the app
-##########################################################################################
+###############################################################################
+# Returns the header of the app
+###############################################################################
 def get_header(app):
     """
-    Returns the heder of the app
+    Returns the header of the app
     """
     header = html.Div(
         [html.Div(
@@ -32,27 +31,26 @@ def get_header(app):
          html.Div(
              [html.Div(
                  [html.H5("Acoustic Monitoring Device Report",
-                          style={'text-decoration':'underline'})
-                 ], className="seven columns main-title"),
+                          style={'text-decoration': 'underline'})
+                  ], className="seven columns main-title"),
               html.Div(
                   [html.A("Download Report",
                           id="download-link-report",
                           download='readMe.pdf',
-                          style={'text-decoration':'underline'},
+                          style={'text-decoration': 'underline'},
                           href="/readMe.pdf",
                           className="full-view-link")
-                  ], className="five columns")
-             ], className="twelve columns",
+                   ], className="five columns")
+              ], className="twelve columns",
              style={"padding-left": "0"})
-        ], className="row")
+         ], className="row")
 
     return header
 
 
-
-##########################################################################################
-                # Menu options
-##########################################################################################
+###############################################################################
+# Menu options
+###############################################################################
 def get_menu():
     """
     Menu options
@@ -98,11 +96,9 @@ def get_menu():
     return menu
 
 
-
-
-##########################################################################################
-        # Return a dash definition of an HTML table for a Pandas dataframe
-##########################################################################################
+###############################################################################
+# Return a dash definition of an HTML table for a Pandas dataframe
+###############################################################################
 def make_dash_table(dataframe):
     """
     Return a dash definition of an HTML table for a Pandas dataframe
@@ -114,4 +110,3 @@ def make_dash_table(dataframe):
             html_row.append(html.Td([row[index]]))
         table.append(html.Tr(html_row))
     return table
-

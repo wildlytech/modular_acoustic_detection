@@ -9,7 +9,7 @@ from colorama import Fore, Style
 
 
 ###########################################################################
-                # Description and help
+# Description and help
 ###########################################################################
 
 DESCRIPTION = "Reads the annotation file and Embeddings \
@@ -19,7 +19,7 @@ HELP = "Input the annotation file path [Label_1, Label_2, Label_3] \n \
 
 
 ###########################################################################
-          #parse the input arguments given from command line
+# parse the input arguments given from command line
 ###########################################################################
 
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
@@ -30,8 +30,6 @@ PARSER.add_argument('-path_for_saved_embeddings', '--path_for_saved_embeddings',
 PARSER.add_argument('-path_to_save_dataframe', '--path_to_save_dataframe', action='store',
                     help="Input the path to save dataframe (.pkl) file")
 RESULT = PARSER.parse_args()
-
-
 
 
 LABELS_NAME_COLUMNS = ['Label_1', "Label_2", "Label_3", "Label_4"]
@@ -50,55 +48,54 @@ def read_data_files(filename):
 
 
 ###########################################################################
-                # create dictionary
+# create dictionary
 ###########################################################################
-SET_DICTIONARY = {"crow":"Crow",
-                  "honking":"Vehicle",
-                  "stream":"Stream",
-                  "frogmouth":"Frog",
-                  "birdf":"Bird",
-                  "conersation":"Conversation",
-                  "honkiong":"Vehicle",
-                  "peafowl":"Bird",
-                  "convertsation":"Conversation",
-                  "inesct":"Insect",
-                  "helicopter":"Vehicle",
-                  "aeroplane":"Vehicle",
-                  "plane":"Vehicle",
-                  "birtd":"Bird",
-                  "frog":"Frog",
-                  "raini":"Rain",
-                  "rain":"Rain",
-                  "forg":"Frog",
-                  "insect":"Insect",
-                  "manmade":"Conversation",
-                  "thunder":"Thunder",
-                  "honkinig":"Vehicle",
-                  "conversatoin":"Conversation",
-                  "none":"",
-                  "vehicle":"Vehicle",
-                  "music":"Music",
-                  "dog barking":"Dog",
-                  "human":"Speech",
-                  "conservation":"Conversation",
-                  "conversation":"Conversation",
-                  "bird":"Bird",
-                  "felling (axe)":"Tools",
-                  "wind":"Wind",
-                  "biird":"Bird",
-                  "footsteps":"Walk, footsteps",
-                  "door closing":"",
-                  "buzzing":"Insect",
-                  "Silence" :"Silence",
-                  "twig snap":"",
-                  "buzz":"Insect",
-                  "fly/buzzing":"Insect",
-                  "----":''}
-
+SET_DICTIONARY = {"crow": "Crow",
+                  "honking": "Vehicle",
+                  "stream": "Stream",
+                  "frogmouth": "Frog",
+                  "birdf": "Bird",
+                  "conersation": "Conversation",
+                  "honkiong": "Vehicle",
+                  "peafowl": "Bird",
+                  "convertsation": "Conversation",
+                  "inesct": "Insect",
+                  "helicopter": "Vehicle",
+                  "aeroplane": "Vehicle",
+                  "plane": "Vehicle",
+                  "birtd": "Bird",
+                  "frog": "Frog",
+                  "raini": "Rain",
+                  "rain": "Rain",
+                  "forg": "Frog",
+                  "insect": "Insect",
+                  "manmade": "Conversation",
+                  "thunder": "Thunder",
+                  "honkinig": "Vehicle",
+                  "conversatoin": "Conversation",
+                  "none": "",
+                  "vehicle": "Vehicle",
+                  "music": "Music",
+                  "dog barking": "Dog",
+                  "human": "Speech",
+                  "conservation": "Conversation",
+                  "conversation": "Conversation",
+                  "bird": "Bird",
+                  "felling (axe)": "Tools",
+                  "wind": "Wind",
+                  "biird": "Bird",
+                  "footsteps": "Walk, footsteps",
+                  "door closing": "",
+                  "buzzing": "Insect",
+                  "Silence": "Silence",
+                  "twig snap": "",
+                  "buzz": "Insect",
+                  "fly/buzzing": "Insect",
+                  "----": ''}
 
 
 ###########################################################################
-              # Helper Function
+# Helper Function
 ###########################################################################
 def check_for_null(array):
     """
@@ -143,7 +140,6 @@ def check_for_unknown_label(data_frame, label_columns_list):
     print("Labels not found in Dictionary: \n", list(set(labels_not_found)))
 
 
-
 def read_embeddings(data_frame, path_to_embeddings):
     """
     read the embeddings
@@ -152,7 +148,7 @@ def read_embeddings(data_frame, path_to_embeddings):
     test_index = []
     for each_file in data_frame['wav_file'].values.tolist():
         try:
-            with open(path_to_embeddings+each_file[:-4]+".pkl", 'rb') as file_obj:
+            with open(path_to_embeddings + each_file[:-4] + ".pkl", 'rb') as file_obj:
                 embeddings_list.append(pickle.load(file_obj))
         except:
             test_index.append(data_frame['wav_file'].values.tolist().index(each_file))
@@ -172,7 +168,7 @@ def initiate_preprocessing(data_file_name, path_to_embeddings):
     data = preprocess_data(data_file, LABELS_NAME_COLUMNS, data_file_name)
     data = data.drop(LABELS_NAME_COLUMNS, axis=1)
 
-    #read all the embeddings
+    # read all the embeddings
     if path_to_embeddings:
         data_with_embeddings = read_embeddings(data, path_to_embeddings)
         return data_with_embeddings
@@ -190,8 +186,9 @@ def write_dataframe(path_to_write, dataframe):
     else:
         print("Input path to write dataframe")
 
+
 ###########################################################################
-                # Main Function
+# Main Function
 ###########################################################################
 if __name__ == "__main__":
 
@@ -199,8 +196,6 @@ if __name__ == "__main__":
         DATAFRAME = initiate_preprocessing(RESULT.annotation_file, RESULT.path_for_saved_embeddings)
     else:
         DATAFRAME = initiate_preprocessing(RESULT.annotation_file, None)
-
-
 
     if RESULT.path_to_save_dataframe:
         write_dataframe(RESULT.path_to_save_dataframe, DATAFRAME)

@@ -1,5 +1,5 @@
 """
-Testing a Binary Relevance Model
+Testing a Multi label Model
 """
 # Import the necessary functions and libraries
 import argparse
@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import pickle
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
+
 from youtube_audioset import get_recursive_sound_names
 
 
@@ -47,10 +48,8 @@ def import_predict_configuration_json(predictions_cfg_json):
                 # Update extension paths in dictionary
                 config_data["ontology"]["extension"] = ontologyExtFiles
 
-                label_name = '[' + config_data["aggregatePositiveLabelName"] + ']Vs[' + \
-                             config_data["aggregateNegativeLabelName"] + ']'
-
-                config_data_dict[label_name] = config_data
+                model_name = config_data["name"]
+                config_data_dict[model_name] = config_data
 
     return config_data_dict
 
@@ -102,16 +101,22 @@ def main(predictions_cfg_json,
         #######################################################################
         LABELS_BINARIZED = pd.DataFrame()
 
-        for label_name in list(CONFIG_DATAS.keys()):
+        for model_name in list(CONFIG_DATAS.keys()):
+            positiveLabels = {}
+            config_data = CONFIG_DATAS[model_name]
+            for label in config_data["labels"]:
+                positiveLabels[label["aggregatePositiveLabelName"]] = \
+                    get_recursive_sound_names(designated_sound_names=label["positiveLabels"],
+                                              path_to_ontology="./",
+                                              ontology_extension_paths=config_data["ontology"]["extension"])
 
-            config_data = CONFIG_DATAS[label_name]
+            for key in positiveLabels.keys():
+                pos_lab = positiveLabels[key]
+                binarized_op_column = 1.0 * DATA_FRAME['labels_name'].apply( \
+                    lambda arr: np.any([x.lower() in pos_lab for x in arr]))
 
-            positiveLabels = get_recursive_sound_names(designated_sound_names=config_data["positiveLabels"],
-                                                       path_to_ontology="./",
-                                                       ontology_extension_paths=config_data["ontology"]["extension"])
-
-            LABELS_BINARIZED[label_name] = 1.0 * DATA_FRAME['labels_name'].apply( \
-                lambda arr: np.any([x.lower() in positiveLabels for x in arr]))
+                LABELS_BINARIZED[key] = binarized_op_column
+        target_cols = LABELS_BINARIZED.columns
 
     ###########################################################################
     # Filtering the sounds that are exactly 10 seconds
@@ -119,11 +124,13 @@ def main(predictions_cfg_json,
     DF_TEST = DATA_FRAME.loc[DATA_FRAME.features.apply(lambda x: x.shape[0] == 10)]
 
     if IS_DATAFRAME_LABELED:
+
         LABELS_FILTERED = LABELS_BINARIZED.loc[DF_TEST.index, :]
 
     ###########################################################################
     # preprocess the data into required structure
     ###########################################################################
+
     X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 
     ###########################################################################
@@ -135,71 +142,88 @@ def main(predictions_cfg_json,
     # Implementing using the keras usual prediction technique
     ###########################################################################
 
-    for label_name in list(CONFIG_DATAS.keys()):
+    for model_name in list(CONFIG_DATAS.keys()):
 
-        config_data = CONFIG_DATAS[label_name]
+        config_data = CONFIG_DATAS[model_name]
 
         MODEL = load_model(config_data["networkCfgJson"], config_data["train"]["outputWeightFile"])
 
-        print(("\nLoaded " + label_name + " model from disk"))
+        print(("\nLoaded " + model_name + " model from disk"))
 
         #######################################################################
         # Predict on test data
         #######################################################################
-        CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST).ravel()
+
+        CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
+
         CLF2_TEST_PREDICTION = CLF2_TEST_PREDICTION_PROB.round()
 
-        # Add results to data frame
-        DF_TEST.insert(len(DF_TEST.columns), label_name + "_Probability", CLF2_TEST_PREDICTION_PROB)
-        DF_TEST.insert(len(DF_TEST.columns), label_name + "_Prediction", CLF2_TEST_PREDICTION)
+        pred_args = CLF2_TEST_PREDICTION_PROB.argmax(axis=1)
+
+        prob_colnames = [label_name + "_Probability" for label_name in target_cols]
+        pred_colnames = [label_name + "_Prediction" for label_name in target_cols]
+
+        DF_TEST_PRED = pd.concat([pd.DataFrame(CLF2_TEST_PREDICTION_PROB, columns=prob_colnames),
+                                  pd.DataFrame(CLF2_TEST_PREDICTION, columns=pred_colnames)],
+                                 axis=1)
+        DF_TEST = pd.concat([DF_TEST.reset_index(drop=True), DF_TEST_PRED], axis=1)
 
         if IS_DATAFRAME_LABELED:
             ###################################################################
             # Target for the test labels
             ###################################################################
-            CLF2_TEST_TARGET = LABELS_FILTERED[label_name].values
-            print('Target shape:', CLF2_TEST_TARGET.shape)
+            CLF2_TEST_TARGET = LABELS_FILTERED.values
 
+            gt_args = CLF2_TEST_TARGET.argmax(axis=1)
             ###################################################################
             # To get the Misclassified examples
             ###################################################################
-            DF_TEST.insert(len(DF_TEST.columns), label_name + '_Actual', CLF2_TEST_TARGET)
-            MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
-            print('\nMisclassified number of examples for ' + label_name + " :", \
-                  DF_TEST.loc[MISCLASSIFED_ARRAY].shape[0])
+            actual_colnames = [label_name + "_Actual" for label_name in target_cols]
+
+            CLF2_TEST_TARGET = pd.DataFrame(CLF2_TEST_TARGET,
+                                            columns=actual_colnames).reset_index(drop=True)
+            DF_TEST = pd.concat([DF_TEST, CLF2_TEST_TARGET], axis=1)
+
+            MISCLASSIFED_ARRAY = (CLF2_TEST_PREDICTION != CLF2_TEST_TARGET).any(axis=1)
+            print('\nMisclassified number of examples for ' + model_name + " :", \
+                  MISCLASSIFED_ARRAY.sum())
 
             ###################################################################
             # misclassified examples are to be saved
             ###################################################################
             if save_misclassified_examples:
                 misclassified_pickle_file = save_misclassified_examples + \
-                    "misclassified_examples_br_model_" + label_name + ".pkl"
+                    "_misclassified_examples_multilabel_model_" + \
+                    model_name.replace(' ', '_') + ".pkl"
                 with open(misclassified_pickle_file, "wb") as f:
-                    pickle.dump(DF_TEST[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
+                    pickle.dump(DF_TEST.loc[MISCLASSIFED_ARRAY].drop(["features"], axis=1), f)
 
             ###################################################################
             # Print confusion matrix and classification_report
             ###################################################################
-            print('Confusion Matrix for ' + label_name)
+            print('Confusion Matrix for ' + model_name)
             print('============================================')
-            RESULT_ = confusion_matrix(CLF2_TEST_TARGET,
-                                       CLF2_TEST_PREDICTION)
-            print(RESULT_)
+            for i in range(CLF2_TEST_TARGET.shape[1]):
+                print("Confusion matrix for", target_cols[i])
+                a = CLF2_TEST_TARGET.iloc[:, i].values
+                b = CLF2_TEST_PREDICTION[:, i]
+                RESULT_ = confusion_matrix(a, b)
+                print(RESULT_)
 
             ###################################################################
             # print classification report
             ###################################################################
-            print('Classification Report for ' + label_name)
+            print('Classification Report for ' + model_name)
             print('============================================')
-            CL_REPORT = classification_report(CLF2_TEST_TARGET,
-                                              CLF2_TEST_PREDICTION)
+            CL_REPORT = classification_report(gt_args,
+                                              pred_args)
             print(CL_REPORT)
 
             ###################################################################
             # calculate accuracy and hamming loss
             ###################################################################
-            ACCURACY = accuracy_score(CLF2_TEST_TARGET,
-                                      CLF2_TEST_PREDICTION)
+            ACCURACY = accuracy_score(gt_args,
+                                      pred_args)
             HL = hamming_loss(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION)
             print('Hamming Loss :', HL)
             print('Accuracy :', ACCURACY)

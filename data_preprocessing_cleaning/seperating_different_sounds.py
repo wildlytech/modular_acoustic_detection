@@ -1,7 +1,7 @@
 """
-Seperates different sounds based on its labelling
+Separates different sounds based on its labelling
 """
-#Importing necessary library funtions
+# Importing necessary library funtions
 import pickle
 import os
 import argparse
@@ -9,12 +9,11 @@ import numpy as np
 import pandas as pd
 
 
-
-######################################################################################
-#parse the input path to write the dataframes of seprated sounds
-######################################################################################
+###############################################################################
+# parse the input path to write the dataframes of separated sounds
+###############################################################################
 PARSER = argparse.ArgumentParser(description='Input path to write the dataframe \
-                                 of seperated sounds Make it interpretable directory name \
+                                 of separated sounds Make it interpretable directory name \
                                  [ eg "diff_class_datasets/" ].\
                                  so that it could be easily accessed ')
 
@@ -29,26 +28,24 @@ PARSER.add_argument('-path_to_write_different_sounds',
 RESULT = PARSER.parse_args()
 
 
-
-######################################################################################
-                #create a path if not there
-######################################################################################
+###############################################################################
+# create a path if not there
+###############################################################################
 if not os.path.exists(RESULT.path_to_write_different_sounds):
     os.makedirs(RESULT.path_to_write_different_sounds)
 
 
-
-######################################################################################
-                # Helper Function
-######################################################################################
+###############################################################################
+# Helper Function
+###############################################################################
 
 def path_initializer(type_sound):
     """
     creates path for each type of sound files and stores
     respectively
     """
-    if not os.path.exists(RESULT.path_to_write_different_sounds+type_sound):
-        os.makedirs(RESULT.path_to_write_different_sounds+type_sound)
+    if not os.path.exists(RESULT.path_to_write_different_sounds + type_sound):
+        os.makedirs(RESULT.path_to_write_different_sounds + type_sound)
 
 
 def check_for_null(data_frame):
@@ -61,26 +58,25 @@ def check_for_null(data_frame):
         return False
 
 
-
-######################################################################################
-        # Reading a pickle file consiting of the unbalanced data and sound labels
-######################################################################################
+###############################################################################
+# Reading a pickle file consiting of the unbalanced data and sound labels
+###############################################################################
 with open(RESULT.dataframe_path, 'rb') as f:
     UN = pickle.load(f)
 LABELS_CSV = pd.read_csv('data/audioset/class_labels_indices.csv')
 print('Files Loaded')
 print(UN.shape)
 
-#Reading the coarse labels pickle file.
-#It consists of seperate classes for sounds related to
-#Explosion, Motor, Nature, Human, Wood with numbers assigned as 0,1,2,3,4 respectively.
+# Reading the coarse labels pickle file.
+# It consists of separate classes for sounds related to
+# Explosion, Motor, Nature, Human, Wood with numbers assigned
+# as 0,1,2,3,4 respectively.
 LAB = pd.read_csv('coarse_labels.csv')
 
 
-
-######################################################################################
-            # Creating the Data distribution coulumn
-######################################################################################
+###############################################################################
+# Creating the Data distribution coulumn
+###############################################################################
 UN['Data_dist_new'] = UN['labels_name'].map(lambda arr: [LAB.loc[LAB['sounds'] == y].id for y in arr])
 UN['Data_dist_new'] = UN['Data_dist_new'].apply(np.concatenate)
 UN['Data_dist_new'] = UN['Data_dist_new'].apply(set)
@@ -90,7 +86,7 @@ UN['Data_dist_new'] = UN['Data_dist_new'].apply(list)
 UN['len'] = UN['Data_dist_new'].apply(len)
 
 
-#For with single sound , two , three , four and five
+# For with single sound , two , three , four and five
 UN_1 = UN.loc[UN['len'] == 1]
 UN_2 = UN.loc[UN['len'] == 2]
 UN_3 = UN.loc[UN['len'] == 3]
@@ -98,13 +94,11 @@ UN_4 = UN.loc[UN['len'] == 4]
 UN_5 = UN.loc[UN['len'] == 5]
 
 
-
-
-######################################################################################
-        # seperate out the sounds from single labelled.
-        # Check out the coarse_labels.csv file to know what
-        # are index values for Explosion, Motor, Natutre, Human, and all other sounds
-######################################################################################
+###############################################################################
+# separate out the sounds from single labelled.
+# Check out the coarse_labels.csv file to know what
+# are index values for Explosion, Motor, Nature, Human, and all other sounds
+###############################################################################
 PURE_EXP = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 0)]
 PURE_MOT = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 1)]
 PURE_NAT = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 2)]
@@ -115,11 +109,9 @@ PURE_DOM = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 6)]
 PURE_TOOLS = UN_1.loc[UN_1['Data_dist_new'].apply(lambda arr: arr[0] == 7)]
 
 
-
-
-######################################################################################
-            # write out all those pure single labelled Sounds
-######################################################################################
+###############################################################################
+# write out all those pure single labelled Sounds
+###############################################################################
 FILE_NAMES = ['pure_exp', 'pure_mot', 'pure_nat', 'pure_hum',
               'pure_wod', 'pure_wild', 'pure_dom', 'pure_tools']
 for i, j in zip(FILE_NAMES,
@@ -128,16 +120,15 @@ for i, j in zip(FILE_NAMES,
     if check_for_null(j):
         pass
     else:
-        path_initializer("pure/"+i)
-        with open(RESULT.path_to_write_different_sounds+"pure/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("pure/" + i)
+        with open(RESULT.path_to_write_different_sounds + "pure/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
-
-######################################################################################
-            # seperate out sounds which are Multi-labelled with two classes
-                        #exp with other sounds
-######################################################################################
+###############################################################################
+# separate out sounds which are Multi-labelled with two classes
+# exp with other sounds
+###############################################################################
 EXP_MOT = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 0) & (arr[1] == 1)))]
 EXP_NAT = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 0) & (arr[1] == 2)))]
 EXP_HUM = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 0) & (arr[1] == 3)))]
@@ -152,16 +143,14 @@ for i, j in zip(FILE_NAMES, [EXP_MOT, EXP_NAT, EXP_HUM, EXP_WOD, EXP_WILD, EXP_D
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
-
-
-######################################################################################
-                    # mot with other sounds
-######################################################################################
+###############################################################################
+# mot with other sounds
+###############################################################################
 MOT_NAT = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 1) & (arr[1] == 2)))]
 MOT_HUM = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 1) & (arr[1] == 3)))]
 MOT_WOD = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 1) & (arr[1] == 4)))]
@@ -175,38 +164,34 @@ for i, j in zip(FILE_NAMES, [MOT_NAT, MOT_HUM, MOT_WOD, MOT_WILD, MOT_DOM, MOT_T
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
-
-
-######################################################################################
-                    #nature with other Sounds
-######################################################################################
+###############################################################################
+# nature with other Sounds
+###############################################################################
 NAT_HUM = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 2) & (arr[1] == 3)))]
 NAT_WOD = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 2) & (arr[1] == 4)))]
 NAT_WILD = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 2) & (arr[1] == 5)))]
 NAT_DOM = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 2) & (arr[1] == 6)))]
 NAT_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 2) & (arr[1] == 7)))]
 
-#wrute out all those sounds
+# write out all those sounds
 FILE_NAMES = ['nat_hum', 'nat_wod', 'nat_wild', 'nat_dom', 'nat_tools']
 for i, j in zip(FILE_NAMES, [NAT_HUM, NAT_WOD, NAT_WILD, NAT_DOM, NAT_TOOLS]):
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
-
-
-######################################################################################
-                    #human sounds with other Sounds
-######################################################################################
+###############################################################################
+# human sounds with other Sounds
+###############################################################################
 HUM_WOD = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 3) & (arr[1] == 4)))]
 HUM_WILD = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 3) & (arr[1] == 5)))]
 HUM_DOM = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 3) & (arr[1] == 6)))]
@@ -216,15 +201,14 @@ for i, j in zip(FILE_NAMES, [HUM_WOD, HUM_WILD, HUM_DOM, HUM_TOOLS]):
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
-
-######################################################################################
-                    #wood and other sounds
-######################################################################################
+###############################################################################
+# wood and other sounds
+###############################################################################
 WOD_WILD = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 4) & (arr[1] == 5)))]
 WOD_DOM = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 4) & (arr[1] == 6)))]
 WOD_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 4) & (arr[1] == 7)))]
@@ -235,16 +219,14 @@ for i, j in zip(FILE_NAMES, [WOD_WILD, WOD_DOM, WOD_TOOLS]):
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
-
-
-######################################################################################
-                    #wild and other sounds
-######################################################################################
+###############################################################################
+# wild and other sounds
+###############################################################################
 WILD_DOM = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 5) & (arr[1] == 6)))]
 WILD_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 5) & (arr[1] == 7)))]
 FILE_NAMES = ['wild_dom', 'wild_tools']
@@ -254,36 +236,32 @@ for i, j in zip(FILE_NAMES, [WILD_DOM, WILD_TOOLS]):
     if check_for_null(j):
         pass
     else:
-        path_initializer("mixed_sounds/"+i)
-        with open(RESULT.path_to_write_different_sounds+"mixed_sounds/"+i+"/"+i+'_'+str(j.shape[0])+'.pkl', 'wb') as f:
+        path_initializer("mixed_sounds/" + i)
+        with open(RESULT.path_to_write_different_sounds + "mixed_sounds/" + i + "/" + i + '_' + str(j.shape[0]) + '.pkl', 'wb') as f:
             pickle.dump(j, f)
 
 
-
-
-######################################################################################
-                    #domestic and other
-######################################################################################
+###############################################################################
+# domestic and other
+###############################################################################
 DOM_TOOLS = UN_2.loc[UN_2['Data_dist_new'].apply(lambda arr: ((arr[0] == 6) & (arr[1] == 7)))]
-with open(RESULT.path_to_write_different_sounds+'dom_tools_'+
-          str(DOM_TOOLS.shape[0])+'.pkl', 'wb') as f:
+with open(RESULT.path_to_write_different_sounds + 'dom_tools_' + \
+          str(DOM_TOOLS.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(DOM_TOOLS, f)
 
 
-
-
-######################################################################################
-                #Sounds with more than 2 classes labelled are witten
-######################################################################################
+###############################################################################
+# Sounds with more than 2 classes labelled are witten
+###############################################################################
 print('three labelled sounds shape: ', UN_3.shape)
-with open(RESULT.path_to_write_different_sounds+'3_labelled_priority1_'+
-          str(UN_3.shape[0])+'.pkl', 'wb') as f:
+with open(RESULT.path_to_write_different_sounds + '3_labelled_priority1_' + \
+          str(UN_3.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(UN_3, f)
 print('four labelled sounds shape: ', UN_4.shape)
-with open(RESULT.path_to_write_different_sounds+'4_labelled_priority1_'+
-          str(UN_4.shape[0])+'.pkl', 'wb') as f:
+with open(RESULT.path_to_write_different_sounds + '4_labelled_priority1_' + \
+          str(UN_4.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(UN_4, f)
 print('five labelled sounds shape: ', UN_5.shape)
-with open(RESULT.path_to_write_different_sounds+'5_labelled_prioirty1_'+
-          str(UN_5.shape[0])+'.pkl', 'wb') as f:
+with open(RESULT.path_to_write_different_sounds + '5_labelled_prioirty1_' + \
+          str(UN_5.shape[0]) + '.pkl', 'wb') as f:
     pickle.dump(UN_5, f)

@@ -13,7 +13,9 @@ from ftplib import FTP
 import socket
 import struct
 from datetime import timedelta
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 from time import strptime
 import glob
 import dash
@@ -29,10 +31,9 @@ from .utils import Header, make_dash_table
 import pathlib
 
 
-
-##########################################################################################
-                # get relative data folder
-##########################################################################################
+###############################################################################
+# get relative data folder
+###############################################################################
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
 if os.path.exists("data_downloaded/"):
@@ -41,37 +42,32 @@ else:
     os.mkdir("data_downloaded/")
 
 
-
-##########################################################################################
-                # Inputs Required: Path FTP
-##########################################################################################
+###############################################################################
+# Inputs Required: Path FTP
+###############################################################################
 PRIMARY_PATH = "/home/user-u0xzU/BNP/"
 DIR_REQ = "BNP/"
 MAPBOX_ACCESS_TOKEN = "*************"
 
 
-
-##########################################################################################
-            # Inputs Required: FTP credentials
-##########################################################################################
+###############################################################################
+# Inputs Required: FTP credentials
+###############################################################################
 FTP_USERNAME = "user-u0xzU"
 FTP_PASSWORD = "**********"
 FTP_HOST = '34.211.117.196'
 
 
-##########################################################################################
-                         # READING ARGUMENTS #
-##########################################################################################
+###############################################################################
+# READING ARGUMENTS
+###############################################################################
 DESCRIPTION = "Wildly Acoutsic Monitoring Device Report"
 HELP = "Give the Required Arguments"
 
 
-
-
-
-##########################################################################################
-                # parse the input arguments given from command line
-##########################################################################################
+###############################################################################
+# parse the input arguments given from command line
+###############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-transmission_mode_csv_path', '--transmission_mode_csv_path', action='store',
                     help=HELP, default="data_downloaded")
@@ -80,58 +76,53 @@ PARSER.add_argument('-record_mode_csv_path', '--record_mode_csv_path', action='s
 RESULT = PARSER.parse_args()
 
 
+###############################################################################
 
-
-##########################################################################################
-
-##########################################################################################
+###############################################################################
 if RESULT.transmission_mode_csv_path:
-    CSV_FILES = glob.glob(RESULT.transmission_mode_csv_path+"/*.csv")
+    CSV_FILES = glob.glob(RESULT.transmission_mode_csv_path + "/*.csv")
 else:
     pass
 if RESULT.record_mode_csv_path:
-    CSV_FILES_1 = glob.glob(RESULT.record_mode_csv_path+"/*.csv")
+    CSV_FILES_1 = glob.glob(RESULT.record_mode_csv_path + "/*.csv")
 else:
     pass
 
 
+###############################################################################
 
-##########################################################################################
-
-##########################################################################################
+###############################################################################
 def get_dictionary(csv_files):
     """
     Returns the dictionary with all the csv files as device names
     """
     req_dict = dict()
     for index, each_file in enumerate(csv_files):
-        req_dict["Device_"+str(index)] = each_file
+        req_dict["Device_" + str(index)] = each_file
     return req_dict
 
 
-##########################################################################################
+###############################################################################
 
-##########################################################################################
+###############################################################################
 DATAFRAME_DEVICE = pd.DataFrame()
 
 
-
-##########################################################################################
-                         # Main APP LAYOUT #
-##########################################################################################
+###############################################################################
+# Main APP LAYOUT
+###############################################################################
 
 app = dash.Dash()
 server = app.server
-app.config['suppress_callback_exceptions']=True
+app.config['suppress_callback_exceptions'] = True
 app.layout = html.Div(
     [dcc.Location(id="url", refresh=False), html.Div(id="page-content")]
 )
 
 
-
-##########################################################################################
-                         # BATTERY PERFORMANCE GRAPH HELPER FUNC TAB #
-##########################################################################################
+###############################################################################
+# BATTERY PERFORMANCE GRAPH HELPER FUNC TAB
+###############################################################################
 
 def SetColor(x):
     """
@@ -146,6 +137,7 @@ def SetColor(x):
     elif x < 10:
         return "red"
 
+
 def plot_function(dataframe):
     """
     Data results for file from Transmission mode
@@ -154,7 +146,7 @@ def plot_function(dataframe):
         val = dataframe[["Filename", "DeviceID", "Network_Status", "Time_Stamp", "Network_Type"]].values
         values_list = []
         for each in val:
-            values_list.append("Name: "+each[0]+", Dev: "+each[1]+", Net_Stat: "+str(each[2])+" Time: "+each[3]+", Net_type: "+each[4])
+            values_list.append("Name: " + each[0] + ", Dev: " + each[1] + ", Net_Stat: " + str(each[2]) + " Time: " + each[3] + ", Net_type: " + each[4])
 
         data = go.Scatter(x=pd.Series(list(range(0, 20000, 1))),
                           text=values_list,
@@ -168,21 +160,21 @@ def plot_function(dataframe):
         val = dataframe[["Filename", "DeviceID"]].values
         values_list = []
         for each in val:
-            values_list.append("Name: "+each[0]+", Dev: "+each[1])
+            values_list.append("Name: " + each[0] + ", Dev: " + each[1])
 
         data = go.Scatter(x=pd.Series(list(range(0, 20000, 1))),
                           text=values_list,
                           mode="markers",
                           name="Network Quality",
                           hoverinfo="text",
-                          marker={"color":"blue"},
+                          marker={"color": "blue"},
                           y=dataframe['Battery_Percentage'])
         return data
 
 
-##########################################################################################
-                # Reads csv file and returns pandas dataframe
-##########################################################################################
+###############################################################################
+# Reads csv file and returns pandas dataframe
+###############################################################################
 def read_csv_file(csv_file_name):
     """
     Return dataframe
@@ -191,36 +183,38 @@ def read_csv_file(csv_file_name):
     return dataframe
 
 
-##########################################################################################
-                # Different dataframe with filter based on date and time
-##########################################################################################
+###############################################################################
+# Different dataframe with filter based on date and time
+###############################################################################
 def get_data_specific_date(dataframe):
     """
-    seperates data and time stamp
+    separates data and time stamp
     """
     list_of_date_time = dataframe['Time_Stamp'].values.tolist()
     only_date = []
     date_value = []
     for each in list_of_date_time:
-        date, value = each.split("-")[0],each.split("-")[0].split("/")[0]
+        date, value = each.split("-")[0], each.split("-")[0].split("/")[0]
         only_date.append(date)
         date_value.append(value)
     dataframe["Date"] = only_date
     return dataframe, list(set(date_value))
 
+
 def get_data_specific_time(dataframe):
     """
-    seperates time from time stamp
+    separates time from time stamp
     """
     list_of_date_time = dataframe["Time_Stamp"].values.tolist()
     only_time = []
     timeFormat = "%H:%M:%S"
     for each in list_of_date_time:
-        time = str(datetime.strptime(each.split("-")[1],timeFormat)).split(" ")[1]
+        time = str(datetime.strptime(each.split("-")[1], timeFormat)).split(" ")[1]
         only_time.append(time)
 
     dataframe["Time"] = only_time
     return dataframe
+
 
 def filter_on_date(dataframe, date):
     """
@@ -251,10 +245,9 @@ def get_dataframe_for_plotting_recording(file_index):
     return df_date
 
 
-
-##########################################################################################
-                    # CALLBACK FOR URL INPUT: DEVICE TRANSMISSION #
-##########################################################################################
+###############################################################################
+# CALLBACK FOR URL INPUT: DEVICE TRANSMISSION
+###############################################################################
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
@@ -276,23 +269,20 @@ def display_page(pathname):
                                                                   "deletable": True} for i in DATAFRAME_DEVICE.columns],
                                                         data=DATAFRAME_DEVICE.to_dict("rows"),
                                                         row_selectable="multi",
-                                                        style_table={"maxHeight":"200px",
-                                                                     "maxWidth" :"200px"})])
-                              ], style={"margin-bottom":"10px"})
-                         ], className="six columns")
-                     ], className="row "),
+                                                        style_table={"maxHeight": "200px",
+                                                                     "maxWidth": "200px"})])
+                               ], style={"margin-bottom": "10px"})
+                          ], className="six columns")
+                      ], className="row "),
                   html.Div(
                       [html.Div(id="inside-transmission")],
                       className="row "),
-                 ], className="sub_page"),
-            ], className="page")
+                  ], className="sub_page"),
+             ], className="page")
 
-
-
-
-    ##########################################################################################
-                         # CALLBACK FOR URL INPUT: LOCATION #
-    ##########################################################################################
+    ###########################################################################
+    # CALLBACK FOR URL INPUT: LOCATION
+    ###########################################################################
     elif pathname == "/acoustic-device-report/location-details":
 
         return html.Div(
@@ -307,24 +297,21 @@ def display_page(pathname):
                                                                              "deletable": True} for i in DATAFRAME_DEVICE.columns],
                                                                    data=DATAFRAME_DEVICE.to_dict("rows"),
                                                                    row_selectable="multi",
-                                                                   style_table={"maxHeight":"200px",
-                                                                                "maxWidth" :"200px"})
-                                             ]),
-                                   ], style={"margin-bottom":"10px"})
-                         ], className="six columns")
-                     ], className="row "),
+                                                                   style_table={"maxHeight": "200px",
+                                                                                "maxWidth": "200px"})
+                                              ]),
+                                    ], style={"margin-bottom": "10px"})
+                          ], className="six columns")
+                      ], className="row "),
                   html.Div(
                       [html.Div(id="inside-location")],
                       className="row ")
-                 ], className="sub_page")
-            ], className="page")
+                  ], className="sub_page")
+             ], className="page")
 
-
-
-
-    ##########################################################################################
-                    # CALLBACK FOR URL INPUT: BATTERY PERFORMANCE #
-    ##########################################################################################
+    ###########################################################################
+    # CALLBACK FOR URL INPUT: BATTERY PERFORMANCE
+    ###########################################################################
     elif pathname == "/acoustic-device-report/battery-performance":
         return html.Div(
             [Header(app),
@@ -338,28 +325,24 @@ def display_page(pathname):
                                                                              "deletable": True} for i in DATAFRAME_DEVICE.columns],
                                                                    data=DATAFRAME_DEVICE.to_dict("rows"),
                                                                    row_selectable="multi",
-                                                                   style_table={"maxHeight":"200px",
-                                                                                "maxWidth" :"200px"})
-                                             ]),
-                                   ], style={"margin-bottom":"10px"})
-                         ], className="six columns")
-                     ], className="row "),
+                                                                   style_table={"maxHeight": "200px",
+                                                                                "maxWidth": "200px"})
+                                              ]),
+                                    ], style={"margin-bottom": "10px"})
+                          ], className="six columns")
+                      ], className="row "),
                   html.Div(
                       [html.Div(id="inside-battery")],
                       className="row "),
                   html.Div(
                       [html.A(id="my-link")],
                       className="row ")
-                 ], className="sub_page")
-            ], className="page")
+                  ], className="sub_page")
+             ], className="page")
 
-
-
-
-
-    ##########################################################################################
-                    # CALLBACK FOR URL INPUT: DEVICE DETAILS #
-    ##########################################################################################
+    ###########################################################################
+    # CALLBACK FOR URL INPUT: DEVICE DETAILS
+    ###########################################################################
     elif pathname == "/acoustic-device-report/device-details":
         return html.Div([Header(app),
                          html.Div(
@@ -373,25 +356,22 @@ def display_page(pathname):
                                                                                     "deletable": True} for i in DATAFRAME_DEVICE.columns],
                                                                           data=DATAFRAME_DEVICE.to_dict("rows"),
                                                                           row_selectable="single",
-                                                                          style_table={"maxHeight":"200px",
-                                                                                       "maxWidth" :"200px"})])
-                                          ], style={"margin-bottom":"10px"})
-                                     ], className="six columns"),
+                                                                          style_table={"maxHeight": "200px",
+                                                                                       "maxWidth": "200px"})])
+                                           ], style={"margin-bottom": "10px"})
+                                      ], className="six columns"),
                                   html.Div(id="device-details-id", className="six columns")
-                                 ], className="row "),
+                                  ], className="row "),
 
                               # Row 2
                               html.Div(
                                   [html.Div(id="inside-device-details")],
                                   className="row ")
-                             ], className="sub_page")], className="page")
+                              ], className="sub_page")], className="page")
 
-
-
-
-    ##########################################################################################
-                    # CALLBACK FOR URL INPUT: REVIEWS #
-    ##########################################################################################
+    ###########################################################################
+    # CALLBACK FOR URL INPUT: REVIEWS
+    ###########################################################################
     elif pathname == "/acoustic-device-report/reviews":
         return html.Div(
             [Header(app),
@@ -407,24 +387,24 @@ def display_page(pathname):
                                                                   "deletable": True} for i in DATAFRAME_DEVICE.columns],
                                                         data=DATAFRAME_DEVICE.to_dict("rows"),
                                                         row_selectable="single",
-                                                        style_table={"maxHeight":"200px",
-                                                                     "maxWidth" :"200px"})
-                                  ])
-                              ], style={"margin-bottom":"10px"})
-                         ], className="six columns"),
+                                                        style_table={"maxHeight": "200px",
+                                                                     "maxWidth": "200px"})
+                                   ])
+                               ], style={"margin-bottom": "10px"})
+                          ], className="six columns"),
                       html.Div(
                           [html.Div(
                               [html.H6("Device Transmission Performance Review",
                                        className="subtitle padded",
-                                       style={"margin-left":"5%"}),
+                                       style={"margin-left": "5%"}),
                                html.Br([]),
                                html.Div(
                                    [html.P("Start Time of the Device:    17:59:03 - 19/07/2019",
-                                           style={"margin-left":"5%"}),
+                                           style={"margin-left": "5%"}),
                                     html.P("Estimated Recorded Files:   3600 (.wav) Files. ",
-                                           style={"margin-left":"5%"})],
+                                           style={"margin-left": "5%"})],
                                    style={"color": "#7a7a7a"})
-                              ], className="six columns"),
+                               ], className="six columns"),
 
                            html.Div(
                                [html.H6("Network Related", className="subtitle padded"),
@@ -433,9 +413,9 @@ def display_page(pathname):
                                     [html.P("TYpe of Network Quality"),
                                      html.P("Consistency of the Network Quality")],
                                     style={"color": "#7a7a7a"})
-                               ],
-                               style={"margin-top":"5%",
-                                      "margin-right":"-20%"},
+                                ],
+                               style={"margin-top": "5%",
+                                      "margin-right": "-20%"},
                                className="six columns"),
 
                            html.Div(
@@ -445,55 +425,49 @@ def display_page(pathname):
                                     [html.P(""),
                                      html.P("")],
                                     style={"color": "#7a7a7a"})
-                               ],
-                               style={"margin-top":"5%"},
+                                ],
+                               style={"margin-top": "5%"},
                                className="six columns")
-                          ],
+                           ],
                           className="row ")
-                     ],
+                      ],
                      className="row "),
 
                   html.Div([html.Div(id="inside-device-details")],
                            className="row ")],
                  className="sub_page")
-            ], className="page")
+             ], className="page")
 
-
-
-    ##########################################################################################
-                # CALLBACK FOR URL INPUT: FULL VIEW #
-    ##########################################################################################
+    ###########################################################################
+    # CALLBACK FOR URL INPUT: FULL VIEW
+    ###########################################################################
     elif pathname == "/acoustic-device-report/full-view":
         return overview.create_layout(app)
 
-
-
-    ##########################################################################################
-             # CALLBACK FOR URL INPUT: OVERVIEW  #
-    ##########################################################################################
+    ###########################################################################
+    # CALLBACK FOR URL INPUT: OVERVIEW
+    ###########################################################################
     elif pathname == "/acoustic-device-report/overview":
         return overview.create_layout(app)
 
-
-
-    ##########################################################################################
-            # CALLBACK FOR URL INPUT: DEFAULT / HOME PAGE #
-    ##########################################################################################
+    ###########################################################################
+    # CALLBACK FOR URL INPUT: DEFAULT / HOME PAGE
+    ###########################################################################
     else:
         connect_group(PRIMARY_PATH)
         list_wavfiles = True
         dir_n_timestamp, directories_time_list = last_ftp_time(PRIMARY_PATH)
         dir_n_timestamp, status = active_or_inactive(dir_n_timestamp, directories_time_list)
         list_device = [each[0] for each in dir_n_timestamp]
-        list_timestamps = [each[1]+" [IST]" for each in dir_n_timestamp]
+        list_timestamps = [each[1] + " [IST]" for each in dir_n_timestamp]
         directory_threads = []
         for index, each_dir in enumerate(list_device):
             if index == 0:
-                threads = threading.Thread(target=write_csv, args=("data_downloaded/"+each_dir+".csv", DIR_REQ+each_dir))
+                threads = threading.Thread(target=write_csv, args=("data_downloaded/" + each_dir + ".csv", DIR_REQ + each_dir))
                 directory_threads.append(threads)
                 threads.start()
             else:
-                threads = threading.Thread(target=write_csv, args=("data_downloaded/"+each_dir+".csv", DIR_REQ+each_dir))
+                threads = threading.Thread(target=write_csv, args=("data_downloaded/" + each_dir + ".csv", DIR_REQ + each_dir))
                 directory_threads.append(threads)
                 threads.start()
         DATAFRAME_DEVICE_ACTIVE = pd.DataFrame()
@@ -501,7 +475,7 @@ def display_page(pathname):
         display_device_list = []
         if list_device:
             for each_value_ in list_device:
-                if os.path.exists("data_downloaded/"+each_value_+".csv"):
+                if os.path.exists("data_downloaded/" + each_value_ + ".csv"):
                     display_device_list.append(each_value_)
                 else:
                     pass
@@ -511,83 +485,80 @@ def display_page(pathname):
         DATAFRAME_DEVICE_ACTIVE['Report'] = ["Download Report"] * DATAFRAME_DEVICE_ACTIVE.shape[0]
         DATAFRAME_DEVICE_ACTIVE["Status   (5 mins)"] = status
         DATAFRAME_DEVICE_ACTIVE = DATAFRAME_DEVICE_ACTIVE.sort_values(by=['Last Modified Time'], ascending=False)
-        DATAFRAME_DEVICE_ACTIVE["Device No."] = list(range(1, len(list_device)+1))
+        DATAFRAME_DEVICE_ACTIVE["Device No."] = list(range(1, len(list_device) + 1))
         DATAFRAME_DEVICE_ACTIVE = DATAFRAME_DEVICE_ACTIVE[["Device No.", "Device ID", "Last Modified Time", "Report", "Status   (5 mins)"]]
 
-
-
-        ##########################################################################################
-                        # Return the page with Directory status and Graph
-        ##########################################################################################
+        #######################################################################
+        # Return the page with Directory status and Graph
+        #######################################################################
         fig_active = get_figure_active(list_device, status)
         if list_wavfiles:
             return html.Div(
-        [
-            html.Div([Header(app)]),
-            html.Div(
                 [
+                    html.Div([Header(app)]),
                     html.Div(
                         [
                             html.Div(
-                                [html.H5("Device (s) Summary",style={"text-align":"center",'text-decoration':'underline'}),
-                                 html.Div([
-                                     html.Br([]),
-                                     html.Br([]),
-                                     html.P("Active Device (s) : "+ str(len(list_device)) +" Device (s)",
-                                            style={'text-decoration':'underline',
-                                                   "margin-left":"10px"}
-                                           ),
-                                     html.Br([]),
-                                     html.Div([Table(DATAFRAME_DEVICE_ACTIVE, "Report")],
-                                              style={"padding-left":"2px",
-                                                     "padding-right":"8px",
-                                                     "margin-top":"20px"}
-                                             )
-                                     ],
-                                          style={"margin-bottom":"10px"}),
-                                 html.Br([]),
-                                 html.Br([]),
-                                 html.P("NOTE: Refresh to see recent activity.[Needs Refresh]",
-                                        style={"margin-left":"70%", 'text-decoration':'underline'})
+                                [
+                                    html.Div(
+                                        [html.H5("Device (s) Summary", style={"text-align": "center", 'text-decoration': 'underline'}),
+                                         html.Div([
+                                             html.Br([]),
+                                             html.Br([]),
+                                             html.P("Active Device (s) : " + str(len(list_device)) + " Device (s)",
+                                                    style={'text-decoration': 'underline',
+                                                           "margin-left": "10px"}
+                                                    ),
+                                             html.Br([]),
+                                             html.Div([Table(DATAFRAME_DEVICE_ACTIVE, "Report")],
+                                                      style={"padding-left": "2px",
+                                                             "padding-right": "8px",
+                                                             "margin-top": "20px"}
+                                                      )
+                                         ],
+                                            style={"margin-bottom": "10px"}),
+                                            html.Br([]),
+                                            html.Br([]),
+                                            html.P("NOTE: Refresh to see recent activity.[Needs Refresh]",
+                                                   style={"margin-left": "70%", 'text-decoration': 'underline'})
 
+                                         ],
+                                        className="product",
+                                    )
                                 ],
-                                className="product",
-                            )
-                        ],
-                        className="row",
-                    ),
-                    # Row
-                    html.Div(
-                        [html.Div([
-                            html.Div([
-                                html.Div([
-                                    html.H6("Device Location Plot",
-                                            className="subtitle padded",
-                                            style={"margin-bottom":"20px"}),
-                                    dcc.Graph(figure={"data":fig_active["data"],
-                                                      "layout":fig_active["layout"]},
-                                              config={"displayModeBar": False})
+                                className="row",
+                            ),
+                            # Row
+                            html.Div(
+                                [html.Div([
+                                    html.Div([
+                                        html.Div([
+                                            html.H6("Device Location Plot",
+                                                    className="subtitle padded",
+                                                    style={"margin-bottom": "20px"}),
+                                            dcc.Graph(figure={"data": fig_active["data"],
+                                                              "layout":fig_active["layout"]},
+                                                      config={"displayModeBar": False})
+                                        ],
+                                            className="twelve columns",
+                                            style={"margin-left": "-57%",
+                                                   "margin-top": "20%"})
                                     ],
-                                         className="twelve columns",
-                                         style={"margin-left":"-57%",
-                                                "margin-top":"20%"})
+                                        style={"margin-bottom": "10px"})
                                 ],
-                                     style={"margin-bottom":"10px"})
-                            ],
-                                  className="six columns"),
-                         html.Div(id="device-details-id",
-                                  className="six columns")
-                        ], className="row ")
-                    ],
-                className="sub_page")
-            ],
-            className="page")
+                                    className="six columns"),
+                                    html.Div(id="device-details-id",
+                                             className="six columns")
+                                ], className="row ")
+                        ],
+                        className="sub_page")
+                ],
+                className="page")
 
 
-
-##########################################################################################
-                    # connect to FTP server
-#######################################################################################
+###############################################################################
+# connect to FTP server
+###############################################################################
 def connect(primary_path):
     '''
     To connect to ftp
@@ -596,6 +567,7 @@ def connect(primary_path):
     ftp = FTP(FTP_HOST, user=FTP_USERNAME, passwd=FTP_PASSWORD)
     print("connected to FTP")
     ftp.cwd(primary_path)
+
 
 def connect_group(primary_path):
     """
@@ -606,11 +578,9 @@ def connect_group(primary_path):
     ftp_group.cwd(primary_path)
 
 
-
-
-#######################################################################################
-                # check for wav files only in FTP server
-#######################################################################################
+###############################################################################
+# check for wav files only in FTP server
+###############################################################################
 def check_wav_files():
     """
     Checks only wav files and returns the list
@@ -622,9 +592,9 @@ def check_wav_files():
     return wavfiles_list
 
 
-##########################################################################################
-                # sort files based on names
-##########################################################################################
+###############################################################################
+# sort files based on names
+###############################################################################
 def sort_on_filenames(files_list):
     """
     Sorts the ftp files based on names: Ascending order
@@ -645,17 +615,15 @@ def sort_on_filenames(files_list):
         sorted_wavfiles = sorted(wav_files_toint)
 
         for sorted_file in sorted_wavfiles:
-            wav_files_list.append(character + str(sorted_file)[:8]+"_"+ str(sorted_file)[8:]+ extension)
+            wav_files_list.append(character + str(sorted_file)[:8] + "_" + str(sorted_file)[8:] + extension)
         return wav_files_list
     else:
         return []
 
 
-
-
-##########################################################################################
-        # sort files based on ftp timestamps: Very slow for large files
-##########################################################################################
+###############################################################################
+# sort files based on ftp timestamps: Very slow for large files
+###############################################################################
 def get_list_files_sorted(ftp_path):
     """
     sort files based on ftp timestamps
@@ -673,11 +641,9 @@ def get_list_files_sorted(ftp_path):
     return sorted_wav_files_list
 
 
-
-
-##########################################################################################
-                # Removes duplicate files from iteration
-##########################################################################################
+###############################################################################
+# Removes duplicate files from iteration
+###############################################################################
 def get_without_duplicates(csv_filename, sorted_wavfiles):
     """
     Removes duplicate files from iteration
@@ -697,10 +663,9 @@ def get_without_duplicates(csv_filename, sorted_wavfiles):
         return sorted_wavfiles
 
 
-
-##########################################################################################
-                # Create and write csv file with all the details
-##########################################################################################
+###############################################################################
+# Create and write csv file with all the details
+###############################################################################
 def write_csv(csv_filename, ftp_path):
     """
     Create and write csv file with all the details
@@ -710,23 +675,22 @@ def write_csv(csv_filename, ftp_path):
     wav_files = ftp.nlst()
     sorted_files = sort_on_filenames(wav_files)
 
-
-    ##########################################################################################
-                # CSV file column details
-    ##########################################################################################
+    ###########################################################################
+    # CSV file column details
+    ###########################################################################
     non_repeated = get_without_duplicates(csv_filename, sorted_files)
     wav_info_tags = ["Filename", "Operator", "DeviceID", "Battery_Voltage", "Battery_Percentage",\
-    "Network_Status", "Network_Type", "Firmare_Revision", "Time_Stamp", "Latitude", "Longitude", \
-    "Clock", "ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size", "AudioFormat", \
-    "NumChannels", "SampleRate", "ByteRate", "BlockAlign", "BitsPerSample", "SubChunk2ID", \
-    "SubChunk2Size"]
+                     "Network_Status", "Network_Type", "Firmare_Revision", "Time_Stamp", "Latitude", "Longitude", \
+                     "Clock", "ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size", "AudioFormat", \
+                     "NumChannels", "SampleRate", "ByteRate", "BlockAlign", "BitsPerSample", "SubChunk2ID", \
+                     "SubChunk2Size"]
     wav_info_tags2 = ["ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size", \
-    "AudioFormat", "NumChannels", "SampleRate", "ByteRate", "BlockAlign", \
-    "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]
+                      "AudioFormat", "NumChannels", "SampleRate", "ByteRate", "BlockAlign", \
+                      "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]
 
-    ##########################################################################################
-                # If CSV file already exists append rows to it
-    ##########################################################################################
+    ###########################################################################
+    # If CSV file already exists append rows to it
+    ###########################################################################
     if os.path.exists(csv_filename):
         with open(csv_filename, "a") as file_object:
             wav_information_object = csv.writer(file_object)
@@ -764,9 +728,9 @@ def write_csv(csv_filename, ftp_path):
                     ftp = FTP(FTP_HOST, user=FTP_USERNAME, passwd=FTP_PASSWORD)
                     ftp.cwd(ftp_path)
 
-    ##########################################################################################
+    ###########################################################################
                     # If CSV file doesn't exists create new and write
-    ##########################################################################################
+    ###########################################################################
     else:
         with open(csv_filename, "w") as file_object:
             wav_information_object = csv.writer(file_object)
@@ -806,15 +770,15 @@ def write_csv(csv_filename, ftp_path):
                     ftp.cwd(ftp_path)
 
 
-##########################################################################################
-         # FTP class to read data without downloading file
-##########################################################################################
+###############################################################################
+# FTP class to read data without downloading file
+###############################################################################
 class FtpFile:
     """
     sdfsg
     """
 
-    def __init__(self, ftp, name ):
+    def __init__(self, ftp, name):
         self.ftp = ftp
         self.name = name
         self.size = 10240
@@ -831,10 +795,10 @@ class FtpFile:
     def tell(self):
         return self.pos
 
-    def read(self, ftp_path,size= None):
+    def read(self, ftp_path, size=None):
         ftp = FTP(FTP_HOST, user=FTP_USERNAME, passwd=FTP_PASSWORD)
         ftp.cwd(ftp_path)
-        if size == None:
+        if size is None:
             size = self.size - self.pos
         data = B""
         ftp.voidcmd('TYPE I')
@@ -859,10 +823,10 @@ class FtpFile:
         return data
 
 
-##########################################################################################
-                # Get wavheader information
-##########################################################################################
-def get_wavheader_extraheader(name,ftp_path):
+###############################################################################
+# Get wavheader information
+###############################################################################
+def get_wavheader_extraheader(name, ftp_path):
     '''
     To read wav file header details
     '''
@@ -872,7 +836,7 @@ def get_wavheader_extraheader(name,ftp_path):
 
     if (name[-3:] == 'wav') or (name[-3:] == 'WAV'):
         try:
-            file_header_info = BytesIO(FtpFile(ftp,name).read(ftp_path,264))
+            file_header_info = BytesIO(FtpFile(ftp, name).read(ftp_path, 264))
 
             riff, size, fformat = struct.unpack('<4sI4s', file_header_info.read(12))
             chunkoffset = file_header_info.tell()
@@ -896,13 +860,12 @@ def get_wavheader_extraheader(name,ftp_path):
             chunkoffset = file_header_info.tell()
 
             wav_header = [riff, size, fformat, subchunkid, subchunksize, aformat, \
-            channels, samplerate, byterate, blockalign, bps, subchunk2id, subchunk2size]
+                          channels, samplerate, byterate, blockalign, bps, subchunk2id, subchunk2size]
 
-            for each_value in zip(wav_header,["ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size",
-                                              "AudioFormat", "NumChannels", "SampleRate", "ByteRate", "BlockAlign",
-                                              "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]):
+            for each_value in zip(wav_header, ["ChunkID", "TotalSize", "Format", "SubChunk1ID", "SubChunk1Size",
+                                               "AudioFormat", "NumChannels", "SampleRate", "ByteRate", "BlockAlign",
+                                               "BitsPerSample", "SubChunk2ID", "SubChunk2Size"]):
                 wavheader_dict[each_value[1]] = each_value[0]
-
 
             extra_header_info = extra_header.decode("ascii").split(',')
 
@@ -912,10 +875,9 @@ def get_wavheader_extraheader(name,ftp_path):
             return None, None
 
 
-
-##########################################################################################
-                # Get directory and time stamp
-##########################################################################################
+###############################################################################
+# Get directory and time stamp
+###############################################################################
 def get_directory_timestamp_listed():
     """
     Get directory and time stamp
@@ -933,16 +895,16 @@ def get_directory_timestamp_listed():
     return device_list, timestamps
 
 
-##########################################################################################
+###############################################################################
 
-##########################################################################################
+###############################################################################
 def check_wav_file_size(each_wav_file, blockalign, samplerate):
     """
     Checks for wavfile size and return if it is completely
     uploaded to ftp server or not
     """
     ftp_group.sendcmd("TYPE I")
-    if ftp_group.size(each_wav_file) > samplerate*blockalign*10:
+    if ftp_group.size(each_wav_file) > samplerate * blockalign * 10:
         ftp_group.sendcmd("TYPE A")
         return True
     else:
@@ -950,10 +912,9 @@ def check_wav_file_size(each_wav_file, blockalign, samplerate):
         return False
 
 
-
-##########################################################################################
-                # Groups device based on device id
-##########################################################################################
+###############################################################################
+# Groups device based on device id
+###############################################################################
 def group_by_device_id():
     """
     """
@@ -977,7 +938,7 @@ def group_by_device_id():
                                         pass
                                     else:
                                         ftp_group.mkd(Device_ID)
-                                    ftp_group.rename(PRIMARY_PATH+wav_file, PRIMARY_PATH+Device_ID+'/'+wav_file)
+                                    ftp_group.rename(PRIMARY_PATH + wav_file, PRIMARY_PATH + Device_ID + '/' + wav_file)
                                 else:
                                     pass
                     else:
@@ -992,9 +953,9 @@ def group_by_device_id():
             connect_group(PRIMARY_PATH)
 
 
-##########################################################################################
-          # Creates a table in dash format from pandas dataframe format
-##########################################################################################
+###############################################################################
+# Creates a table in dash format from pandas dataframe format
+###############################################################################
 def Table(dataframe, column_name):
     """
     Creates a table in dash format from pandas dataframe format
@@ -1006,71 +967,68 @@ def Table(dataframe, column_name):
         for col in dataframe.columns:
             value = dataframe.iloc[i][col]
 
-            if os.path.exists("data_downloaded/"+dataframe.iloc[i][1]+".csv"):
-                csv_string = pd.read_csv("data_downloaded/"+dataframe.iloc[i][1]+".csv")
+            if os.path.exists("data_downloaded/" + dataframe.iloc[i][1] + ".csv"):
+                csv_string = pd.read_csv("data_downloaded/" + dataframe.iloc[i][1] + ".csv")
                 csv_string = csv_string.to_csv(index=False, encoding='utf-8')
-                csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" +  urllib.parse.quote(csv_string)
+                csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
                 if col == column_name:
-                    print("Im executed", dataframe.iloc[i][1]+".csv")
+                    print("Im executed", dataframe.iloc[i][1] + ".csv")
                     cell = html.Td(html.A(id="download-report",
                                           href=csv_string,
-                                          download="data_downloaded/"+dataframe.iloc[i][1]+".csv",
+                                          download="data_downloaded/" + dataframe.iloc[i][1] + ".csv",
                                           children=[value],
-                                          style={"color":"blue", 'text-decoration':'underline'}),
-                                   style={"padding-top":"10px",
-                                          "padding-right":"13px",
-                                          "padding-left":"10px",
-                                          'text-align':'center',})
+                                          style={"color": "blue", 'text-decoration': 'underline'}),
+                                   style={"padding-top": "10px",
+                                          "padding-right": "13px",
+                                          "padding-left": "10px",
+                                          'text-align': 'center', })
                 else:
                     cell = html.Td(children=value,
-                                   style={"padding-top":"10px",
-                                          'color':'black',
-                                          "padding-right":"13px",
-                                          "padding-left":"10px",
-                                          'text-align':'center'})
+                                   style={"padding-top": "10px",
+                                          'color': 'black',
+                                          "padding-right": "13px",
+                                          "padding-left": "10px",
+                                          'text-align': 'center'})
                 row.append(cell)
             else:
                 if col == column_name:
                     cell = html.Td(html.A(children=[value],
-                                          style={"color":"black",
-                                                 'text-decoration':'underline'}),
-                                   style={"padding-top":"10px",
-                                          "padding-right":"13px",
-                                          "padding-left":"10px",
-                                          'text-align':'center'})
+                                          style={"color": "black",
+                                                 'text-decoration': 'underline'}),
+                                   style={"padding-top": "10px",
+                                          "padding-right": "13px",
+                                          "padding-left": "10px",
+                                          'text-align': 'center'})
                 else:
                     cell = html.Td(children=value,
-                                   style={"padding-top":"10px",
-                                          'color':'black',
-                                          "padding-right":"13px",
-                                          "padding-left":"10px",
-                                          'text-align':'center'})
+                                   style={"padding-top": "10px",
+                                          'color': 'black',
+                                          "padding-right": "13px",
+                                          "padding-left": "10px",
+                                          'text-align': 'center'})
                 row.append(cell)
 
         rows.append(html.Tr(row))
     return html.Table(
         [html.Tr([html.Th(col,
-                          style={"padding-top":"10px",
-                                 "padding-right":"30px",
-                                 'color':'black',
-                                 "padding-left":"30px",
-                                 "padding-bottom":'10px',
-                                 'text-align':'center'}) for col in dataframe.columns])] + rows)
+                          style={"padding-top": "10px",
+                                 "padding-right": "30px",
+                                 'color': 'black',
+                                 "padding-left": "30px",
+                                 "padding-bottom": '10px',
+                                 'text-align': 'center'}) for col in dataframe.columns])] + rows)
 
 
-
-
-
-##########################################################################################
-             # Map plot for active and inactive devices on home page
-##########################################################################################
+###############################################################################
+# Map plot for active and inactive devices on home page
+###############################################################################
 LATITUDES_ACTIVE = []
 LONGITUDES_ACTIVE = []
 DEVICE_ACTIVE_COLOR = []
 DEVICE_LIST_ACTIVE = []
 
 
-def get_data_active(device_list,color):
+def get_data_active(device_list, color):
     print(DEVICE_ACTIVE_COLOR)
     data = go.Scattermapbox(
         mode='markers',
@@ -1082,7 +1040,6 @@ def get_data_active(device_list,color):
     return data
 
 
-
 def get_figure_active(list_of_devices, status_list):
     """
     Active devices / home page maps
@@ -1090,8 +1047,8 @@ def get_figure_active(list_of_devices, status_list):
     global LATITUDES_ACTIVE, LONGITUDES_ACTIVE, DEVICE_ACTIVE_COLOR, DEVICE_LIST_ACTIVE
     trace = []
     for dev, stat in zip(list_of_devices, status_list):
-        if os.path.exists("data_downloaded/"+dev+".csv"):
-            dataframe = read_csv_file("data_downloaded/"+dev+".csv")
+        if os.path.exists("data_downloaded/" + dev + ".csv"):
+            dataframe = read_csv_file("data_downloaded/" + dev + ".csv")
             cord_ = dataframe[["Latitude", "Longitude"]]
             print(cord_.iloc[0][0])
             if cord_.iloc[0][0] and cord_.iloc[0][1]:
@@ -1132,11 +1089,11 @@ def get_layout_active():
                                center=go.layout.mapbox.Center(
                                    lat=float("{0:.4f}".format(LATITUDES_ACTIVE[0])),
                                    lon=float("{0:.4f}".format(LONGITUDES_ACTIVE[0]))
-                                   ),
+                               ),
                                pitch=0,
                                style="light",
                                zoom=10)
-                          )
+                           )
         return layout
 
     else:
@@ -1155,14 +1112,12 @@ def get_layout_active():
                                style="light",
                                zoom=10))
 
-
         return layout
 
 
-
-##########################################################################################
-                # Get all the directory in specified ftp server path
-##########################################################################################
+###############################################################################
+# Get all the directory in specified ftp server path
+###############################################################################
 def directory_details(ftp_path):
     """
 
@@ -1184,23 +1139,22 @@ def directory_details(ftp_path):
                     month = line.split(' ')[-4]
                 else:
                     month = line.split(' ')[-5]
-                timestamp1 = now_year +'/'+str(strptime(month, '%b').tm_mon)+'/'+\
-                line.split(' ')[-3]+'-'+line.split(' ')[-2]
+                timestamp1 = now_year + '/' + str(strptime(month, '%b').tm_mon) + '/' +\
+                    line.split(' ')[-3] + '-' + line.split(' ')[-2]
                 time2 = str(datetime.strptime(timestamp1, datetimeFormat1) + timedelta(minutes=330))
 
                 dir_n_time = directory, time2, 'active'
                 dir_n_timestamp.append(dir_n_time)
                 print("timestamp(time):", time2)
             else:
-                timestamp1 = line.split(' ')[-2]+'/'+str(strptime(line.split(' ')[-5], '%b').tm_mon)\
-                +'/'+line.split(' ')[-4]
+                timestamp1 = line.split(' ')[-2] + '/' + str(strptime(line.split(' ')[-5], '%b').tm_mon)\
+                    + '/' + line.split(' ')[-4]
                 print("timestamp(year):", timestamp1)
                 dir_n_time = directory, timestamp1, 'inactive'
                 dir_n_timestamp.append(dir_n_time)
 
     print("dir_n_timestamp:", dir_n_timestamp)
     return dir_n_timestamp
-
 
 
 def last_ftp_time(ftp_path):
@@ -1224,10 +1178,9 @@ def last_ftp_time(ftp_path):
     return dir_n_timestamp, directories_time_list
 
 
-
-##########################################################################################
-            # Return active and inactive devices based on 5 Mins activity
-##########################################################################################
+###############################################################################
+# Return active and inactive devices based on 5 Mins activity
+###############################################################################
 def active_or_inactive(dir_n_timestamp, directories_time_list):
     """
     Return active and inactive devices based on 5 Mins activity
@@ -1241,13 +1194,13 @@ def active_or_inactive(dir_n_timestamp, directories_time_list):
                 hour = int(td.split(":")[0])
                 minute = int(td.split(":")[1])
                 seconds_ = int(td.split(":")[2])
-                seconds = hour*60*60 + minute*60 + seconds_
+                seconds = hour * 60 * 60 + minute * 60 + seconds_
             else:
                 day = td.split(" ")[0]
                 hour = td.split(" ")[2].split(":")[0]
                 minute = td.split(" ")[2].split(":")[1]
                 seconds_ = td.split(" ")[2].split(":")[2]
-                seconds = day*24*60*60 + hour*60*60 + minute*60 + seconds_
+                seconds = day * 24 * 60 * 60 + hour * 60 * 60 + minute * 60 + seconds_
             if seconds <= 300:
                 status.append('Active')
             else:
@@ -1255,11 +1208,9 @@ def active_or_inactive(dir_n_timestamp, directories_time_list):
     return dir_n_timestamp, status
 
 
-
-
-##########################################################################################
-                             # TRANSMISSION HELPER FUNCTION #
-##########################################################################################
+###############################################################################
+# TRANSMISSION HELPER FUNCTION
+###############################################################################
 
 def plot_function_bar(dataframe):
     """
@@ -1268,24 +1219,21 @@ def plot_function_bar(dataframe):
     val = dataframe[["Filename", "DeviceID", "Network_Status", "Time_Stamp", "Network_Type"]].values
     values_list = []
     for each in val:
-        values_list.append("Name: "+each[0]+", Dev: "+each[1]+", Net_Stat: "+str(each[2])+" Time: "+each[3]+", Net_type: "+each[4])
+        values_list.append("Name: " + each[0] + ", Dev: " + each[1] + ", Net_Stat: " + str(each[2]) + " Time: " + each[3] + ", Net_type: " + each[4])
 
     trace1 = go.Bar(
         x=[dataframe["DeviceID"].iloc[0]],
         y=[dataframe.shape[0]],
-        name="Duration:- "+str(get_time_difference(dataframe["Time_Stamp"].iloc[0],
-                                                   dataframe["Time_Stamp"].iloc[dataframe.shape[0]-1])),
-        text="No. Files:- "+str(dataframe.shape[0]),
+        name="Duration:- " + str(get_time_difference(dataframe["Time_Stamp"].iloc[0],
+                                                     dataframe["Time_Stamp"].iloc[dataframe.shape[0] - 1])),
+        text="No. Files:- " + str(dataframe.shape[0]),
         textposition="outside")
     return trace1
 
 
-
-
-
-##########################################################################################
-                         # TIME STAMP DIFFERENCE HELPER FUNC #
-##########################################################################################
+###############################################################################
+# TIME STAMP DIFFERENCE HELPER FUNC
+###############################################################################
 
 def get_time_difference(timestamp1, timestamp2):
     """
@@ -1297,13 +1245,9 @@ def get_time_difference(timestamp1, timestamp2):
     return time_diff
 
 
-
-
-
-##########################################################################################
-                         # LOCATION HELPER FUNC  #
-##########################################################################################
-
+###############################################################################
+# LOCATION HELPER FUNC
+###############################################################################
 
 
 def get_data(name, latitudes, longitudes, device_name_location):
@@ -1344,7 +1288,6 @@ def get_layout(latitudes, longitudes):
                            pitch=0,
                            zoom=7))
 
-
     return layout
 
 
@@ -1354,7 +1297,7 @@ def get_figure(list_of_devices):
     """
     trace = []
     for _, each in enumerate(list_of_devices):
-        dataframe = read_csv_file("data_downloaded/"+each+".csv")
+        dataframe = read_csv_file("data_downloaded/" + each + ".csv")
         latitudes = dataframe["Latitude"].iloc[2]
         longitudes = dataframe["Longitude"].iloc[2]
         data = get_data(each, latitudes, longitudes, each)
@@ -1364,10 +1307,9 @@ def get_figure(list_of_devices):
     return fig
 
 
-##########################################################################################
-                         # CALLBACK FOR TRANSMISSION #
-##########################################################################################
-
+###############################################################################
+# CALLBACK FOR TRANSMISSION
+###############################################################################
 
 
 @app.callback(
@@ -1375,7 +1317,7 @@ def get_figure(list_of_devices):
     [Input('datatable-interactivity-transmission', 'data'),
      Input('datatable-interactivity-transmission', 'columns'),
      Input("datatable-interactivity-transmission", "derived_virtual_selected_rows")])
-def update_figure_transmission(rows,columns,indices):
+def update_figure_transmission(rows, columns, indices):
     """
     Callback for plots on  Transmission files details
     """
@@ -1386,17 +1328,17 @@ def update_figure_transmission(rows,columns,indices):
         selected = pred_df.values.tolist()
         if selected:
             if len(selected) == 1:
-                df_date = get_dataframe_for_plotting_transmission("data_downloaded/"+selected[0]+".csv")
+                df_date = get_dataframe_for_plotting_transmission("data_downloaded/" + selected[0] + ".csv")
                 device1 = plot_function_bar(df_date)
                 fig.append(device1)
             else:
                 for each_fig in selected:
-                    df_date = get_dataframe_for_plotting_transmission("data_downloaded/"+each_fig+".csv")
+                    df_date = get_dataframe_for_plotting_transmission("data_downloaded/" + each_fig + ".csv")
                     device1 = plot_function_bar(df_date)
                     fig.append(device1)
             return html.Div([html.H6("Device Transmission Performances",
                                      className="subtitle padded"),
-                             dcc.Graph(figure={"data":fig,
+                             dcc.Graph(figure={"data": fig,
                                                "layout": go.Layout(
                                                    autosize=True,
                                                    width=750,
@@ -1410,35 +1352,35 @@ def update_figure_transmission(rows,columns,indices):
                                                    titlefont={"family": "Raleway",
                                                               "size": 10},
                                                    xaxis={'title': 'Device ID',
-                                                          'titlefont':{'family':'Courier New, monospace',
-                                                                       'size':16,
-                                                                       'color':'black'}
-                                                         },
+                                                          'titlefont': {'family': 'Courier New, monospace',
+                                                                        'size': 16,
+                                                                        'color': 'black'}
+                                                          },
                                                    yaxis={'title': 'No. Files Transmitted',
-                                                          'titlefont':{'family':'Courier New, monospace',
-                                                                       'size':16,
-                                                                       'color':'black'}
-                                                         }),
-                                              },
+                                                          'titlefont': {'family': 'Courier New, monospace',
+                                                                        'size': 16,
+                                                                        'color': 'black'}
+                                                          }),
+                                               },
                                        config={"displayModeBar": False},
-                                       style={"margin-top":"20px",
-                                              "margin-bottom":"10px"}
-                                      )
-                            ], className="twelve columns",
-                            style={"margin-left":"-57%",
-                                   "margin-top":"20%"}
-                           )
+                                       style={"margin-top": "20px",
+                                              "margin-bottom": "10px"}
+                                       )
+                             ], className="twelve columns",
+                            style={"margin-left": "-57%",
+                                   "margin-top": "20%"}
+                            )
 
 
-##########################################################################################
-                         # CALLBACK FOR LOCATION #
-##########################################################################################
+###############################################################################
+# CALLBACK FOR LOCATION
+###############################################################################
 @app.callback(
     dash.dependencies.Output("inside-location", "children"),
     [Input('datatable-interactivity-location', 'data'),
      Input('datatable-interactivity-location', 'columns'),
      Input("datatable-interactivity-location", "derived_virtual_selected_rows")])
-def update_figure_location(rows,columns,indices):
+def update_figure_location(rows, columns, indices):
     """
     Callback for Location Plot
     """
@@ -1451,25 +1393,25 @@ def update_figure_location(rows,columns,indices):
             fig = get_figure(selected)
             return html.Div([html.H6("Device Location Plot",
                                      className="subtitle padded"),
-                             dcc.Graph(figure={"data":fig["data"],
+                             dcc.Graph(figure={"data": fig["data"],
                                                "layout":fig["layout"]},
                                        config={"displayModeBar": False})
-                            ],
+                             ],
                             className="twelve columns",
-                            style={"margin-left":"-57%",
-                                   "margin-top":"20%"})
+                            style={"margin-left": "-57%",
+                                   "margin-top": "20%"})
 
 
-##########################################################################################
-                          # CALLBACK FOR BATTERY PERFORMANCE GRAPH #
-##########################################################################################
+###############################################################################
+# CALLBACK FOR BATTERY PERFORMANCE GRAPH
+###############################################################################
 
 @app.callback(
     dash.dependencies.Output("inside-battery", "children"),
     [Input('datatable-interactivity-battery', 'data'),
      Input('datatable-interactivity-battery', 'columns'),
      Input("datatable-interactivity-battery", "derived_virtual_selected_rows")])
-def update_figure_battery(rows,columns,indices):
+def update_figure_battery(rows, columns, indices):
     """
     Callback for Battery Plot
     """
@@ -1480,16 +1422,16 @@ def update_figure_battery(rows,columns,indices):
         selected = pred_df.values.tolist()
         if selected:
             if len(selected) == 1:
-                df_date = get_dataframe_for_plotting_transmission("data_downloaded/"+selected[0]+".csv")
+                df_date = get_dataframe_for_plotting_transmission("data_downloaded/" + selected[0] + ".csv")
                 device1 = plot_function(df_date)
                 fig.append(device1)
             else:
                 for each_fig in selected:
-                    df_date = get_dataframe_for_plotting_transmission("data_downloaded/"+each_fig+".csv")
+                    df_date = get_dataframe_for_plotting_transmission("data_downloaded/" + each_fig + ".csv")
                     device1 = plot_function(df_date)
                     fig.append(device1)
             return html.Div([html.H6("Device Battery Performance", className="subtitle padded"),
-                             dcc.Graph(figure={"data":fig,
+                             dcc.Graph(figure={"data": fig,
                                                "layout": go.Layout(
                                                    autosize=True,
                                                    width=750,
@@ -1503,26 +1445,25 @@ def update_figure_battery(rows,columns,indices):
                                                    titlefont={"family": "Raleway",
                                                               "size": 10},
                                                    xaxis={'title': 'Time ( Seconds )',
-                                                          'titlefont':{'family':'Courier New, monospace',
-                                                                       'size':16,
-                                                                       'color':'black'}},
+                                                          'titlefont': {'family': 'Courier New, monospace',
+                                                                        'size': 16,
+                                                                        'color': 'black'}},
                                                    yaxis={'title': 'Battery Level ( Percentage )',
-                                                          'titlefont':{'family':'Courier New, monospace',
-                                                                       'size':16,
-                                                                       'color':'black'}})},
+                                                          'titlefont': {'family': 'Courier New, monospace',
+                                                                        'size': 16,
+                                                                        'color': 'black'}})},
                                        config={"displayModeBar": False},
-                                       style={"margin-top":"20px",
-                                              "margin-bottom":"10px"}
-                                      ),
-                            ], className="twelve columns",
-                            style={"margin-left":"-59%",
-                                   "margin-top":"30%"})
+                                       style={"margin-top": "20px",
+                                              "margin-bottom": "10px"}
+                                       ),
+                             ], className="twelve columns",
+                            style={"margin-left": "-59%",
+                                   "margin-top": "30%"})
 
 
-
-##########################################################################################
-                         # CALLBACK FOR DEVICE DETAILS #
-##########################################################################################
+###############################################################################
+# CALLBACK FOR DEVICE DETAILS
+###############################################################################
 @app.callback(
     dash.dependencies.Output("device-details-id", "children"),
     [Input('datatable-interactivity-device-details', 'data'),
@@ -1536,20 +1477,18 @@ def update_figure_device_details(rows, columns, indices):
         pred_df = pred_df.iloc[indices]["Select Device"]
         selected = pred_df.values.tolist()
         if selected:
-            dataframe = pd.read_csv("data_downloaded/"+selected[0]+".csv")
+            dataframe = pd.read_csv("data_downloaded/" + selected[0] + ".csv")
             df_details = pd.DataFrame()
             df_details["label"] = dataframe.columns
             df_details["value"] = dataframe.iloc[1, :].values.tolist()
-            return  [html.H6(["Device Details - "+selected[0]],
-                             className="subtitle padded"),
-                     html.Table(make_dash_table(df_details)),]
+            return [html.H6(["Device Details - " + selected[0]],
+                            className="subtitle padded"),
+                    html.Table(make_dash_table(df_details)), ]
 
 
-
-##########################################################################################
-                         # CALLBACK FOR DOWNLOAD REPORT #
-##########################################################################################
-
+###############################################################################
+# CALLBACK FOR DOWNLOAD REPORT
+###############################################################################
 
 
 if __name__ == "__main__":
