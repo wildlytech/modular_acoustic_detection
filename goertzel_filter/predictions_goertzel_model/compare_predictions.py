@@ -2,11 +2,10 @@
 Compares the predictions made using model libaries and without libraries
 """
 import argparse
-import tensorflow.compat.v1.keras as keras
-from tensorflow.compat.v1.keras.models import Sequential, Model
+from tensorflow.compat.v1.keras.models import Model
 from tensorflow.compat.v1.keras.layers import Input
 from . import predicting_without_libraries
-from tensorflow.compat.v1.keras.layers import Dense, Conv1D, Conv2D, MaxPooling1D, Flatten, AveragePooling1D, TimeDistributed, MaxPooling2D
+from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten, TimeDistributed, MaxPooling2D
 from . import audiomoth_function_for_goertzel_model
 
 
@@ -16,7 +15,7 @@ HELP_AUDIO = "Path for audio files ( .WAV )"
 HELP_GOERTZEL = "Path for Goertzel freq components ( .pkl )"
 
 
-#parse the input arguments given from command line
+# parse the input arguments given from command line
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-audio_files_path',
                     '--audio_files_path', action='store',
@@ -41,7 +40,7 @@ PREDICTIONS = Flatten()(MAX_POOL_2)
 MODEL = Model(inputs=[INPUTS], outputs=[PREDICTIONS])
 print(MODEL.summary())
 
-#Load weights from saved weights file
+# Load weights from saved weights file
 MODEL.load_weights('Goertzel_model_8k_weights_time.h5')
 
 # get the weights of each layer from loaded model
@@ -50,14 +49,14 @@ for layer in MODEL.layers:
     WEIGHTS.append(layer.get_weights())
 print('Length of  the weights : ', len(WEIGHTS))
 
-#redict on audiomoth files using keras library
-TEST_VAULES, DATA_FRAME = audiomoth_function_for_goertzel_model.dataframe_with_frequency_components(RESULT.audio_files_path,RESULT.path_to_goertzel_components)
+# predict on audiomoth files using keras library
+TEST_VAULES, DATA_FRAME = audiomoth_function_for_goertzel_model.dataframe_with_frequency_components(RESULT.audio_files_path, RESULT.path_to_goertzel_components)
 PREDICTIONS_OUT = MODEL.predict(TEST_VAULES).ravel()
 DATA_FRAME['predictions_prob'] = PREDICTIONS_OUT
 DATA_FRAME['predictions'] = PREDICTIONS_OUT.ravel().round()
 
-#predict on any of the audiomoth file without using any of the keras library
-#In this example code we are taking 100th example
+# predict on any of the audiomoth file without using any of the keras library
+# In this example code we are taking 100th example
 OUTPUT = predicting_without_libraries.layer1_predictions(TEST_VAULES[100], WEIGHTS)
 print(OUTPUT)
 print(DATA_FRAME['predictions_prob'][100])

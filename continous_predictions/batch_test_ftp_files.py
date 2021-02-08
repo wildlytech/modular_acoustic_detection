@@ -7,12 +7,9 @@ import pandas as pd
 from . import generate_before_predict_BR
 
 
-
-
 ############################################################################
-                # Target Path or Folder in FTP
+# Target Path or Folder in FTP
 ############################################################################
-
 
 
 DESCRIPTION = "Generates the csv file with prediction results"
@@ -20,14 +17,14 @@ HELP = "Give the Required Arguments"
 
 
 ############################################################################
-                # Target Path or Folder in FTP
+# Target Path or Folder in FTP
 ############################################################################
 DEFAULT_CSV_FILENAME = "predictions_FTP_folder.csv"
 FTP_PASSWORD = "********"
 
 
 ############################################################################
-        # Parsing argument
+# Parsing argument
 ############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-ftp_folder_path', '--ftp_folder_path', action='store',
@@ -38,9 +35,8 @@ PARSER.add_argument('-csv_filename', '--csv_filename', action='store',
 RESULT = PARSER.parse_args()
 
 
-
 ############################################################################
-        # Parsing argument
+# Parsing argument
 ############################################################################
 
 if RESULT.ftp_folder_path:
@@ -52,7 +48,7 @@ else:
 
 
 ############################################################################
-         # Check for directory locally to download
+# Check for directory locally to download
 ############################################################################
 def check_directory_to_write_wavfiles():
     """
@@ -64,9 +60,8 @@ def check_directory_to_write_wavfiles():
         os.mkdir("FTP_downloaded/")
 
 
-
 ############################################################################
-            # List only wav files into
+# List only wav files into
 ############################################################################
 def check_for_wav_only(list_values):
     """
@@ -74,16 +69,14 @@ def check_for_wav_only(list_values):
     """
     wav_files = []
     for each_value in list_values:
-        if each_value[-3:] == "WAV"  or each_value[-3:] == "wav":
+        if each_value[-3:] == "WAV" or each_value[-3:] == "wav":
             wav_files.append(each_value)
     print("Total file: ", len(wav_files))
     return wav_files
 
 
-
-
 ############################################################################
-            # Sort files based on time
+# Sort files based on time
 ############################################################################
 def sorting_files_same_as_upload_order(wav_files_list):
     """
@@ -97,7 +90,6 @@ def sorting_files_same_as_upload_order(wav_files_list):
             # returns last uploaded file's time with utc
             time1 = ftp.voidcmd("MDTM " + name)
             count += 1
-            #print time1[4:], name
             DICT[name] = time1[4:]
     sorted_list = sorted((value, key) for (key, value) in list(DICT.items()))
     sorted_filenames = [element[0] for element in sorted_list]
@@ -105,10 +97,8 @@ def sorting_files_same_as_upload_order(wav_files_list):
     return sorted_filenames
 
 
-
-
 ############################################################################
-            # Connect ftp server
+# Connect ftp server
 ############################################################################
 def call_for_ftp():
     """
@@ -132,10 +122,8 @@ def call_for_ftp():
     return dataframe
 
 
-
-
 ############################################################################
-     # Loops over the list of files in ftp & saves predictions in csv
+    # Loops over the list of files in ftp & saves predictions in csv
 ############################################################################
 def start_batch_run_ftp_live():
     """
@@ -148,7 +136,6 @@ def start_batch_run_ftp_live():
                  "Human_probability", "Nature_probability", "Domestic_probability",
                  "Tools_probability"]
 
-
     # Check if the csv file is already existing or not. If it is existing then append the result
     # to same csv file based on the downloaded file
     if os.path.exists(DEFAULT_CSV_FILENAME):
@@ -156,13 +143,13 @@ def start_batch_run_ftp_live():
             wav_information_object = csv.writer(file_object)
             file_object.flush()
             for each_file in dum_df['FileNames'].tolist():
-                path = "FTP_downloaded/"+each_file
+                path = "FTP_downloaded/" + each_file
                 check_directory_to_write_wavfiles()
                 if os.path.exists(path):
                     print("path Exists")
                 else:
                     with open(path, 'wb') as file_obj:
-                        ftp.retrbinary('RETR '+each_file, file_obj.write)
+                        ftp.retrbinary('RETR ' + each_file, file_obj.write)
                     try:
                         emb = generate_before_predict_BR.main(path, 0, 0, 0)
                     except ValueError:
@@ -176,7 +163,7 @@ def start_batch_run_ftp_live():
                     predictions_each_model = []
                     print("Predicting for :", each_file)
                     for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-                        pred_prob, pred = generate_before_predict_BR.main(path+each_file, 1, emb, each_model)
+                        pred_prob, pred = generate_before_predict_BR.main(path + each_file, 1, emb, each_model)
                         if pred_prob:
                             predictions_each_model.append("{0:.2f}".format(pred_prob[0][0] * 100))
                         else:
@@ -193,15 +180,15 @@ def start_batch_run_ftp_live():
 
             # Loop over the files
             for each_file in dum_df['FileNames'].tolist():
-                path = "FTP_downloaded/"+each_file
+                path = "FTP_downloaded/" + each_file
                 check_directory_to_write_wavfiles()
                 if os.path.exists(path):
                     print("path Exists")
                 else:
                     with open(path, 'wb') as file_obj:
-                        ftp.retrbinary('RETR '+ each_file, file_obj.write)
+                        ftp.retrbinary('RETR ' + each_file, file_obj.write)
                 try:
-                    emb = generate_before_predict_BR.main(path, 0, 0,0)
+                    emb = generate_before_predict_BR.main(path, 0, 0, 0)
                 except ValueError:
                     print("malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index)
                     dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
@@ -211,7 +198,7 @@ def start_batch_run_ftp_live():
                 predictions_each_model = []
                 print("Predicting for :", each_file)
                 for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-                    pred_prob, pred = generate_before_predict_BR.main(path+each_file, 1, emb, each_model)
+                    pred_prob, pred = generate_before_predict_BR.main(path + each_file, 1, emb, each_model)
                     if pred_prob:
                         predictions_each_model.append("{0:.2f}".format(pred_prob[0][0] * 100))
                     else:
@@ -220,13 +207,11 @@ def start_batch_run_ftp_live():
                 file_object.flush()
 
 
-
 ############################################################################
             # Main Function
 ############################################################################
-if __name__=="__main__":
+if __name__ == "__main__":
     while(True):
         start_batch_run_ftp_live()
         time.sleep(120)
         print("Waiting to FTP files to get accumulate: 2 Minutes")
-

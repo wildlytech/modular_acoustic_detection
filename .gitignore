@@ -21,3 +21,6 @@ data/audioset/rerated_video_ids.txt
 data/
 sounds/
 .DS_Store
+diff_class_datasets/
+.idea/
+predictions/multilabel_model/weights/
