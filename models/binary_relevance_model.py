@@ -16,9 +16,9 @@ import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
 import sys
-
+from tensorflow.keras.callbacks import EarlyStopping
 from youtube_audioset import get_recursive_sound_names
-
+from imblearn.keras import BalancedBatchGenerator
 #############################################################################
                 # Description and help
 #############################################################################
@@ -271,6 +271,9 @@ def import_dataframes(dataframe_file_list,
 
   return train_df, test_df
 
+
+
+
 DF_TRAIN, DF_TEST = \
     import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
                       positive_label_filter_arr=POSITIVE_LABELS,
@@ -367,6 +370,14 @@ else:
 #############################################################################
       # Implementing using the keras usual training techinque
 #############################################################################
+
+callback = EarlyStopping(
+    monitor="val_accuracy",
+    verbose=1,
+    mode="max"
+)
+
+
 if CONFIG_DATA["networkCfgJson"] is None:
   MODEL = create_keras_model()
 else:
@@ -383,6 +394,7 @@ MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            batch_size=CONFIG_DATA["train"]["batchSize"],
                            class_weight={0: CLASS_WEIGHT_0, 1: CLASS_WEIGHT_1},
                            verbose=1,
+                           callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
 
 #############################################################################
