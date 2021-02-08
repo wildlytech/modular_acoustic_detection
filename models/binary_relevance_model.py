@@ -18,7 +18,10 @@ from sklearn.metrics import confusion_matrix, accuracy_score, classification_rep
 import sys
 from tensorflow.keras.callbacks import EarlyStopping
 from youtube_audioset import get_recursive_sound_names
-from imblearn.keras import BalancedBatchGenerator
+#from imblearn.keras import BalancedBatchGenerator
+#from imblearn.under_sampling import NearMiss
+from keras_balanced_batch_generator import make_generator
+from tensorflow.keras.utils import to_categorical
 #############################################################################
                 # Description and help
 #############################################################################
@@ -378,6 +381,11 @@ callback = EarlyStopping(
 )
 
 
+training_generator = make_generator(
+    CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"],categorical=False)
+
+batch = next(iter(training_generator))
+
 if CONFIG_DATA["networkCfgJson"] is None:
   MODEL = create_keras_model()
 else:
@@ -389,13 +397,16 @@ else:
   MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
                 metrics=['accuracy'])
 
-MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
+'''MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            epochs=CONFIG_DATA["train"]["epochs"],
                            batch_size=CONFIG_DATA["train"]["batchSize"],
                            class_weight={0: CLASS_WEIGHT_0, 1: CLASS_WEIGHT_1},
                            verbose=1,
                            callbacks=[callback],
-                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
+                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET))'''
+
+steps_per_epoch = len(CLF2_TRAIN)//CONFIG_DATA["train"]["batchSize"]
+MODEL_TRAINING = MODEL.fit(training_generator,shuffle=True,epochs=2,steps_per_epoch=steps_per_epoch,validation_data=(CLF2_TEST,CLF2_TEST_TARGET.reshape(-1)),verbose=1)
 
 #############################################################################
       # Predict on train and test data
