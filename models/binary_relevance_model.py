@@ -383,7 +383,6 @@ callback = EarlyStopping(
 training_generator = make_generator(
     CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False)
 
-batch = next(iter(training_generator))
 
 if CONFIG_DATA["networkCfgJson"] is None:
     MODEL = create_keras_model()
