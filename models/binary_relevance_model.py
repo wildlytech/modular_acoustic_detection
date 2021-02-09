@@ -19,7 +19,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 from youtube_audioset import get_recursive_sound_names
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.utils import to_categorical
-
+import matplotlib.pyplot as plt
 #############################################################################
 # Description and help
 #############################################################################
@@ -392,7 +392,7 @@ else:
     loaded_model_json = json_file.read()
     json_file.close()
     MODEL = model_from_json(loaded_model_json)
-    MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+    MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
                   metrics=['accuracy'])
 
 '''MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
@@ -404,8 +404,17 @@ else:
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))'''
 
 steps_per_epoch = len(CLF2_TRAIN) // CONFIG_DATA["train"]["batchSize"]
-MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True, epochs=2, steps_per_epoch=steps_per_epoch,
+MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True, epochs=100, steps_per_epoch=steps_per_epoch,
+                           callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET.reshape(-1)), verbose=1)
+plt.plot(MODEL_TRAINING.history["accuracy"])
+plt.plot(MODEL_TRAINING.history["val_accuracy"])
+plt.title("Model Accuracy")
+plt.ylabel("Accuracy")
+plt.xlabel("Epoch")
+plt.legend(["train","test"],loc="upper right")
+plt.savefig("TrainvsVal "+FULL_NAME+" 1e-5.png")
+plt.show()
 
 #############################################################################
 # Predict on train and test data
