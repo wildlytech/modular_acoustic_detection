@@ -17,7 +17,6 @@ from colorama import Fore, Style
 import argparse
 from tensorflow.keras.callbacks import EarlyStopping
 from keras_balanced_batch_generator import make_generator
-from tensorflow.keras.utils import to_categorical
 
 #########################################################
 # Description and Help
