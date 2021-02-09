@@ -20,6 +20,7 @@ from youtube_audioset import get_recursive_sound_names
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.utils import to_categorical
 import matplotlib.pyplot as plt
+
 #############################################################################
 # Description and help
 #############################################################################
@@ -383,7 +384,6 @@ callback = EarlyStopping(
 training_generator = make_generator(
     CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False)
 
-
 if CONFIG_DATA["networkCfgJson"] is None:
     MODEL = create_keras_model()
 else:
@@ -412,8 +412,8 @@ plt.plot(MODEL_TRAINING.history["val_accuracy"])
 plt.title("Model Accuracy")
 plt.ylabel("Accuracy")
 plt.xlabel("Epoch")
-plt.legend(["train","test"],loc="upper right")
-plt.savefig("TrainvsVal "+FULL_NAME+" 1e-5.png")
+plt.legend(["train", "test"], loc="upper right")
+plt.savefig("TrainvsVal " + FULL_NAME + " 1e-5.png")
 plt.show()
 
 #############################################################################
