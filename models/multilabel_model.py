@@ -15,6 +15,9 @@ from glob import glob
 import json
 from colorama import Fore, Style
 import argparse
+from tensorflow.keras.callbacks import EarlyStopping
+from keras_balanced_batch_generator import make_generator
+from tensorflow.keras.utils import to_categorical
 
 #########################################################
 # Description and Help
@@ -38,13 +41,12 @@ def read_config(filepath):
 
 config = read_config(cfg_path)
 
-
 output_wt_file = config["train"]["outputWeightFile"]
 pathToFileDirectory = "/".join(output_wt_file.split('/')[:-1]) + '/'
 if not os.path.exists(pathToFileDirectory):
     os.makedirs(pathToFileDirectory)
 
-assert(config["ontology"]["useYoutubeAudioSet"])
+assert (config["ontology"]["useYoutubeAudioSet"])
 # If single file or null, then convert to list
 ontologyExtFiles = config["ontology"]["extension"]
 
@@ -52,7 +54,6 @@ if ontologyExtFiles is None:
     ontologyExtFiles = []
 elif type(ontologyExtFiles) != list:
     ontologyExtFiles = [ontologyExtFiles]
-
 
 pos_sounds = {}
 neg_sounds = {}
@@ -176,7 +177,8 @@ def import_dataframes(dataframe_file_list,
         search_results = [x for x in search_results if x not in exclude_paths]
 
         if len(search_results) == 0:
-            print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths, Style.RESET_ALL)
+            print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths,
+                  Style.RESET_ALL)
             assert (False)
 
         for path in search_results:
@@ -197,14 +199,12 @@ def import_dataframes(dataframe_file_list,
     list_of_train_dataframes = []
     list_of_test_dataframes = []
     for input_file_dict in dataframe_file_list:
-
-        assert("patternPath" not in list(input_file_dict.keys()))
-        assert("path" in list(input_file_dict.keys()))
+        assert ("patternPath" not in list(input_file_dict.keys()))
+        assert ("path" in list(input_file_dict.keys()))
 
         print("Importing", input_file_dict["path"], "...")
 
         with open(input_file_dict["path"], 'rb') as file_obj:
-
             # Load the file
 
             df = pickle.load(file_obj)
@@ -236,7 +236,6 @@ DF_TRAIN, DF_TEST = import_dataframes(dataframe_file_list=config["train"]["input
                                       negative_label_filter_arr=neg_sounds,
                                       validation_split=config["train"]["validationSplit"])
 
-
 LABELS_BINARIZED_TRAIN = pd.DataFrame()
 LABELS_BINARIZED_TEST = pd.DataFrame()
 for key in pos_sounds.keys():
@@ -245,7 +244,6 @@ for key in pos_sounds.keys():
     LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(DF_TRAIN, POSITIVE_LABELS)
 
     LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
-
 
 print("TR: ", LABELS_BINARIZED_TRAIN.columns)
 print("TS: ", LABELS_BINARIZED_TEST.columns)
@@ -296,13 +294,12 @@ def create_keras_model():
 
 
 ########################################################################
-    # reshaping the train and test data so as to align with input for model
+# reshaping the train and test data so as to align with input for model
 ########################################################################
 CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
 CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
 CLF2_TRAIN_TARGET = LABELS_BINARIZED_TRAIN
 CLF2_TEST_TARGET = LABELS_BINARIZED_TEST
-
 
 ########################################################################
 # Implementing & Training the keras model
@@ -322,11 +319,23 @@ else:
 epochs = config["train"]["epochs"]
 batch_size = config["train"]["batchSize"]
 
+callback = EarlyStopping(
+    monitor="val_loss",
+    verbose=1,
+    mode="auto"
+)
 
-MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
+training_generator = make_generator(
+    CLF2_TRAIN, CLF2_TRAIN_TARGET.values, batch_size=batch_size, categorical=True)
+
+'''MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            epochs=epochs, batch_size=batch_size, verbose=1,
-                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
+                           callbacks = [callback],
+                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET))'''
 
+steps_per_epoch = len(CLF2_TRAIN) // batch_size
+MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True, epochs=2, steps_per_epoch=steps_per_epoch,
+                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET.values), verbose=1)
 
 ########################################################################
 # Predict on train and test data
@@ -336,7 +345,6 @@ CLF2_TRAIN_PREDICTION = MODEL.predict(CLF2_TRAIN).round()
 CLF2_TRAIN_PREDICTION_PROB = MODEL.predict(CLF2_TRAIN)
 CLF2_TEST_PREDICTION = MODEL.predict(CLF2_TEST).round()
 CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
-
 
 ########################################################################
 # To get the Misclassified examples
@@ -348,12 +356,10 @@ DF_TEST['predicted_prob'] = np.split(CLF2_TEST_PREDICTION_PROB, DF_TEST.shape[0]
 MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 
-
 ########################################################################
 # print misclassified number of examples
 ########################################################################
 print('Misclassified number of examples :', DF_TEST[MISCLASSIFIED_EXAMPLES].shape[0])
-
 
 ########################################################################
 # Print confusion matrix and classification_report
@@ -372,7 +378,6 @@ CL_REPORT = classification_report(CLF2_TEST_TARGET.values.argmax(axis=1),
                                   CLF2_TEST_PREDICTION.argmax(axis=1))
 print(CL_REPORT)
 
-
 ########################################################################
 # calculate accuracy and hamming loss
 ########################################################################
@@ -381,7 +386,6 @@ ACCURACY = accuracy_score(CLF2_TEST_TARGET.values.argmax(axis=1),
 HL = hamming_loss(CLF2_TEST_TARGET.values.argmax(axis=1), CLF2_TEST_PREDICTION.argmax(axis=1))
 print('Hamming Loss :', HL)
 print('Accuracy :', ACCURACY)
-
 
 ########################################################################
 # Save the model weights
