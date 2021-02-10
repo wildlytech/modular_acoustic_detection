@@ -1,7 +1,3 @@
-# bird sounds scrapping - audio data
-from pprint import pprint
-
-
 import requests
 import youtube_dl
 import argparse
