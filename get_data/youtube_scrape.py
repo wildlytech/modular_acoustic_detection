@@ -36,8 +36,7 @@ print("Links: ", VIDEO_LIST)
 COUNT = 0
 for item in VIDEO_LIST[:NUMBER_AUDIOCLIPS_LIMIT]:
     COUNT += 1
-    path = PATH_TO_WRITE_AUDIO + "_".join(SEARCH_KEYWORD.split(" ")) + "/" + \
-           SEARCH_KEYWORD + "_" + item.split("=")[-1] + "_" + str(COUNT)
+    path = PATH_TO_WRITE_AUDIO + "_".join(SEARCH_KEYWORD.split(" ")) + "/" + SEARCH_KEYWORD + "_" + item.split("=")[-1] + "_" + str(COUNT)
     if not os.path.exists(path):
         try:
             check_call(['youtube-dl', item,
