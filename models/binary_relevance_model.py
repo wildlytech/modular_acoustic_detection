@@ -338,7 +338,7 @@ def create_keras_model():
     model.add(Flatten())
     print(model.summary())
     # Compile model
-    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
                   metrics=['accuracy'])
     return model
 
