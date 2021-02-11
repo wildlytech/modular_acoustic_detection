@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 import glob
 
 
-def read_file(filepath):
+def read_json_file(filepath):
     with open(filepath, "r") as f:
         file = json.load(f)
     return file
