@@ -325,7 +325,7 @@ callback = EarlyStopping(
 )
 
 training_generator = make_generator(
-    CLF2_TRAIN, CLF2_TRAIN_TARGET.values, batch_size=batch_size, categorical=True)
+    CLF2_TRAIN, CLF2_TRAIN_TARGET.values, batch_size=batch_size, categorical=True, seed=42)
 
 '''MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
                            epochs=epochs, batch_size=batch_size, verbose=1,
