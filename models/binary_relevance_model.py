@@ -407,14 +407,6 @@ steps_per_epoch = len(CLF2_TRAIN) // CONFIG_DATA["train"]["batchSize"]
 MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True, epochs=100, steps_per_epoch=steps_per_epoch,
                            callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET.reshape(-1)), verbose=1)
-plt.plot(MODEL_TRAINING.history["accuracy"])
-plt.plot(MODEL_TRAINING.history["val_accuracy"])
-plt.title("Model Accuracy")
-plt.ylabel("Accuracy")
-plt.xlabel("Epoch")
-plt.legend(["train", "test"], loc="upper right")
-plt.savefig("TrainvsVal " + FULL_NAME + " 1e-5.png")
-plt.show()
 
 #############################################################################
 # Predict on train and test data
