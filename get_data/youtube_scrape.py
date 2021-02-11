@@ -24,7 +24,7 @@ else:
 ###########################################################################
 # Settings for scraping the youtube webpage with selected query keyword
 ###########################################################################
-vid_search = VideosSearch(SEARCH_KEYWORD, limit=10)
+vid_search = VideosSearch(SEARCH_KEYWORD, limit=NUMBER_AUDIOCLIPS_LIMIT)
 VIDEO_LIST = []
 for result_dict in vid_search.result()["result"]:
     VIDEO_LIST.append(result_dict["link"])
