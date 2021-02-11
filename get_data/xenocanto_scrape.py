@@ -9,6 +9,10 @@ api_link = "https://www.xeno-canto.org/api/2/recordings?query="
 
 
 def query_api(bird_species):
+    """
+    Query xeno-canto api for links to audio for bird species
+    """
+
     res = requests.get(api_link + bird_species)
     recordings = res.json()["recordings"]
     links = [recordings[i]["file"] for i in range(len(recordings))]
@@ -17,6 +21,10 @@ def query_api(bird_species):
 
 
 def download_audio(audio_links, audio_files_path, bird_ids):
+    """
+    Download the audio at the specified links to the folder path
+    """
+
     if not audio_files_path.endswith("/"):
         audio_files_path += '/'
 
