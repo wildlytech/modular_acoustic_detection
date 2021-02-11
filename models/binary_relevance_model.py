@@ -403,7 +403,9 @@ else:
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET))'''
 
 steps_per_epoch = len(CLF2_TRAIN) // CONFIG_DATA["train"]["batchSize"]
-MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True, epochs=100, steps_per_epoch=steps_per_epoch,
+MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True,
+                           epochs=CONFIG_DATA["train"]["epochs"],
+                           steps_per_epoch=steps_per_epoch,
                            callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET.reshape(-1)), verbose=1)
 
