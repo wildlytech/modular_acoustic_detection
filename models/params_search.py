@@ -10,8 +10,6 @@ from tensorflow.compat.v1.keras.models import model_from_json, Sequential
 from tensorflow.compat.v1.keras.optimizers import Adam
 from youtube_audioset import get_recursive_sound_names
 
-params_path = "param_file.json"
-config_path = "model_configs/binary_relevance_model/binary_relevance_model_Wild_cfg.json"
 
 np.random.seed(10)
 random.seed(10)
