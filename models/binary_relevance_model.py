@@ -371,7 +371,7 @@ else:
     CLASS_WEIGHT_1 = (1 - TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
 
 #############################################################################
-# Implementing using the keras usual training techinque
+# Implementing using the keras usual training technique
 #############################################################################
 
 callback = EarlyStopping(
