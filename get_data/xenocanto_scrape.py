@@ -17,6 +17,10 @@ def query_api(bird_species):
 
 
 def download_audio(audio_links, audio_files_path, bird_ids):
+    """
+    Download the audio at the specified links to the folder path
+    """
+
     if not audio_files_path.endswith("/"):
         audio_files_path += '/'
 
