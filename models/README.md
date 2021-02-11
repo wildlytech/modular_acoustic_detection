@@ -76,3 +76,14 @@ $ python -m models.binary_relevance_model [-h]  -model_cfg_json MODEL_CONFIG_JSO
                                                 [-output_weight_file OUTPUT_WEIGHT_FILE]
 ```
 
+#### 5. Parameter Search file
+- This file takes parameters from the ```params_file.json``` file as input and prints out results after training the model using each of them.
+- A variety of hyperparameters can be tested together 
+- The hyperparameters supported include:<br>
+a. loss: The loss function<br>
+b. lr: The learning rate<br>
+c. epsilon: Momentum parameter<br>
+d. batch_size: Batch size<br>
+e. networkCfgJson: Network architecture json file<br>
+- The script can be run using the following command:
+```python models/param_search.py -params_path <Path to the parameter json file> -config_path <Path to the model config file>```
