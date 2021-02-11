@@ -42,7 +42,7 @@ def load_model(CONFIG_DATA):
         json_file.close()
         MODEL = model_from_json(loaded_model_json)
 
-        MODEL.load_weights(CONFIG_DATA["train"]["outputWeightFile"])
+
 
     return MODEL
 
@@ -132,9 +132,10 @@ if __name__ == "__main__":
         CLASS_WEIGHT_0 = 1
         CLASS_WEIGHT_1 = (1 - TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
 
-    MODEL = load_model(CONFIG_DATA)
+
 
     for param in params_file["params"]:
+        MODEL = load_model(param)
         MODEL.compile(loss=param["loss"],
                       optimizer=Adam(lr=param["lr"], epsilon=param["epsilon"]),
                       metrics=['accuracy'])
