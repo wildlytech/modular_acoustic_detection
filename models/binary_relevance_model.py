@@ -312,7 +312,7 @@ print("PERCENT POSITIVE EXAMPLES:",
       "{0:.2f}%".format(100.0 * TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES / TOTAL_TRAIN_TEST_EXAMPLES))
 
 #############################################################################
-# preprecess the data into required structure
+# preprocess the data into required structure
 #############################################################################
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TRAIN_STANDARDIZED = X_TRAIN / 255
