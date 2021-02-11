@@ -52,8 +52,8 @@ if __name__ == "__main__":
     ARGUMENT_PARSER.add_argument("-config_path", "--config_path", help="Path to config file", required=True)
 
     PARSED_ARGS = ARGUMENT_PARSER.parse_args()
-    CONFIG_DATA = read_file(PARSED_ARGS.config_path)
-    params_file = read_file(PARSED_ARGS.params_path)
+    CONFIG_DATA = read_json_file(PARSED_ARGS.config_path)
+    params_file = read_json_file(PARSED_ARGS.params_path)
 
     FULL_NAME = CONFIG_DATA["aggregatePositiveLabelName"] + 'vs' + CONFIG_DATA["aggregateNegativeLabelName"]
     assert (CONFIG_DATA["ontology"]["useYoutubeAudioSet"])
