@@ -42,8 +42,6 @@ def load_model(CONFIG_DATA):
         json_file.close()
         MODEL = model_from_json(loaded_model_json)
 
-
-
     return MODEL
 
 
@@ -131,8 +129,6 @@ if __name__ == "__main__":
     else:
         CLASS_WEIGHT_0 = 1
         CLASS_WEIGHT_1 = (1 - TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
-
-
 
     for param in params_file["params"]:
         MODEL = load_model(param)
