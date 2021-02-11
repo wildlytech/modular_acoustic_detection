@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import random
 import tensorflow as tf
-from preprocess_utils import read_json_file, get_select_vector, import_dataframes
+from .preprocess_utils import read_json_file, get_select_vector, import_dataframes
 from sklearn.metrics import classification_report
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from tensorflow.compat.v1.keras.models import model_from_json, Sequential
