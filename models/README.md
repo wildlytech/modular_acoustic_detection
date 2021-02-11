@@ -86,4 +86,4 @@ c. epsilon: Momentum parameter<br>
 d. batch_size: Batch size<br>
 e. networkCfgJson: Network architecture json file<br>
 - The script can be run using the following command:
-```python models/param_search.py -params_path <Path to the parameter json file> -config_path <Path to the model config file>```
+```python -m models.param_search -params_path <Path to the parameter json file> -config_path <Path to the model config file>```
