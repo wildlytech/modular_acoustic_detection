@@ -134,19 +134,19 @@ if __name__ == "__main__":
 
     MODEL = load_model(CONFIG_DATA)
 
-    for i in range(params_file["nParams"]):
-        MODEL.compile(loss=params_file["loss"][i],
-                      optimizer=Adam(lr=params_file["lr"][i], epsilon=params_file["epsilon"][i]),
+    for param in params_file["params"]:
+        MODEL.compile(loss=param["loss"],
+                      optimizer=Adam(lr=param["lr"], epsilon=param["epsilon"]),
                       metrics=['accuracy'])
         MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
-                  epochs=params_file["epochs"][i],
+                  epochs=param["epochs"],
                   class_weight={0: CLASS_WEIGHT_0, 1: CLASS_WEIGHT_1},
                   verbose=1)
 
         preds = MODEL.predict(CLF2_TEST)
         preds = np.round(preds)
-        print("Parameters: lr=", params_file["lr"][i], "\t",
-              "loss=", params_file["loss"][i], "\t",
-              "epsilon=", params_file["epsilon"][i], "\t",
-              "epochs: ", params_file["epochs"][i])
+        print("Parameters: lr=", param["lr"], "\t",
+              "loss=", param["loss"], "\t",
+              "epsilon=", param["epsilon"], "\t",
+              "epochs: ", param["epochs"])
         print(classification_report(CLF2_TEST_TARGET, preds))
