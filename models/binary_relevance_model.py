@@ -19,7 +19,6 @@ from tensorflow.keras.callbacks import EarlyStopping
 from youtube_audioset import get_recursive_sound_names
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.utils import to_categorical
-import matplotlib.pyplot as plt
 
 #############################################################################
 # Description and help
