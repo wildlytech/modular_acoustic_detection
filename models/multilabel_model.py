@@ -17,7 +17,7 @@ from colorama import Fore, Style
 import argparse
 from tensorflow.keras.callbacks import ModelCheckpoint
 from keras_balanced_batch_generator import make_generator
-
+from tensorflow.keras.losses import BinaryCrossentropy
 #########################################################
 # Description and Help
 #########################################################
@@ -356,6 +356,11 @@ DF_TEST['predicted_prob'] = np.split(CLF2_TEST_PREDICTION_PROB, DF_TEST.shape[0]
 MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 
+
+print("******* FINAL VAL LOSS *******")
+bce = BinaryCrossentropy()
+print(bce(CLF2_TEST_TARGET,CLF2_TEST_PREDICTION_PROB).numpy())
+print("********************************")
 ########################################################################
 # print misclassified number of examples
 ########################################################################
