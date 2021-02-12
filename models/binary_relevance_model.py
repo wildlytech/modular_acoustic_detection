@@ -376,6 +376,8 @@ else:
 checkpoint_path = "checkpoint/cp.ckpt"
 callback = ModelCheckpoint(
     filepath=checkpoint_path,
+    monitor="val_accuracy",
+
     save_best_only=True,
     save_weights_only=True
 )
