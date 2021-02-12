@@ -15,8 +15,9 @@ from glob import glob
 import json
 from colorama import Fore, Style
 import argparse
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint
 from keras_balanced_batch_generator import make_generator
+from tensorflow.keras.losses import BinaryCrossentropy
 
 #########################################################
 # Description and Help
@@ -287,7 +288,7 @@ def create_keras_model():
     model.add(Flatten())
     print(model.summary())
     # Compile model
-    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
                   metrics=['accuracy'])
     return model
 
@@ -312,29 +313,31 @@ else:
     json_file.close()
 
     MODEL = model_from_json(loaded_model_json)
-    MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+    MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
                   metrics=['accuracy'])
 
 epochs = config["train"]["epochs"]
 batch_size = config["train"]["batchSize"]
 
-callback = EarlyStopping(
-    monitor="val_loss",
-    verbose=1,
-    mode="auto"
+checkpoint_path = "checkpoint/cp.ckpt"
+callback = ModelCheckpoint(
+    filepath=checkpoint_path,
+    save_best_only=True,
+    save_weights_only=True,
+    verbose=1
+
 )
 
 training_generator = make_generator(
-    CLF2_TRAIN, CLF2_TRAIN_TARGET.values, batch_size=batch_size, categorical=True)
-
-'''MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
-                           epochs=epochs, batch_size=batch_size, verbose=1,
-                           callbacks = [callback],
-                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET))'''
+    CLF2_TRAIN, CLF2_TRAIN_TARGET.values, batch_size=batch_size, categorical=True, seed=42)
 
 steps_per_epoch = len(CLF2_TRAIN) // batch_size
-MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True, epochs=2, steps_per_epoch=steps_per_epoch,
+MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True,
+                           epochs=epochs, steps_per_epoch=steps_per_epoch, callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET.values), verbose=1)
+print("Load model weights from checkpoint: ")
+MODEL.load_weights(checkpoint_path)
+print("Model Loaded")
 
 ########################################################################
 # Predict on train and test data
@@ -355,6 +358,10 @@ DF_TEST['predicted_prob'] = np.split(CLF2_TEST_PREDICTION_PROB, DF_TEST.shape[0]
 MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 MISCLASSIFIED_EXAMPLES = np.any(MISCLASSIFED_ARRAY, axis=1)
 
+print("******* FINAL VAL LOSS *******")
+bce = BinaryCrossentropy()
+print(bce(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION_PROB).numpy())
+print("********************************")
 ########################################################################
 # print misclassified number of examples
 ########################################################################

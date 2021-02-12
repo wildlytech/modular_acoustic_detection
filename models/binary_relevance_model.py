@@ -15,11 +15,11 @@ import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint
 from youtube_audioset import get_recursive_sound_names
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.utils import to_categorical
-import matplotlib.pyplot as plt
+from tensorflow.keras.losses import BinaryCrossentropy
 
 #############################################################################
 # Description and help
@@ -313,7 +313,7 @@ print("PERCENT POSITIVE EXAMPLES:",
       "{0:.2f}%".format(100.0 * TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES / TOTAL_TRAIN_TEST_EXAMPLES))
 
 #############################################################################
-# preprecess the data into required structure
+# preprocess the data into required structure
 #############################################################################
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TRAIN_STANDARDIZED = X_TRAIN / 255
@@ -339,7 +339,7 @@ def create_keras_model():
     model.add(Flatten())
     print(model.summary())
     # Compile model
-    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
                   metrics=['accuracy'])
     return model
 
@@ -372,17 +372,20 @@ else:
     CLASS_WEIGHT_1 = (1 - TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
 
 #############################################################################
-# Implementing using the keras usual training techinque
+# Implementing using the keras usual training technique
 #############################################################################
-
-callback = EarlyStopping(
+checkpoint_path = "checkpoint/cp.ckpt"
+callback = ModelCheckpoint(
+    filepath=checkpoint_path,
     monitor="val_accuracy",
     verbose=1,
-    mode="max"
+    save_best_only=True,
+    save_weights_only=True
 )
 
 training_generator = make_generator(
-    CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False)
+    CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False,
+    seed=42)
 
 if CONFIG_DATA["networkCfgJson"] is None:
     MODEL = create_keras_model()
@@ -395,26 +398,16 @@ else:
     MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
                   metrics=['accuracy'])
 
-'''MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
-                           epochs=CONFIG_DATA["train"]["epochs"],
-                           batch_size=CONFIG_DATA["train"]["batchSize"],
-                           class_weight={0: CLASS_WEIGHT_0, 1: CLASS_WEIGHT_1},
-                           verbose=1,
-                           callbacks=[callback],
-                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET))'''
-
 steps_per_epoch = len(CLF2_TRAIN) // CONFIG_DATA["train"]["batchSize"]
-MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True, epochs=100, steps_per_epoch=steps_per_epoch,
+MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True,
+                           epochs=CONFIG_DATA["train"]["epochs"],
+                           steps_per_epoch=steps_per_epoch,
                            callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET.reshape(-1)), verbose=1)
-plt.plot(MODEL_TRAINING.history["accuracy"])
-plt.plot(MODEL_TRAINING.history["val_accuracy"])
-plt.title("Model Accuracy")
-plt.ylabel("Accuracy")
-plt.xlabel("Epoch")
-plt.legend(["train", "test"], loc="upper right")
-plt.savefig("TrainvsVal " + FULL_NAME + " 1e-5.png")
-plt.show()
+
+print("Load model weights from checkpoint: ")
+MODEL.load_weights(checkpoint_path)
+print("Model Loaded")
 
 #############################################################################
 # Predict on train and test data
@@ -464,6 +457,11 @@ ACCURACY = accuracy_score(CLF2_TEST_TARGET,
 HL = hamming_loss(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION)
 print('Hamming Loss :', HL)
 print('Accuracy :', ACCURACY)
+
+print("******* FINAL VAL LOSS *******")
+bce = BinaryCrossentropy()
+print(bce(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION_PROB).numpy())
+print("********************************")
 
 #############################################################################
 # save model weights. Change as per the model type
