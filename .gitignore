@@ -24,3 +24,4 @@ sounds/
 diff_class_datasets/
 .idea/
 predictions/multilabel_model/weights/
+checkpoint/
