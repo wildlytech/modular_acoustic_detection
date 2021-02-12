@@ -323,6 +323,7 @@ callback = ModelCheckpoint(
     filepath=checkpoint_path,
     save_best_only=True,
     save_weights_only=True,
+    verbose=1
 
 )
 
