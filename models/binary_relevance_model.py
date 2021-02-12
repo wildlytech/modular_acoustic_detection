@@ -19,7 +19,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 from youtube_audioset import get_recursive_sound_names
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.utils import to_categorical
-
+from tensorflow.keras.losses import BinaryCrossentropy
 #############################################################################
 # Description and help
 #############################################################################
@@ -377,7 +377,7 @@ checkpoint_path = "checkpoint/cp.ckpt"
 callback = ModelCheckpoint(
     filepath=checkpoint_path,
     monitor="val_accuracy",
-
+    verbose=1,
     save_best_only=True,
     save_weights_only=True
 )
@@ -399,7 +399,7 @@ else:
 
 steps_per_epoch = len(CLF2_TRAIN) // CONFIG_DATA["train"]["batchSize"]
 MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True,
-                           epochs=CONFIG_DATA["train"]["epochs"],
+                           epochs=5,
                            steps_per_epoch=steps_per_epoch,
                            callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET.reshape(-1)), verbose=1)
@@ -456,6 +456,13 @@ ACCURACY = accuracy_score(CLF2_TEST_TARGET,
 HL = hamming_loss(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION)
 print('Hamming Loss :', HL)
 print('Accuracy :', ACCURACY)
+
+
+print("******* FINAL VAL LOSS *******")
+bce = BinaryCrossentropy()
+print(bce(CLF2_TEST_TARGET,CLF2_TEST_PREDICTION_PROB).numpy())
+print("********************************")
+
 
 #############################################################################
 # save model weights. Change as per the model type
