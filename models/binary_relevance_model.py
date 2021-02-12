@@ -380,7 +380,7 @@ callback = ModelCheckpoint(
 )
 
 training_generator = make_generator(
-    CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False)
+    CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False, seed=42)
 
 
 if CONFIG_DATA["networkCfgJson"] is None:
