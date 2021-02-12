@@ -373,15 +373,16 @@ else:
 #############################################################################
 # Implementing using the keras usual training technique
 #############################################################################
-
+checkpoint_path = "checkpoint/cp.ckpt"
 callback = ModelCheckpoint(
-    filepath="checkpoint/",
-    save_best_only=True
+    filepath=checkpoint_path,
+    save_best_only=True,
+    save_weights_only=True
 )
 
 training_generator = make_generator(
-    CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False, seed=42)
-
+    CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False,
+    seed=42)
 
 if CONFIG_DATA["networkCfgJson"] is None:
     MODEL = create_keras_model()
@@ -400,6 +401,10 @@ MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True,
                            steps_per_epoch=steps_per_epoch,
                            callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET.reshape(-1)), verbose=1)
+
+print("Load model weights from checkpoint: ")
+MODEL.load_weights(checkpoint_path)
+print("Model Loaded")
 
 #############################################################################
 # Predict on train and test data
