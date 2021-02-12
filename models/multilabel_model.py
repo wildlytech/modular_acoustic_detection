@@ -318,7 +318,7 @@ else:
 epochs = config["train"]["epochs"]
 batch_size = config["train"]["batchSize"]
 
-checkpoint_path="checkpoint/cp.ckpt"
+checkpoint_path = "checkpoint/cp.ckpt"
 callback = ModelCheckpoint(
     filepath=checkpoint_path,
     save_best_only=True,
@@ -331,7 +331,7 @@ training_generator = make_generator(
 
 steps_per_epoch = len(CLF2_TRAIN) // batch_size
 MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True,
-                           epochs=1, steps_per_epoch=steps_per_epoch,callbacks=[callback],
+                           epochs=1, steps_per_epoch=steps_per_epoch, callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET.values), verbose=1)
 print("Load model weights from checkpoint: ")
 MODEL.load_weights(checkpoint_path)
