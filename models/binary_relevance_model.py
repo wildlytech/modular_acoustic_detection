@@ -15,7 +15,7 @@ import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint
 from youtube_audioset import get_recursive_sound_names
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.utils import to_categorical
@@ -374,14 +374,14 @@ else:
 # Implementing using the keras usual training technique
 #############################################################################
 
-callback = EarlyStopping(
-    monitor="val_accuracy",
-    verbose=1,
-    mode="max"
+callback = ModelCheckpoint(
+    filepath="checkpoint/",
+    save_best_only=True
 )
 
 training_generator = make_generator(
     CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False)
+
 
 if CONFIG_DATA["networkCfgJson"] is None:
     MODEL = create_keras_model()
