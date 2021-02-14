@@ -20,9 +20,12 @@ def query_api(bird_species):
 
     df = pd.DataFrame(recordings)
 
+    # The following columns are maintained for legacy purposes when the html
+    # was being scraped
     df["XenoCanto_ID"] = "XC" + df['id']
 
     scientific_name = df["gen"] + " " + df["sp"] + " " + df["ssp"]
+    # Strip trailing whitespaces in case there is no subspecies identifier
     scientific_name = scientific_name.str.strip()
     df["Common name/Scientific"] = df["en"] + " (" + scientific_name + ")"
 
