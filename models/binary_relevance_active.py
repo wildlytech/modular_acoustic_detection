@@ -53,7 +53,7 @@ PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 #############################################################################
 # Parse the arguments
 #############################################################################
-### SET SEEDS
+# SET SEEDS
 np.random.seed(10)
 random.seed(10)
 tf.compat.v1.set_random_seed(10)
@@ -444,7 +444,7 @@ def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAI
     rec.append(recall_score(y_test, np.round(preds)))
 
     tnr.append(specificity(y_test, np.round(preds).reshape(-1)))
-    mismatch_model = Model(MODEL.input, MODEL.layers[-3].output)
+
     print("CONFUSION: ", confusion_matrix(y_test, np.round(preds)))
 
     train_acc = []
