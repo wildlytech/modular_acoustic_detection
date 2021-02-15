@@ -14,14 +14,14 @@ import os
 import pandas as pd
 import pickle
 
-from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from youtube_audioset import get_recursive_sound_names
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+
 from tensorflow.compat.v1.keras.models import Model
 from preprocess_utils import import_dataframes, get_select_vector
 
@@ -32,7 +32,7 @@ from preprocess_utils import import_dataframes, get_select_vector
 DESCRIPTION = "Reads the configuration file to train a particular \
                label and outputs the model"
 
-### GPU MEMORY GROWTH ###
+# GPU Memory Growth
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -246,7 +246,6 @@ else:
 
 json_file = open(CONFIG_DATA["networkCfgJson"], 'r')
 loaded_model_json = json_file.read()
-mismatch_model = model_from_json(loaded_model_json)
 
 
 def train_model(CONFIG_DATA):
@@ -266,7 +265,7 @@ def train_model(CONFIG_DATA):
     return MODEL
 
 
-#### MISMATCH MODEL ####
+# MISMATCH MODEL
 MODEL = train_model(CONFIG_DATA)
 mismatch_model = Model(MODEL.input, MODEL.layers[-3].output)
 
@@ -448,14 +447,6 @@ def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAI
     mismatch_model = Model(MODEL.input, MODEL.layers[-3].output)
     print("CONFUSION: ", confusion_matrix(y_test, np.round(preds)))
 
-    def equality(l1, l2):
-
-        for el1, el2 in zip(l1, l2):
-
-            if np.array_equal(el1, el2):
-                print("Equal weights found")
-
-    prev_ls = mismatch_model.get_weights()
     train_acc = []
     queries = []
     prob_t_plot = []
