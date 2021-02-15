@@ -78,7 +78,8 @@ def get_select_vector(dataframe, label_filter_arr):
 def import_dataframes(dataframe_file_list,
                       positive_label_filter_arr,
                       negative_label_filter_arr,
-                      validation_split):
+                      validation_split,
+                      model="binary"):
     """
     Iterate through each pickle file and import a subset of the dataframe
     """
@@ -138,56 +139,87 @@ def import_dataframes(dataframe_file_list,
     # Proceed with importing all dataframe files
     list_of_train_dataframes = []
     list_of_test_dataframes = []
-    for input_file_dict in dataframe_file_list:
+    if model=="binary":
+        for input_file_dict in dataframe_file_list:
 
-        assert ("patternPath" not in list(input_file_dict.keys()))
-        assert ("path" in list(input_file_dict.keys()))
+            assert ("patternPath" not in list(input_file_dict.keys()))
+            assert ("path" in list(input_file_dict.keys()))
 
-        print("Importing", input_file_dict["path"], "...")
+            print("Importing", input_file_dict["path"], "...")
 
-        with open(input_file_dict["path"], 'rb') as file_obj:
+            with open(input_file_dict["path"], 'rb') as file_obj:
 
-            # Load the file
-            df = pickle.load(file_obj)
+                # Load the file
+                df = pickle.load(file_obj)
+
+                # Filtering the sounds that are exactly 10 seconds
+                # Examples should be exactly 10 seconds. Anything else
+                # is not a valid input to the model
+                df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+
+                # Only use examples that have a label in label filter array
+                positive_example_select_vector = get_select_vector(df, positive_label_filter_arr)
+                positive_examples_df = df.loc[positive_example_select_vector]
+
+                # This ensures there no overlap between positive and negative examples
+                negative_example_select_vector = ~positive_example_select_vector
+                if negative_label_filter_arr is not None:
+                    # Exclude even further examples that don't fall into the negative label filter
+                    negative_example_select_vector &= get_select_vector(df, negative_label_filter_arr)
+                negative_examples_df = df.loc[negative_example_select_vector]
+
+                # No longer need df after this point
+                del df
+
+                train_positive_examples_df, test_positive_examples_df = \
+                    split_and_subsample_dataframe(dataframe=positive_examples_df,
+                                                  validation_split=validation_split,
+                                                  subsample=input_file_dict["positiveSubsample"])
+                del positive_examples_df
+
+                train_negative_examples_df, test_negative_examples_df = \
+                    split_and_subsample_dataframe(dataframe=negative_examples_df,
+                                                  validation_split=validation_split,
+                                                  subsample=input_file_dict["negativeSubsample"])
+                del negative_examples_df
+
+                # append to overall list of examples
+                list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
+                list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
+
+        train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
+        test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
+
+        print("Import done.")
+
+        return train_df, test_df
+    else:
+        for input_file_dict in dataframe_file_list:
+            assert ("patternPath" not in list(input_file_dict.keys()))
+            assert ("path" in list(input_file_dict.keys()))
+
+            print("Importing", input_file_dict["path"], "...")
+
+            with open(input_file_dict["path"], 'rb') as file_obj:
+                # Load the file
+
+                df = pickle.load(file_obj)
 
             # Filtering the sounds that are exactly 10 seconds
             # Examples should be exactly 10 seconds. Anything else
             # is not a valid input to the model
+
             df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
-            # Only use examples that have a label in label filter array
-            positive_example_select_vector = get_select_vector(df, positive_label_filter_arr)
-            positive_examples_df = df.loc[positive_example_select_vector]
+            final_dfs = []
 
-            # This ensures there no overlap between positive and negative examples
-            negative_example_select_vector = ~positive_example_select_vector
-            if negative_label_filter_arr is not None:
-                # Exclude even further examples that don't fall into the negative label filter
-                negative_example_select_vector &= get_select_vector(df, negative_label_filter_arr)
-            negative_examples_df = df.loc[negative_example_select_vector]
+            final_dfs.append(df)
 
-            # No longer need df after this point
-            del df
+        DF = pd.concat(final_dfs, ignore_index=True)
 
-            train_positive_examples_df, test_positive_examples_df = \
-                split_and_subsample_dataframe(dataframe=positive_examples_df,
-                                              validation_split=validation_split,
-                                              subsample=input_file_dict["positiveSubsample"])
-            del positive_examples_df
+        DF_TRAIN, DF_TEST = split_and_subsample_dataframe(dataframe=DF,
+                                                          validation_split=validation_split,
+                                                          subsample=input_file_dict["subsample"])
+        print("Import done.")
 
-            train_negative_examples_df, test_negative_examples_df = \
-                split_and_subsample_dataframe(dataframe=negative_examples_df,
-                                              validation_split=validation_split,
-                                              subsample=input_file_dict["negativeSubsample"])
-            del negative_examples_df
-
-            # append to overall list of examples
-            list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
-            list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
-
-    train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
-    test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
-
-    print("Import done.")
-
-    return train_df, test_df
+        return DF_TRAIN, DF_TEST
