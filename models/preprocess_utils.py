@@ -139,7 +139,7 @@ def import_dataframes(dataframe_file_list,
     # Proceed with importing all dataframe files
     list_of_train_dataframes = []
     list_of_test_dataframes = []
-    if model=="binary":
+    if model == "binary":
         for input_file_dict in dataframe_file_list:
 
             assert ("patternPath" not in list(input_file_dict.keys()))
