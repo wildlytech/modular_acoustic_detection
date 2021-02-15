@@ -6,45 +6,48 @@ import pickle
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-from tensorflow.compat.v1.keras.models import Sequential,model_from_json
+from tensorflow.compat.v1.keras.models import Sequential, model_from_json
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from tensorflow.compat.v1.keras.optimizers import Adam
 from youtube_audioset import get_recursive_sound_names
 import balancing_dataset
 import os
 import json
-from colorama import Fore,Style
+from colorama import Fore, Style
 import argparse
-from keras.wrappers.scikit_learn import KerasClassifier
+from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 from modAL.models import ActiveLearner
 import matplotlib.pyplot as plt
+from preprocess_utils import import_dataframes, get_select_vector
+
 #########################################################
-    #Description and Help
+# Description and Help
 #########################################################
 DESCRIPTION = "Reads config file from user and trains multilabel model accordingly."
 HELP = "Input config filepath for the required model to be trained."
 #########################################################
-    #Parse the arguments
+# Parse the arguments
 #########################################################
 parser = argparse.ArgumentParser(description=DESCRIPTION)
-parser.add_argument("-cfg_json",action="store",help=HELP,required=True)
+parser.add_argument("-cfg_json", action="store", help=HELP, required=True)
 result = parser.parse_args()
 cfg_path = result.cfg_json
+
 
 def read_config(filepath):
     with open(filepath) as f:
         config = json.load(f)
     return config
 
-config = read_config(cfg_path)
 
+config = read_config(cfg_path)
 
 output_wt_file = config["train"]["outputWeightFile"]
 pathToFileDirectory = "/".join(output_wt_file.split('/')[:-1]) + '/'
 if not os.path.exists(pathToFileDirectory):
     os.makedirs(pathToFileDirectory)
 
-assert(config["ontology"]["useYoutubeAudioSet"])
+assert (config["ontology"]["useYoutubeAudioSet"])
 # If single file or null, then convert to list
 ontologyExtFiles = config["ontology"]["extension"]
 
@@ -53,28 +56,24 @@ if ontologyExtFiles is None:
 elif type(ontologyExtFiles) != list:
     ontologyExtFiles = [ontologyExtFiles]
 
-
 pos_sounds = {}
 neg_sounds = {}
 for label_dicts in config["labels"]:
     lab_name = label_dicts["aggregatePositiveLabelName"]
-    comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"],"./",ontologyExtFiles)
+    comprising_pos_labels = get_recursive_sound_names(label_dicts["positiveLabels"], "./", ontologyExtFiles)
     pos_sounds[lab_name] = comprising_pos_labels
-    if label_dicts["negativeLabels"]!=None:
+    if label_dicts["negativeLabels"] != None:
         neg_lab_name = label_dicts["aggregateNegativeLabelName"]
-        comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"],"./",ontologyExtFiles)
+        comprising_neg_labels = get_recursive_sound_names(label_dicts["negativeLabels"], "./", ontologyExtFiles)
         comprising_neg_labels = comprising_neg_labels.difference(comprising_pos_labels)
         neg_sounds[neg_lab_name] = comprising_neg_labels
 
-
-
-
 ########################################################################
-      # Importing balanced data from the function.
-      # Including audiomoth annotated files for training
+# Importing balanced data from the function.
+# Including audiomoth annotated files for training
 ########################################################################
 
-def subsample_dataframe(dataframe, subsample):
+'''def subsample_dataframe(dataframe, subsample):
     """
     Subsample examples from the dataframe
     """
@@ -216,54 +215,7 @@ def import_dataframes(dataframe_file_list,
 
         final_dfs = []
 
-        '''for key in positive_label_filter_arr.keys():
 
-            positive_filter = positive_label_filter_arr[key]
-            if key in negative_label_filter_arr.keys():
-                negative_filter = negative_label_filter_arr[key]
-            else:
-                negative_filter = None
-            # Only use examples that have a label in label filter array
-
-            positive_example_select_vector = get_select_vector(df, positive_filter)
-            positive_examples_df = df.loc[positive_example_select_vector]
-
-            # This ensures there no overlap between positive and negative examples
-            negative_example_select_vector = ~positive_example_select_vector
-            if negative_filter is not None:
-                # Exclude even further examples that don't fall into the negative label filter
-                negative_example_select_vector &= get_select_vector(df, negative_filter)
-            negative_examples_df = df.loc[negative_example_select_vector]
-
-            # No longer need df after this point
-
-            train_positive_examples_df, test_positive_examples_df = \
-                    split_and_subsample_dataframe(dataframe=positive_examples_df,
-                                                  validation_split=validation_split,
-                                                  subsample=input_file_dict["subsample"])
-
-            del positive_examples_df
-
-            train_negative_examples_df, test_negative_examples_df = \
-                    split_and_subsample_dataframe(dataframe=negative_examples_df,
-                                                  validation_split=validation_split,
-                                                  subsample=input_file_dict["subsample"])
-
-            del negative_examples_df
-
-            # append to overall list of examples
-
-            list_of_train_dataframes += [train_positive_examples_df, train_negative_examples_df]
-
-
-
-            list_of_test_dataframes += [test_positive_examples_df, test_negative_examples_df]
-
-
-        train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
-        final_dfs_train.append(train_df)
-        test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
-        final_dfs_test.append(test_df)'''
         final_dfs.append(df)
 
     DF = pd.concat(final_dfs,ignore_index=True)
@@ -272,23 +224,19 @@ def import_dataframes(dataframe_file_list,
                                                      validation_split=validation_split,
                                                      subsample=input_file_dict["subsample"])
 
-    #DF_TRAIN = pd.concat(final_dfs_train, ignore_index=True)
-    #DF_TEST = pd.concat(final_dfs_test, ignore_index=True)
+
     print("Import done.")
 
-    return DF_TRAIN, DF_TEST
-
+    return DF_TRAIN, DF_TEST'''
 
 DF_TRAIN, DF_TEST = import_dataframes(dataframe_file_list=config["train"]["inputDataFrames"],
-                              positive_label_filter_arr=pos_sounds,
-                              negative_label_filter_arr=neg_sounds,
-                              validation_split=config["train"]["validationSplit"])
-
+                                      positive_label_filter_arr=pos_sounds,
+                                      negative_label_filter_arr=neg_sounds,
+                                      validation_split=config["train"]["validationSplit"],
+                                      model="multilabel")
 
 wavefiles = DF_TRAIN.wav_file
 labels = DF_TRAIN.labels_name
-
-
 
 LABELS_BINARIZED_TRAIN = pd.DataFrame()
 LABELS_BINARIZED_TEST = pd.DataFrame()
@@ -297,13 +245,10 @@ for key in pos_sounds.keys():
     POSITIVE_LABELS = pos_sounds[key]
     LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(DF_TRAIN, POSITIVE_LABELS)
 
-
     LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
 
-
-
-print("TR: ",LABELS_BINARIZED_TRAIN.columns)
-print("TS: ",LABELS_BINARIZED_TEST.columns)
+print("TR: ", LABELS_BINARIZED_TRAIN.columns)
+print("TS: ", LABELS_BINARIZED_TEST.columns)
 
 TOTAL_TRAIN_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TRAIN.sum(axis=0)
 TOTAL_TEST_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TEST.sum(axis=0)
@@ -319,12 +264,13 @@ print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS)
 print("PERCENT EXAMPLES (BY CLASS):")
 print(TOTAL_TRAIN_TEST_EXAMPLES_BY_CLASS / TOTAL_TRAIN_TEST_EXAMPLES)
 ########################################################################
-      # preprecess the data into required structure
+# preprecess the data into required structure
 ########################################################################
 X_TRAIN = np.array(DF_TRAIN.features.apply(lambda x: x.flatten()).tolist())
 X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 X_TEST_STANDARDIZED = X_TEST / 255
+
 
 ########## Make a function to read pool #######
 def read_pool(pool_path):
@@ -336,33 +282,36 @@ def read_pool(pool_path):
     for ii, feat in enumerate(df.features):
 
         for i in range(0, (len(feat) // 10) * 10, 10):
-            if i==0:
-                res = feat[i:i+10]
+            if i == 0:
+                res = feat[i:i + 10]
             else:
-                res = np.concatenate([res,feat[i:i+10]])
+                res = np.concatenate([res, feat[i:i + 10]])
 
-            #split_feats.append(feat[i:i + 10])
+            # split_feats.append(feat[i:i + 10])
             split_wavfiles.append(df.wav_file[ii] + "_start_" + str(i))
             split_labels.append(df.label_name[ii])
-        if ii==0:
+        if ii == 0:
             super_res = res
         else:
-            super_res = np.concatenate([super_res,res])
-    #df = pd.DataFrame({"features": split_feats, "wav_files": split_wavfiles})
-    #df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
-    return super_res.reshape(-1,1280),split_wavfiles,split_labels
+            super_res = np.concatenate([super_res, res])
+    # df = pd.DataFrame({"features": split_feats, "wav_files": split_wavfiles})
+    # df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+    return super_res.reshape(-1, 1280), split_wavfiles, split_labels
+
+
 ########################################################################
-      # create the keras model.
-      # Change and play around with model architecture
-      # Hyper parameters can be tweaked here
+# create the keras model.
+# Change and play around with model architecture
+# Hyper parameters can be tweaked here
 ########################################################################
 
-df_pool,wavfiles_pool = read_pool("active_learning.pkl")
+df_pool, wavfiles_pool = read_pool("active_learning_test.pkl")
 
-#features = df_pool.features.values
-#labels = df_pool.wav_files.values
-#print("F SHAPE ",features.shape)
-#print("L SHAPE ",labels.shape)
+
+# features = df_pool.features.values
+# labels = df_pool.wav_files.values
+# print("F SHAPE ",features.shape)
+# print("L SHAPE ",labels.shape)
 
 def create_keras_model():
     """
@@ -391,20 +340,17 @@ def create_keras_model():
     return model
 
 
-
 classifier = KerasClassifier(create_keras_model)
 ########################################################################
-    # reshaping the train and test data so as to align with input for model
+# reshaping the train and test data so as to align with input for model
 ########################################################################
 CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
 CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
 CLF2_TRAIN_TARGET = LABELS_BINARIZED_TRAIN
 CLF2_TEST_TARGET = LABELS_BINARIZED_TEST
 
-
-
 ########################################################################
-      # Implementing & Training the keras model
+# Implementing & Training the keras model
 ########################################################################
 
 if config["networkCfgJson"] is None:
@@ -421,23 +367,19 @@ else:
 epochs = config["train"]["epochs"]
 batch_size = config["train"]["batchSize"]
 
-
 n_initial = 1000
-#initial_idx = np.random.choice(range(len(CLF2_TRAIN_TARGET)), size=n_initial, replace=False)
+# initial_idx = np.random.choice(range(len(CLF2_TRAIN_TARGET)), size=n_initial, replace=False)
 X_initial = CLF2_TRAIN
 y_initial = CLF2_TRAIN_TARGET.values
 X_test = CLF2_TEST
 y_test = CLF2_TEST_TARGET.values
-print("SHAPE: ",CLF2_TRAIN.shape)
+print("SHAPE: ", CLF2_TRAIN.shape)
 
 ########################## Read Pool #####################################
 X_pool = df_pool
-X_pool = X_pool.reshape(-1,1280,1)
-#X_pool = np.delete(CLF2_TRAIN, initial_idx, axis=0)[:500]
-#y_pool = np.delete(CLF2_TRAIN_TARGET.values, initial_idx, axis=0)[:500]
-
-
-
+X_pool = X_pool.reshape(-1, 1280, 1)
+# X_pool = np.delete(CLF2_TRAIN, initial_idx, axis=0)[:500]
+# y_pool = np.delete(CLF2_TRAIN_TARGET.values, initial_idx, axis=0)[:500]
 
 
 learner = ActiveLearner(
@@ -453,18 +395,18 @@ for idx in range(n_queries):
     print('Query no. %d' % (idx + 1))
     query_idx, query_instance = learner.query(X_pool, n_instances=10, verbose=0)
 
-    #labels = np.zeros(shape=(100,7))
+    # labels = np.zeros(shape=(100,7))
     features = pd.DataFrame()
     labels = [["label"] for i in range(len(query_idx))]
 
     features["wavefiles"] = np.array(wavfiles_pool)[query_idx]
     features["labels_name"] = np.array(labels_pool)[query_idx].tolist()
 
-    features.to_csv("active_learner.csv",sep=";")
+    features.to_csv("active_learner.csv", sep=";")
     inp = input("Enter any character after you finish labelling the csv")
-    labelled_csv = pd.read_csv("active_learner.csv",index_col=0,delimiter=";")
+    labelled_csv = pd.read_csv("active_learner.csv", index_col=0, delimiter=";")
 
-    #labelled_csv = features
+    # labelled_csv = features
     labs = pd.DataFrame()
 
     for key in pos_sounds.keys():
@@ -475,23 +417,21 @@ for idx in range(n_queries):
 
     y_pool = labs.values
 
-    #print("Y ", y_pool)
-    #print("YPOOL: ",np.argmax(y_pool,axis=1))
+    # print("Y ", y_pool)
+    # print("YPOOL: ",np.argmax(y_pool,axis=1))
     learner.teach(
         X=X_pool[query_idx], y=y_pool, only_new=True,
         verbose=1
     )
 
-
-
-    model_accuracy.append(learner.score(X_test,y_test))
+    model_accuracy.append(learner.score(X_test, y_test))
     query_list.append(idx)
     # remove queried instance from pool
     X_pool = np.delete(X_pool, query_idx, axis=0)
 
-print("Acc: ",model_accuracy)
-print("Query: ",query_list)
-plt.plot(query_list,model_accuracy)
+print("Acc: ", model_accuracy)
+print("Query: ", query_list)
+plt.plot(query_list, model_accuracy)
 plt.xlabel("Query Index")
 plt.ylabel("Accuracy")
 plt.savefig("Accuracy_vs_query.png")
