@@ -1,6 +1,6 @@
 
-#This code is copied and modified from
-#https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
+# This code is copied and modified from
+# https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py
 
 r"""A simple demonstration of running VGGish in inference mode.
 This is intended as a toy example that demonstrates how the various building
@@ -36,7 +36,6 @@ import sys
 import tensorflow.compat.v1 as tf
 from tensorflow.compat.v1.keras import backend as K
 from . import model_function_binary_relevance
-import os
 
 VGGISH_PATH = 'externals/tensorflow_models/research/audioset/vggish/'
 sys.path.insert(0, VGGISH_PATH)
@@ -48,27 +47,25 @@ import vggish_slim
 
 
 ##############################################################################
-      # Defining the flags before hand
+# Defining the flags before hand
 ##############################################################################
 FLAGS = {
-    'pca_params' : VGGISH_PATH + 'vggish_pca_params.npz',
-    'checkpoint' : VGGISH_PATH + 'vggish_model.ckpt'
+    'pca_params': VGGISH_PATH + 'vggish_pca_params.npz',
+    'checkpoint': VGGISH_PATH + 'vggish_model.ckpt'
 }
 
 ##############################################################################
 
 ##############################################################################
-def main(wav_file, flag_for_data, data,model_type):
+
+
+def main(wav_file, flag_for_data, data, model_type):
     """
     Specify the path for the downloaded or recorded audio files and
     also path for writing the embeddings or pickle files
     """
     if flag_for_data == 0:
-        if wav_file:
-            pkl = wav_file[:-4]+'.pkl'
-            # print (pkl)
         examples_batch = vggish_input.wavfile_to_examples(wav_file)
-
 
         # Prepare a postprocessor to munge the model embeddings.
         pproc = vggish_postprocess.Postprocessor(FLAGS['pca_params'])

@@ -11,15 +11,14 @@ from . import generate_before_predict_BR
 
 
 ############################################################################
-        # Description and Help
+# Description and Help
 ############################################################################
 DESCRIPTION = "Generates the csv file with prediction results"
 HELP = "Give the Required Arguments"
 
 
-
 ############################################################################
-        # Parsing argument
+# Parsing argument
 ############################################################################
 PARSER = argparse.ArgumentParser(description=DESCRIPTION)
 PARSER.add_argument('-local_folder_path', '--local_folder_path', action='store',
@@ -29,24 +28,21 @@ PARSER.add_argument('-csv_filename', '--csv_filename', action='store',
 RESULT = PARSER.parse_args()
 
 
-
 ############################################################################
-        # Setting the input arguments
+# Setting the input arguments
 ############################################################################
 FOLDER_FILES_PATH = RESULT.local_folder_path
 CSV_FILENAME = RESULT.csv_filename
 
 
-
-
 ############################################################################
-    # Loops over the list of files in the directrory specified
+# Loops over the list of files in the directrory specified
 ############################################################################
 def start_batch_run_ftp_live(path_for_folder):
     """
     Writes the predicted results  on to csvfile row wise
     """
-    all_wav_files_path = glob.glob(path_for_folder+"*.WAV") + glob.glob(path_for_folder+"*.wav")
+    all_wav_files_path = glob.glob(path_for_folder + "*.WAV") + glob.glob(path_for_folder + "*.wav")
     all_wav_files = [each_file.split("/")[-1] for each_file in all_wav_files_path]
     print('Total No. of Files: ', len(all_wav_files))
     dum_df = pd.DataFrame()
@@ -56,11 +52,10 @@ def start_batch_run_ftp_live(path_for_folder):
                  "Human_probability", "Nature_probability", "Domestic_probability",
                  "Tools_probability", "dBFS"]
 
-
-    #############################################################################
-                # Check if the csv file is already existing or not.
-                # If it is existing then append the result to same csv file
-    #############################################################################
+    ###########################################################################
+    # Check if the csv file is already existing or not.
+    # If it is existing then append the result to same csv file
+    ###########################################################################
     if os.path.exists(CSV_FILENAME):
         data_read = pd.read_csv(CSV_FILENAME)
         list_of_files_predicted = data_read['FileNames'].tolist()
@@ -70,8 +65,8 @@ def start_batch_run_ftp_live(path_for_folder):
             for each_file in dum_df['FileNames'].tolist():
                 if each_file not in list_of_files_predicted:
                     try:
-                        emb = generate_before_predict_BR.main(path_for_folder+each_file, 0, 0, 0)
-                        dbfs = AudioSegment.from_wav(path_for_folder+each_file).dBFS
+                        emb = generate_before_predict_BR.main(path_for_folder + each_file, 0, 0, 0)
+                        dbfs = AudioSegment.from_wav(path_for_folder + each_file).dBFS
                     except ValueError:
                         print("malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index)
                         dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
@@ -82,7 +77,7 @@ def start_batch_run_ftp_live(path_for_folder):
                     predictions_each_model = []
                     print("predicting for :", each_file)
                     for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-                        pred_prob, pred = generate_before_predict_BR.main(path_for_folder+each_file, 1, emb, each_model)
+                        pred_prob, pred = generate_before_predict_BR.main(path_for_folder + each_file, 1, emb, each_model)
                         if pred_prob:
                             predictions_each_model.append("{0:.2f}".format(pred_prob[0][0] * 100))
                         else:
@@ -92,9 +87,9 @@ def start_batch_run_ftp_live(path_for_folder):
                 else:
                     pass
 
-    #############################################################################
+    ###########################################################################
             # Is there is no csv file then create one and write
-    #############################################################################
+    ###########################################################################
     else:
         with open(CSV_FILENAME, "w") as file_object:
             wav_information_object = csv.writer(file_object)
@@ -104,8 +99,8 @@ def start_batch_run_ftp_live(path_for_folder):
             # Loop over the files
             for each_file in dum_df['FileNames'].tolist():
                 try:
-                    emb = generate_before_predict_BR.main(path_for_folder+each_file, 0, 0, 0)
-                    dbfs = AudioSegment.from_wav(path_for_folder+each_file).dBFS
+                    emb = generate_before_predict_BR.main(path_for_folder + each_file, 0, 0, 0)
+                    dbfs = AudioSegment.from_wav(path_for_folder + each_file).dBFS
                 except ValueError:
                     print("malformed index", dum_df.loc[dum_df["FileNames"] == each_file].index)
                     dum_df = dum_df.drop(dum_df.loc[dum_df["FileNames"] == each_file].index)
@@ -114,7 +109,7 @@ def start_batch_run_ftp_live(path_for_folder):
                 predictions_each_model = []
                 print("predicting for :", each_file)
                 for each_model in ["Motor", "Explosion", "Human", "Nature", "Domestic", "Tools"]:
-                    pred_prob, pred = generate_before_predict_BR.main(path_for_folder+each_file, 1, emb, each_model)
+                    pred_prob, pred = generate_before_predict_BR.main(path_for_folder + each_file, 1, emb, each_model)
                     if pred_prob:
                         predictions_each_model.append("{0:.2f}".format(pred_prob[0][0] * 100))
                     else:
