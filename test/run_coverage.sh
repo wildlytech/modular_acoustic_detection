@@ -12,6 +12,7 @@ rm -rf test_wav/
 rm -rf wav_10sec/
 rm -rf FTP_downloaded/
 rm -rf explosion_sounds/
+rm -rf youtube_downloaded
 rm *.csv *.pkl *.png
 
 cd ../
@@ -23,7 +24,7 @@ coverage run -a -m get_data.download_soi --target_sounds=explosion_sounds \
                                          --target_path=test/explosion_sounds --file_limit=20
 coverage run -a -m get_data.ioc_bird_taxonomy_scrape -o data/ioc_ontology_extension.json
 coverage run -a -m get_data.xenocanto_scrape -bird_species "rhinoptilus bitorquatus" -path_to_save_audio_files ./test/bird_sounds_xc/
-coverage run -a -m get_data.youtube_scrape  #Script is broken, page layout has changed
+coverage run -a -m get_data.youtube_scrape -search_word "dog" -path_to_save_audio_files test/youtube_downloaded/ -num_results 5
 
 mkdir test/test_mp3/
 cp -r ./test/bird_sounds_xc/rhinoptilus_bitorquatus/*.* ./test/test_mp3/

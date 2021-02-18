@@ -201,6 +201,22 @@
                 "subsample": 500
             },
             {
+                "path": "diff_class_datasets/Datasets/pure/Motor/pure_mot_76045.pkl",
+                "subsample": 500
+            },
+            {
+                "path": "diff_class_datasets/Datasets/pure/Human_sounds/pure_hum_46525.pkl",
+                "subsample": 500
+            },
+            {
+                "path": "diff_class_datasets/Datasets/pure/Wood/pure_wod_1115.pkl",
+                "subsample": 500
+            },
+            {
+                "path": "diff_class_datasets/Datasets/pure/Nature_sounds/pure_nat_13527.pkl",
+                "subsample": 500
+            },
+            {
                 "path": "diff_class_datasets/Datasets/pure/Domestic/pure_dom_9497.pkl",
                 "subsample": 500
             },
