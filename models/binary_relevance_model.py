@@ -14,8 +14,11 @@ import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
-
+from tensorflow.keras.callbacks import ModelCheckpoint
 from youtube_audioset import get_recursive_sound_names
+from keras_balanced_batch_generator import make_generator
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.losses import BinaryCrossentropy
 
 #############################################################################
 # Description and help
@@ -59,7 +62,7 @@ if not os.path.exists(pathToFileDirectory):
 #############################################################################
 
 # Model training only supports using audio set as main ontology
-assert(CONFIG_DATA["ontology"]["useYoutubeAudioSet"])
+assert (CONFIG_DATA["ontology"]["useYoutubeAudioSet"])
 
 # List of paths to json files that will be used to extend
 # existing youtube ontology
@@ -83,6 +86,7 @@ else:
     NEGATIVE_LABELS = get_recursive_sound_names(CONFIG_DATA["negativeLabels"], "./", ontologyExtFiles)
     # Make sure there is no overlap between negative and positive labels
     NEGATIVE_LABELS = NEGATIVE_LABELS.difference(POSITIVE_LABELS)
+
 
 #############################################################################
 # Importing dataframes from the function
@@ -131,13 +135,13 @@ def split_and_subsample_dataframe(dataframe, validation_split, subsample):
 
     if (train_df.shape[0] == 0) and (train_subsample > 0):
         print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
-        assert(False)
+        assert (False)
     else:
         train_df = subsample_dataframe(train_df, train_subsample)
 
     if (test_df.shape[0] == 0) and (test_subsample > 0):
         print(Fore.RED, "No examples to subsample from!", Style.RESET_ALL)
-        assert(False)
+        assert (False)
     else:
         test_df = subsample_dataframe(test_df, test_subsample)
 
@@ -193,8 +197,9 @@ def import_dataframes(dataframe_file_list,
         search_results = [x for x in search_results if x not in exclude_paths]
 
         if len(search_results) == 0:
-            print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths, Style.RESET_ALL)
-            assert(False)
+            print(Fore.RED, "No file matches pattern criteria:", pattern_path, "Excluded Paths:", exclude_paths,
+                  Style.RESET_ALL)
+            assert (False)
 
         for path in search_results:
             # Add an entry with fixed path
@@ -215,8 +220,8 @@ def import_dataframes(dataframe_file_list,
     list_of_test_dataframes = []
     for input_file_dict in dataframe_file_list:
 
-        assert("patternPath" not in list(input_file_dict.keys()))
-        assert("path" in list(input_file_dict.keys()))
+        assert ("patternPath" not in list(input_file_dict.keys()))
+        assert ("path" in list(input_file_dict.keys()))
 
         print("Importing", input_file_dict["path"], "...")
 
@@ -274,7 +279,6 @@ DF_TRAIN, DF_TEST = \
                       negative_label_filter_arr=NEGATIVE_LABELS,
                       validation_split=CONFIG_DATA["train"]["validationSplit"])
 
-
 #############################################################################
 # Turn the target labels into one binarized vector
 #############################################################################
@@ -299,7 +303,8 @@ print("NUMBER EXAMPLES (TOTAL/POSITIVE/NEGATIVE):", \
       TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES, "/", \
       TOTAL_TRAIN_TEST_NEGATIVE_EXAMPLES)
 
-print("PERCENT POSITIVE EXAMPLES:", "{0:.2f}%".format(100.0 * TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES / TOTAL_TRAIN_TEST_EXAMPLES))
+print("PERCENT POSITIVE EXAMPLES:",
+      "{0:.2f}%".format(100.0 * TOTAL_TRAIN_TEST_POSITIVE_EXAMPLES / TOTAL_TRAIN_TEST_EXAMPLES))
 
 #############################################################################
 # preprocess the data into required structure
@@ -338,22 +343,39 @@ else:
     CLASS_WEIGHT_1 = (1 - TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
 
 #############################################################################
-    # Implementing using the keras usual training techinque
+# Implementing using the keras usual training technique
 #############################################################################
+checkpoint_path = "checkpoint/cp.ckpt"
+callback = ModelCheckpoint(
+    filepath=checkpoint_path,
+    monitor="val_accuracy",
+    verbose=1,
+    save_best_only=True,
+    save_weights_only=True
+)
+
+training_generator = make_generator(
+    CLF2_TRAIN, to_categorical(CLF2_TRAIN_TARGET), batch_size=CONFIG_DATA["train"]["batchSize"], categorical=False,
+    seed=42)
+
 # load json and create model
 json_file = open(CONFIG_DATA["networkCfgJson"], 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 MODEL = model_from_json(loaded_model_json)
-MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
               metrics=['accuracy'])
 
-MODEL_TRAINING = MODEL.fit(CLF2_TRAIN, CLF2_TRAIN_TARGET,
+steps_per_epoch = len(CLF2_TRAIN) // CONFIG_DATA["train"]["batchSize"]
+MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True,
                            epochs=CONFIG_DATA["train"]["epochs"],
-                           batch_size=CONFIG_DATA["train"]["batchSize"],
-                           class_weight={0: CLASS_WEIGHT_0, 1: CLASS_WEIGHT_1},
-                           verbose=1,
-                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET))
+                           steps_per_epoch=steps_per_epoch,
+                           callbacks=[callback],
+                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET.reshape(-1)), verbose=1)
+
+print("Load model weights from checkpoint: ")
+MODEL.load_weights(checkpoint_path)
+print("Model Loaded")
 
 #############################################################################
 # Predict on train and test data
@@ -363,7 +385,6 @@ CLF2_TRAIN_PREDICTION_PROB = MODEL.predict(CLF2_TRAIN)
 CLF2_TEST_PREDICTION = MODEL.predict(CLF2_TEST).round()
 CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 
-
 #############################################################################
 # To get the Misclassified examples
 #############################################################################
@@ -372,12 +393,10 @@ CLF2_TEST_PREDICTION_PROB = MODEL.predict(CLF2_TEST)
 # DF_TEST['predicted_prob'] = np.split(CLF2_TEST_PREDICTION_PROB, DF_TEST.shape[0])
 MISCLASSIFED_ARRAY = CLF2_TEST_PREDICTION != CLF2_TEST_TARGET
 
-
 #############################################################################
 # print misclassified number of examples
 #############################################################################
 print('Misclassified number of examples :', MISCLASSIFED_ARRAY.sum())
-
 
 #############################################################################
 # Print confusion matrix and classification_report
@@ -389,7 +408,6 @@ RESULT = confusion_matrix(CLF2_TEST_TARGET,
                           CLF2_TEST_PREDICTION)
 print(RESULT)
 
-
 #############################################################################
 # print classification report
 #############################################################################
@@ -398,7 +416,6 @@ print('============================================')
 CL_REPORT = classification_report(CLF2_TEST_TARGET,
                                   CLF2_TEST_PREDICTION)
 print(CL_REPORT)
-
 
 #############################################################################
 # calculate accuracy and hamming loss
@@ -409,6 +426,10 @@ HL = hamming_loss(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION)
 print('Hamming Loss :', HL)
 print('Accuracy :', ACCURACY)
 
+print("******* FINAL VAL LOSS *******")
+bce = BinaryCrossentropy()
+print(bce(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION_PROB).numpy())
+print("********************************")
 
 #############################################################################
 # save model weights. Change as per the model type

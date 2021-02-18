@@ -24,6 +24,7 @@ sounds/
 diff_class_datasets/
 .idea/
 predictions/multilabel_model/weights/
+checkpoint/
 predictions/binary_relevance_model/weights/
 test/weights/
 test/out/
