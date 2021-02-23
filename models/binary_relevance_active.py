@@ -532,7 +532,7 @@ q_list_rand, acc_rand, prec_rand, rec_rand, tnr_rand, prob_t_plot = active_learn
                                                                                          CLF2_TRAIN, CLF2_TRAIN_TARGET,
                                                                                          20, "random")
 
-fig,ax = plt.subplots(2,2)
+fig, ax = plt.subplots(2, 2)
 
 ax[0][0].plot(q_list_active, acc_active, "blue", label="active_learning")
 ax[0][0].plot(q_list_rand, acc_rand, "red", label="random_sampling")
@@ -554,7 +554,6 @@ ax[1][0].set_xlabel("Query Index")
 ax[1][0].set_ylabel("Recall")
 ax[1][0].legend(['active_learning', 'random_sampling'], loc='upper left')
 ax[1][0].set_title("Recall vs Query")
-
 
 ax[1][1].plot(q_list_active, tnr_active, "blue", label="active_learning")
 ax[1][1].plot(q_list_rand, tnr_rand, "red", label="random_sampling")
