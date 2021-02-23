@@ -23,7 +23,7 @@ import tensorflow as tf
 from youtube_audioset import get_recursive_sound_names
 
 from tensorflow.compat.v1.keras.models import Model
-from preprocess_utils import import_dataframes, get_select_vector
+from .preprocess_utils import import_dataframes, get_select_vector
 
 #############################################################################
 # Description and help
