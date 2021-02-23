@@ -46,7 +46,8 @@ REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
 REQUIRED_NAMED.add_argument('-model_cfg_json', '--model_cfg_json',
                             help='Input json configuration file for label',
                             required=True)
-REQUIRED_NAMED.add_argument("-external_datapath", "--external_datapath", help="Path to external data",
+REQUIRED_NAMED.add_argument("-external_datapath", "--external_datapath",
+                            help="Path to external data to be used in the pool and val set",
                             required=True)
 OPTIONAL_NAMED.add_argument('-output_weight_file', '--output_weight_file', help='Output weight file name')
 ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
@@ -126,13 +127,13 @@ DF_TEST = DF_TEST.drop(pool_df.index)
 X_pool = np.array(pool_df.features.apply(lambda x: x.flatten()).tolist())
 drop_indices_pool = []
 new_x_pool = []
-for ii, i in enumerate(X_pool):
+for index, row in enumerate(X_pool):
 
-    if len(i) != 1280:
+    if len(row) != 1280:
 
-        drop_indices_pool.append(ii)
+        drop_indices_pool.append(index)
     else:
-        new_x_pool.append(i)
+        new_x_pool.append(row)
 X_pool = np.array(new_x_pool)
 X_pool_STANDARDIZED = X_pool / 255
 CLF2_pool = X_pool.reshape((-1, 1280, 1))
@@ -177,11 +178,11 @@ X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = DF_TEST.features.apply(lambda x: x.flatten()).tolist()
 
 drop_indices = []
-for ii, i in enumerate(X_TEST):
+for index, row in enumerate(X_TEST):
 
-    if len(i) != 1280:
-        X_TEST.remove(i)
-        drop_indices.append(ii)
+    if len(row) != 1280:
+        X_TEST.remove(row)
+        drop_indices.append(index)
 
 X_TEST = np.array(X_TEST)
 
@@ -278,17 +279,17 @@ def read_pool(pool_path):
     # df = pd.read_csv(pool_path)
     split_wavfiles = []
     split_labels = []
-    for ii, feat in enumerate(df.features):
+    for index_feat, feat in enumerate(df.features):
 
-        for i in range(0, (len(feat) // 10) * 10, 10):
+        for index in range(0, (len(feat) // 10) * 10, 10):
             if i == 0:
-                res = feat[i:i + 10]
+                res = feat[index:index + 10]
             else:
-                res = np.concatenate([res, feat[i:i + 10]])
+                res = np.concatenate([res, feat[index:index + 10]])
 
             # split_feats.append(feat[i:i + 10])
-            split_wavfiles.append(df.wav_file[ii] + "_start_" + str(i))
-            split_labels.append(df.label_name[ii])
+            split_wavfiles.append(df.wav_file[index_feat] + "_start_" + str(index_feat))
+            split_labels.append(df.label_name[index_feat])
         if ii == 0:
             super_res = res
         else:
