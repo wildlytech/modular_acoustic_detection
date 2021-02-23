@@ -46,6 +46,8 @@ REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
 REQUIRED_NAMED.add_argument('-model_cfg_json', '--model_cfg_json',
                             help='Input json configuration file for label',
                             required=True)
+REQUIRED_NAMED.add_argument("-external_datapath", "--external_datapath", help="Path to external data",
+                            required=True)
 OPTIONAL_NAMED.add_argument('-output_weight_file', '--output_weight_file', help='Output weight file name')
 ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
 PARSED_ARGS = ARGUMENT_PARSER.parse_args()
@@ -113,8 +115,8 @@ DF_TRAIN, _ = \
                       positive_label_filter_arr=POSITIVE_LABELS,
                       negative_label_filter_arr=NEGATIVE_LABELS,
                       validation_split=CONFIG_DATA["train"]["validationSplit"])
-
-with open("diff_class_datasets/Datasets/Nandi.pkl", "rb") as f:
+extern_data = PARSED_ARGS.external_datapath
+with open(extern_data, "rb") as f:
     DF_TEST = pickle.load(f)
 
 # DF_TRAIN = DF_TRAIN.sample(frac=0.1)
