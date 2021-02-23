@@ -258,7 +258,7 @@ def train_model(CONFIG_DATA):
         json_file.close()
         MODEL = model_from_json(loaded_model_json)
 
-        MODEL.load_weights(CONFIG_DATA["train"]["outputWeightFile"])
+        # MODEL.load_weights(CONFIG_DATA["train"]["outputWeightFile"])
         MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
                       metrics=['accuracy'])
 
@@ -517,11 +517,7 @@ def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAI
     if strategy == "active":
         with open("queried_ex.pkl", "wb") as f:
             pickle.dump(queries, f)
-    plt.plot(query_list[1:], train_acc)
-    plt.xlabel("Query Index")
-    plt.ylabel("Train Loss")
 
-    plt.show()
     return query_list, model_accuracy, prec, rec, tnr, prob_t_plot
 
 
