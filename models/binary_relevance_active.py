@@ -260,7 +260,7 @@ def train_model(CONFIG_DATA):
         json_file.close()
         MODEL = model_from_json(loaded_model_json)
 
-        # MODEL.load_weights(CONFIG_DATA["train"]["outputWeightFile"])
+        MODEL.load_weights(CONFIG_DATA["train"]["outputWeightFile"])
         MODEL.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
                       metrics=['accuracy'])
 
