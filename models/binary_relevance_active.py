@@ -288,7 +288,7 @@ def read_pool(pool_path):
                 res = np.concatenate([res, feat[index:index + 10]])
 
             # split_feats.append(feat[i:i + 10])
-            split_wavfiles.append(df.wav_file[index_feat] + "_start_" + str(index_feat))
+            split_wavfiles.append(df.wav_file[index_feat] + "_start_" + str(index))
             split_labels.append(df.label_name[index_feat])
         if index_feat == 0:
             super_res = res
