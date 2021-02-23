@@ -282,7 +282,7 @@ def read_pool(pool_path):
     for index_feat, feat in enumerate(df.features):
 
         for index in range(0, (len(feat) // 10) * 10, 10):
-            if i == 0:
+            if index == 0:
                 res = feat[index:index + 10]
             else:
                 res = np.concatenate([res, feat[index:index + 10]])
@@ -290,7 +290,7 @@ def read_pool(pool_path):
             # split_feats.append(feat[i:i + 10])
             split_wavfiles.append(df.wav_file[index_feat] + "_start_" + str(index_feat))
             split_labels.append(df.label_name[index_feat])
-        if ii == 0:
+        if index_feat == 0:
             super_res = res
         else:
             super_res = np.concatenate([super_res, res])
