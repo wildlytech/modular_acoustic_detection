@@ -23,7 +23,7 @@ import tensorflow as tf
 from youtube_audioset import get_recursive_sound_names
 
 from tensorflow.compat.v1.keras.models import Model
-from preprocess_utils import import_dataframes, get_select_vector
+from .preprocess_utils import import_dataframes, get_select_vector
 
 #############################################################################
 # Description and help
@@ -209,7 +209,7 @@ def create_keras_model():
     model.add(Flatten())
 
     # Compile model
-    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-4, epsilon=1e-8),
+    model.compile(loss='binary_crossentropy', optimizer=Adam(lr=1e-5, epsilon=1e-8),
                   metrics=['accuracy'])
     return model
 
@@ -243,7 +243,7 @@ else:
     CLASS_WEIGHT_1 = (1 - TRAIN_TARGET_POSITIVE_PERCENTAGE) / TRAIN_TARGET_POSITIVE_PERCENTAGE
 
 #############################################################################
-# Implementing using the keras usual training techinque
+# Implementing using the keras usual training technique
 #############################################################################
 
 json_file = open(CONFIG_DATA["networkCfgJson"], 'r')
