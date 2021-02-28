@@ -54,7 +54,8 @@ $ python -m data_preprocessing_cleaning.identifying_mislabelled_silence_audiofil
 <br>
 
 #### 4. Converting audio clips in folder to dataframe
-- From folder of audio clips, generate dataframe with labeled examples that can be used for training/evaluation. For xenocanto audio, use the xenocanto_to_dataframe.py script, which also does scraping.
+- From folder of audio clips, generate dataframe with labeled examples that can be used for training/evaluation.
+- For xenocanto audio, use the xenocanto_to_dataframe.py script, which also does scraping in addition to transformations done in this script.
 ```shell
 $ python -m data_preprocessing_cleaning.audio_clips_to_dataframe [-h] -f FOLDER_PATH
                                                                  [--delete_mp3_files]
@@ -70,7 +71,10 @@ $ python -m data_preprocessing_cleaning.audio_clips_to_dataframe [-h] -f FOLDER_
 <br>
 
 #### 5. Add labels to dataframe
-- Add a labels_name column to dataframe pickle file from specified columns in csv file. If dealing with xenocanto dataframe, the csv file is usually in a different format, so use add_xenocanto_labels_to_dataframe.py instead.
+- Add a labels_name column to dataframe pickle file from specified columns in csv file.
+- If dealing with a xenocanto dataframe, the csv file is usually in a different format, so use add_xenocanto_labels_to_dataframe.py instead.
+- To quickly get a csv file to label and add as an argument to this script, one can use apply pickle_to_csv.py on the dataframe to obtain a record of the audio clips in the dataframe
+
 ```shell
 $ python -m data_preprocessing_cleaning.add_csv_labels_to_dataframe [-h] -d DATAFRAME
                                                                     -csv CSV
