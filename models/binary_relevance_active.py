@@ -4,7 +4,7 @@ Traning a Binary Relevance Model
 # Import the necessary functions and libraries
 import argparse
 import random
-
+from ast import literal_eval
 import json
 from tensorflow.compat.v1.keras.models import model_from_json, Sequential
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
@@ -12,7 +12,7 @@ from tensorflow.compat.v1.keras.optimizers import Adam
 import numpy as np
 import os
 import pandas as pd
-import pickle
+import pickle5 as pickle
 
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
@@ -23,7 +23,7 @@ import tensorflow as tf
 from youtube_audioset import get_recursive_sound_names
 
 from tensorflow.compat.v1.keras.models import Model
-from .preprocess_utils import import_dataframes, get_select_vector
+from preprocess_utils import import_dataframes, get_select_vector
 
 #############################################################################
 # Description and help
@@ -49,6 +49,11 @@ REQUIRED_NAMED.add_argument('-model_cfg_json', '--model_cfg_json',
 REQUIRED_NAMED.add_argument("-external_datapath", "--external_datapath",
                             help="Path to external data to be used in the pool and val set",
                             required=True)
+REQUIRED_NAMED.add_argument("-o", "--oracle",
+                            help="Path to external data to be used in the pool and val set",
+                            required=True)
+
+
 OPTIONAL_NAMED.add_argument('-output_weight_file', '--output_weight_file', help='Output weight file name')
 ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
 PARSED_ARGS = ARGUMENT_PARSER.parse_args()
@@ -61,6 +66,9 @@ np.random.seed(10)
 random.seed(10)
 tf.compat.v1.set_random_seed(10)
 
+#ORACLE
+oracle = PARSED_ARGS.oracle
+print("ORACLE: ",oracle)
 with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
     CONFIG_DATA = json.load(json_file_obj)
 
@@ -111,19 +119,32 @@ else:
 #############################################################################
 # Importing dataframes from the function
 #############################################################################
-DF_TRAIN, _ = \
-    import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
-                      positive_label_filter_arr=POSITIVE_LABELS,
-                      negative_label_filter_arr=NEGATIVE_LABELS,
-                      validation_split=CONFIG_DATA["train"]["validationSplit"])
 extern_data = PARSED_ARGS.external_datapath
-with open(extern_data, "rb") as f:
-    DF_TEST = pickle.load(f)
+if oracle:
+    DF_TRAIN, DF_TEST = \
+        import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
+                          positive_label_filter_arr=POSITIVE_LABELS,
+                          negative_label_filter_arr=NEGATIVE_LABELS,
+                          validation_split=CONFIG_DATA["train"]["validationSplit"])
+    with open(extern_data, "rb") as f:
+        pool_df = pickle.load(f)
+else:
+    DF_TRAIN, _ = \
+        import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
+                          positive_label_filter_arr=POSITIVE_LABELS,
+                          negative_label_filter_arr=NEGATIVE_LABELS,
+                          validation_split=CONFIG_DATA["train"]["validationSplit"])
+    with open(extern_data, "rb") as f:
+        DF_TEST = pickle.load(f)
 
-# DF_TRAIN = DF_TRAIN.sample(frac=0.1)
-pool_df = DF_TEST.sample(frac=0.2)
+    # DF_TRAIN = DF_TRAIN.sample(frac=0.1)
+    pool_df = DF_TEST.sample(frac=0.2)
+    DF_TEST = DF_TEST.drop(pool_df.index)
+
+wavfiles = pool_df.wav_file.values
+
 # DF_TRAIN = DF_TRAIN.drop(pool_df.index)
-DF_TEST = DF_TEST.drop(pool_df.index)
+
 X_pool = np.array(pool_df.features.apply(lambda x: x.flatten()).tolist())
 drop_indices_pool = []
 new_x_pool = []
@@ -429,7 +450,7 @@ def farthest_first(cur_pool, total_pool):
     return farthest_indices
 
 
-def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, strategy=None):
+def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, strategy=None,wavfiles=wavfiles,oracle=oracle):
     labels_pool_arr = LABELS_BINARIZED_pool
     model_accuracy = []
     query_list = []
@@ -465,7 +486,26 @@ def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAI
         elif strategy == "random":
             man_idx = random_sampling(len(CLF2_pool), 10)
 
-        y_pool = labels_pool_arr[man_idx]
+
+        if oracle==1:
+            wavfiles_pool = wavfiles[man_idx]
+            labels_ph = [[""] for i in range(len(wavfiles_pool))]
+            print("Wavfiles: ",wavfiles_pool)
+            print("Labels: ",labels_ph)
+            queried_csv = pd.DataFrame()
+            queried_csv["wav_file"] = wavfiles_pool
+            queried_csv["labels_name"] = labels_ph
+            queried_csv.to_csv("to_be_labelled.csv",sep=";")
+
+            inp = input("Press any key when done labelling")
+
+            labelled_csv = pd.read_csv("to_be_labelled.csv",converters={"labels_name": lambda x: x.strip("[]").replace("'","").split(", ")},sep=";")
+
+            vec = 1.0*get_select_vector(labelled_csv,POSITIVE_LABELS)
+
+            y_pool = vec
+        else:
+            y_pool = labels_pool_arr[man_idx]
         unique, counts = np.unique(y_pool, return_counts=True)
         value_counts = dict(zip(unique, counts))
         print("Counter Query: ", dict(zip(unique, counts)))
