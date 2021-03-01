@@ -13,7 +13,8 @@ def pickle_to_csv(path_to_dataframe,
     with open(path_to_dataframe, "rb") as f:
         df = pickle.load(f)
 
-        df.drop('features', axis=1, inplace=True)
+        if drop_features:
+            df.drop('features', axis=1, inplace=True)
 
         df.to_csv(path_to_output_csv_file)
 
@@ -29,19 +30,23 @@ if __name__ == "__main__":
     REQUIRED_ARGUMENTS = PARSER.add_argument_group('required arguments')
     REQUIRED_ARGUMENTS.add_argument('-d', '--dataframe',
                                     action='store',
-                                    help='Path to feature dataframe pickle file',
+                                    help='Path to feature dataframe '
+                                         'pickle file',
                                     required=True)
     REQUIRED_ARGUMENTS.add_argument('-c', '--csv',
                                     action='store',
                                     help='Path to csv file to write dataframe',
                                     required=True)
-    OPTIONAL_ARGUMENTS.add_argument('-df', '--drop_features',
+    OPTIONAL_ARGUMENTS.add_argument('-ddf', '--dont_drop_features',
                                     action='store_true',
-                                    help='Drop features column since it can be very large')
+                                    help='Default drop features column '
+                                         'since it can be very large. '
+                                         'Set this to not drop features '
+                                         'column')
 
     PARSER._action_groups.append(OPTIONAL_ARGUMENTS)
     RESULT = PARSER.parse_args()
 
     pickle_to_csv(path_to_dataframe=RESULT.dataframe,
                   path_to_output_csv_file=RESULT.csv,
-                  drop_features=RESULT.drop_features)
+                  drop_features=(not RESULT.dont_drop_features))
