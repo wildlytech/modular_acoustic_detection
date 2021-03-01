@@ -20,7 +20,7 @@ from youtube_audioset import get_recursive_sound_names
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.losses import BinaryCrossentropy
-
+import tensorflow as tf
 #############################################################################
 # Description and help
 #############################################################################
@@ -45,6 +45,9 @@ PARSED_ARGS = ARGUMENT_PARSER.parse_args()
 #############################################################################
 # Parse the arguments
 #############################################################################
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
+config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
     CONFIG_DATA = json.load(json_file_obj)
@@ -254,7 +257,8 @@ def import_dataframes(dataframe_file_list,
 
             # No longer need df after this point
             del df
-
+            if input_file_dict["path"] == "./diff_class_datasets/Datasets/pure/Birds/dataframe_brahminy_kite_xc_with_labels.pkl":
+                print(positive_examples_df)
             train_positive_examples_df, test_positive_examples_df = \
                 split_and_subsample_dataframe(dataframe=positive_examples_df,
                                               validation_split=validation_split,
@@ -278,7 +282,7 @@ def import_dataframes(dataframe_file_list,
 
     return train_df, test_df
 
-
+POSITIVE_LABELS = ["cape_parrot"]
 DF_TRAIN, DF_TEST = \
     import_dataframes(dataframe_file_list=CONFIG_DATA["train"]["inputDataFrames"],
                       positive_label_filter_arr=POSITIVE_LABELS,
@@ -320,7 +324,6 @@ X_TRAIN_STANDARDIZED = X_TRAIN / 255
 X_TEST = np.array(DF_TEST.features.apply(lambda x: x.flatten()).tolist())
 X_TEST_STANDARDIZED = X_TEST / 255
 
-
 #############################################################################
 # create the keras model. It is a maxpool version BR model
 #############################################################################
@@ -351,7 +354,8 @@ CLF2_TRAIN = X_TRAIN.reshape((-1, 1280, 1))
 CLF2_TEST = X_TEST.reshape((-1, 1280, 1))
 CLF2_TRAIN_TARGET = LABELS_BINARIZED_TRAIN.values
 CLF2_TEST_TARGET = LABELS_BINARIZED_TEST.values
-
+print("TR: ",CLF2_TRAIN.shape)
+print("TGT: ",CLF2_TRAIN_TARGET.shape)
 #############################################################################
 # assign class weights to ensure balanced datasets during training
 #############################################################################
@@ -399,12 +403,17 @@ else:
                   metrics=['accuracy'])
 
 steps_per_epoch = len(CLF2_TRAIN) // CONFIG_DATA["train"]["batchSize"]
-MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True,
+'''MODEL_TRAINING = MODEL.fit(training_generator, shuffle=True,
+                           epochs=CONFIG_DATA["train"]["epochs"],
+                           steps_per_epoch=steps_p Expect x to be a non-empty array or dataset.er_epoch,
+                           callbacks=[callback],
+                           validation_data=(CLF2_TEST, CLF2_TEST_TARGET.reshape(-1)), verbose=1)'''
+print("SH: ",CLF2_TRAIN.shape)
+MODEL_TRAINING = MODEL.fit(CLF2_TRAIN,CLF2_TRAIN_TARGET, shuffle=True,
                            epochs=CONFIG_DATA["train"]["epochs"],
                            steps_per_epoch=steps_per_epoch,
                            callbacks=[callback],
                            validation_data=(CLF2_TEST, CLF2_TEST_TARGET.reshape(-1)), verbose=1)
-
 print("Load model weights from checkpoint: ")
 MODEL.load_weights(checkpoint_path)
 print("Model Loaded")
@@ -463,6 +472,14 @@ bce = BinaryCrossentropy()
 print(bce(CLF2_TEST_TARGET, CLF2_TEST_PREDICTION_PROB).numpy())
 print("********************************")
 
+with open("diff_class_datasets/Datasets/transfer_01_dataframe.pkl","rb") as f:
+    df_test = pickle.load(f)
+
+arr_t = df_test.features.values
+test_feats = np.concatenate(arr_t,axis=0).reshape((-1,1280,1))
+preds = MODEL.predict(test_feats)
+np.save("Preds_WBT.npy",preds)
+DF_TEST.to_csv("filenames.csv")
 #############################################################################
 # save model weights. Change as per the model type
 #############################################################################
