@@ -212,8 +212,6 @@ def import_dataframes(dataframe_file_list,
 
             df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
-
-
             final_dfs.append(df)
 
         DF = pd.concat(final_dfs, ignore_index=True)

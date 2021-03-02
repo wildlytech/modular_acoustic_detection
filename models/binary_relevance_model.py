@@ -3,8 +3,7 @@ Traning a Binary Relevance Model
 """
 # Import the necessary functions and libraries
 import argparse
-from colorama import Fore, Style
-from glob import glob
+
 import json
 from tensorflow.compat.v1.keras.models import model_from_json, Sequential
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
@@ -12,8 +11,6 @@ from tensorflow.compat.v1.keras.optimizers import Adam
 import numpy as np
 import os
 import pandas as pd
-import pickle
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
 from tensorflow.keras.callbacks import ModelCheckpoint
 from youtube_audioset import get_recursive_sound_names

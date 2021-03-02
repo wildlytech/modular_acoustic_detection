@@ -2,18 +2,14 @@
 Training a Multilabel Model
 """
 import pandas as pd
-import pickle
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, hamming_loss
 from tensorflow.compat.v1.keras.models import Sequential, model_from_json
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
 from tensorflow.compat.v1.keras.optimizers import Adam
 from youtube_audioset import get_recursive_sound_names
 import os
-from glob import glob
 import json
-from colorama import Fore, Style
 import argparse
 from tensorflow.keras.callbacks import ModelCheckpoint
 from keras_balanced_batch_generator import make_generator
