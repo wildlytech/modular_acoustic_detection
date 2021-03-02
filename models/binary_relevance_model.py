@@ -3,7 +3,6 @@ Traning a Binary Relevance Model
 """
 # Import the necessary functions and libraries
 import argparse
-
 import json
 from tensorflow.compat.v1.keras.models import model_from_json, Sequential
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
