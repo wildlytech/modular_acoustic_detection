@@ -14,7 +14,7 @@ import argparse
 from tensorflow.keras.callbacks import ModelCheckpoint
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.losses import BinaryCrossentropy
-from preprocess_utils import import_dataframes, get_select_vector
+from .preprocess_utils import import_dataframes, get_select_vector
 import tensorflow as tf
 
 #########################################################
