@@ -194,6 +194,7 @@ def import_dataframes(dataframe_file_list,
 
         return train_df, test_df
     else:
+        final_dfs = []
         for input_file_dict in dataframe_file_list:
             assert ("patternPath" not in list(input_file_dict.keys()))
             assert ("path" in list(input_file_dict.keys()))
@@ -211,7 +212,7 @@ def import_dataframes(dataframe_file_list,
 
             df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
 
-            final_dfs = []
+
 
             final_dfs.append(df)
 
