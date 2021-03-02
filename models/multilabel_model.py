@@ -15,7 +15,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.losses import BinaryCrossentropy
 from .preprocess_utils import import_dataframes, get_select_vector
-import tensorflow as tf
+
 
 #########################################################
 # Description and Help
@@ -29,6 +29,7 @@ parser = argparse.ArgumentParser(description=DESCRIPTION)
 parser.add_argument("-cfg_json", action="store", help=HELP, required=True)
 result = parser.parse_args()
 cfg_path = result.cfg_json
+
 
 def read_config(filepath):
     with open(filepath) as f:
