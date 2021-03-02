@@ -18,7 +18,8 @@ import argparse
 from tensorflow.keras.callbacks import ModelCheckpoint
 from keras_balanced_batch_generator import make_generator
 from tensorflow.keras.losses import BinaryCrossentropy
-from preprocess_utils import import_dataframes_multilabel, get_select_vector
+from preprocess_utils import import_dataframes, get_select_vector
+import tensorflow as tf
 
 #########################################################
 # Description and Help
@@ -32,6 +33,10 @@ parser = argparse.ArgumentParser(description=DESCRIPTION)
 parser.add_argument("-cfg_json", action="store", help=HELP, required=True)
 result = parser.parse_args()
 cfg_path = result.cfg_json
+
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
+config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 
 def read_config(filepath):
@@ -74,10 +79,11 @@ for label_dicts in config["labels"]:
 ########################################################################
 
 
-DF_TRAIN, DF_TEST = import_dataframes_multilabel(dataframe_file_list=config["train"]["inputDataFrames"],
-                                                 positive_label_filter_arr=pos_sounds,
-                                                 negative_label_filter_arr=neg_sounds,
-                                                 validation_split=config["train"]["validationSplit"])
+DF_TRAIN, DF_TEST = import_dataframes(dataframe_file_list=config["train"]["inputDataFrames"],
+                                      positive_label_filter_arr=pos_sounds,
+                                      negative_label_filter_arr=neg_sounds,
+                                      validation_split=config["train"]["validationSplit"],
+                                      model="multilabel")
 
 LABELS_BINARIZED_TRAIN = pd.DataFrame()
 LABELS_BINARIZED_TEST = pd.DataFrame()
@@ -87,9 +93,6 @@ for key in pos_sounds.keys():
     LABELS_BINARIZED_TRAIN[FULL_NAME] = 1.0 * get_select_vector(DF_TRAIN, POSITIVE_LABELS)
 
     LABELS_BINARIZED_TEST[FULL_NAME] = 1.0 * get_select_vector(DF_TEST, POSITIVE_LABELS)
-
-print("TR: ", LABELS_BINARIZED_TRAIN.columns)
-print("TS: ", LABELS_BINARIZED_TEST.columns)
 
 TOTAL_TRAIN_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TRAIN.sum(axis=0)
 TOTAL_TEST_EXAMPLES_BY_CLASS = LABELS_BINARIZED_TEST.sum(axis=0)
