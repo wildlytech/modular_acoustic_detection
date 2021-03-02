@@ -194,7 +194,37 @@ def import_dataframes(dataframe_file_list,
 
         return train_df, test_df
     else:
-        final_dfs = []
+        for input_file_dict in dataframe_file_list:
+            assert ("patternPath" not in list(input_file_dict.keys()))
+            assert ("path" in list(input_file_dict.keys()))
+
+            print("Importing", input_file_dict["path"], "...")
+
+            with open(input_file_dict["path"], 'rb') as file_obj:
+                # Load the file
+
+                df = pickle.load(file_obj)
+
+                # Filtering the sounds that are exactly 10 seconds
+                # Examples should be exactly 10 seconds. Anything else
+                # is not a valid input to the model
+                df = df.loc[df.features.apply(lambda x: x.shape[0] == 10)]
+
+                train_file_examples_df, test_file_examples_df = \
+                    split_and_subsample_dataframe(dataframe=df,
+                                                  validation_split=validation_split,
+                                                  subsample=input_file_dict["subsample"])
+
+                # append to overall list of examples
+                list_of_train_dataframes.append(train_file_examples_df)
+                list_of_test_dataframes.append(test_file_examples_df)
+
+        train_df = pd.concat(list_of_train_dataframes, ignore_index=True)
+        test_df = pd.concat(list_of_test_dataframes, ignore_index=True)
+
+        print("Import done.")
+
+        return train_df, test_df
         for input_file_dict in dataframe_file_list:
             assert ("patternPath" not in list(input_file_dict.keys()))
             assert ("path" in list(input_file_dict.keys()))
