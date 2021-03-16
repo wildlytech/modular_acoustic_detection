@@ -53,7 +53,6 @@ REQUIRED_NAMED.add_argument("-o", "--oracle",
                             help="Path to external data to be used in the pool and val set",
                             required=True)
 
-
 OPTIONAL_NAMED.add_argument('-output_weight_file', '--output_weight_file', help='Output weight file name')
 ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
 PARSED_ARGS = ARGUMENT_PARSER.parse_args()
@@ -66,9 +65,10 @@ np.random.seed(10)
 random.seed(10)
 tf.compat.v1.set_random_seed(10)
 
-#ORACLE
+# ORACLE
 oracle = PARSED_ARGS.oracle
-print("ORACLE: ",oracle)
+oracle = (int)(oracle)
+print("ORACLE: ", oracle)
 with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
     CONFIG_DATA = json.load(json_file_obj)
 
@@ -146,6 +146,7 @@ wavfiles = pool_df.wav_file.values
 # DF_TRAIN = DF_TRAIN.drop(pool_df.index)
 
 X_pool = np.array(pool_df.features.apply(lambda x: x.flatten()).tolist())
+
 drop_indices_pool = []
 new_x_pool = []
 for index, row in enumerate(X_pool):
@@ -155,13 +156,16 @@ for index, row in enumerate(X_pool):
         drop_indices_pool.append(index)
     else:
         new_x_pool.append(row)
+
 X_pool = np.array(new_x_pool)
 X_pool_STANDARDIZED = X_pool / 255
 CLF2_pool = X_pool.reshape((-1, 1280, 1))
-LABELS_BINARIZED_pool = pd.DataFrame()
-LABELS_BINARIZED_pool[FULL_NAME] = 1.0 * get_select_vector(pool_df, POSITIVE_LABELS)
-CLF2_pool_target = LABELS_BINARIZED_pool.values
-CLF2_pool_target = np.delete(CLF2_pool_target, drop_indices_pool)
+if oracle == 0:
+    LABELS_BINARIZED_pool = pd.DataFrame()
+    LABELS_BINARIZED_pool[FULL_NAME] = 1.0 * get_select_vector(pool_df, POSITIVE_LABELS)
+    CLF2_pool_target = LABELS_BINARIZED_pool.values
+    CLF2_pool_target = np.delete(CLF2_pool_target, drop_indices_pool)
+
 #############################################################################
 # Turn the target labels into one binarized vector
 #############################################################################
@@ -319,7 +323,8 @@ def read_pool(pool_path):
     return super_res.reshape(-1, 1280), split_wavfiles, split_labels
 
 
-print("POOL LABELS: ", LABELS_BINARIZED_pool.value_counts())
+if oracle == 0:
+    print("POOL LABELS: ", LABELS_BINARIZED_pool.value_counts())
 
 classifier = KerasClassifier(create_keras_model)
 X_initial = CLF2_TRAIN
@@ -346,7 +351,8 @@ n_queries = 20
 query_list = []
 model_accuracy = []
 
-labels_pool_arr = LABELS_BINARIZED_pool.values
+if oracle == 0:
+    labels_pool_arr = LABELS_BINARIZED_pool.values
 
 
 def query_KNN(labelled_truth, labelled_truth_labs, pool_df, pool_labs, n_instances):
@@ -450,7 +456,8 @@ def farthest_first(cur_pool, total_pool):
     return farthest_indices
 
 
-def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, strategy=None,wavfiles=wavfiles,oracle=oracle):
+def active_learning_loop(CLF2_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, LABELS_BINARIZED_pool=None, strategy=None,
+                         wavfiles=wavfiles, oracle=oracle):
     labels_pool_arr = LABELS_BINARIZED_pool
     model_accuracy = []
     query_list = []
@@ -474,6 +481,7 @@ def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAI
     train_acc = []
     queries = []
     prob_t_plot = []
+    csv_list = []
     for idx in range(n_queries):
 
         print('Query no. %d' % (idx + 1))
@@ -486,26 +494,28 @@ def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAI
         elif strategy == "random":
             man_idx = random_sampling(len(CLF2_pool), 10)
 
-
-        if oracle==1:
+        if oracle == 1:
             wavfiles_pool = wavfiles[man_idx]
             labels_ph = [[""] for i in range(len(wavfiles_pool))]
-            print("Wavfiles: ",wavfiles_pool)
-            print("Labels: ",labels_ph)
+            print("Wavfiles: ", wavfiles_pool)
+            print("Labels: ", labels_ph)
             queried_csv = pd.DataFrame()
             queried_csv["wav_file"] = wavfiles_pool
             queried_csv["labels_name"] = labels_ph
-            queried_csv.to_csv("to_be_labelled.csv",sep=";")
+            queried_csv.to_csv("to_be_labelled.csv", sep=";")
 
             inp = input("Press any key when done labelling")
 
-            labelled_csv = pd.read_csv("to_be_labelled.csv",converters={"labels_name": lambda x: x.strip("[]").replace("'","").split(", ")},sep=";")
-
-            vec = 1.0*get_select_vector(labelled_csv,POSITIVE_LABELS)
+            labelled_csv = pd.read_csv("to_be_labelled.csv",
+                                       converters={"labels_name": lambda x: x.strip("[]").replace("'", "").split(", ")},
+                                       sep=";")
+            csv_list.append(labelled_csv)
+            vec = 1.0 * get_select_vector(labelled_csv, POSITIVE_LABELS)
 
             y_pool = vec
         else:
             y_pool = labels_pool_arr[man_idx]
+            labels_pool_arr = np.delete(labels_pool_arr, man_idx, axis=0)
         unique, counts = np.unique(y_pool, return_counts=True)
         value_counts = dict(zip(unique, counts))
         print("Counter Query: ", dict(zip(unique, counts)))
@@ -555,23 +565,40 @@ def active_learning_loop(CLF2_pool, LABELS_BINARIZED_pool, CLF2_TRAIN, CLF2_TRAI
         # remove queried instance from pool
 
         CLF2_pool = np.delete(CLF2_pool, man_idx, axis=0)
-        labels_pool_arr = np.delete(labels_pool_arr, man_idx, axis=0)
 
     if strategy == "active":
         with open("queried_ex.pkl", "wb") as f:
             pickle.dump(queries, f)
 
+    annotated_df = pd.concat(csv_list, axis=0)
+    annotated_df.to_csv("final_annotated_df.csv", ignore_index=True)
     return query_list, model_accuracy, prec, rec, tnr, prob_t_plot
 
 
-q_list_active, acc_active, prec_active, rec_active, tnr_active, prob_t_plot = active_learning_loop(CLF2_pool,
-                                                                                                   CLF2_pool_target,
-                                                                                                   CLF2_TRAIN,
-                                                                                                   CLF2_TRAIN_TARGET,
-                                                                                                   20, "active")
-q_list_rand, acc_rand, prec_rand, rec_rand, tnr_rand, prob_t_plot = active_learning_loop(CLF2_pool, CLF2_pool_target,
-                                                                                         CLF2_TRAIN, CLF2_TRAIN_TARGET,
-                                                                                         20, "random")
+print("The oracle is: ", oracle == 1)
+if oracle == 0:
+    q_list_active, acc_active, prec_active, rec_active, tnr_active, prob_t_plot = active_learning_loop(CLF2_pool,
+                                                                                                       CLF2_TRAIN,
+                                                                                                       CLF2_TRAIN_TARGET,
+                                                                                                       20,
+                                                                                                       CLF2_pool_target,
+                                                                                                       "active")
+    q_list_rand, acc_rand, prec_rand, rec_rand, tnr_rand, prob_t_plot = active_learning_loop(CLF2_pool,
+                                                                                             CLF2_TRAIN,
+                                                                                             CLF2_TRAIN_TARGET,
+                                                                                             20, CLF2_pool_target,
+                                                                                             strategy="random")
+elif oracle == 1:
+
+    q_list_active, acc_active, prec_active, rec_active, tnr_active, prob_t_plot = active_learning_loop(CLF2_pool,
+                                                                                                       CLF2_TRAIN,
+                                                                                                       CLF2_TRAIN_TARGET,
+                                                                                                       20,
+                                                                                                       strategy="active")
+    q_list_rand, acc_rand, prec_rand, rec_rand, tnr_rand, prob_t_plot = active_learning_loop(CLF2_pool,
+                                                                                             CLF2_TRAIN,
+                                                                                             CLF2_TRAIN_TARGET,
+                                                                                             20, strategy="random")
 
 fig, ax = plt.subplots(2, 2)
 
