@@ -4,7 +4,6 @@ Traning a Binary Relevance Model
 # Import the necessary functions and libraries
 import argparse
 import random
-from ast import literal_eval
 import json
 from tensorflow.compat.v1.keras.models import model_from_json, Sequential
 from tensorflow.compat.v1.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
@@ -504,7 +503,7 @@ def active_learning_loop(CLF2_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, LA
             queried_csv["labels_name"] = labels_ph
             queried_csv.to_csv("to_be_labelled.csv", sep=";")
 
-            inp = input("Press any key when done labelling")
+            inp = input("Press any key when done labelling") #noqa: F841
 
             labelled_csv = pd.read_csv("to_be_labelled.csv",
                                        converters={"labels_name": lambda x: x.strip("[]").replace("'", "").split(", ")},
