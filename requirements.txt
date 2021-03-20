@@ -69,7 +69,7 @@ iteration-utilities==0.7.0
 itsdangerous==1.1.0
 jams==0.3.2
 jenkinsapi==0.3.6
-Jinja2==2.10
+Jinja2==2.11.3
 jmespath==0.9.4
 joblib==0.11
 jsonpickle==1.0
