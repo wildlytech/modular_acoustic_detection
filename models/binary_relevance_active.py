@@ -11,7 +11,9 @@ from tensorflow.compat.v1.keras.optimizers import Adam
 import numpy as np
 import os
 import pandas as pd
-import pickle5 as pickle
+import pickle
+from pydub import AudioSegment
+from pydub.playback import play
 
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
@@ -22,7 +24,7 @@ import tensorflow as tf
 from youtube_audioset import get_recursive_sound_names
 
 from tensorflow.compat.v1.keras.models import Model
-from preprocess_utils import import_dataframes, get_select_vector
+from .preprocess_utils import import_dataframes, get_select_vector
 
 #############################################################################
 # Description and help
@@ -48,10 +50,17 @@ REQUIRED_NAMED.add_argument('-model_cfg_json', '--model_cfg_json',
 REQUIRED_NAMED.add_argument("-external_datapath", "--external_datapath",
                             help="Path to external data to be used in the pool and val set",
                             required=True)
-REQUIRED_NAMED.add_argument("-o", "--oracle",
-                            help="Path to external data to be used in the pool and val set",
-                            required=True)
-
+OPTIONAL_NAMED.add_argument("-o", "--oracle",
+                            action="store_true",
+                            help="Enable user annotation mode")
+OPTIONAL_NAMED.add_argument('-w', '--wav_file_folder',
+                            default="./",
+                            help='Folder of wav files to playback for annotation.'
+                                 'Only used if in oracle mode')
+OPTIONAL_NAMED.add_argument('-output_annotation_file', '--output_annotation_file',
+                            default="active_learning_total_annotations.csv",
+                            help='Final output file with annotations from all queries'
+                                 'Only used if in oracle mode')
 OPTIONAL_NAMED.add_argument('-output_weight_file', '--output_weight_file', help='Output weight file name')
 ARGUMENT_PARSER._action_groups.append(OPTIONAL_NAMED)
 PARSED_ARGS = ARGUMENT_PARSER.parse_args()
@@ -72,6 +81,10 @@ with open(PARSED_ARGS.model_cfg_json) as json_file_obj:
     CONFIG_DATA = json.load(json_file_obj)
 
 FULL_NAME = CONFIG_DATA["aggregatePositiveLabelName"] + 'vs' + CONFIG_DATA["aggregateNegativeLabelName"]
+
+WAV_FILE_FOLDER = PARSED_ARGS.wav_file_folder
+if not WAV_FILE_FOLDER.endswith('/'):
+    WAV_FILE_FOLDER += '/'
 
 if PARSED_ARGS.output_weight_file is None:
     # Set default output weight file name
@@ -477,10 +490,11 @@ def active_learning_loop(CLF2_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, LA
 
     print("CONFUSION: ", confusion_matrix(y_test, np.round(preds)))
 
+    annotated_df = pd.DataFrame([], columns=['wav_file', 'labels_name'])
+
     train_acc = []
     queries = []
     prob_t_plot = []
-    csv_list = []
     for idx in range(n_queries):
 
         print('Query no. %d' % (idx + 1))
@@ -495,22 +509,51 @@ def active_learning_loop(CLF2_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, LA
 
         if oracle == 1:
             wavfiles_pool = wavfiles[man_idx]
-            labels_ph = [[""] for i in range(len(wavfiles_pool))]
             print("Wavfiles: ", wavfiles_pool)
-            print("Labels: ", labels_ph)
-            queried_csv = pd.DataFrame()
-            queried_csv["wav_file"] = wavfiles_pool
-            queried_csv["labels_name"] = labels_ph
-            queried_csv.to_csv("to_be_labelled.csv", sep=";")
+            query_df = pd.DataFrame()
+            query_df["wav_file"] = wavfiles_pool
 
-            inp = input("Press any key when done labelling")  # noqa: F841
+            query_labels_column = []
+            for index in range(query_df.shape[0]):
 
-            labelled_csv = pd.read_csv("to_be_labelled.csv",
-                                       converters={"labels_name": lambda x: x.strip("[]").replace("'", "").split(", ")},
-                                       sep=";")
-            csv_list.append(labelled_csv)
-            vec = 1.0 * get_select_vector(labelled_csv, POSITIVE_LABELS)
+                labels_for_clip = []
 
+                print("\nAnnotate clip:", wavfiles_pool[index])
+
+                # playback by default
+                choice = 2
+
+                while choice != 3:
+                    if choice == 1:
+                        label = input("Enter only one label (You can add additional labels by selecting option 1 again):")
+                        labels_for_clip.append(label)
+                    elif choice == 2:
+                        song = AudioSegment.from_wav(WAV_FILE_FOLDER + wavfiles_pool[index])
+                        play(song)
+                    elif choice == 4:
+                        labels_for_clip = []
+
+                    print("\nAnnotate clip:", wavfiles_pool[index], "Current annotation:", labels_for_clip)
+                    try:
+                        choice = int(input("Enter 1 to add a label\n"
+                                           "Enter 2 to playback clip\n"
+                                           "Enter 3 to finish annotating this clip\n"
+                                           "Enter 4 to clear labels\n"
+                                           "Choice: "))
+                    except ValueError:
+                        # Repeat menu
+                        choice = -1
+
+                # add row to accumulated dataframe
+                row = query_df.iloc[index, :]
+                row["labels_name"] = labels_for_clip
+                annotated_df = annotated_df.append(row, ignore_index=True)
+                annotated_df.to_csv(PARSED_ARGS.output_annotation_file, sep=";", index=False)
+
+                query_labels_column.append(labels_for_clip)
+
+            query_df["labels_name"] = query_labels_column
+            vec = 1.0 * get_select_vector(query_df, POSITIVE_LABELS)
             y_pool = vec
         else:
             y_pool = labels_pool_arr[man_idx]
@@ -569,8 +612,6 @@ def active_learning_loop(CLF2_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, LA
         with open("queried_ex.pkl", "wb") as f:
             pickle.dump(queries, f)
 
-    annotated_df = pd.concat(csv_list, axis=0)
-    annotated_df.to_csv("final_annotated_df.csv", ignore_index=True)
     return query_list, model_accuracy, prec, rec, tnr, prob_t_plot
 
 
