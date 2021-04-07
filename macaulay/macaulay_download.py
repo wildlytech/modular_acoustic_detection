@@ -1,4 +1,3 @@
-import requests
 import os
 import pandas as pd
 import youtube_dl

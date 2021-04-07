@@ -116,20 +116,17 @@ if __name__ == "__main__":
                     browser = get_chrome_driver(args.chrome_path)
                 else:
                     raise BrowserPathException
-            except BrowserPathException as e:
+            except BrowserPathException:
                 print("Chrome Driver path does not exist")
         elif driver == "F" or driver == "f":
             try:
                 browser = get_ff_driver()
-            except BrowserPathException as e:
+            except BrowserPathException:
                 print("Gecko driver path not added to PATH. Try moving driver to /usr/local/bin")
 
         else:
             raise BrowserArgException
 
         scrape(browser)
-
-
-
     except BrowserPathException as e:
         print(e)
