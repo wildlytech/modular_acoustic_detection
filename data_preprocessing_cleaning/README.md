@@ -51,5 +51,49 @@ $ python -m data_preprocessing_cleaning.identifying_mislabelled_silence_audiofil
                                                                                         -path_for_audio_files
 ```
 
+<br>
 
+#### 4. Converting audio clips in folder to dataframe
+- From folder of audio clips, generate dataframe with labeled examples that can be used for training/evaluation.
+- For xenocanto audio, use the xenocanto_to_dataframe.py script, which also does scraping in addition to transformations done in this script.
+```shell
+$ python -m data_preprocessing_cleaning.audio_clips_to_dataframe [-h] -f FOLDER_PATH
+                                                                 [--delete_mp3_files]
+                                                                 [--dont_delete_mp3_files]
+                                                                 [--delete_wav_files]
+                                                                 [--dont_delete_wav_files]
+                                                                 [--delete_split_wav_files]
+                                                                 [--dont_delete_split_wav_files]
+                                                                 [--delete_embeddings_files]
+                                                                 [--dont_delete_embeddings_files]
+```
 
+<br>
+
+#### 5. Add labels to dataframe
+- Add a labels_name column to dataframe pickle file from specified columns in csv file.
+- If dealing with a xenocanto dataframe, the csv file is usually in a different format, so use add_xenocanto_labels_to_dataframe.py instead.
+- To quickly get a csv file to label and add as an argument to this script, one can use apply pickle_to_csv.py on the dataframe to obtain a record of the audio clips in the dataframe
+
+```shell
+$ python -m data_preprocessing_cleaning.add_csv_labels_to_dataframe [-h] -d DATAFRAME
+                                                                    -csv CSV
+                                                                    -cols COLUMN_NAMES [COLUMN_NAMES ...]
+                                                                    -dj DATAFRAME_JOIN_COLUMN
+                                                                    -cj CSV_JOIN_COLUMN
+                                                                    [-a] [-o OUTPUT_FILE_NAME]
+```
+
+<br>
+
+#### 6. Remove rows from dataframe
+- Remove rows from dataframe pickle file using entries in blacklist file.
+```shell
+$ python -m data_preprocessing_cleaning.remove_rows_from_dataframe.py [-h] -d DATAFRAME
+                                                                      -b BLACKLIST_FILE
+                                                                      -c ID_COLUMN
+                                                                      [-s BLACKLIST_ITEM_SUFFIX]
+                                                                      [-o OUTPUT_FILE_NAME]
+```
+
+<br>
