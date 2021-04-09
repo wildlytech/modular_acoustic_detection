@@ -10,12 +10,14 @@ import argparse
 from model_configs.panns import test_config as config
 from tqdm import trange
 
+
 # SEED STUFF
 def seed_everything():
     torch.manual_seed(42)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     np.random.seed(42)
+
 
 PERIOD = config["PERIOD"]
 SR = config["SR"]
@@ -25,7 +27,6 @@ BIRD_CODE = config["BIRD_CODES"]
 INV_BIRD_CODE = config["INV_BIRD_CODE"]
 MODEL_DETAILS = config["model"]
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 
 def get_model(ModelClass: object, config: dict, weights_path: str):
@@ -70,7 +71,7 @@ def prediction_for_clip(clip: np.ndarray,
         image = image.to(device)
 
         with torch.no_grad():
-            _,prediction = model((image, None))
+            _, prediction = model((image, None))
             framewise_outputs = prediction["framewise_output"].detach(
             ).cpu().numpy()[0].mean(axis=0)
             clipwise_outputs = prediction["clipwise_output"].detach(
@@ -85,7 +86,6 @@ def prediction_for_clip(clip: np.ndarray,
             clip_codes.append(INV_BIRD_CODE[ci])
 
         global_cc = list(set(global_cc) | set(clip_codes))
-
 
         for target_idx in range(thresholded.shape[1]):
             if thresholded[:, target_idx].mean() == 0:
@@ -129,10 +129,10 @@ def prediction_for_clip(clip: np.ndarray,
 
     prediction_df = pd.DataFrame(estimated_event_list)
 
-    return prediction_df,global_cc
+    return prediction_df, global_cc
 
 
-def predict(test_df,model,model_details):
+def predict(test_df, model, model_details):
     paths = test_df["filepath"].values
     labels = test_df["ebird_code"].values
     model.eval()
@@ -145,43 +145,44 @@ def predict(test_df,model,model_details):
     pbar.set_description("Prediction Bar")
     for ii in pbar:
         time.sleep(0.01)
-        #print("Iteration ",ii+1,"of ",len(paths))
+        # print("Iteration ",ii+1,"of ",len(paths))
         try:
-            clip,_ = librosa.load(paths[ii],sr=SR,mono=True,res_type="kaiser_fast")
-            total+=1
+            clip, _ = librosa.load(paths[ii], sr=SR, mono=True, res_type="kaiser_fast")
+            total += 1
         except:
             print("Something wrong with the audioclip")
 
             continue
 
-        pred_df,clip_codes = prediction_for_clip(clip,model,model_details["threshold"],model_details["clip_threshold"])
-        if len(clip_codes)==0:
-            clip_codes=["NOCALL"]
+        pred_df, clip_codes = prediction_for_clip(clip, model, model_details["threshold"],
+                                                  model_details["clip_threshold"])
+        if len(clip_codes) == 0:
+            clip_codes = ["NOCALL"]
         if labels[ii] in clip_codes:
-
-            acc_counter+=1
-        if (ii+1)%10==0:
-            pbar.set_postfix(accuracy=acc_counter/total)
+            acc_counter += 1
+        if (ii + 1) % 10 == 0:
+            pbar.set_postfix(accuracy=acc_counter / total)
         #    print("Accuracy after ",(ii+1),"Iterations is ",(acc_counter/total))
         predictions["filepath"].append(paths[ii])
-        if len(clip_codes)>0:
+        if len(clip_codes) > 0:
             predictions["ebird_code"].append(clip_codes)
         else:
             predictions["ebird_code"].append("NOCALL")
 
     return pd.DataFrame(predictions)
 
-if __name__=="__main__":
 
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Makes Predictions using the Panns Model")
-    parser.add_argument("-p","--path_to_input",action="store",required=True,help="Path to the input data")
-    parser.add_argument("-ps","--path_to_save_preds",action="store",required=True,help="Path for the preds to be saved")
+    parser.add_argument("-p", "--path_to_input", action="store", required=True, help="Path to the input data")
+    parser.add_argument("-ps", "--path_to_save_preds", action="store", required=True,
+                        help="Path for the preds to be saved")
     args = parser.parse_args()
 
     test_df = pd.read_csv(args.path_to_input)
     model_details = MODEL_DETAILS
-    panns_model = get_model(PANNsDense121Att,model_details["config"],model_details["weights_path"])
+    panns_model = get_model(PANNsDense121Att, model_details["config"], model_details["weights_path"])
 
-    pred_df = predict(test_df,panns_model,model_details)
+    pred_df = predict(test_df, panns_model, model_details)
     print("Saving preds....")
     pred_df.to_csv(args.path_to_save_preds)
