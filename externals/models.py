@@ -26,7 +26,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
-from torchlibrosa import Spectrogram,LogmelFilterBank,SpecAugmentation
+from torchlibrosa import Spectrogram, LogmelFilterBank, SpecAugmentation
+
 
 def init_layer(layer):
     nn.init.xavier_uniform_(layer.weight)
@@ -175,7 +176,8 @@ class AttBlock(nn.Module):
 
 class CustomPanns(nn.Module):
     def __init__(self, sample_rate: int, window_size: int, hop_size: int,
-                 mel_bins: int, fmin: int, fmax: int,act_classes: int, classes_num: int, apply_aug: bool,wts_path: str, top_db=None):
+                 mel_bins: int, fmin: int, fmax: int, act_classes: int, classes_num: int, apply_aug: bool,
+                 wts_path: str, top_db=None):
         super().__init__()
 
         self.bn0 = nn.BatchNorm2d(mel_bins)
@@ -183,51 +185,43 @@ class CustomPanns(nn.Module):
         self.fc1 = nn.Linear(1024, 1024, bias=True)
         self.attn = AttBlock(1024, act_classes, activation='sigmoid')
         self.backbone = PANNsDense121Att(sample_rate, window_size, hop_size,
-                                         mel_bins, fmin, fmax, classes_num, apply_aug,top_db)
+                                         mel_bins, fmin, fmax, classes_num, apply_aug, top_db)
         checkpoint = torch.load(wts_path)
 
         self.backbone.load_state_dict(checkpoint["model"])
         for param in self.backbone.parameters():
-            param.requires_grad=False
+            param.requires_grad = False
 
-
-    def forward(self,input_data):
+    def forward(self, input_data):
         input_x, mixup_lambda = input_data
         """
         Input: (batch_size, data_length)"""
         b, c, s = input_x.shape
 
-
-
-        #frame_shape = framewise_output.shape
-        #clip_shape = clipwise_output.shape
-        #combined = torch.cat([clipwise_output,clip_bkbone],dim=1)
-        #combined = combined/torch.sum(combined)
+        # frame_shape = framewise_output.shape
+        # clip_shape = clipwise_output.shape
+        # combined = torch.cat([clipwise_output,clip_bkbone],dim=1)
+        # combined = combined/torch.sum(combined)
         '''output_dict = {
             'framewise_output': framewise_output.reshape(b, c, frame_shape[1], frame_shape[2]),
             'clipwise_output': clipwise_output.reshape(b, c, clip_shape[1]),
             "combined_output": combined.reshape(b,c,combined.shape[1]),
             "backbone_output": clip_bkbone.reshape(b,c,clip_bkbone.shape[1])
         }'''
-        features,output_dict = self.backbone.forward(input_data)
-
+        features, output_dict = self.backbone.forward(input_data)
 
         (clipwise_output, norm_att, segmentwise_output) = self.attn(features)
-        #segmentwise_output = segmentwise_output.transpose(1, 2)
+        # segmentwise_output = segmentwise_output.transpose(1, 2)
 
-        #framewise_output = interpolate(segmentwise_output,
+        # framewise_output = interpolate(segmentwise_output,
         #                              self.backbone.interpolate_ratio)
-        #framewise_output = pad_framewise_output(framewise_output, frames_num)
-        #print(output_dict["clipwise_output"].shape)
-        #print(clipwise_output.shape)
-        combined = torch.cat([output_dict["clipwise_output"],clipwise_output.unsqueeze(1)],axis=2)
-        #combined = torch.softmax(combined,dim=2)
-        output_dict["combined_output"] = combined.reshape(b,c,combined.shape[2])
+        # framewise_output = pad_framewise_output(framewise_output, frames_num)
+        # print(output_dict["clipwise_output"].shape)
+        # print(clipwise_output.shape)
+        combined = torch.cat([output_dict["clipwise_output"], clipwise_output.unsqueeze(1)], axis=2)
+        # combined = torch.softmax(combined,dim=2)
+        output_dict["combined_output"] = combined.reshape(b, c, combined.shape[2])
         return output_dict
-
-
-
-
 
 
 class PANNsDense121Att(nn.Module):
@@ -346,4 +340,4 @@ class PANNsDense121Att(nn.Module):
             'clipwise_output': clipwise_output.reshape(b, c, clip_shape[1]),
         }
 
-        return x,output_dict
+        return x, output_dict

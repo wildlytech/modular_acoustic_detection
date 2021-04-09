@@ -44,7 +44,7 @@ def prediction_for_clip(clip: np.ndarray,
                         clip_threshold):
     audios = []
     y = clip.astype(np.float32)
-    len_y = len(y)
+
     start = 0
     end = PERIOD * SR
     while True:

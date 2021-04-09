@@ -173,7 +173,7 @@ for epoch in master_bar:
     master_bar.set_postfix(train_loss=loss.item(), val_loss=val_loss.item(),
                            train_acc=acc_score, val_acc=val_acc)
 
-###TESTING####
+# TESTING
 # print("Testing....")
 test_bar = tqdm.tqdm(test_dataloader, unit="batch")
 test_bar.set_description("Testing")
