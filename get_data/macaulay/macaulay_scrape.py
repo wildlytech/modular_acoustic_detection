@@ -26,10 +26,11 @@ def get_ff_driver():
     This function returns a firefox webdriver. Make sure the ff driver
     is added to path
     '''
-    options = FirefoxOptions()
+    #options = FirefoxOptions()
     # Set browser in headless mode
-    options.headless = True
-    browser = webdriver.Firefox(options=options)
+    #options.headless = True
+    #browser = webdriver.Firefox(options=options)
+    browser = webdriver.Firefox()
     return browser
 
 
@@ -64,6 +65,7 @@ def scrape(browser):
     time.sleep(3)
     # Press enter to make the query
     element.send_keys(Keys.RETURN)
+    time.sleep(5)
     # Get the current url
     url = browser.current_url
     # Create the insertion url (for mediatype = audio)
@@ -84,6 +86,7 @@ def scrape(browser):
     bird_names = []
 
     # Iterate through results to fetch asset ids and store them in lists
+
     for row in results:
         asset_id = row.get_attribute("data-asset-id")
         asset_id_list.append(asset_id)
@@ -91,9 +94,10 @@ def scrape(browser):
         k += 1
 
     # Create dataframe and save it
+    print("Creating and saving DF...")
     df = pandas.DataFrame({"ClipName": bird_names, "Asset_ID": asset_id_list})
     df.to_csv("Asset_ids.csv")
-
+    print("DF Saved...")
     # Close the browser
     browser.close()
 
