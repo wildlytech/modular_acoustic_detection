@@ -1,8 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
+import argparse
 
-url = "https://ebird.org/region/IN/media?yr=all&m="
+parser = argparse.ArgumentParser(description="Scrapes bird names from argument checklist")
+parser.add_argument("-u", "--url", help="URL for checklist", required=True)
+parser.add_argument("-sp", "--save_path", help="Path to save file", required=True)
 
+args = parser.parse_args()
+url = args.url
+save_path = args.save_path
 page = requests.get(url)
 soup = BeautifulSoup(page.content, "html.parser")
 
@@ -12,5 +18,5 @@ s = ""
 for name in name_elements[1:]:
     s += name + "\n"
 
-with open("macaulay_birds.txt", "w+") as f:
+with open(save_path, "w+") as f:
     f.write(s)
