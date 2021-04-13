@@ -99,7 +99,7 @@ def scrape(browser,save_path):
     print("Creating and saving DF...")
     df = pandas.DataFrame({"ClipName": bird_names, "Asset_ID": asset_id_list})
     df.to_csv(save_path)
-    print("DF Saved...")
+    print("DF Saved to: ",save_path)
     # Close the browser
     browser.close()
 
