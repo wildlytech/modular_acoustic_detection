@@ -28,8 +28,9 @@ if __name__ == "__main__":
         os.mkdir(args.path_to_save_audioclips)
 
     for i in range(len(asset_ids)):
-        clip_name = asset_ids["ClipName"][i]
+
         audio_id = asset_ids["Asset_ID"][i]
+        clip_name = "Macaulay_"+audio_id
         download_clip(audio_id, clip_name, args.path_to_save_audioclips)
         if i == 2:
             break
