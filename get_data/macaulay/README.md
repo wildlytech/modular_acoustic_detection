@@ -33,4 +33,5 @@ Do not pass path to the firefox driver while running the script with firefox.
 4. Once this file has executed run `macaulay_download` with the relevant arguments in the terminal.
    The relevant arguments can be viewed using `python macaulay_download.py -h`
    
-  
+5. Run `macaulay_url.py` to get the bird names for a particular url checklist
+and save it to a text file.
