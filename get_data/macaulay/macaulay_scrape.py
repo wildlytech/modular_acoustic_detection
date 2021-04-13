@@ -26,10 +26,10 @@ def get_ff_driver():
     This function returns a firefox webdriver. Make sure the ff driver
     is added to path
     '''
-    #options = FirefoxOptions()
+    options = FirefoxOptions()
     # Set browser in headless mode
-    #options.headless = True
-    #browser = webdriver.Firefox(options=options)
+    options.headless = True
+    browser = webdriver.Firefox(options=options)
     browser = webdriver.Firefox()
     return browser
 
@@ -62,9 +62,11 @@ def scrape(browser):
     # Input the bird name as a query
     element.send_keys(args.query_name)
     # Sleep to press enter
+    print("Query just entered in the browser, waiting for suggestions to load..")
     time.sleep(3)
     # Press enter to make the query
     element.send_keys(Keys.RETURN)
+    print("Enter key just pressed, waiting for results to load...")
     time.sleep(5)
     # Get the current url
     url = browser.current_url
