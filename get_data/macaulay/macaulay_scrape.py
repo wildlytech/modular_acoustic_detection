@@ -45,7 +45,7 @@ def get_chrome_driver(chrome_path):
     return browser
 
 
-def scrape(browser):
+def scrape(browser,save_path):
     '''
     This function involves the entire scraping functionality
     and saves the results as a dataframe with clipnames and asset ids
@@ -98,7 +98,7 @@ def scrape(browser):
     # Create dataframe and save it
     print("Creating and saving DF...")
     df = pandas.DataFrame({"ClipName": bird_names, "Asset_ID": asset_id_list})
-    df.to_csv("Asset_ids.csv")
+    df.to_csv(save_path)
     print("DF Saved...")
     # Close the browser
     browser.close()
@@ -109,9 +109,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Scrapes macaulay audio lib using selenium")
     parser.add_argument("-b", "--browser", help="Browser of choice: C for Chrome and F for firefox", required=True)
     parser.add_argument("-q", "--query_name", help="Name of bird whose audio is required", required=True)
+    parser.add_argument("-sp", "--save_path", help="Path to save the asset ids dataframe", required=True)
     parser.add_argument("-cp", "--chrome_path", help="If chrome is the browser of choice, path to its webdriver")
     parser.add_argument("-l", "--link", help="Link to web page to be scraped",
                         default="https://www.macaulaylibrary.org/")
+
     args = parser.parse_args()
 
     driver = args.browser
@@ -133,6 +135,6 @@ if __name__ == "__main__":
         else:
             raise BrowserArgException
 
-        scrape(browser)
+        scrape(browser,args.save_path)
     except BrowserPathException as e:
         print(e)
