@@ -120,6 +120,7 @@ if __name__ == "__main__":
     driver = args.browser
 
     if args.query_path:
+        print("Scraping using path to query text file")
         with open(args.query_path, "r") as f:
             queries = f.readlines()
         df_list = []
@@ -155,3 +156,30 @@ if __name__ == "__main__":
             print("DF Saved to: ", args.save_path)
         except Exception:
             print("Something went wrong while making the final Dataframe")
+
+    else:
+        print("Scraping using query name")
+        try:
+            if driver == "C" or driver == "c":
+                try:
+                    if os.path.exists(args.chrome_path):
+                        browser = get_chrome_driver(args.chrome_path)
+                    else:
+                        raise BrowserPathException
+                except BrowserPathException:
+                    print("Chrome Driver path does not exist")
+            elif driver == "F" or driver == "f":
+                try:
+                    browser = get_ff_driver()
+                except BrowserPathException:
+                    print("Gecko driver path not added to PATH. Try moving driver to /usr/local/bin")
+
+            else:
+                raise BrowserArgException
+
+            df = scrape(browser, args.query_name)
+            print("Creating and saving df...")
+            df.to_csv(args.save_path)
+
+        except BrowserPathException as e:
+            print(e)
