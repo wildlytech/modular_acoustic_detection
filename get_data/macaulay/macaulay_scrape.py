@@ -30,7 +30,7 @@ def get_ff_driver():
     # Set browser in headless mode
     options.headless = True
     browser = webdriver.Firefox(options=options)
-    browser = webdriver.Firefox()
+
     return browser
 
 
@@ -45,7 +45,7 @@ def get_chrome_driver(chrome_path):
     return browser
 
 
-def scrape(browser, save_path):
+def scrape(browser, query):
     '''
     This function involves the entire scraping functionality
     and saves the results as a dataframe with clipnames and asset ids
@@ -60,7 +60,7 @@ def scrape(browser, save_path):
     # Get the text input element
     element = browser.find_element_by_id("hero-search")
     # Input the bird name as a query
-    element.send_keys(args.query_name)
+    element.send_keys(query)
     # Sleep to press enter
     print("Query just entered in the browser, waiting for suggestions to load..")
     time.sleep(3)
@@ -83,7 +83,7 @@ def scrape(browser, save_path):
 
     # Initialise relevant variables
     asset_id_list = []
-    bird_name = args.query_name + "_macaul_"
+    bird_name = query + "_macaul_"
     k = 1
     bird_names = []
 
@@ -96,10 +96,10 @@ def scrape(browser, save_path):
         k += 1
 
     # Create dataframe and save it
-    print("Creating and saving DF...")
+    print("Creating Bird DF...")
     df = pandas.DataFrame({"ClipName": bird_names, "Asset_ID": asset_id_list})
-    df.to_csv(save_path)
-    print("DF Saved to: ", save_path)
+
+    return df
     # Close the browser
     browser.close()
 
@@ -108,33 +108,50 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Scrapes macaulay audio lib using selenium")
     parser.add_argument("-b", "--browser", help="Browser of choice: C for Chrome and F for firefox", required=True)
-    parser.add_argument("-q", "--query_name", help="Name of bird whose audio is required", required=True)
     parser.add_argument("-sp", "--save_path", help="Path to save the asset ids dataframe", required=True)
     parser.add_argument("-cp", "--chrome_path", help="If chrome is the browser of choice, path to its webdriver")
     parser.add_argument("-l", "--link", help="Link to web page to be scraped",
                         default="https://www.macaulaylibrary.org/")
+    parser.add_argument("-q", "--query_name", help="Name of bird whose audio is required")
+    parser.add_argument("-qp", "--query_path", help="Path to text file with required bird names")
 
     args = parser.parse_args()
 
     driver = args.browser
-    try:
-        if driver == "C" or driver == "c":
+
+    if args.query_path:
+        with open(args.query_path, "r") as f:
+            queries = f.readlines()
+        df_list = []
+        for query in queries:
+            print("Scraping for bird ", query)
             try:
-                if os.path.exists(args.chrome_path):
-                    browser = get_chrome_driver(args.chrome_path)
+                if driver == "C" or driver == "c":
+                    try:
+                        if os.path.exists(args.chrome_path):
+                            browser = get_chrome_driver(args.chrome_path)
+                        else:
+                            raise BrowserPathException
+                    except BrowserPathException:
+                        print("Chrome Driver path does not exist")
+                elif driver == "F" or driver == "f":
+                    try:
+                        browser = get_ff_driver()
+                    except BrowserPathException:
+                        print("Gecko driver path not added to PATH. Try moving driver to /usr/local/bin")
+
                 else:
-                    raise BrowserPathException
-            except BrowserPathException:
-                print("Chrome Driver path does not exist")
-        elif driver == "F" or driver == "f":
-            try:
-                browser = get_ff_driver()
-            except BrowserPathException:
-                print("Gecko driver path not added to PATH. Try moving driver to /usr/local/bin")
+                    raise BrowserArgException
 
-        else:
-            raise BrowserArgException
+                df = scrape(browser, query)
+                df_list.append(df)
 
-        scrape(browser, args.save_path)
-    except BrowserPathException as e:
-        print(e)
+            except BrowserPathException as e:
+                print(e)
+
+        try:
+            final_df = pandas.concat(df_list)
+            final_df.to_csv(args.save_path)
+            print("DF Saved to: ", args.save_path)
+        except Exception:
+            print("Something went wrong while making the final Dataframe")
