@@ -45,7 +45,7 @@ def get_chrome_driver(chrome_path):
     return browser
 
 
-def scrape(browser,save_path):
+def scrape(browser, save_path):
     '''
     This function involves the entire scraping functionality
     and saves the results as a dataframe with clipnames and asset ids
@@ -99,7 +99,7 @@ def scrape(browser,save_path):
     print("Creating and saving DF...")
     df = pandas.DataFrame({"ClipName": bird_names, "Asset_ID": asset_id_list})
     df.to_csv(save_path)
-    print("DF Saved to: ",save_path)
+    print("DF Saved to: ", save_path)
     # Close the browser
     browser.close()
 
@@ -135,6 +135,6 @@ if __name__ == "__main__":
         else:
             raise BrowserArgException
 
-        scrape(browser,args.save_path)
+        scrape(browser, args.save_path)
     except BrowserPathException as e:
         print(e)
