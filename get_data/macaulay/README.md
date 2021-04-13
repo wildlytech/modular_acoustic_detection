@@ -26,7 +26,11 @@ This directory consists of two files
 2. Run `macaulay_scrape.py` with the relevant arguments in the terminal. The relevant arguments can be viewed using
    `python macaulay_scrape.py -h`
 
-3. Once this file has executed run `macaulay_download` with the relevant arguments in the terminal.
+3. While using `macaulay_scrape.py` if using chrome driver, pass the path to the
+chromedriver as an argument. Else if using firefox webdriver, put the firefox webdriver in the `/usr/bin/` directory before running the script.
+Do not pass path to the firefox driver while running the script with firefox.
+
+4. Once this file has executed run `macaulay_download` with the relevant arguments in the terminal.
    The relevant arguments can be viewed using `python macaulay_download.py -h`
    
   
