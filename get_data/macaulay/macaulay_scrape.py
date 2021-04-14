@@ -6,7 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.common.keys import Keys
-
+import youtube_dl
 import time
 import argparse
 
@@ -104,11 +104,24 @@ def scrape(browser, query):
     browser.close()
 
 
+def download_clip(audio_id, clip_name, save_path,
+                  root_link_path="https://cdn.download.ams.birds.cornell.edu/api/v1/asset/"):
+    id_1 = audio_id
+    audio_link = root_link_path + str(id_1)
+    audio_files_path = save_path + clip_name
+    ydl_opts = {'outtmpl': audio_files_path + '.mp3'}
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([audio_link])
+
+
+
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Scrapes macaulay audio lib using selenium")
     parser.add_argument("-b", "--browser", help="Browser of choice: C for Chrome and F for firefox", required=True)
-    parser.add_argument("-sp", "--save_path", help="Path to save the asset ids dataframe", required=True)
+    parser.add_argument("-sp", "--save_path", help="Path to save the audio clips",default="macaulay_audio/")
     parser.add_argument("-cp", "--chrome_path", help="If chrome is the browser of choice, path to its webdriver")
     parser.add_argument("-l", "--link", help="Link to web page to be scraped",
                         default="https://www.macaulaylibrary.org/")
@@ -178,8 +191,13 @@ if __name__ == "__main__":
                 raise BrowserArgException
 
             df = scrape(browser, args.query_name)
-            print("Creating and saving df...")
-            df.to_csv(args.save_path)
+            for i in range(len(df)):
+                audio_id = df["Asset_ID"][i]
+                clip_name = "Macaulay_" + str(audio_id)
+                download_clip(audio_id, clip_name, args.save_path)
+
+            #print("Creating and saving df...")
+            #df.to_csv(args.save_path)
 
         except BrowserPathException as e:
             print(e)
