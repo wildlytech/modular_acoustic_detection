@@ -114,14 +114,11 @@ def download_clip(audio_id, clip_name, save_path,
         ydl.download([audio_link])
 
 
-
-
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Scrapes macaulay audio lib using selenium")
     parser.add_argument("-b", "--browser", help="Browser of choice: C for Chrome and F for firefox", required=True)
-    parser.add_argument("-sp", "--save_path", help="Path to save the audio clips",default="macaulay_audio/")
+    parser.add_argument("-sp", "--save_path", help="Path to save the audio clips", default="macaulay_audio/")
     parser.add_argument("-cp", "--chrome_path", help="If chrome is the browser of choice, path to its webdriver")
     parser.add_argument("-l", "--link", help="Link to web page to be scraped",
                         default="https://www.macaulaylibrary.org/")
@@ -196,8 +193,8 @@ if __name__ == "__main__":
                 clip_name = "Macaulay_" + str(audio_id)
                 download_clip(audio_id, clip_name, args.save_path)
 
-            #print("Creating and saving df...")
-            #df.to_csv(args.save_path)
+            # print("Creating and saving df...")
+            # df.to_csv(args.save_path)
 
         except BrowserPathException as e:
             print(e)
