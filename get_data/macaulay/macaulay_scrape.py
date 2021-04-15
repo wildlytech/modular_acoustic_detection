@@ -164,6 +164,10 @@ if __name__ == "__main__":
             final_df = pandas.concat(df_list)
             final_df.to_csv(args.save_path)
             print("DF Saved to: ", args.save_path)
+            for i in range(len(final_df)):
+                audio_id = final_df["Asset_ID"][i]
+                clip_name = "Macaulay_" + str(audio_id)
+                download_clip(audio_id, clip_name, args.save_path)
         except Exception:
             print("Something went wrong while making the final Dataframe")
 
