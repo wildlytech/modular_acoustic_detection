@@ -133,6 +133,7 @@ if __name__ == "__main__":
         print("Scraping using path to query text file")
         with open(args.query_path, "r") as f:
             queries = f.readlines()
+        queries = [query.rstrip("\n") for query in queries]
         df_list = []
         for query in queries:
             print("Scraping for bird ", query)
