@@ -218,8 +218,13 @@ drop_indices = []
 for index, row in enumerate(X_TEST):
 
     if len(row) != 1280:
-        X_TEST.remove(row)
         drop_indices.append(index)
+
+reverse_drop_indices = drop_indices.copy()
+reverse_drop_indices.reverse()
+
+for index in reverse_drop_indices:
+    del X_TEST[index]
 
 X_TEST = np.array(X_TEST)
 
@@ -525,7 +530,8 @@ def active_learning_loop(CLF2_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, LA
 
                 while choice != 3:
                     if choice == 1:
-                        label = input("Enter only one label (You can add additional labels by selecting option 1 again):")
+                        label = input(
+                            "Enter only one label (You can add additional labels by selecting option 1 again):")
                         labels_for_clip.append(label)
                     elif choice == 2:
                         song = AudioSegment.from_wav(WAV_FILE_FOLDER + wavfiles_pool[index])
@@ -607,6 +613,8 @@ def active_learning_loop(CLF2_pool, CLF2_TRAIN, CLF2_TRAIN_TARGET, n_queries, LA
         # remove queried instance from pool
 
         CLF2_pool = np.delete(CLF2_pool, man_idx, axis=0)
+        if CLF2_pool.shape[0] < 10:
+            break
 
     if strategy == "active":
         with open("queried_ex.pkl", "wb") as f:
