@@ -29,7 +29,7 @@ def search_records(url, l_limit=0, u_limit=100000):
         mid_url = url + str(mid)
         page = requests.get(mid_url)
         try:
-            res = page.json()["results"] #noqa F841
+            res = page.json()["results"]  # noqa F841
 
             if mid == l_limit:
                 break
