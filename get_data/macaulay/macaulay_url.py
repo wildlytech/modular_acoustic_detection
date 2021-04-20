@@ -3,8 +3,8 @@ from bs4 import BeautifulSoup
 import argparse
 
 parser = argparse.ArgumentParser(description="Scrapes bird codes from argument checklist")
-parser.add_argument("-u", "--url", help="URL for checklist", required=True)
-parser.add_argument("-sp", "--save_path", help="Path to save file", required=True,default="bird-codes.txt")
+parser.add_argument("-u", "--url", help="URL for checklist", default="https://ebird.org/region/IN/media?yr=all&m=")
+parser.add_argument("-sp", "--save_path", help="Path to save file",default="bird-codes.txt")
 
 args = parser.parse_args()
 url = args.url
