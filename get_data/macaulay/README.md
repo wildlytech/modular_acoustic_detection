@@ -58,3 +58,7 @@ and save it to a text file.
     - `-u`: The url for the checklist which will contain the names of birds of a particular region.
     - `-sp`: The path to the file where you want to save the bird names.
     
+5. For running scraping without webdrivers, run `macaulay_url.py` to get taxon codes file.
+
+6. Then run `macaulay_api_sim.py` with the approporiate arguments from the `-h` menu to download
+appropriate sound clips.
