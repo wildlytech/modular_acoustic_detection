@@ -20,5 +20,10 @@ $ cd binary_relevance_model/
 ```
 **Note**: [Navigate to binary_relevance_model/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/predictions/binary_relevance_model)
 
+####4. Panns Inference
 
+- Make sure you have all the files moved to the repository as mentioned in 
+the models/README.md under PANNs model
+- Run the panns inference script using the command `python predictions/panns/panns_kaggle1_inference.py` with the
+appropriate arguments mentioned in the help menu
 
