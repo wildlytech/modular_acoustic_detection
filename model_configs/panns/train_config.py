@@ -69,7 +69,7 @@ config = {
         "act_classes": 4,
         "classes_num": 264,
         "apply_aug": False,
-        "wts_path": "kaggle_1_soln/weights/final_5fold_sed_dense121_nomix_fold0_checkpoint_50_score0.7219.pt",
+        "wts_path": "models/weights/final_5fold_sed_dense121_nomix_fold0_checkpoint_50_score0.7219.pt",
         "top_db": None
     },
     "PERIOD": 30,

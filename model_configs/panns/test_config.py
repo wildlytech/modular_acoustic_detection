@@ -71,7 +71,7 @@ config = {
             "apply_aug": False,
             "top_db": None
         },
-        "weights_path": "kaggle_1_soln/weights/final_5fold_sed_dense121_nomix_fold0_checkpoint_50_score0.7219.pt",
+        "weights_path": "models/weights/final_5fold_sed_dense121_nomix_fold0_checkpoint_50_score0.7219.pt",
         "clip_threshold": 0.3,
         "threshold": 0.3
 
