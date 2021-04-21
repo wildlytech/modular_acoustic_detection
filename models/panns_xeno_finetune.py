@@ -1,3 +1,5 @@
+import argparse
+
 from externals.models import CustomPanns
 import librosa
 import numpy as np
@@ -5,7 +7,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from model_configs.panns import train_config as config
+from model_configs.panns.train_config import config
 import tqdm
 
 # SEED EVERYTHING
@@ -83,135 +85,141 @@ class XC_Dataset(Dataset):
         return tensors, label
 
 
-data_csv = pd.read_csv("kaggle_1_soln/checked_df_train.csv")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Fintuner for PANNs model")
+    parser.add_argument("-train", "--train_path", help="Path to train dataframe (csv file)")
+    parser.add_argument("-test", "--test_path", help="Path to test dataframe (csv file)")
+    parser.add_argument("-p2p", "--path_to_prediction", help="Path to save predictions (csv file)")
+    args = parser.parse_args()
+    data_csv = pd.read_csv(args.train_path)
 
-test_data_csv = pd.read_csv("kaggle_1_soln/checked_df_test.csv")
+    test_data_csv = pd.read_csv(args.test_path)
 
-df_train, df_val = train_test_split(data_csv, test_size=0.2, random_state=42)
-df_train.reset_index(inplace=True)
-df_val.reset_index(inplace=True)
-train_dset = XC_Dataset(df_train, BIRD_CODE, 268)
-val_dset = XC_Dataset(df_val, BIRD_CODE, 268)
-test_dset = XC_Dataset(test_data_csv, BIRD_CODE, 268)
+    df_train, df_val = train_test_split(data_csv, test_size=0.2, random_state=42)
+    df_train.reset_index(inplace=True)
+    df_val.reset_index(inplace=True)
+    train_dset = XC_Dataset(df_train, BIRD_CODE, 268)
+    val_dset = XC_Dataset(df_val, BIRD_CODE, 268)
+    test_dset = XC_Dataset(test_data_csv, BIRD_CODE, 268)
 
-train_dataloader = DataLoader(train_dset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-val_dataloader = DataLoader(val_dset, batch_size=BATCH_SIZE, num_workers=4)
-test_dataloader = DataLoader(test_dset, batch_size=BATCH_SIZE, num_workers=4)
+    train_dataloader = DataLoader(train_dset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+    val_dataloader = DataLoader(val_dset, batch_size=BATCH_SIZE, num_workers=4)
+    test_dataloader = DataLoader(test_dset, batch_size=BATCH_SIZE, num_workers=4)
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model.to(device)
-EPOCHS = config["EPOCHS"]
-criterion = config["LOSS"]
-optimizer = config["OPTIM"]
-optim = optimizer(model.parameters(), lr=config["LR"])
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    model.to(device)
+    EPOCHS = config["EPOCHS"]
+    criterion = config["LOSS"]
+    optimizer = config["OPTIM"]
+    optim = optimizer(model.parameters(), lr=config["LR"])
 
-master_bar = tqdm.trange(EPOCHS, unit="Epochs")
+    master_bar = tqdm.trange(EPOCHS, unit="Epochs")
 
-for epoch in master_bar:
+    for epoch in master_bar:
 
-    acc_score = 0.0
-    model.train()
-    pbar_t = tqdm.tqdm(train_dataloader, unit="batch", leave=False)
-    pbar_t.set_description(f"Epoch: {epoch}")
-    for ii, (x, y) in enumerate(pbar_t):
-        optim.zero_grad()
-        image = x.unsqueeze(1)
+        acc_score = 0.0
+        model.train()
+        pbar_t = tqdm.tqdm(train_dataloader, unit="batch", leave=False)
+        pbar_t.set_description(f"Epoch: {epoch}")
+        for ii, (x, y) in enumerate(pbar_t):
+            optim.zero_grad()
+            image = x.unsqueeze(1)
 
-        image = image.to(device)
-        y = y.to(device)
+            image = image.to(device)
+            y = y.to(device)
 
-        out = model((image, None))
-        try:
+            out = model((image, None))
+            try:
+                clipwise_op = torch.clamp(out["combined_output"], 0, 1)
+
+                preds = np.argmax(clipwise_op.detach().cpu().squeeze(1).numpy(), axis=1)
+
+                target = np.argmax(y.detach().cpu().squeeze(1).numpy(), axis=1)
+
+                acc_score += (np.sum(target == preds)) / BATCH_SIZE
+                loss = criterion(clipwise_op[:, :, -4:], y[:, :, -4:])
+
+                acc_score = acc_score / (ii + 1)
+                pbar_t.set_postfix(loss=loss.item(), accuracy=acc_score)
+            except Exception as e:
+                print(e)
+
+            loss.backward()
+            optim.step()
+
+        model.eval()
+        val_acc = 0.0
+        val_preds = []
+        val_targets = []
+        pbar_v = tqdm.tqdm(val_dataloader, unit="batch", leave=False)
+        pbar_v.set_description("Validation")
+        for ii, (x, y) in enumerate(pbar_v):
+            image = x.unsqueeze(1)
+
+            image = image.to(device)
+            y = y.to(device)
+            with torch.no_grad():
+                out = model((image, None))
             clipwise_op = torch.clamp(out["combined_output"], 0, 1)
 
             preds = np.argmax(clipwise_op.detach().cpu().squeeze(1).numpy(), axis=1)
 
             target = np.argmax(y.detach().cpu().squeeze(1).numpy(), axis=1)
+            val_preds.extend([INV_BIRD_CODE[i] for i in preds.tolist()])
+            val_targets.extend([INV_BIRD_CODE[i] for i in target.tolist()])
+            val_acc += (np.sum(target == preds)) / BATCH_SIZE
+            val_loss = criterion(clipwise_op, y)
+            val_acc = val_acc / (ii + 1)
 
-            acc_score += (np.sum(target == preds)) / BATCH_SIZE
-            loss = criterion(clipwise_op[:, :, -4:], y[:, :, -4:])
+            pbar_v.set_postfix(loss=val_loss.item(), accuracy=val_acc)
 
-            acc_score = acc_score / (ii + 1)
-            pbar_t.set_postfix(loss=loss.item(), accuracy=acc_score)
-        except Exception as e:
-            print(e)
+        pred_df = {}
+        pred_df["preds"] = val_preds
+        pred_df["target"] = val_targets
+        pd.DataFrame(pred_df).to_csv("kaggle_1_soln/epoch_" + str(epoch) + "_preds.csv")
+        # print("Val Accuracy: ",val_acc/len(val_dataloader))
+        master_bar.set_postfix(train_loss=loss.item(), val_loss=val_loss.item(),
+                               train_acc=acc_score, val_acc=val_acc)
 
-        loss.backward()
-        optim.step()
-
+    # TESTING
+    # print("Testing....")
+    test_bar = tqdm.tqdm(test_dataloader, unit="batch")
+    test_bar.set_description("Testing")
     model.eval()
-    val_acc = 0.0
-    val_preds = []
-    val_targets = []
-    pbar_v = tqdm.tqdm(val_dataloader, unit="batch", leave=False)
-    pbar_v.set_description("Validation")
-    for ii, (x, y) in enumerate(pbar_v):
+    test_acc = 0.0
+    test_preds = []
+    test_targets = []
+    clip_threshold = 0.2
+    for ii, (x, y) in enumerate(test_bar):
         image = x.unsqueeze(1)
 
         image = image.to(device)
         y = y.to(device)
         with torch.no_grad():
             out = model((image, None))
-        clipwise_op = torch.clamp(out["combined_output"], 0, 1)
 
-        preds = np.argmax(clipwise_op.detach().cpu().squeeze(1).numpy(), axis=1)
+        clip_op = out["clipwise_output"].detach().cpu().numpy().mean(axis=1)
+        backbone_op = out["combined_output"].detach().cpu().numpy().mean(axis=1)
+
+        clip_indices = np.argsort(-backbone_op, axis=1)
+        clip_indices = clip_indices[:, :1]
+
+        clip_codes = []
+        for ci_arr in clip_indices:
+            inv_codes = []
+            for ci in ci_arr:
+                inv_codes.append(INV_BIRD_CODE[ci])
+            clip_codes.append(inv_codes)
+        test_preds.extend(clip_codes)
 
         target = np.argmax(y.detach().cpu().squeeze(1).numpy(), axis=1)
-        val_preds.extend([INV_BIRD_CODE[i] for i in preds.tolist()])
-        val_targets.extend([INV_BIRD_CODE[i] for i in target.tolist()])
-        val_acc += (np.sum(target == preds)) / BATCH_SIZE
-        val_loss = criterion(clipwise_op, y)
-        val_acc = val_acc / (ii + 1)
 
-        pbar_v.set_postfix(loss=val_loss.item(), accuracy=val_acc)
+        test_targets.extend([INV_BIRD_CODE[i] for i in target.tolist()])
 
+    print(test_preds[:10])
     pred_df = {}
-    pred_df["preds"] = val_preds
-    pred_df["target"] = val_targets
-    pd.DataFrame(pred_df).to_csv("kaggle_1_soln/epoch_" + str(epoch) + "_preds.csv")
-    # print("Val Accuracy: ",val_acc/len(val_dataloader))
-    master_bar.set_postfix(train_loss=loss.item(), val_loss=val_loss.item(),
-                           train_acc=acc_score, val_acc=val_acc)
-
-# TESTING
-# print("Testing....")
-test_bar = tqdm.tqdm(test_dataloader, unit="batch")
-test_bar.set_description("Testing")
-model.eval()
-test_acc = 0.0
-test_preds = []
-test_targets = []
-clip_threshold = 0.2
-for ii, (x, y) in enumerate(test_bar):
-    image = x.unsqueeze(1)
-
-    image = image.to(device)
-    y = y.to(device)
-    with torch.no_grad():
-        out = model((image, None))
-
-    clip_op = out["clipwise_output"].detach().cpu().numpy().mean(axis=1)
-    backbone_op = out["combined_output"].detach().cpu().numpy().mean(axis=1)
-
-    clip_indices = np.argsort(-backbone_op, axis=1)
-    clip_indices = clip_indices[:, :1]
-
-    clip_codes = []
-    for ci_arr in clip_indices:
-        inv_codes = []
-        for ci in ci_arr:
-            inv_codes.append(INV_BIRD_CODE[ci])
-        clip_codes.append(inv_codes)
-    test_preds.extend(clip_codes)
-
-    target = np.argmax(y.detach().cpu().squeeze(1).numpy(), axis=1)
-
-    test_targets.extend([INV_BIRD_CODE[i] for i in target.tolist()])
-
-print(test_preds[:10])
-pred_df = {}
-print("Preds: ", len(test_preds))
-print("Targets: ", len(test_targets))
-pred_df["preds"] = test_preds
-pred_df["target"] = test_targets
-pd.DataFrame(pred_df).to_csv("kaggle_1_soln/test_preds.csv")
+    print("Preds: ", len(test_preds))
+    print("Targets: ", len(test_targets))
+    pred_df["preds"] = test_preds
+    pred_df["target"] = test_targets
+    pd.DataFrame(pred_df).to_csv(args.path_to_prediction)
