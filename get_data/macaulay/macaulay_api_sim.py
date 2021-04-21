@@ -54,10 +54,12 @@ if __name__ == "__main__":
     asset_ids = []
     bird_names = []
     for code in codes:
+
         print("Operating code: ", code)
         url = "https://search.macaulaylibrary.org/catalog.json?searchField=species&taxonCode=" + code + "&count="
         print("Searching for number of results..")
-        mid = search_records(url)
+        #mid = search_records(url)
+        mid = 100
         final_url = url + str(mid)
         page = requests.get(final_url)
         if len(page.json()["results"]["content"]) == 0:
@@ -66,6 +68,9 @@ if __name__ == "__main__":
             num_recs = len(page.json()["results"]["content"])
             asset_ids.extend([el["assetId"] for el in page.json()["results"]["content"]])
             bird_names.extend([page.json()["searchRequestForm"]["q"] for i in range(num_recs)])
+        print("A: ",asset_ids)
+        print(len(asset_ids))
+        break
 
     df_dict["Asset_ID"] = asset_ids
     df_dict["bird_names"] = bird_names
