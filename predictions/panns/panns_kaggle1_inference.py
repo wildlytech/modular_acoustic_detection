@@ -7,7 +7,7 @@ import numpy as np
 from externals.models import PANNsDense121Att
 import librosa
 import argparse
-from model_configs.panns import test_config as config
+from model_configs.panns.test_config import config
 from tqdm import trange
 
 
@@ -96,7 +96,7 @@ def prediction_for_clip(clip: np.ndarray,
                 tail_idx = 0
                 while True:
                     if (tail_idx + 1 == len(detected)) or (
-                            detected[tail_idx + 1] - # noqa W504
+                            detected[tail_idx + 1] -  # noqa W504
                             detected[tail_idx] != 1):
                         onset = 0.01 * detected[
                             head_idx] + global_time
