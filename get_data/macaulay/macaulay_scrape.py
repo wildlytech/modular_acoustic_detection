@@ -78,7 +78,7 @@ def scrape(browser, query):
     new_url = split_url[0] + insertion + split_url[1]
     # Make the browser go to the new url
     browser.get(new_url)
-    while(True):
+    while (True):
         try:
             print("Show more button found...")
             button = browser.find_element_by_id("show_more")
@@ -98,7 +98,6 @@ def scrape(browser, query):
     # Iterate through results to fetch asset ids and store them in lists
 
     for row in results:
-
         asset_id = row.get_attribute("data-asset-id")
 
         asset_id_list.append(asset_id)
@@ -112,7 +111,7 @@ def scrape(browser, query):
     # bird_names = bird_names[:len(asset_id_list)]
     df = pandas.DataFrame({"ClipName": bird_names, "Asset_ID": asset_id_list})
     print(df.Asset_ID.value_counts())
-    print("Number of results: ",len(df))
+    print("Number of results: ", len(df))
     return df
     # Close the browser
     browser.close()
@@ -209,7 +208,7 @@ if __name__ == "__main__":
             df = scrape(browser, args.query_name)
             for i in range(len(df)):
                 audio_id = df["Asset_ID"][i]
-                clip_name = df["ClipName"][i]+"_" + str(audio_id)
+                clip_name = df["ClipName"][i] + "_" + str(audio_id)
                 download_clip(audio_id, clip_name, args.save_path)
 
             # print("Creating and saving df...")
