@@ -35,4 +35,7 @@ tf-slim==1.1.0
 xmltodict == 0.12.0
 youtube-dl==2021.2.4.1
 youtube-search-python==1.4.0
-
+torch==1.8.1
+torchlibrosa==0.0.9
+torchvision==0.9.1
+tqdm==4.55.0
