@@ -83,6 +83,7 @@ def scrape(browser, query):
             print("Show more button found...")
             button = browser.find_element_by_id("show_more")
             button.click()
+            time.sleep(2)
         except:
             print("Record Limit Reached..")
             break
@@ -106,11 +107,11 @@ def scrape(browser, query):
 
     # Create dataframe and save it
     print("Creating Bird DF...")
-    print(len(set(asset_id_list)))
+
     # asset_id_list = list(set(asset_id_list))
     # bird_names = bird_names[:len(asset_id_list)]
     df = pandas.DataFrame({"ClipName": bird_names, "Asset_ID": asset_id_list})
-    print(df.Asset_ID.value_counts())
+
     print("Number of results: ", len(df))
     return df
     # Close the browser
@@ -181,7 +182,10 @@ if __name__ == "__main__":
             for i in range(len(final_df)):
                 audio_id = final_df["Asset_ID"][i]
                 clip_name = "Macaulay_" + str(audio_id)
-                download_clip(audio_id, clip_name, args.save_path)
+                try:
+                    download_clip(audio_id, clip_name, args.save_path)
+                except Exception:
+                    print("Download Error")
         except Exception:
             print("Something went wrong while making the final Dataframe")
 
@@ -206,6 +210,7 @@ if __name__ == "__main__":
                 raise BrowserArgException
 
             df = scrape(browser, args.query_name)
+            print("Scraping ", len(df), " audioclips")
             for i in range(len(df)):
                 audio_id = df["Asset_ID"][i]
                 clip_name = df["ClipName"][i] + "_" + str(audio_id)
