@@ -1,4 +1,5 @@
 import argparse
+import json
 
 from externals.models import CustomPanns
 import librosa
@@ -6,27 +7,23 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
+import torch.nn as nn
+import torch.optim as optim
 from sklearn.model_selection import train_test_split
-from model_configs.panns.train_config import config
 import tqdm
 
 # SEED EVERYTHING
 torch.manual_seed(42)
 np.random.seed(42)
 
-model_config = config["MODEL_CONFIG"]
 
-model = CustomPanns(
-    **model_config
-)
+def get_model(config):
+    model_config = config["MODEL_CONFIG"]
 
-PERIOD = config["PERIOD"]
-SR = config["SR"]
-vote_lim = config["vote_lim"]
-TTA = config["TTA"]
-BATCH_SIZE = config["BATCH_SIZE"]
-BIRD_CODE = config["BIRD_CODE"]
-INV_BIRD_CODE = config["INV_BIRD_CODE"]
+    model = CustomPanns(
+        **model_config
+    )
+    return model
 
 
 def df_checker(df_path, SR=32000):
@@ -90,10 +87,23 @@ if __name__ == "__main__":
     parser.add_argument("-train", "--train_path", help="Path to train dataframe (csv file)")
     parser.add_argument("-test", "--test_path", help="Path to test dataframe (csv file)")
     parser.add_argument("-p2p", "--path_to_prediction", help="Path to save predictions (csv file)")
+    parser.add_argument("-cfg", "-path2config", help="Path to the json config file")
     args = parser.parse_args()
     data_csv = pd.read_csv(args.train_path)
 
     test_data_csv = pd.read_csv(args.test_path)
+    with open(args.cfg, "r") as f:
+        config = json.load(f)
+
+    PERIOD = config["PERIOD"]
+    SR = config["SR"]
+    vote_lim = config["vote_lim"]
+    TTA = config["TTA"]
+    BATCH_SIZE = config["BATCH_SIZE"]
+    BIRD_CODE = config["BIRD_CODE"]
+    INV_BIRD_CODE = {v: k for k, v in config["BIRD_CODE"].items()}
+
+    model = get_model(config)
 
     df_train, df_val = train_test_split(data_csv, test_size=0.2, random_state=42)
     df_train.reset_index(inplace=True)
@@ -109,8 +119,8 @@ if __name__ == "__main__":
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model.to(device)
     EPOCHS = config["EPOCHS"]
-    criterion = config["LOSS"]
-    optimizer = config["OPTIM"]
+    criterion = eval(config["LOSS"])
+    optimizer = eval(config["OPTIM"])
     optim = optimizer(model.parameters(), lr=config["LR"])
 
     master_bar = tqdm.trange(EPOCHS, unit="Epochs")
