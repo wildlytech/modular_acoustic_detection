@@ -174,7 +174,7 @@ def predict(test_df, model, model_details):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Makes Predictions using the Panns Model")
-    parser.add_argument("-p", "--path_to_input", action="store", required=True, help="Path to the input data")
+    parser.add_argument("-p", "--path_to_input", action="store", required=True, help="Path to csv file with input manifest")
     parser.add_argument("-ps", "--csv_path_to_save_preds", action="store", required=True,
                         help="Path for csv file with predictions to be saved")
     args = parser.parse_args()
