@@ -176,7 +176,7 @@ if __name__ == "__main__":
         pred_df = {}
         pred_df["preds"] = val_preds
         pred_df["target"] = val_targets
-        pd.DataFrame(pred_df).to_csv("kaggle_1_soln/epoch_" + str(epoch) + "_preds.csv")
+        pd.DataFrame(pred_df).to_csv(args.path_to_prediction)
         # print("Val Accuracy: ",val_acc/len(val_dataloader))
         master_bar.set_postfix(train_loss=loss.item(), val_loss=val_loss.item(),
                                train_acc=acc_score, val_acc=val_acc)
