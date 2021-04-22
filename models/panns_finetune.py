@@ -52,7 +52,7 @@ def df_checker(df_path, SR=32000):
     return pd.DataFrame(new_df_dict)
 
 
-class XC_Dataset(Dataset):
+class Audio_Dataset(Dataset):
     def __init__(self, csv, enc_dict, num_classes):
         self.csv = csv
         self.enc_dict = enc_dict
@@ -108,9 +108,9 @@ if __name__ == "__main__":
     df_train, df_val = train_test_split(data_csv, test_size=0.2, random_state=42)
     df_train.reset_index(inplace=True)
     df_val.reset_index(inplace=True)
-    train_dset = XC_Dataset(df_train, BIRD_CODE, 268)
-    val_dset = XC_Dataset(df_val, BIRD_CODE, 268)
-    test_dset = XC_Dataset(test_data_csv, BIRD_CODE, 268)
+    train_dset = Audio_Dataset(df_train, BIRD_CODE, 268)
+    val_dset = Audio_Dataset(df_val, BIRD_CODE, 268)
+    test_dset = Audio_Dataset(test_data_csv, BIRD_CODE, 268)
 
     train_dataloader = DataLoader(train_dset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
     val_dataloader = DataLoader(val_dset, batch_size=BATCH_SIZE, num_workers=4)
