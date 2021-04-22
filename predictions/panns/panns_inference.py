@@ -1,5 +1,5 @@
 # (https://www.apache.org/licenses/LICENSE-2.0)
-#
+# Original NB URL: https://www.kaggle.com/taggatle/cornell-birdcall-identification-1st-place-solution
 import time
 import pandas as pd
 import torch
