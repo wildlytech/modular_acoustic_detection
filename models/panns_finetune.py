@@ -226,7 +226,7 @@ if __name__ == "__main__":
 
         test_targets.extend([INV_BIRD_CODE[i] for i in target.tolist()])
 
-    print(test_preds[:10])
+
     pred_df = {}
     print("Preds: ", len(test_preds))
     print("Targets: ", len(test_targets))
