@@ -88,8 +88,7 @@ def prediction_for_clip(clip: np.ndarray,
                 tail_idx = 0
                 while True:
                     if (tail_idx + 1 == len(detected)) or (
-                            detected[tail_idx + 1] -  # noqa W504
-                            detected[tail_idx] != 1):
+                            detected[tail_idx + 1] - detected[tail_idx] != 1):
                         onset = 0.01 * detected[
                             head_idx] + global_time
                         offset = 0.01 * detected[
@@ -97,9 +96,9 @@ def prediction_for_clip(clip: np.ndarray,
                         onset_idx = detected[head_idx]
                         offset_idx = detected[tail_idx]
                         max_confidence = framewise_outputs[
-                                         onset_idx:offset_idx, target_idx].max()  # noqa E126
+                            onset_idx:offset_idx, target_idx].max()
                         mean_confidence = framewise_outputs[
-                                          onset_idx:offset_idx, target_idx].mean()  # noqa E126
+                            onset_idx:offset_idx, target_idx].mean()
 
                         if INV_BIRD_CODE[target_idx] in clip_codes:
                             estimated_event = {
@@ -193,4 +192,4 @@ if __name__ == "__main__":
 
     pred_df = predict(test_df, panns_model, config["THRESHOLD"], config["CLIP_THRESHOLD"])
     print("Saving preds....")
-    pred_df.to_csv(args.path_to_save_preds)
+    pred_df.to_csv(args.csv_path_to_save_preds)

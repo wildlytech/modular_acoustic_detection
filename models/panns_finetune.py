@@ -84,10 +84,10 @@ class Audio_Dataset(Dataset):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fintuner for PANNs model")
-    parser.add_argument("-train", "--train_path", help="Path to train dataframe (csv file)")
-    parser.add_argument("-test", "--test_path", help="Path to test dataframe (csv file)")
-    parser.add_argument("-p2p", "--path_to_prediction", help="Path to save predictions (csv file)")
-    parser.add_argument("-cfg", "-path2config", help="Path to the json config file")
+    parser.add_argument("-train", "--train_path", required=True, help="Path to train dataframe (csv file)")
+    parser.add_argument("-test", "--test_path", required=True, help="Path to test dataframe (csv file)")
+    parser.add_argument("-p2p", "--path_to_prediction", required=True, help="Path to save predictions (csv file)")
+    parser.add_argument("-cfg", "-path2config", required=True, help="Path to the json config file")
     args = parser.parse_args()
     data_csv = pd.read_csv(args.train_path)
 

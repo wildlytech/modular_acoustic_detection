@@ -96,11 +96,10 @@ e. networkCfgJson: Network architecture json file<br>
 - Additional files required to for testing
     - `checked_df_train.csv`: Csv of training audio clip names
     - `checked_df_test.csv` : Csv of testing audio clip names
-    - `final_5fold_sed_dense121_nomix_fold0_checkpoint_50_score0.7219`: PANNs weights
-    - `XC_Sounds_Split/`: Folder containing split wavfiles of corresponding xenocanto audioclips
+    - Initial PANNs weights (e.g. `final_5fold_sed_dense121_nomix_fold0_checkpoint_50_score0.7219`)
+    - Folder containing split wavfiles (10 seconds) of corresponding audioclips
 - If using custom data make sure to bring your data files to these formats
 
-- To run Panns finetune: run `python models/panns_xeno_finetune.py` with the 
+- To run Panns finetune: run `python models/panns_finetune.py` with the 
 appropriate arguments from the help menu.
-- Make sure to adjust the relevant filepaths and parameters in the `model_configs/panns/train_config.py`
-
+- Make sure to adjust the relevant filepaths and parameters in the `model_configs/panns/train_config.json`
