@@ -122,7 +122,7 @@ def prediction_for_clip(clip: np.ndarray,
     return prediction_df, global_cc
 
 
-def predict(test_df, model, theshold, clip_threshold):
+def predict(test_df, model, threshold, clip_threshold):
     paths = test_df["filepath"].values
     labels = test_df["ebird_code"].values
     model.eval()
