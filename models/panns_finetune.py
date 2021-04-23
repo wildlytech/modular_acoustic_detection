@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 import torch.nn as nn  # noqa F401
-import torch.optim as optim
+import torch.optim as optim  # noqa F401
 from sklearn.model_selection import train_test_split
 import tqdm
 
