@@ -104,9 +104,9 @@ def prediction_for_clip(clip: np.ndarray,
                         onset_idx = detected[head_idx]
                         offset_idx = detected[tail_idx]
                         max_confidence = framewise_outputs[
-                                         onset_idx:offset_idx, target_idx].max()  # noqa E126
+                            onset_idx:offset_idx, target_idx].max()
                         mean_confidence = framewise_outputs[
-                                          onset_idx:offset_idx, target_idx].mean()  # noqa E126
+                            onset_idx:offset_idx, target_idx].mean()
 
                         if INV_BIRD_CODE[target_idx] in clip_codes:
                             estimated_event = {
