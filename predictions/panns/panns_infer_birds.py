@@ -135,7 +135,6 @@ def predict(test_df, model, threshold, clip_threshold, framewise_output_path):
     pbar.set_description("Prediction Bar")
     for ii in pbar:
         time.sleep(0.01)
-        # print("Iteration ",ii+1,"of ",len(paths))
         try:
             clip, _ = librosa.load(paths[ii], sr=SR, mono=True, res_type="kaiser_fast")
             total += 1
@@ -153,7 +152,6 @@ def predict(test_df, model, threshold, clip_threshold, framewise_output_path):
             acc_counter += 1
         if (ii + 1) % 10 == 0:
             pbar.set_postfix(accuracy=acc_counter / total)
-        #    print("Accuracy after ",(ii+1),"Iterations is ",(acc_counter/total))
         predictions["filepath"].append(paths[ii])
         if len(clip_codes) > 0:
             predictions["ebird_code"].append(clip_codes)
