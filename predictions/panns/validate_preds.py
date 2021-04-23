@@ -17,7 +17,6 @@ def top5_acc(df):
     for p, t in zip(predictions, targets):
         if t in p:
             acc += 1
-    # print("Top 5 Accuracy: ",acc/len(predictions))
     return acc / len(predictions)
 
 
