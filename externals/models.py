@@ -184,7 +184,7 @@ class CustomPanns(nn.Module):
 
         self.fc1 = nn.Linear(1024, 1024, bias=True)
         self.attn = AttBlock(1024, act_classes, activation='sigmoid')
-        self.backbone = PANNsDense121Att(sample_rate, window_size, hop_size,
+        self.backbone = PANNsDense121Att(sample_rate, window_size, hop_size, act_classes, wts_path,
                                          mel_bins, fmin, fmax, classes_num, apply_aug, top_db)
         checkpoint = torch.load(wts_path)
 
