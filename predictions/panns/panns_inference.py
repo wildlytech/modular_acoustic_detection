@@ -8,7 +8,6 @@ import numpy as np
 from externals.models import PANNsDense121Att
 import librosa
 import argparse
-from model_configs.panns.test_config import config
 from tqdm import trange
 
 
