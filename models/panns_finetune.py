@@ -222,8 +222,6 @@ if __name__ == "__main__":
         target = np.argmax(y.detach().cpu().squeeze(1).numpy(), axis=1)
 
         test_targets.extend([INV_BIRD_CODE[i] for i in target.tolist()])
-
-
     pred_df = {}
     print("Preds: ", len(test_preds))
     print("Targets: ", len(test_targets))
