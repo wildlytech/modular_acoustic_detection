@@ -185,4 +185,4 @@ if __name__ == "__main__":
 
     pred_df = predict(test_df, panns_model, model_details)
     print("Saving preds....")
-    pred_df.to_csv(args.path_to_save_preds)
+    pred_df.to_csv(args.csv_path_to_save_preds)
