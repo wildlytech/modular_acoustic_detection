@@ -122,7 +122,7 @@ def prediction_for_clip(clip: np.ndarray,
     return prediction_df, global_cc
 
 
-def predict(test_df, model, threshold, clip_threshold):
+def predict(test_df, model, threshold, clip_threshold, framewise_output_path):
     paths = test_df["filepath"].values
     labels = test_df["ebird_code"].values
     model.eval()
@@ -146,7 +146,7 @@ def predict(test_df, model, threshold, clip_threshold):
 
         pred_df, clip_codes = prediction_for_clip(clip, model, threshold,
                                                   clip_threshold)
-        pred_df.to_csv("Framewise_outputs.csv")
+        pred_df.to_csv(framewise_output_path)
         if len(clip_codes) == 0:
             clip_codes = ["NOCALL"]
         if labels[ii] in clip_codes:
@@ -171,6 +171,9 @@ if __name__ == "__main__":
                         help="Path for csv file with predictions to be saved")
     parser.add_argument("-c", "--config", action="store", help="Path to config file for testing",
                         default="model_configs/panns/train_config.json")
+    parser.add_argument("-f", "--path_to_save_framewise_outputs", action="store", help="Path to save framewise outputs",
+                        default="framewise_outputs.csv")
+
     args = parser.parse_args()
 
     with open(args.config, "r") as f:
@@ -190,6 +193,7 @@ if __name__ == "__main__":
 
     test_df = pd.read_csv(args.path_to_input)
 
-    pred_df = predict(test_df, panns_model, config["THRESHOLD"], config["CLIP_THRESHOLD"])
+    pred_df = predict(test_df, panns_model, config["THRESHOLD"], config["CLIP_THRESHOLD"],
+                      args.path_to_save_framewise_outputs)
     print("Saving preds....")
     pred_df.to_csv(args.csv_path_to_save_preds)
