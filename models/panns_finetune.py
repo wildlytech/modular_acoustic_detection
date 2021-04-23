@@ -192,7 +192,6 @@ if __name__ == "__main__":
                                train_acc=acc_score, val_acc=val_acc)
 
     # TESTING
-    # print("Testing....")
     test_bar = tqdm.tqdm(test_dataloader, unit="batch")
     test_bar.set_description("Testing")
     model.eval()
