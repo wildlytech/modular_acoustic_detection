@@ -74,8 +74,6 @@ class Audio_Dataset(Dataset):
         array = clip.astype(np.float32)
         if len(array) < 960000:
             array = np.pad(array, (0, 960000 - len(array)), mode='constant', constant_values=0)
-        # print(path)
-        # print(len(array))
         tensors = torch.from_numpy(array)
 
         label = torch.Tensor(zs)
