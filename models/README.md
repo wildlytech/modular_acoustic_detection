@@ -96,7 +96,7 @@ e. networkCfgJson: Network architecture json file<br>
 - Additional files required to for testing
     - `checked_df_train.csv`: Csv of training audio clip names
     - `checked_df_test.csv` : Csv of testing audio clip names
-    - `final_5fold_sed_dense121_nomix_fold0_checkpoint_50_score0.7219`: PANNs weights
+    - Initial PANNs weights (e.g. `final_5fold_sed_dense121_nomix_fold0_checkpoint_50_score0.7219`)
     - Folder containing split wavfiles (10 seconds) of corresponding audioclips
 - If using custom data make sure to bring your data files to these formats
 
