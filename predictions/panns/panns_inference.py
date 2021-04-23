@@ -1,5 +1,6 @@
 # (https://www.apache.org/licenses/LICENSE-2.0)
 # Original NB URL: https://www.kaggle.com/taggatle/cornell-birdcall-identification-1st-place-solution
+import json
 import time
 import pandas as pd
 import torch
@@ -19,17 +20,7 @@ def seed_everything():
     np.random.seed(42)
 
 
-PERIOD = config["PERIOD"]
-SR = config["SR"]
-vote_lim = config["vote_lim"]
-TTA = config["TTA"]
-BIRD_CODE = config["BIRD_CODES"]
-INV_BIRD_CODE = config["INV_BIRD_CODE"]
-MODEL_DETAILS = config["model"]
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-def get_model(ModelClass: object, config: dict, weights_path: str):
+def get_model(ModelClass: object, config: dict, weights_path: str, device):
     model = ModelClass(**config)
     checkpoint = torch.load(weights_path, map_location='cpu')
     model.load_state_dict(checkpoint["model"])
@@ -81,6 +72,7 @@ def prediction_for_clip(clip: np.ndarray,
 
         clip_thresholded = clipwise_outputs >= clip_threshold
         clip_indices = np.argwhere(clip_thresholded).reshape(-1)
+
         clip_codes = []
         for ci in clip_indices:
             clip_codes.append(INV_BIRD_CODE[ci])
@@ -132,7 +124,7 @@ def prediction_for_clip(clip: np.ndarray,
     return prediction_df, global_cc
 
 
-def predict(test_df, model, model_details):
+def predict(test_df, model, theshold, clip_threshold):
     paths = test_df["filepath"].values
     labels = test_df["ebird_code"].values
     model.eval()
@@ -154,8 +146,8 @@ def predict(test_df, model, model_details):
 
             continue
 
-        pred_df, clip_codes = prediction_for_clip(clip, model, model_details["threshold"],
-                                                  model_details["clip_threshold"])
+        pred_df, clip_codes = prediction_for_clip(clip, model, theshold,
+                                                  clip_threshold)
         if len(clip_codes) == 0:
             clip_codes = ["NOCALL"]
         if labels[ii] in clip_codes:
@@ -174,15 +166,31 @@ def predict(test_df, model, model_details):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Makes Predictions using the Panns Model")
-    parser.add_argument("-p", "--path_to_input", action="store", required=True, help="Path to csv file with input manifest")
+    parser.add_argument("-p", "--path_to_input", action="store", required=True,
+                        help="Path to csv file with input manifest")
     parser.add_argument("-ps", "--csv_path_to_save_preds", action="store", required=True,
                         help="Path for csv file with predictions to be saved")
+    parser.add_argument("-c", "--config", action="store", help="Path to config file for testing",
+                        default="model_configs/panns/train_config.json")
     args = parser.parse_args()
 
-    test_df = pd.read_csv(args.path_to_input)
-    model_details = MODEL_DETAILS
-    panns_model = get_model(PANNsDense121Att, model_details["config"], model_details["weights_path"])
+    with open(args.config, "r") as f:
+        config = json.load(f)
 
-    pred_df = predict(test_df, panns_model, model_details)
+    PERIOD = config["PERIOD"]
+    SR = config["SR"]
+    vote_lim = config["vote_lim"]
+    TTA = config["TTA"]
+    BIRD_CODE = config["BIRD_CODE"]
+    INV_BIRD_CODE = {v: k for k, v in config["BIRD_CODE"].items()}
+    MODEL_DETAILS = config["MODEL_CONFIG"]
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model_details = MODEL_DETAILS
+    panns_model = get_model(PANNsDense121Att, model_details, model_details["wts_path"], device)
+
+    test_df = pd.read_csv(args.path_to_input)
+
+    pred_df = predict(test_df, panns_model, config["THRESHOLD"], config["CLIP_THRESHOLD"])
     print("Saving preds....")
     pred_df.to_csv(args.path_to_save_preds)
