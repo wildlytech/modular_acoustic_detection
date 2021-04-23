@@ -133,6 +133,8 @@ def predict(test_df, model, threshold, clip_threshold, framewise_output_path):
     total = 0
     pbar = trange(len(paths))
     pbar.set_description("Prediction Bar")
+    framewise_list = []
+    paths_list = []
     for ii in pbar:
         time.sleep(0.01)
         try:
@@ -145,7 +147,9 @@ def predict(test_df, model, threshold, clip_threshold, framewise_output_path):
 
         pred_df, clip_codes = prediction_for_clip(clip, model, threshold,
                                                   clip_threshold)
-        pred_df.to_csv(framewise_output_path)
+
+        framewise_list.append(pred_df)
+        paths_list.extend([paths[ii] for i in range(len(pred_df))])
         if len(clip_codes) == 0:
             clip_codes = ["NOCALL"]
         if labels[ii] in clip_codes:
@@ -158,6 +162,9 @@ def predict(test_df, model, threshold, clip_threshold, framewise_output_path):
         else:
             predictions["ebird_code"].append("NOCALL")
 
+    framewise_df = pd.concat(framewise_list)
+    framewise_df["filepaths"] = paths_list
+    framewise_df.to_csv("framewise_outputs.csv")
     return pd.DataFrame(predictions)
 
 
