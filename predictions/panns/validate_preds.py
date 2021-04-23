@@ -23,6 +23,5 @@ def top5_acc(df):
 
 for bird_name in bird_names:
     req = preds[preds["target"] == bird_name]
-    # accuracy = np.sum(req["preds"]==req["target"].values)/len(req)
     accuracy = top5_acc(req)
     print("BIRD NAME: ", bird_name, "TOP 3 ACCURACY: ", accuracy)
