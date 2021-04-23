@@ -144,7 +144,7 @@ def predict(test_df, model, threshold, clip_threshold):
 
             continue
 
-        pred_df, clip_codes = prediction_for_clip(clip, model, theshold,
+        pred_df, clip_codes = prediction_for_clip(clip, model, threshold,
                                                   clip_threshold)
         if len(clip_codes) == 0:
             clip_codes = ["NOCALL"]
