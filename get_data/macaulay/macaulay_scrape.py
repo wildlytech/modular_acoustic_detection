@@ -133,6 +133,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Scrapes macaulay audio lib using selenium")
     parser.add_argument("-b", "--browser", help="Browser of choice: C for Chrome and F for firefox", required=True)
     parser.add_argument("-sp", "--save_path", help="Path to save the audio clips", default="macaulay_audio/")
+    parser.add_argument("-csv", "--save_csv", help="Path to save asset id csv", default="asset_ids.csv")
     parser.add_argument("-cp", "--chrome_path", help="If chrome is the browser of choice, path to its webdriver")
     parser.add_argument("-l", "--link", help="Link to web page to be scraped",
                         default="https://www.macaulaylibrary.org/")
@@ -177,7 +178,7 @@ if __name__ == "__main__":
 
         try:
             final_df = pandas.concat(df_list)
-            final_df.to_csv(args.save_path)
+            final_df.to_csv(args.save_csv)
             print("DF Saved to: ", args.save_path)
             for i in range(len(final_df)):
                 audio_id = final_df["Asset_ID"][i]
@@ -210,6 +211,7 @@ if __name__ == "__main__":
                 raise BrowserArgException
 
             df = scrape(browser, args.query_name)
+            df.to_csv(args.save_csv)
             print("Scraping ", len(df), " audioclips")
             for i in range(len(df)):
                 audio_id = df["Asset_ID"][i]
