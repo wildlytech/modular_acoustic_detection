@@ -225,7 +225,7 @@ class CustomPanns(nn.Module):
 
 
 class PANNsDense121Att(nn.Module):
-    def __init__(self, sample_rate: int, window_size: int, hop_size: int,
+    def __init__(self, sample_rate: int, window_size: int, hop_size: int, act_classes: int, wts_path: str,
                  mel_bins: int, fmin: int, fmax: int, classes_num: int, apply_aug: bool, top_db=None):
         super().__init__()
 
