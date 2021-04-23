@@ -135,7 +135,6 @@ def predict(test_df, model, threshold, clip_threshold):
     pbar.set_description("Prediction Bar")
     for ii in pbar:
         time.sleep(0.01)
-        # print("Iteration ",ii+1,"of ",len(paths))
         try:
             clip, _ = librosa.load(paths[ii], sr=SR, mono=True, res_type="kaiser_fast")
             total += 1
