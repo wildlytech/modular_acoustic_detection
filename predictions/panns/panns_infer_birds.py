@@ -95,9 +95,9 @@ def prediction_for_clip(clip: np.ndarray,
                         onset_idx = detected[head_idx]
                         offset_idx = detected[tail_idx]
                         max_confidence = framewise_outputs[
-                            onset_idx:offset_idx, target_idx].max()
+                                         onset_idx:offset_idx, target_idx].max()
                         mean_confidence = framewise_outputs[
-                            onset_idx:offset_idx, target_idx].mean()
+                                          onset_idx:offset_idx, target_idx].mean()
 
                         if INV_BIRD_CODE[target_idx] in clip_codes:
                             estimated_event = {
@@ -146,6 +146,7 @@ def predict(test_df, model, threshold, clip_threshold):
 
         pred_df, clip_codes = prediction_for_clip(clip, model, threshold,
                                                   clip_threshold)
+        pred_df.to_csv("Framewise_outputs.csv")
         if len(clip_codes) == 0:
             clip_codes = ["NOCALL"]
         if labels[ii] in clip_codes:
