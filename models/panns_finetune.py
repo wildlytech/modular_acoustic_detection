@@ -7,7 +7,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
-import torch.nn as nn
+import torch.nn as nn  # noqa F401
 import torch.optim as optim
 from sklearn.model_selection import train_test_split
 import tqdm
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     EPOCHS = config["EPOCHS"]
     criterion = eval(config["LOSS"])
     optimizer = eval(config["OPTIM"])
-    optim = optimizer(model.parameters(), lr=config["LR"])
+    adam = optimizer(model.parameters(), lr=config["LR"])
 
     master_bar = tqdm.trange(EPOCHS, unit="Epochs")
 
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         pbar_t = tqdm.tqdm(train_dataloader, unit="batch", leave=False)
         pbar_t.set_description(f"Epoch: {epoch}")
         for ii, (x, y) in enumerate(pbar_t):
-            optim.zero_grad()
+            adam.zero_grad()
             image = x.unsqueeze(1)
 
             image = image.to(device)
@@ -155,7 +155,7 @@ if __name__ == "__main__":
                 print(e)
 
             loss.backward()
-            optim.step()
+            adam.step()
 
         model.eval()
         val_acc = 0.0
