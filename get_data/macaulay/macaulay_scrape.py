@@ -218,6 +218,5 @@ if __name__ == "__main__":
                 clip_name = df["ClipName"][i] + "_" + str(audio_id)
                 download_clip(audio_id, clip_name, args.save_path)
 
-
         except BrowserPathException as e:
             print(e)
