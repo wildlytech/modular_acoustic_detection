@@ -153,7 +153,6 @@ def predict(test_df, model, threshold, clip_threshold):
             acc_counter += 1
         if (ii + 1) % 10 == 0:
             pbar.set_postfix(accuracy=acc_counter / total)
-        #    print("Accuracy after ",(ii+1),"Iterations is ",(acc_counter/total))
         predictions["filepath"].append(paths[ii])
         if len(clip_codes) > 0:
             predictions["ebird_code"].append(clip_codes)
