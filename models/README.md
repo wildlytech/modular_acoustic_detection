@@ -39,3 +39,19 @@ d. batch_size: Batch size<br>
 e. networkCfgJson: Network architecture json file<br>
 - The script can be run using the following command:
 ```python -m models.param_search -params_path <Path to the parameter json file> -config_path <Path to the model config file>```
+
+
+#### 6. Panns Finetuning File
+
+- The file finetunes the Panns model based on input data
+- Make sure to run it only if you have a GPU Machine
+- Additional files required to for testing
+    - `checked_df_train.csv`: Csv of training audio clip names
+    - `checked_df_test.csv` : Csv of testing audio clip names
+    - Initial PANNs weights (e.g. `final_5fold_sed_dense121_nomix_fold0_checkpoint_50_score0.7219`)
+    - Folder containing split wavfiles (10 seconds) of corresponding audioclips
+- If using custom data make sure to bring your data files to these formats
+
+- To run Panns finetune: run `python models/panns_finetune.py` with the 
+appropriate arguments from the help menu.
+- Make sure to adjust the relevant filepaths and parameters in the `model_configs/panns/train_config.json`
