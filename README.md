@@ -3,11 +3,46 @@
 
 ## 1. Environment Setup
 
-#### 1.1 Ubuntu Environment Setup
-*Note*: Recommended to install Anaconda to manage the different environment and to avoid package/library version conflicts
-Download: [Download Anaconda](https://www.anaconda.com/distribution/)
+#### Recommended System Requirements:
+##### Local Hosting Setup:
+- 2 Core CPU / 4 GiB RAM
+- OS: Ubuntu 18:04
+##### Cloud Hosting on AWS
+- AWS Instance: t*.medium or above
+- AWS AMI: ami-0b84c6433cdbe5c3e (Ubuntu 18:04)
 
-- ##### Create a separate environment with python 3.7 Version
+#### 1.1 Local Repository setup
+
+- #####  Clone the Repository
+**IMPORTANT**: Make sure to add GitHub SSH Keys to your local system before cloning the repository.\
+Guide: [Add SSH key to GitHub](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+
+```shell
+$ git clone git@github.com:wildlytech/modular_acoustic_detection.git
+```
+
+- #####  To load all git sub modules :
+```shell
+# Change to directory
+$ cd modular_acoustic_detection
+
+$ git submodule update --init --recursive
+```
+- ##### To download all the data files :
+```shell
+# Make script executable
+$ chmod 777 download_data_files.sh
+
+$ ./download_data_files.sh
+```
+
+#### 1.2 Python environment Setup
+
+##### Approach 1:
+**Note**: Recommended to install Anaconda to manage the different environment and to avoid package/library version conflicts.\
+Download: [Anaconda](https://www.anaconda.com/distribution/)
+
+- ##### Create a separate environment with Python 3.7 Version
 ```shell
 $ conda create -n env_name python=3.7
 ```
@@ -22,34 +57,10 @@ $ conda activate env_name
 (env_name)$
 ```
 
-#### 1.2 Local Repository setup
-
-- #####  Clone the Repository
-```shell
-$ git clone https://github.com/wildlytech/modular_acoustic_detection.git
-```
-
-- #####  To load all git sub modules :
-```shell
-$ git submodule update --init --recursive
-```
-- ##### To download all the data files :
-```shell
-# Make script executable
-$ chmod 777 download_data_files.sh
-
-$ ./download_data_files.sh
-```
-
-#### 1.3 Python environment Setup
-To install all the required library python packages at one go. Type in the command mentioned below
-##### Approach 1:
-```shell
-$ pip install -r requirements.txt
-```
-**Note** :  Approach 1 is Preferred method as all the packages are freezed automatically here.
-
 ##### Approach 2:
+**Note**: This method is an alternate to using Anaconda and to instead use Python virtualenv environments.\
+
+- ##### Install required Ubuntu Packages
 ```shell
 # Make script executable
 $ chmod 777 ubuntu_packages_install.sh
@@ -57,6 +68,28 @@ $ chmod 777 ubuntu_packages_install.sh
 # Run script to install
 $ ./ubuntu_packages_install.sh
 ```
+
+- ##### Create virtual environment with Python 3.7 Version
+```shell
+$ virtualenv -p python3.7 env_name
+```
+**Note**: Change ```env_name``` to your convenient name
+
+- ##### To load your virtual environment
+```shell
+$ cd env_name
+
+# activate the virtual environment
+$ source bin/activate
+```
+
+#### **Important:** Install Python requirements for either approach:
+- To install all the required library python packages at one go. Type in the command mentioned below
+
+```shell
+$ pip install -r requirements.txt
+```
+
 <br>
 
 ## 2. Getting Audio Data
@@ -85,7 +118,7 @@ This will download the embeddings as ```.pkl``` files at the directory where you
 
 ```shell
 $ python generating_embeddings.py   --wav_file
-				    --path_to_write_embeddings
+                    --path_to_write_embeddings
 ```
 ###### Output of above script will return :
 - Embeddings in ```.pkl``` files for each downloaded audio file at specified directory. (```--wav_file``` requires the directory path where ```.wav``` files are saved )
@@ -95,13 +128,13 @@ $ python generating_embeddings.py   --wav_file
 ## 5. Create Base Dataframe
 - This will add the generated embedding values of each audio file to base dataframe columns if it already exists ```(TYPE 1)```, otherwise it creates base dataframe with ```["wav_file", "features"]``` columns i.e ```(TYPE 2)```. Final dataframe will now have one extra column when compared with ```downloaded_base_dataframe.pkl``` i.e with ```["features"]```
 - About Arguments:
-	-  ```-dataframe_without_feature``` : If ```TYPE 1``` dataframe exists already, path of it should be given otherwise it can be ignored
-	-  ```-path_for_saved_embeddings``` : Directory path where all the ```.pkl``` files are saved
-	-  ```-path_to_write_dataframe``` : Path along with name of the file with ```.pkl``` extension to write the final dataframe
+    -  ```-dataframe_without_feature``` : If ```TYPE 1``` dataframe exists already, path of it should be given otherwise it can be ignored
+    -  ```-path_for_saved_embeddings``` : Directory path where all the ```.pkl``` files are saved
+    -  ```-path_to_write_dataframe``` : Path along with name of the file with ```.pkl``` extension to write the final dataframe
 ```shell
 $ python create_base_dataframe.py [-h] -dataframe_without_feature
-				       -path_for_saved_embeddings
-				       -path_to_write_dataframe
+                       -path_for_saved_embeddings
+                       -path_to_write_dataframe
 ```
 ###### Output of this script will return :
 -  If  ```-dataframe_without_feature``` ```(TYPE 1)``` dataframe is inputted then ```["features]``` column is added to same dataframe, if not a new dataframe with ```["wav_file", "features"]``` columns is stored
@@ -160,8 +193,8 @@ $ cd compression/
 
 -   Definition of Goertzel Filter: [Wikipedia Source](https://en.wikipedia.org/wiki/Goertzel_algorithm)
 - Navigate to goertzel_filter/ directory if you want to :
-	- Visualize the audio file in spectrogram after applying goertzel filter
-	- Extract  particular frequency components of an audio file
+    - Visualize the audio file in spectrogram after applying goertzel filter
+    - Extract  particular frequency components of an audio file
 - To navigate to ```goertzel_filter/``` directory follow the below command
 ```shell
 $ cd goertzel_filter/
@@ -173,18 +206,15 @@ $ cd goertzel_filter/
 ## 11. Dash User Interface Applications
 - About Dash Framework: [Dash | Plotly](https://plot.ly/dash/)
 - We have used Dash framework for building local web apps for different purposes stated below
-	- **Audio Annotation** : We can annotate audio files (.wav format) in any folder present locally and save all the annotations in ```.csv file```. It also enables to view spectrogram and see the model's prediction for that wavfile
-		- To annotate audio files navigate to [Dash_integration/annotation/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/annotation)
-		- Follow the command to navigate to that folder in terminal
-		- ``` $ cd Dash_integraion/annotation/```
-	- **Device Report** : Enables to see generate a concise report for each device that is uploading files in FTP server. Device parameters such as Battery performance, Location Details etc can be visualized using this app
-		- To generate report navigate to  [Dash_integration/device_report/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/device_report)
-		- Follow the command to navigate to this folder in terminal
-		- ``` $ cd Dash_integraion/device_report/```
-	- **Monitoring and Alert** : Enables user to monitor FTP server directories, Device(s), get alert based on detection of any sounds of interest, upload multiple audio wavfiles to see the predictions etc
-		- To monitor and get alerts via SMS navigate to [Dash_integration/monitoring_alert/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/monitoring_alert)
-		- Follow the command in terminal to navigate to this
-		- ``` $ cd Dash_integration/monitoring_alert/ ```
-
-
-
+    - **Audio Annotation** : We can annotate audio files (.wav format) in any folder present locally and save all the annotations in ```.csv file```. It also enables to view spectrogram and see the model's prediction for that wavfile
+        - To annotate audio files navigate to [Dash_integration/annotation/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/annotation)
+        - Follow the command to navigate to that folder in terminal
+        - ``` $ cd Dash_integraion/annotation/```
+    - **Device Report** : Enables to see generate a concise report for each device that is uploading files in FTP server. Device parameters such as Battery performance, Location Details etc can be visualized using this app
+        - To generate report navigate to  [Dash_integration/device_report/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/device_report)
+        - Follow the command to navigate to this folder in terminal
+        - ``` $ cd Dash_integraion/device_report/```
+    - **Monitoring and Alert** : Enables user to monitor FTP server directories, Device(s), get alert based on detection of any sounds of interest, upload multiple audio wavfiles to see the predictions etc
+        - To monitor and get alerts via SMS navigate to [Dash_integration/monitoring_alert/](https://github.com/wildlytech/modular_acoustic_detection/tree/master/Dash_integration/monitoring_alert)
+        - Follow the command in terminal to navigate to this
+        - ``` $ cd Dash_integration/monitoring_alert/ ```
