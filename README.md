@@ -58,7 +58,7 @@ $ conda activate env_name
 ```
 
 ##### Approach 2:
-**Note**: This method is an alternate to using Anaconda and to instead use Python virtualenv environments.\
+**Note**: This method is an alternate to using Anaconda and to instead use Python virtualenv environments.
 
 - ##### Install required Ubuntu Packages
 ```shell
