@@ -713,8 +713,4 @@ if __name__ == '__main__':
     if PARSED_ARGS.public:
         app.run_server(debug=True, host='0.0.0.0', use_reloader=True)
     else:
-<<<<<<< HEAD
         app.run_server(debug=True, use_reloader=True)
-=======
-        app.run_server(debug=True, use_reloader=True)
->>>>>>> ad13eb943cb62f74cd2a43fc19e9e0589375695d
