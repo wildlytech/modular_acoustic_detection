@@ -694,6 +694,8 @@ if __name__ == '__main__':
     ###########################################################################
     ARGUMENT_PARSER = argparse.ArgumentParser(description=DESCRIPTION)
     OPTIONAL_NAMED = ARGUMENT_PARSER._action_groups.pop()
+    OPTIONAL_NAMED.add_argument("-p", "--public", action="store_true",
+                                help="Make app public (not local) for other remote clients to access")
 
     REQUIRED_NAMED = ARGUMENT_PARSER.add_argument_group('required arguments')
     REQUIRED_NAMED.add_argument('-predictions_cfg_json',
@@ -708,5 +710,7 @@ if __name__ == '__main__':
     # Import json data
     ###########################################################################
     CONFIG_DATAS = get_results_binary_relevance.import_predict_configuration_json(PARSED_ARGS.predictions_cfg_json)
-
-    app.run_server(debug=True, use_reloader=True)
+    if PARSED_ARGS.public:
+        app.run_server(debug=True, host='0.0.0.0', use_reloader=True)
+    else:
+        app.run_server(debug=True, use_reloader=True)
